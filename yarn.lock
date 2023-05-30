@@ -7758,6 +7758,11 @@ react-flagkit@^2.0.4:
   resolved "https://registry.npmjs.org/react-flagkit/-/react-flagkit-2.0.4.tgz"
   integrity sha512-e0Rak6VG1+KemBFqLqTPzFDLYS40lEW1YOpG9s68WDoEoQiC0YPEXDkIGLorNgP6omJztcg/OtcjSqAKM2O1cw==
 
+react-ga4@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/react-ga4/-/react-ga4-2.1.0.tgz"
+  integrity sha512-ZKS7PGNFqqMd3PJ6+C2Jtz/o1iU9ggiy8Y8nUeksgVuvNISbmrQtJiZNvC/TjDsqD0QlU5Wkgs7i+w9+OjHhhQ==
+
 react-i18next@^12.3.1:
   version "12.3.1"
   resolved "https://registry.npmjs.org/react-i18next/-/react-i18next-12.3.1.tgz"
