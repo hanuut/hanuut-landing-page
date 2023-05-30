@@ -8,22 +8,35 @@ const Container = styled.div`
   font-size: ${(props) => props.theme.fontlg};
   line-height: 1.5;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+  @media (max-width: 768px) {
+    width: 85%;
+    font-size: ${(props) => props.theme.fontmd};
+  }
 `;
 const Heading = styled.h1`
   font-size: ${(props) => props.theme.fontLargest};
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontxxxl};
+  }
 `;
 
 const SubHeading = styled.h2`
   font-size: ${(props) => props.theme.fontxxxl};
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontxxl};
+  }
 `;
 
 const Paragraph = styled.p`
-  font-size: ${(props) => props.theme.font};
+  font-size: ${(props) => props.theme.fontlg};
   margin-bottom: 10px;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontmd};
+  }
 `;
 
 const List = styled.ul`
