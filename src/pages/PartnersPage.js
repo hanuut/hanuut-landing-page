@@ -22,12 +22,23 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+  @media (max-width: 768px) {
+    width: 90%;
+    min-height: 100%;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  
+  }
 `;
 const RightBox = styled.div`
   width: 40%;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
   
 `;
 const PartnersImageContainer = styled.img`
@@ -43,6 +54,10 @@ const LeftBox = styled.div`
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  @media (max-width: 768px) {
+    width: 100%;
+    
+  }
 `;
 const Heading = styled.h1`
   width: 80%;
@@ -51,17 +66,30 @@ const Heading = styled.h1`
   color: ${(props) => props.theme.primaryColor};
   font-weight: 900;
   text-transform: uppercase;
+  @media (max-width: 768px) {
+    width: 90%;
+    font-size: ${(props) => props.theme.fontxxxl};
+  }
+
   
 `;
 const SubHeading = styled.h2`
   width: 100%;
   font-size: ${(props) => props.theme.fontxxxl};
   margin-bottom: 2rem;
+  @media (max-width: 768px) {
+    width: 90%;
+    font-size: ${(props) => props.theme.fontxl};
+  }
 `;
 const Paragraph = styled.p`
   width: 100%;
   font-size: ${(props) => props.theme.fontxl};
   margin-bottom: 1rem;
+  @media(max-width: 768px) {
+    width: 90%;
+    font-size: ${(props) => props.theme.fontmd};
+  }
 `;
 
 const InputContainer = styled.div`
@@ -72,6 +100,10 @@ const InputContainer = styled.div`
   padding: 0.5rem;
   border: 1px solid ${(props) => props.theme.primaryColor};
   margin-bottom: 0.5rem;
+  @media (max-width: 768px) {
+    width: 90%;
+    font-size: ${(props) => props.theme.fontsm};
+  }
 `;
 
 const Input = styled.input`
@@ -82,6 +114,7 @@ const Input = styled.input`
   &:focus {
     outline: none;
   }
+
 `;
 
 const Button = styled.button`
@@ -92,10 +125,15 @@ const Button = styled.button`
   padding: ${(props) => props.theme.actionButtonPadding};
   font-size: ${(props) => props.theme.fontxl};
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
 
   &:hover {
     transform: scale(1.03);
+  }
+
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontlg};
+    padding: ${(props) => props.theme.actionButtonPaddingMobile};
   }
 `;
 
@@ -103,6 +141,10 @@ const SmallParagraph = styled.p`
   width: 100%;
   font-size: ${(props) => props.theme.fontmd};
   margin-bottom: 1rem;
+  @media (max-width: 768px) {
+    width: 90%;
+    font-size: ${(props) => props.theme.fontsm};
+  }
 `;
 
 const PartnersPage = () => {

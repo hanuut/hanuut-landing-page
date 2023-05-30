@@ -36,8 +36,7 @@ const Menu = styled.ul`
   justify-content: space-between;
   align-items: center;
   list-style: none;
-
-
+  
   @media (max-width: 768px) {
     position: absolute;
     top: ${(props) => props.theme.navHeight};
@@ -50,7 +49,7 @@ const Menu = styled.ul`
     background-color: ${(props) => props.theme.body};
     transform: ${(props) =>
       props.show ? "translateY(0px)" : "translateY(-150%)"};
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.5s ease-in-out;
     z-index: 2;
   }
 `;
@@ -66,7 +65,7 @@ const MenuItem = styled.li`
     width: 0%;
     height: 2px;
     border-radius: 2px;
-    transition: width 0.3s ease;
+    transition: width 0.5s ease;
     background-color: ${(props) => props.theme.text};
   }
   &:hover::after {
@@ -74,6 +73,7 @@ const MenuItem = styled.li`
   }
   @media (max-width: 768px) {
     margin: 0;
+    font-size: ${(props) => props.theme.fontmd};
   }
 
 `;
@@ -84,6 +84,7 @@ const LanguageMenuItem = styled.li`
   cursor: pointer;
   @media (max-width: 768px) {
     margin: 0;
+    font-size: ${(props) => props.theme.fontmd};
   }
 
 `;
@@ -100,17 +101,17 @@ const HamburgerMenu = styled.span`
   background-color: ${(props) => props.theme.text};
   position: absolute;
   top: 2.5rem;
-  right: 0;
+  right: ${(props) => (props.isArabic ? "80%" : "0")};
   transform: translateX(-100%);
 
   display: none;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease;
   cursor: pointer;
 
   @media (max-width: 768px) {
-    top: 2.5rem;
+    top: 2.4rem;
     display: flex;
   }
 
@@ -121,7 +122,7 @@ const HamburgerMenu = styled.span`
     height: 2px;
     background-color: ${(props) => props.theme.text};
     position: absolute;
-    transition: transform 0.3s ease;
+    transition: transform 0.5s ease;
   }
 
   &::after {
@@ -160,9 +161,9 @@ const Navbar = () => {
       <Navigation isArabic={i18n.language === "ar"}>
         <Logo className="partnerLogo"/>
         <HamburgerMenuContainer onClick={handleClick}>
-          <HamburgerMenu className={isActive ? "active" : ""} />
+          <HamburgerMenu isArabic={i18n.language === "ar"} className={isActive ? "active" : ""}  />
         </HamburgerMenuContainer>
-        <Menu show={isActive} isArabic={i18n.language === "ar"}>
+        <Menu show={isActive} isArabic={i18n.language === "ar"} >
           <MenuItem>
             <Link to="/" onClick={handleMenuItemClick}>
             {t('navHome')}
@@ -173,16 +174,16 @@ const Navbar = () => {
             {t('navPartners')}
             </Link>
           </MenuItem>
-          <MenuItem>
+          {/* <MenuItem>
              <Link to="/solutions" onClick={handleMenuItemClick}>
              {t('navSolution')}
             </Link>
-          </MenuItem>
-          <MenuItem>
+          </MenuItem> */}
+          {/* <MenuItem>
           <Link to="/contact" onClick={handleMenuItemClick}>
           {t('navContact')}
             </Link>
-          </MenuItem>
+          </MenuItem> */}
           <LanguageMenuItem>
           <LanguagesDropDown className="languageMenuItem"/>
           </LanguageMenuItem>

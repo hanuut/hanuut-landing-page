@@ -13,10 +13,9 @@ const Section = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  @media (max-width: 768px) {
-    min-height: 100vh;
-  }
+
 `;
+
 const Container = styled.div`
   width: 80%;
   display: flex;
@@ -24,20 +23,41 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+
+  @media (max-width: 768px) {
+    width: 90%;
+    min-height: 100%;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 7rem;
+  }
 `;
+
 const RightBox = styled.div`
   width: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
 `;
+
 const LeftBox = styled.div`
   width: 40%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    
+  }
 `;
+
 const Heading = styled.h1`
   width: 80%;
   margin-bottom: 0.5rem;
@@ -45,16 +65,33 @@ const Heading = styled.h1`
   color: ${(props) => props.theme.primaryColor};
   font-weight: 900;
   text-transform: uppercase;
+
+  @media (max-width: 768px) {
+    width: 90%;
+    font-size: ${(props) => props.theme.fontxxxl};
+  }
 `;
+
 const SubHeading = styled.h2`
   width: 100%;
   font-size: ${(props) => props.theme.fontxxxl};
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    width: 90%;
+    font-size: ${(props) => props.theme.fontxl};
+  }
 `;
+
 const Paragraph = styled.p`
   width: 100%;
   font-size: ${(props) => props.theme.fontxl};
   margin-bottom: 1rem;
+
+  @media(max-width: 768px) {
+    width: 90%;
+    font-size: ${(props) => props.theme.fontmd};
+  }
 `;
 
 const Button = styled.button`
@@ -65,10 +102,16 @@ const Button = styled.button`
   padding: ${(props) => props.theme.actionButtonPadding};
   font-size: ${(props) => props.theme.fontxl};
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   margin-bottom: 0.5rem;
+
   &:hover {
     transform: scale(1.03);
+  }
+
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontmd};
+    padding: ${(props) => props.theme.actionButtonPaddingMobile};
   }
 `;
 
@@ -76,22 +119,30 @@ const SmallParagraph = styled.p`
   width: 100%;
   font-size: ${(props) => props.theme.fontmd};
   margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    width: 90%;
+    font-size: ${(props) => props.theme.fontsm};
+  }
 `;
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();
+
   return (
     <Section>
       <Container isArabic={i18n.language === "ar"}>
         <LeftBox>
-          <Heading> {t("homeHeading")}</Heading>
+          <Heading>{t("homeHeading")}</Heading>
           <SubHeading>{t("homeSubHeading")}</SubHeading>
           <Paragraph>{t("homeParagraph")}</Paragraph>
-            <Button>{t("homeInputButton")}</Button>
+          <Button>{t("homeInputButton")}</Button>
           <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>
         </LeftBox>
         <RightBox>
-          <HomeCarousel images = {[homeIllustration1, homeIllustration2, homeIllustration3]}/>
+          <HomeCarousel
+            images={[homeIllustration1, homeIllustration2, homeIllustration3]}
+          />
         </RightBox>
       </Container>
     </Section>

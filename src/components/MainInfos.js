@@ -27,19 +27,19 @@ const InfoItem = styled.div`
 const Email = styled.a`
   text-decoration: none;
   color: ${(props) => props.theme.body};
-  transition: all 0.2s ease;
+  transition: all 0.5s ease;
 `;
 
 const Address = styled.a`
   text-decoration: none;
   color: ${(props) => props.theme.body};
-  transition: all 0.2s ease;
+  transition: all 0.5s ease;
 `;
 
 const Phone = styled.a`
   text-decoration: none;
   color: ${(props) => props.theme.body};
-  transition: all 0.2s ease;
+  transition: all 0.5s ease;
 `;
 const MainInfos = () => {
   return (
