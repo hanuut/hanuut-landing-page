@@ -31,6 +31,7 @@ const UpperBox = styled.div`
    }
 `;
 const LeftBox = styled.div`
+
 `;
 
 const RightBox = styled.div`
@@ -38,11 +39,12 @@ const RightBox = styled.div`
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 1rem;
   @media (max-width: 768px) {
    flex-direction: column;
    gap: 0.5rem;
+  
   }
 `;
 

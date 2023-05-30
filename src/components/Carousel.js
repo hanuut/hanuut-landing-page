@@ -8,8 +8,6 @@ const CarouselContainer = styled.div`
   align-items: center;
   position: relative;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  
-  
 `;
 
 const CarouselImage = styled.img`

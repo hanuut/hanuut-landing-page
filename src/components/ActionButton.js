@@ -18,6 +18,10 @@ const Button = styled.button`
   &:active {
     background-color: ${(props) => props.theme.secondaryColor};
   }
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontlg};
+    padding: ${(props) => props.theme.actionButtonPaddingMobile};
+  }
 `;
 
 const ActionButton = ({ children, onClick }) => {

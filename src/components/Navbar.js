@@ -185,7 +185,7 @@ const Navbar = () => {
             </Link>
           </MenuItem> */}
           <LanguageMenuItem>
-          <LanguagesDropDown className="languageMenuItem"/>
+          <LanguagesDropDown className="languageMenuItem" handleChooseLanguage= {handleMenuItemClick}/>
           </LanguageMenuItem>
         </Menu>
       </Navigation>
