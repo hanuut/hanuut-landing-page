@@ -66,7 +66,6 @@ const SotialMediaContainer = styled.div`
 `;
 
 const SocialMediaIcon = styled.h1`
-font-size: ${(props) => props.theme.fontxxxl};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -75,6 +74,9 @@ font-size: ${(props) => props.theme.fontxxxl};
     cursor: pointer;
     color: ${(props) => props.theme.secondaryColor};
   }
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontxxl};
+   }
 `;
 const LowerBox = styled.div`
   display: flex;
