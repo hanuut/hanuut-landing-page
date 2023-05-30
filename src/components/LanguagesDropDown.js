@@ -21,6 +21,9 @@ const Menu = styled.div`
   ${Container}:hover & {
     display: block;
   }
+  @media (max-width: 768px) {
+    right: -11%;
+  }
 `;
 
 const MenuItem = styled.div`

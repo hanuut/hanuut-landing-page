@@ -9,7 +9,7 @@ const Button = styled.button`
   border-radius: ${(props) => props.theme.defaultRadius};
   font-size: ${(props) => props.theme.fontxxxl};
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   
   &:hover {
     transform: scale(1.03);

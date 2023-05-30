@@ -8,6 +8,9 @@ const Section = styled.h1`
     letter-spacing: 1px;
     color: ${(props) => props.theme.primaryColor}; 
     cursor: default;
+    @media (max-width: 768px) {
+      font-size: ${(props) => props.theme.fontxxxl};
+     }
 `;
 
 const Logo = () => {

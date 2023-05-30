@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 
-
-
 const CarouselContainer = styled.div`
   width: 100%;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   position: relative;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+  
+  
 `;
 
 const CarouselImage = styled.img`
@@ -18,7 +18,10 @@ const CarouselImage = styled.img`
   object-fit: cover;
   position: absolute;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
-`;
+  @media (max-width: 768px) {
+    max-width: 24%;
+  }
+  `;
 
 const slide = keyframes`
   0% {
@@ -37,6 +40,10 @@ const CenterImage = styled(CarouselImage)`
   opacity: 1;
   max-width: 42%;
   animation: ${slide} 0.5s ease;
+  @media (max-width: 768px) {
+    max-width: 30%;
+    
+  }
 `;
 
 const BackImage = styled(CarouselImage)`
@@ -48,10 +55,16 @@ const BackImage = styled(CarouselImage)`
 
 const LeftImage = styled(BackImage)`
   transform: translate(-10.5rem, 1.25rem) rotate(-15deg);
+  @media (max-width: 768px) {
+    transform: translate(-4rem, 0) rotate(0deg);
+  }
 `;
 
 const RightImage = styled(BackImage)`
   transform: translate(10.5rem, 1.25rem) rotate(15deg);
+  @media (max-width: 768px) {
+    transform: translate(4rem, 0) rotate(0deg);
+  }
 `;
 
 const Carousel = ({ images }) => {

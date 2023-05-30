@@ -23,19 +23,34 @@ const UpperBox = styled.div`
   justify-content: space-between;
   align-items: center;
   overflow-x: hidden;
+  @media (max-width: 768px) {
+    padding: 0.8rem 0;
+    min-width: 90%;
+    justify-content: space-between;
+    align-items: flex-start;
+   }
 `;
-const LeftBox = styled.div``;
+const LeftBox = styled.div`
+`;
 
 const RightBox = styled.div`
+
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   justify-content: center;
   gap: 1rem;
+  @media (max-width: 768px) {
+   flex-direction: column;
+   gap: 0.5rem;
+  }
 `;
 
 const Title = styled.h1`
   color: white;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontxxl};
+   }
 `;
 
 const SotialMediaContainer = styled.div`
@@ -44,10 +59,14 @@ const SotialMediaContainer = styled.div`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  @media (max-width: 768px) {
+    gap: 1rem;
+   }
  
 `;
 
 const SocialMediaIcon = styled.h1`
+font-size: ${(props) => props.theme.fontxxxl};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -69,10 +88,11 @@ const FooterText = styled.p`
   padding: 0.5rem 0;
   color: ${(props) => props.theme.body};
   letter-spacing: 2px;
-  font-size: ${(props) => props.theme.fontsm};
+  font-size: ${(props) => props.theme.fontxs};
   margin: 0;
   @media (max-width: 768px) {
     text-align: center;
+    padding: 0.7rem 0;
   }
 `;
 const Footer = () => {
