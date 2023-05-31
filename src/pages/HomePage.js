@@ -2,9 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import HomeCarousel from "../components/Carousel";
-import homeIllustration1 from "../assets/screenshot1.jpeg";
-import homeIllustration2 from "../assets/screenshot2.jpg";
-import homeIllustration3 from "../assets/screenshot3.jpg";
+import HomeIllustration1 from "../assets/screenshot1.jpeg";
+import HomeIllustration2 from "../assets/screenshot2.jpg";
+import HomeIllustration3 from "../assets/screenshot3.jpg";
+import { Link } from "react-router-dom";
+// import Values from "./Sections/Values";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -13,7 +15,9 @@ const Section = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+  }
 `;
 
 const Container = styled.div`
@@ -23,25 +27,22 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-
   @media (max-width: 768px) {
     width: 90%;
-    min-height: 100%;
     flex-direction: column-reverse;
     align-items: flex-start;
-    gap: 7rem;
   }
 `;
 
 const RightBox = styled.div`
   width: 50%;
+  
   display: flex;
   align-items: center;
   justify-content: center;
-  
   @media (max-width: 768px) {
     width: 100%;
-    margin-bottom: 1rem;
+    padding: 45% 0;
   }
 `;
 
@@ -51,10 +52,8 @@ const LeftBox = styled.div`
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  
   @media (max-width: 768px) {
     width: 100%;
-    
   }
 `;
 
@@ -88,7 +87,7 @@ const Paragraph = styled.p`
   font-size: ${(props) => props.theme.fontxl};
   margin-bottom: 1rem;
 
-  @media(max-width: 768px) {
+  @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontmd};
   }
@@ -118,7 +117,7 @@ const Button = styled.button`
 const SmallParagraph = styled.p`
   width: 100%;
   font-size: ${(props) => props.theme.fontmd};
-  margin-bottom: 1rem;
+  opacity: 0.75;
 
   @media (max-width: 768px) {
     width: 90%;
@@ -128,24 +127,29 @@ const SmallParagraph = styled.p`
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();
+  const link = "https://docs.google.com/forms/d/e/1FAIpQLScDMEL5ruTmJNRXrlzKOaMq6637CfDqwr7RUxk2aFdlxdI-NA/viewform";
 
-  return (
+  return (<>
     <Section>
       <Container isArabic={i18n.language === "ar"}>
         <LeftBox>
           <Heading>{t("homeHeading")}</Heading>
           <SubHeading>{t("homeSubHeading")}</SubHeading>
           <Paragraph>{t("homeParagraph")}</Paragraph>
-          <Button>{t("homeInputButton")}</Button>
+          <Link to={link}>
+            <Button>{t("homeInputButton")}</Button>
+          </Link>
           <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>
         </LeftBox>
         <RightBox>
           <HomeCarousel
-            images={[homeIllustration1, homeIllustration2, homeIllustration3]}
+            images={[HomeIllustration1, HomeIllustration2, HomeIllustration3]}
           />
         </RightBox>
       </Container>
     </Section>
+    {/* <Values /> */}
+    </>
   );
 };
 

@@ -71,12 +71,14 @@ const SocialMediaIcon = styled.h1`
   display: flex;
   justify-content: center;
   align-items: center;
-  color: ${(props) => props.theme.primaryColor};
+  color: ${(props) => props.theme.body};
   &:hover{
     cursor: pointer;
-    color: ${(props) => props.theme.secondaryColor};
+    color: ${(props) => props.theme.primaryColor};
+    transform: scale(1.1);
   }
   @media (max-width: 768px) {
+   
     font-size: ${(props) => props.theme.fontxxl};
    }
 `;
@@ -101,6 +103,7 @@ const FooterText = styled.p`
 `;
 const Footer = () => {
     const { t, i18n } = useTranslation();
+    const instagramLink = "https://www.instagram.com/hanuut_app/" ;
   return (
     <Section isArabic={i18n.language === "ar"}>
       <UpperBox>
@@ -115,7 +118,7 @@ const Footer = () => {
                 <FaFacebook />
               </SocialMediaIcon>
             </Link>
-            <Link to="#">
+            <Link to={instagramLink}>
               <SocialMediaIcon>
                 <FaInstagram />
               </SocialMediaIcon>
