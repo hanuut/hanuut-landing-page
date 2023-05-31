@@ -35,14 +35,15 @@ const LeftBox = styled.div`
 `;
 
 const RightBox = styled.div`
-
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 1rem;
+  
   @media (max-width: 768px) {
    flex-direction: column;
+
    gap: 0.5rem;
   
   }
@@ -50,6 +51,7 @@ const RightBox = styled.div`
 
 const Title = styled.h1`
   color: white;
+  background-color: green;
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontxxl};
    }
@@ -58,8 +60,6 @@ const Title = styled.h1`
 const SotialMediaContainer = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: center;
   gap: 0.5rem;
   @media (max-width: 768px) {
     gap: 1rem;
