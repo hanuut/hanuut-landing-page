@@ -93,11 +93,17 @@ const LowerBox = styled.div`
 const FooterText = styled.p`
   padding: 0.5rem 0;
   color: ${(props) => props.theme.body};
-  letter-spacing: 2px;
-  font-size: ${(props) => props.theme.fontxs};
+  letter-spacing: ${(props) => (props.isArabic ? "0" : "2px")};
+  font-size: ${(props) => props.theme.fontsm};
   margin: 0;
+  .footerLink{
+    &:hover {
+      color: ${(props) => props.theme.primaryColor};
+    }
+  }
   @media (max-width: 768px) {
     text-align: center;
+    font-size: ${(props) => props.theme.fontxs};
     padding: 0.7rem 0;
   }
 `;
@@ -127,10 +133,10 @@ const Footer = () => {
         </RightBox>
       </UpperBox>
       <LowerBox>
-      <FooterText>
+      <FooterText isArabic={i18n.language === "ar"}>
         {t('footerAllRightsReserved')}
-        <Link to="/privacy policy">{t('footerPrivacyAndPolicy')}</Link> 
-        <Link to="/terms and conditions">{t('footerTermsOfUse')}</Link>
+        <Link className="footerLink" to="/privacy policy">{t('footerPrivacyAndPolicy')}</Link> 
+        <Link className="footerLink" to="/terms and conditions">{t('footerTermsOfUse')}</Link>
       </FooterText>
       </LowerBox>
     </Section>
