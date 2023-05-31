@@ -28,33 +28,31 @@ const UpperBox = styled.div`
     min-width: 90%;
     justify-content: space-between;
     align-items: flex-start;
-   }
+  }
 `;
-const LeftBox = styled.div`
-
-`;
+const LeftBox = styled.div``;
 
 const RightBox = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   gap: 1rem;
-  
-  @media (max-width: 768px) {
-   flex-direction: column;
 
-   gap: 0.5rem;
-  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 `;
 
 const Title = styled.h1`
   color: white;
-  background-color: green;
+
+  line-height: 1;
+
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontxxl};
-   }
+  }
 `;
 
 const SotialMediaContainer = styled.div`
@@ -63,8 +61,7 @@ const SotialMediaContainer = styled.div`
   gap: 0.5rem;
   @media (max-width: 768px) {
     gap: 1rem;
-   }
- 
+  }
 `;
 
 const SocialMediaIcon = styled.h1`
@@ -72,15 +69,14 @@ const SocialMediaIcon = styled.h1`
   justify-content: center;
   align-items: center;
   color: ${(props) => props.theme.body};
-  &:hover{
+  &:hover {
     cursor: pointer;
     color: ${(props) => props.theme.primaryColor};
     transform: scale(1.1);
   }
   @media (max-width: 768px) {
-   
     font-size: ${(props) => props.theme.fontxxl};
-   }
+  }
 `;
 const LowerBox = styled.div`
   display: flex;
@@ -96,7 +92,7 @@ const FooterText = styled.p`
   letter-spacing: ${(props) => (props.isArabic ? "0" : "2px")};
   font-size: ${(props) => props.theme.fontsm};
   margin: 0;
-  .footerLink{
+  .footerLink {
     &:hover {
       color: ${(props) => props.theme.primaryColor};
     }
@@ -108,8 +104,8 @@ const FooterText = styled.p`
   }
 `;
 const Footer = () => {
-    const { t, i18n } = useTranslation();
-    const instagramLink = "https://www.instagram.com/hanuut_app/" ;
+  const { t, i18n } = useTranslation();
+  const instagramLink = "https://www.instagram.com/hanuut_app/";
   return (
     <Section isArabic={i18n.language === "ar"}>
       <UpperBox>
@@ -117,7 +113,7 @@ const Footer = () => {
           <Logo />
         </LeftBox>
         <RightBox>
-          <Title>{t('footerFindUs')}</Title>
+          <Title>{t("footerFindUs")}</Title>
           <SotialMediaContainer isArabic={i18n.language === "ar"}>
             <Link to="#">
               <SocialMediaIcon>
@@ -133,11 +129,15 @@ const Footer = () => {
         </RightBox>
       </UpperBox>
       <LowerBox>
-      <FooterText isArabic={i18n.language === "ar"}>
-        {t('footerAllRightsReserved')}
-        <Link className="footerLink" to="/privacy policy">{t('footerPrivacyAndPolicy')}</Link> 
-        <Link className="footerLink" to="/terms and conditions">{t('footerTermsOfUse')}</Link>
-      </FooterText>
+        <FooterText isArabic={i18n.language === "ar"}>
+          {t("footerAllRightsReserved")}
+          <Link className="footerLink" to="/privacy policy">
+            {t("footerPrivacyAndPolicy")}
+          </Link>
+          <Link className="footerLink" to="/terms and conditions">
+            {t("footerTermsOfUse")}
+          </Link>
+        </FooterText>
       </LowerBox>
     </Section>
   );
