@@ -10,7 +10,6 @@ const Container = styled.div`
 const Menu = styled.div`
   position: absolute;
   top: 100%;
-  right: 0;
   z-index: 99;
   background-color: #fff;
   border: 1px solid ${(props) => props.theme.primaryColor};
@@ -26,7 +25,7 @@ const Menu = styled.div`
   }
 `;
 
-const MenuItem = styled.div`
+const MenuItem = styled.div` 
   display: flex;
   align-items: center;
   cursor: pointer;

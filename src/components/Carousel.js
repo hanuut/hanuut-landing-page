@@ -3,11 +3,13 @@ import styled, { keyframes } from "styled-components";
 
 const CarouselContainer = styled.div`
   width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+
 `;
 
 const CarouselImage = styled.img`
@@ -17,7 +19,7 @@ const CarouselImage = styled.img`
   position: absolute;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
   @media (max-width: 768px) {
-    max-width: 24%;
+    max-width: 28%;
   }
   `;
 
@@ -39,7 +41,7 @@ const CenterImage = styled(CarouselImage)`
   max-width: 42%;
   animation: ${slide} 0.5s ease;
   @media (max-width: 768px) {
-    max-width: 30%;
+    max-width: 33%;
     
   }
 `;
@@ -52,17 +54,26 @@ const BackImage = styled(CarouselImage)`
 `;
 
 const LeftImage = styled(BackImage)`
-  transform: translate(-10.5rem, 1.25rem) rotate(-15deg);
+  transform: translate(-12rem, 1.25rem) rotate(-10deg);
+  @media (max-width: 1366px) {
+    transform: translate(-6rem, 0) rotate(-5deg);
+  }
   @media (max-width: 768px) {
     transform: translate(-4rem, 0) rotate(0deg);
   }
+ 
 `;
 
 const RightImage = styled(BackImage)`
-  transform: translate(10.5rem, 1.25rem) rotate(15deg);
+  transform: translate(12rem, 1.25rem) rotate(10deg);
+ 
+  @media (max-width: 1366px) {
+    transform: translate(6rem, 0) rotate(5deg);
+  }
   @media (max-width: 768px) {
     transform: translate(4rem, 0) rotate(0deg);
   }
+
 `;
 
 const Carousel = ({ images }) => {

@@ -12,6 +12,7 @@ const Section = styled.section`
   width: 100vw;
   background-color: ${(props) => props.theme.body};
   height: ${(props) => props.theme.navHeight};
+  z-index: 1000;
   @media (max-width: 768px) {
     position: relative;
   }
