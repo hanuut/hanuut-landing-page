@@ -48,7 +48,10 @@
     "deleteAccountNotSatisfied":"غير راضٍ عن الخدمة" ,
     "deleteAccountreasonOther":"أخرى",
     "deleteAccountOtherReasonsDescription": "وصف السبب",
-    "deleteAccountButton":"إرسال" ,
+    "deleteAccountOnly":"حذف الحساب فقط",
+    "deleteAccountWithData":"حذف الحساب والبيانات",
+    "buttonSubmit":"إرسال" ,
+    "buttonIsSubmitting":"يتم إرسال الطلب ..." ,
     "deleteAccountMessage":"ستتم معالجة طلب حذف حسابك في غضون 48 ساعة. ستتلقى تأكيدًا بالبريد الإلكتروني بمجرد اكتماله."
 }
 

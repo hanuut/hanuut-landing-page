@@ -36,6 +36,7 @@ const Title = styled.h1`
 const Form = styled.form`
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
   width: 100%;
   max-width: 40%;
   @media (max-width: 768px) {
@@ -107,6 +108,7 @@ const TextArea = styled.textarea`
 `;
 
 const Button = styled.button`
+margin-top: 10px;
 background-color: ${(props) => props.theme.primaryColor};
 color: #fff;
 border: none;
@@ -115,7 +117,9 @@ padding: ${(props) => props.theme.actionButtonPadding};
 font-size: ${(props) => props.theme.fontxl};
 cursor: pointer;
 transition: all 0.5s ease;
-
+&.submitting{
+  background-color: #eee;
+}
 &:hover {
   transform: scale(1.03);
 }
@@ -135,6 +139,10 @@ const Message = styled.p`
     padding: 20px;
   }
 `;
+const Checkbox = styled.input`
+  margin: 0 10px;
+`;
+
 
 const DeleteAccountPage = () => {
   const { t, i18n } = useTranslation();
@@ -143,6 +151,9 @@ const DeleteAccountPage = () => {
   const [password, setPassword] = useState("");
   const [reason, setReason] = useState("");
   const [reasonDescription, setReasonDescription] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteAccountOnly, setDeleteAccountOnly] = useState(false);
+  const [deleteAccountWithData, setDeleteAccountWithData] = useState(false);
 
   const handleReasonChange = (event) => {
     setReason(event.target.value);
@@ -154,31 +165,40 @@ const DeleteAccountPage = () => {
   };
 
   const handleSubmit = async (event) => {
-
     event.preventDefault();
+    setIsSubmitting(true);
     const data = {
       fullName,
       phoneNumber,
       password,
       reason,
-      reasonDescription
+      reasonDescription,
+      deleteAccountOnly,
+      deleteAccountWithData
     };
+ const testUrl = process.env.REACT_APP_API_TEST_URL;
+   const prodUrl = process.env.REACT_APP_API_PROD_URL;
     try {
-      const response = await fetch('https://hanuut.cyclic.app/deleteRequest', {
-        mode: 'no-cors',
+      const response = await fetch(prodUrl+'/deleteRequest', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify(data)
       });
-      const result = await response.json();
-  
+     //  const result = await response.json();
+      // console.log('submitted with success');
+      // console.log('Request sent successfully:', result);
+      setIsSubmitting(false);
     } catch (error) {
       console.log('notSubbmitted');
       console.error('Error sending request:', error);
+      setIsSubmitting(false);
     }
   };
+
+
   return (
     <Section>
     <Container isArabic={i18n.language === "ar"}>
@@ -220,7 +240,7 @@ const DeleteAccountPage = () => {
             id="reason"
             value={reason}
             onChange={handleReasonChange}
-            required
+          
           >
             <Option value="" disabled>
             {t('deleteAccountReasonHeader')}
@@ -242,11 +262,28 @@ const DeleteAccountPage = () => {
               id="reasonDescription"
               value={reasonDescription}
               onChange={handleReasonDescriptionChange}
-              required
             />
           </InputWrapper>
         )}
-        <Button type="submit">{t('deleteAccountButton')}</Button>
+        <Label>
+        <Checkbox
+          type="checkbox"
+          checked={deleteAccountOnly}
+          onChange={(event) => setDeleteAccountOnly(event.target.checked)}
+        />
+       {t('deleteAccountOnly')}
+      </Label>
+      <Label>
+        <Checkbox
+          type="checkbox"
+          checked={deleteAccountWithData}
+          onChange={(event) => setDeleteAccountWithData(event.target.checked)}
+        />
+       {t('deleteAccountWithData')}
+      </Label>
+        <Button ttype="submit" className={isSubmitting ? 'submitting' : ''} disabled={isSubmitting}>
+        {isSubmitting ? t('buttonIsSubmitting') : t('buttonSubmit')}
+      </Button>
       </Form>
       <Message>
       {t('deleteAccountMessage')}
