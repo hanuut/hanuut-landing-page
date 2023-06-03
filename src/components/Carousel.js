@@ -13,13 +13,13 @@ const CarouselContainer = styled.div`
 `;
 
 const CarouselImage = styled.img`
-  max-width: 30%;
+  max-width: 35%;
   border-radius: ${(props) => (props.theme.defaultRadius)};
   object-fit: cover;
   position: absolute;
-  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  
   @media (max-width: 768px) {
-    max-width: 28%;
+    max-width: 30%;
   }
   `;
 
@@ -38,10 +38,10 @@ const CenterImage = styled(CarouselImage)`
   z-index: 1;
   transform: translateY(0);
   opacity: 1;
-  max-width: 42%;
+  max-width: 43%;
   animation: ${slide} 0.5s ease;
   @media (max-width: 768px) {
-    max-width: 33%;
+    max-width: 34%;
     
   }
 `;
