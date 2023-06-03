@@ -48,7 +48,7 @@
     "deleteAccountNotSatisfied":"Not satisfied with the service",
     "deleteAccountreasonOther":"Other",
     "deleteAccountOtherReasonsDescription":" Reason Description",
-    "deleteAccountOnly":"Delete account only",
+    "deleteDataOnly":"Delete data only",
     "deleteAccountWithData":"Delete account and data",
     "buttonSubmit":"Submit",
     "buttonIsSubmitting":"Submitting ...",

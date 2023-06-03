@@ -48,7 +48,7 @@
     "deleteAccountNotSatisfied":"غير راضٍ عن الخدمة" ,
     "deleteAccountreasonOther":"أخرى",
     "deleteAccountOtherReasonsDescription": "وصف السبب",
-    "deleteAccountOnly":"حذف الحساب فقط",
+    "deleteDataOnly":"حذف البيانات فقط",
     "deleteAccountWithData":"حذف الحساب والبيانات",
     "buttonSubmit":"إرسال" ,
     "buttonIsSubmitting":"يتم إرسال الطلب ..." ,
