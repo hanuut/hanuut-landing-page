@@ -152,7 +152,7 @@ const DeleteAccountPage = () => {
   const [reason, setReason] = useState("");
   const [reasonDescription, setReasonDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [deleteAccountOnly, setDeleteAccountOnly] = useState(false);
+  const [deleteDataOnly, setDeleteDataOnly] = useState(false);
   const [deleteAccountWithData, setDeleteAccountWithData] = useState(false);
 
   const handleReasonChange = (event) => {
@@ -173,10 +173,10 @@ const DeleteAccountPage = () => {
       password,
       reason,
       reasonDescription,
-      deleteAccountOnly,
+      deleteDataOnly,
       deleteAccountWithData
     };
- const testUrl = process.env.REACT_APP_API_TEST_URL;
+  //const testUrl = process.env.REACT_APP_API_TEST_URL;
    const prodUrl = process.env.REACT_APP_API_PROD_URL;
     try {
       const response = await fetch(prodUrl+'/deleteRequest', {
@@ -268,10 +268,10 @@ const DeleteAccountPage = () => {
         <Label>
         <Checkbox
           type="checkbox"
-          checked={deleteAccountOnly}
-          onChange={(event) => setDeleteAccountOnly(event.target.checked)}
+          checked={deleteDataOnly}
+          onChange={(event) => setDeleteDataOnly(event.target.checked)}
         />
-       {t('deleteAccountOnly')}
+       {t('deleteDataOnly')}
       </Label>
       <Label>
         <Checkbox
