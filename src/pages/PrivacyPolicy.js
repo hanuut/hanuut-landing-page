@@ -38,6 +38,14 @@ const Paragraph = styled.p`
     font-size: ${(props) => props.theme.fontmd};
   }
 `;
+const Link = styled.a`
+  color: #0077cc;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
 
 const List = styled.ul`
   margin-bottom: 10px;
@@ -155,7 +163,7 @@ const PrivacyPolicy = () => {
       <SubHeading>اتصل بنا</SubHeading>
       <Paragraph>
         إذا كان لديك أي أسئلة أو استفسارات حول سياسة الخصوصية الخاصة بنا ، فيرجى
-        الاتصال بنا عبر البريد الإلكتروني التالي: info@hanuut.com
+        الاتصال بنا عبر البريد الإلكتروني التالي:  <Link href="mailto:contact@hanuut.com"> contact@hanuut.com</Link>
       </Paragraph>
     </Container>
   ) : (
@@ -271,7 +279,7 @@ const PrivacyPolicy = () => {
         advised to review this page periodically for any changes. We will notify
         you of any changes by posting the new Privacy Policy on this page.
       </Paragraph>
-      <Paragraph>This policy is effective as of 2023-05-19</Paragraph>
+      <Paragraph>This policy is effective as of 05-19-2023</Paragraph>
       <SubHeading>Contact Us</SubHeading>
       <Paragraph>
         If you have any questions or suggestions about our Privacy Policy, do

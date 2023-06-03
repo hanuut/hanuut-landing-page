@@ -6,7 +6,11 @@ import HomeIllustration1 from "../assets/screenshot1.jpeg";
 import HomeIllustration2 from "../assets/screenshot2.jpg";
 import HomeIllustration3 from "../assets/screenshot3.jpg";
 import { Link } from "react-router-dom";
-// import Values from "./Sections/Values";
+// import AboutUs from "./Sections/AboutUs";
+// import HowItWorks from "./Sections/HowItWorks";
+// import Testimonials from "./Sections/Testimonials";
+// import Partners from "./Sections/Partners";
+// import CallToAction from "./Sections/CallToAction";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -148,7 +152,13 @@ const HomePage = () => {
         </RightBox>
       </Container>
     </Section>
-    {/* <Values /> */}
+    {/* <AboutUs />
+
+    <HowItWorks />
+
+    <Testimonials />
+    <Partners /> 
+    <CallToAction />*/}
     </>
   );
 };

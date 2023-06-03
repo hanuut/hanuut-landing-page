@@ -6,7 +6,7 @@ import Support from "../../assets/support.svg";
 import { useTranslation } from "react-i18next";
 
 const Section = styled.div`
-  background-color: ${(props) => props.theme.primaryColor};
+  background-color: ${(props) => props.theme.body};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -19,7 +19,7 @@ const Container = styled.div`
   flex-direction: row;
   align-items: start;
   justify-content: space-between;
-  color: ${(props) => props.theme.body};
+  color: ${(props) => props.theme.text};
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
 
   @media (max-width: 768px) {
@@ -87,9 +87,9 @@ margin-right: 0.5rem;
 `;
 
 const ValueHeading = styled.h2`
-font-size: ${(props) => props.theme.fontxxxl};
+font-size: ${(props) => props.theme.fontxxl};
 margin-bottom: 1rem;
-color: ${(props) => props.theme.body};
+color: ${(props) => props.theme.primaryColor};
 
 @media (max-width: 768px) {
 font-size: ${(props) => props.theme.fontxl};

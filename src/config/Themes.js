@@ -4,9 +4,9 @@ export const light = {
   text: "#202020",
   bodyRgba: "255, 252, 248",
   textRgba: "32, 32, 32",
-  secondaryColor: "#003F7D", //orange
+  secondaryColor: "#003F7D", //blue
   primaryColor: "#5BC28B", //green
-
+  primaryColorRgba: "91 ,194 ,139",
   //fonts
   fontxs: "0.625em", // 10px: This is a small font size, often used for fine print or disclaimers.
   fontsm: "0.75em", // 12px: This is a common font size for body text on desktop screens, but may be toosmall for mobile screens.
@@ -21,5 +21,5 @@ export const light = {
   navHeight: "5rem",
   actionButtonPadding: "0.7rem 2.1rem",
   actionButtonPaddingMobile : "0.5rem 1.8rem",
-  defaultRadius:"5px",
+  defaultRadius:"10px",
 };
