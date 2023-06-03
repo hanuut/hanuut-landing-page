@@ -37,6 +37,7 @@ const Paragraph = styled.p`
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontmd};
   }
+
 `;
 
 const List = styled.ul`
@@ -59,7 +60,7 @@ const TermsAndConditions = () => {
   const { i18n } = useTranslation();
   return i18n.language === "ar" ? (
     <Container isArabic={true}>
-      <Heading>الشروط والأحكام</Heading>
+      <Heading>الأحكام والشروط</Heading>
       <SubHeading>1. المقدمة</SubHeading>
       <Paragraph>
         بتحميل أو استخدام التطبيق، سيتم تطبيق هذه الشروط تلقائيا عليك - يجب عليك
@@ -136,29 +137,77 @@ const TermsAndConditions = () => {
         من توفيرها لك. ولا يتحمل Hanuut Express أي مسؤولية عن أي خسارة مباشرة أو
         غير مباشرة تواجهك نتيجة الاعتماد بشكل كامل على هذه الوظيفة في التطبيق.
       </Paragraph>
+
       <SubHeading>7. الاستخدام الصحيح</SubHeading>
       <Paragraph>
-        يجب أن تتعامل مع التطبيق ومع المستخدمين الآخرين بطريقة مهذبة ومحترمة، ولا يجوز لك استخدام التطبيق بأي طريقة تتسبب في الإضرار بالتطبيق أو بأي مستخدم آخر. ويحظر بشكل صريح استخدام التطبيق لأي أغراض غير قانونية أو غير أخلاقية، بما في ذلك ولكن لا يقتصر على الاستخدام للترويج أو الشحن غير المشروع للمواد أو المنتجات المحظورة.
+        يجب أن تتعامل مع التطبيق ومع المستخدمين الآخرين بطريقة مهذبة ومحترمة،
+        ولا يجوز لك استخدام التطبيق بأي طريقة تتسبب في الإضرار بالتطبيق أو بأي
+        مستخدم آخر. ويحظر بشكل صريح استخدام التطبيق لأي أغراض غير قانونية أو غير
+        أخلاقية، بما في ذلك ولكن لا يقتصر على الاستخدام للترويج أو الشحن غير
+        المشروع للمواد أو المنتجات المحظورة.
       </Paragraph>
-      <SubHeading>8. إنهاء الخدمة</SubHeading>
+      <SubHeading> 8. التحديثات والإنهاء </SubHeading>
       <Paragraph>
-        يحتفظ Hanuut Express بالحق في إنهاء خدماتها أو التطبيق في أي وقت دون إشعار مسبق. ويجوز لك أيضًا إنهاء استخدام التطبيق في أي وقت. ولكن يجب عليك ملاحظة أنه عند إنهاء استخدام التطبيق، فإنك لا تحذف بياناتك الشخصية التي قدمتها لنا سابقًا. وسيتم تخزين بياناتك الشخصية وفقًا لسياسة الخصوصية الخاصة بنا.
+        في مرحلة ما ، قد نرغب في تحديث التطبيق. التطبيق حاليا متاح على أندرويد
+        &amp; iOS - متطلبات كلا النظامين (وبالنسبة لأي أنظمة إضافية ، قررنا
+        تمديد توافر التطبيق إلى) ، وستحتاج إلى تنزيل التحديثات إذا كنت تريد
+        الاستمرار في استخدام التطبيق. Hanuut Express لا تعد بأنها ستفعل ذلك قم
+        دائمًا بتحديث التطبيق بحيث يكون مناسبًا لك و / أو يعمل معه أندرويد
+        &amp; إصدار iOS الذي قمت بتثبيته على جهازك. ومع ذلك ، فإنك تعد بقبول
+        تحديثات التطبيق دائمًا عندما عرضت عليك. قد نرغب أيضًا في التوقف عن توفير
+        التطبيق ، وربما إنهاء استخدامه في أي وقت دون تقديم إشعار الإنهاء لـ أنت.
+        ما لم نخبرك بخلاف ذلك ، عند أي إنهاء ، (أ) الحقوق وستنتهي التراخيص
+        الممنوحة لك بموجب هذه الشروط ؛ (ب) يجب أن تتوقف باستخدام التطبيق ، و
+        (إذا لزم الأمر) احذفه من جهازك.
       </Paragraph>
-      <SubHeading>8. إنهاء الخدمة</SubHeading>
+
+      <SubHeading>9. إنهاء الخدمة</SubHeading>
       <Paragraph>
-        يحتفظ Hanuut Express بالحق في إنهاء خدماتها أو التطبيق في أي وقت دون إشعار مسبق. ويجوز لك أيضًا إنهاء استخدام التطبيق في أي وقت. ولكن يجب عليك ملاحظة أنه عند إنهاء استخدام التطبيق، فإنك لا تحذف بياناتك الشخصية التي قدمتها لنا سابقًا. وسيتم تخزين بياناتك الشخصية وفقًا لسياسة الخصوصية الخاصة بنا.
+        يحتفظ Hanuut Express بالحق في إنهاء خدماتها أو التطبيق في أي وقت دون
+        إشعار مسبق. ويجوز لك أيضًا إنهاء استخدام التطبيق في أي وقت. ولكن يجب
+        عليك ملاحظة أنه عند إنهاء استخدام التطبيق، فإنك لا تحذف بياناتك الشخصية
+        التي قدمتها لنا سابقًا. وسيتم تخزين بياناتك الشخصية وفقًا لسياسة
+        الخصوصية الخاصة بنا.
       </Paragraph>
-      <SubHeading>10. القانون الساري</SubHeading>
+
+      <SubHeading>10. طلب حذف الحساب</SubHeading>
       <Paragraph>
-        تخضع هذه الشروط والأحكام للقوانين السارية في الدولة التي تعمل بها Hanuut Express. وتخضع أي نزاعات تنشأ عن هذه الشروط والأحكام للقضاء المختص في الدولة التي تعمل بها Hanuut Express.
+      يمكنك طلب حذف حسابك <Link href="/delete account">هنا</Link> 
       </Paragraph>
-      <SubHeading>10. القانون الساري</SubHeading>
+      <SubHeading>11. القانون الساري</SubHeading>
       <Paragraph>
-        تخضع هذه الشروط والأحكام للقوانين السارية في الدولة التي تعمل بها Hanuut Express. وتخضع أي نزاعات تنشأ عن هذه الشروط والأحكام للقضاء المختص في الدولة التي تعمل بها Hanuut Express.
+        تخضع هذه الشروط والأحكام للقوانين السارية في الدولة التي تعمل بها Hanuut
+        Express. وتخضع أي نزاعات تنشأ عن هذه الشروط والأحكام للقضاء المختص في
+        الدولة التي تعمل بها Hanuut Express.
       </Paragraph>
-      <SubHeading>12. الخلاصة</SubHeading>
+
+      <SubHeading>12. التغييرات على هذه الشروط والأحكام</SubHeading>
       <Paragraph>
-        تحدد هذه الشروط والأحكام العلاقة بين Hanuut Express والمستخدمين فيما يتعلق باستخدام التطبيق. يجب عليك قراءتها بعناية للتأكد من فهمك لجميع الشروط المحددة فيها. إذا كنت لا توافق على أي من هذه الشروط، فيجب عليك التوقف عن استخدام التطبيق على الفور. وإذا استمريت في استخدام التطبيق، فإن ذلك يعني موافقتك على جميع الشروط والأحكام المذكورة فيها. ويجب عليك الالتزام بجميع الشروط والأحكام والقوانين السارية في الدولة التي تعمل بها Hanuut Express عند استخدام التطبيق. </Paragraph>
+      قد نقوم بتحديث الشروط والأحكام الخاصة بنا من وقت لآخر. هكذا أنت
+         ينصح بمراجعة هذه الصفحة بشكل دوري لأية تغييرات. سنقوم بإخطار
+         لك أي تغييرات عن طريق نشر الشروط والأحكام الجديدة على هذه الصفحة.
+      </Paragraph>
+      <Paragraph>
+      تسري هذه الشروط والأحكام اعتبارًا من 2023-05-19
+      </Paragraph>
+
+      <SubHeading>13. اتصل بنا</SubHeading>
+      <Paragraph>
+      إذا كان لديك أي أسئلة أو اقتراحات حول الشروط والأحكام الخاصة بنا ،
+           لا تتردد في الاتصال بنا على  
+        <Link href="mailto:contact@hanuut.com"> contact@hanuut.com</Link>
+      </Paragraph>
+
+      <SubHeading>الخلاصة</SubHeading>
+      <Paragraph>
+        تحدد هذه الشروط والأحكام العلاقة بين Hanuut Express والمستخدمين فيما
+        يتعلق باستخدام التطبيق. يجب عليك قراءتها بعناية للتأكد من فهمك لجميع
+        الشروط المحددة فيها. إذا كنت لا توافق على أي من هذه الشروط، فيجب عليك
+        التوقف عن استخدام التطبيق على الفور. وإذا استمريت في استخدام التطبيق،
+        فإن ذلك يعني موافقتك على جميع الشروط والأحكام المذكورة فيها. ويجب عليك
+        الالتزام بجميع الشروط والأحكام والقوانين السارية في الدولة التي تعمل بها
+        Hanuut Express عند استخدام التطبيق.{" "}
+      </Paragraph>
     </Container>
   ) : (
     <Container>
@@ -218,7 +267,6 @@ const TermsAndConditions = () => {
           </Link>
         </ListItem>
       </List>
-
       <SubHeading>6. Limitations of Responsibility</SubHeading>
       <Paragraph>
         You should be aware that there are certain things that Hanuut Express
@@ -257,37 +305,77 @@ const TermsAndConditions = () => {
         direct or indirect, you experience as a result of relying wholly on this
         functionality of the app.
       </Paragraph>
+      <SubHeading>7. Correct usage</SubHeading>
+       <Paragraph>
+         You must deal with the application and other users in a polite and respectful manner,
+         You may not use the Application in any way that is harmful to the Application or in any way
+         another user. The use of the application for any illegal or illegal purposes is expressly prohibited
+         ethical, including but not limited to use for promotion or non-compliance
+         Project for Prohibited Substances or Products.
+       </Paragraph>
+       <SubHeading> 8. Updates and Terminations </SubHeading>
+       <Paragraph>
+         At some point, we may want to update the app. The app is currently available on Android
+         &amp; iOS - requirements for both systems (and for any additional ones, we decided
+         extend app availability to), and you'll need to download updates if you want
+         Continue to use the application. Hanuut Express does not promise that it will do so
+         Always update the app so that it is suitable for you and/or works with Android
+         &amp; The version of iOS you have installed on your device. However, you promise to accept
+         The application always updates when offered to you. We may also want to stop saving
+         and may terminate its use at any time without providing notice of termination to you.
+         Unless we tell you otherwise, upon any termination, (a) the rights and licenses will terminate
+         granted to you under these Terms; (b) you must stop using the Application, and
+         (If necessary) delete it from your device.
+       </Paragraph>
 
-      <SubHeading>7. Updates and Termination</SubHeading>
-      <Paragraph>
-        At some point, we may wish to update the app. The app is currently
-        available on Android &amp; iOS – the requirements for the both systems
-        (and for any additionalsystems we decide to extend the availability of
-        the app to) may change, and you’ll need to download the updates if you
-        want to keep using the app. Hanuut Express does not promise that it will
-        always update the app so that it is relevant to you and/or works with
-        the Android &amp; iOS version that you have installed on your device.
-        However, you promise to always accept updates to the application when
-        offered to you. We may also wish to stop providing the app, and may
-        terminate use of it at any time without giving notice of termination to
-        you. Unless we tell you otherwise, upon any termination, (a) the rights
-        and licenses granted to you in these terms will end; (b) you must stop
-        using the app, and (if needed) delete it from your device.
-      </Paragraph>
-      <SubHeading>8. Changes to This Terms and Conditions</SubHeading>
-      <Paragraph>
-        We may update our Terms and Conditions from time to time. Thus, you are
-        advised to review this page periodically for any changes. We will notify
-        you of any changes by posting the new Terms and Conditions on this page.
-      </Paragraph>
+       <SubHeading>9. Service Termination</SubHeading>
+       <Paragraph>
+         Hanuut Express reserves the right to terminate its services or the application at any time without notice
+         prior notice. You may also terminate your use of the Application at any time. but must
+         You should note that upon termination of use of the Application, you do not delete your personal data
+         that you provided to us earlier. Your personal data will be stored in accordance with the policy
+         Our privacy.
+       </Paragraph>
 
-      <SubHeading>9. Contact Us</SubHeading>
-      <Paragraph>
-        If you have any questions or suggestions about our Terms and Conditions,
-        do not hesitate to contact us at{" "}
-        <Link href="mailto:contact@hanuut.com">contact@hanuut.com</Link>.
-      </Paragraph>
-    </Container>
+       <SubHeading>10. Account deletion request</SubHeading>
+       <Paragraph>
+       You can request deletion of your account <Link href="/delete account">here</Link>
+       </Paragraph>
+       <SubHeading>11. Applicable Law</SubHeading>
+       <Paragraph>
+         These terms and conditions are subject to the laws of the country in which Hanuut operates
+         Express. Any disputes arising from these terms and conditions shall be subject to the competent jurisdiction of
+         The country in which Hanuut Express operates.
+       </Paragraph>
+
+       <SubHeading>12. Changes to these Terms and Conditions</SubHeading>
+       <Paragraph>
+       We may update our Terms and Conditions from time to time. So are you
+          You are advised to check this page periodically for any changes. We will notify
+          You may make any changes by posting the new terms and conditions on this page.
+       </Paragraph>
+       <Paragraph>
+       These terms and conditions are effective from 2023-05-19
+       </Paragraph>
+
+       <SubHeading>13. Contact us</SubHeading>
+       <Paragraph>
+       If you have any questions or suggestions about our Terms and Conditions,
+            Feel free to contact us at
+         <Link href="mailto:contact@hanuut.com"> contact@hanuut.com</Link>
+       </Paragraph>
+
+       <SubHeading>Abstract</SubHeading>
+       <Paragraph>
+         These Terms and Conditions define the relationship between Hanuut Express and Users
+         related to the use of the application. You should read them carefully to make sure you understand all
+         conditions specified therein. If you do not agree to any of these terms, you must
+         Stop using the application immediately. If you continue to use the application,
+         This means that you agree to all the terms and conditions mentioned therein. And you should
+         Comply with all terms, conditions and laws in force in the country in which you work
+         Hanuut Express when using the app.{" "}
+       </Paragraph>
+     </Container>
   );
 };
 
