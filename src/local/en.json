@@ -49,7 +49,7 @@
     "deleteAccountreasonOther":"Other",
     "deleteAccountOtherReasonsDescription":" Reason Description",
     "deleteAccountOnly":"Delete account only",
-    "deleteWithData":"Delete account and data",
+    "deleteAccountWithData":"Delete account and data",
     "buttonSubmit":"Submit",
     "buttonIsSubmitting":"Submitting ...",
     "deleteAccountMessage":"Your account deletion request will be processed within 48 hours. You will receive an email confirmation once it's completed."
