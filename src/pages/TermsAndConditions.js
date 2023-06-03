@@ -61,6 +61,16 @@ const TermsAndConditions = () => {
   return i18n.language === "ar" ? (
     <Container isArabic={true}>
       <Heading>الأحكام والشروط</Heading>
+      <Heading>الخلاصة</Heading>
+      <Paragraph>
+        تحدد هذه الشروط والأحكام العلاقة بين Hanuut Express والمستخدمين فيما
+        يتعلق باستخدام التطبيق. يجب عليك قراءتها بعناية للتأكد من فهمك لجميع
+        الشروط المحددة فيها. إذا كنت لا توافق على أي من هذه الشروط، فيجب عليك
+        التوقف عن استخدام التطبيق على الفور. وإذا استمريت في استخدام التطبيق،
+        فإن ذلك يعني موافقتك على جميع الشروط والأحكام المذكورة فيها. ويجب عليك
+        الالتزام بجميع الشروط والأحكام والقوانين السارية في الدولة التي تعمل بها
+        Hanuut Express عند استخدام التطبيق.{" "}
+      </Paragraph>
       <SubHeading>1. المقدمة</SubHeading>
       <Paragraph>
         بتحميل أو استخدام التطبيق، سيتم تطبيق هذه الشروط تلقائيا عليك - يجب عليك
@@ -197,22 +207,20 @@ const TermsAndConditions = () => {
            لا تتردد في الاتصال بنا على  
         <Link href="mailto:contact@hanuut.com"> contact@hanuut.com</Link>
       </Paragraph>
-
-      <SubHeading>الخلاصة</SubHeading>
-      <Paragraph>
-        تحدد هذه الشروط والأحكام العلاقة بين Hanuut Express والمستخدمين فيما
-        يتعلق باستخدام التطبيق. يجب عليك قراءتها بعناية للتأكد من فهمك لجميع
-        الشروط المحددة فيها. إذا كنت لا توافق على أي من هذه الشروط، فيجب عليك
-        التوقف عن استخدام التطبيق على الفور. وإذا استمريت في استخدام التطبيق،
-        فإن ذلك يعني موافقتك على جميع الشروط والأحكام المذكورة فيها. ويجب عليك
-        الالتزام بجميع الشروط والأحكام والقوانين السارية في الدولة التي تعمل بها
-        Hanuut Express عند استخدام التطبيق.{" "}
-      </Paragraph>
     </Container>
   ) : (
     <Container>
       <Heading>Terms and Conditions</Heading>
-
+      <Heading>Abstract</Heading>
+       <Paragraph>
+         These Terms and Conditions define the relationship between Hanuut Express and Users
+         related to the use of the application. You should read them carefully to make sure you understand all
+         conditions specified therein. If you do not agree to any of these terms, you must
+         Stop using the application immediately. If you continue to use the application,
+         This means that you agree to all the terms and conditions mentioned therein. And you should
+         Comply with all terms, conditions and laws in force in the country in which you work
+         Hanuut Express when using the app.{" "}
+       </Paragraph>
       <SubHeading>1. Introduction</SubHeading>
       <Paragraph>
         By downloading or using the app, these terms will automatically apply to
@@ -365,16 +373,6 @@ const TermsAndConditions = () => {
          <Link href="mailto:contact@hanuut.com"> contact@hanuut.com</Link>
        </Paragraph>
 
-       <SubHeading>Abstract</SubHeading>
-       <Paragraph>
-         These Terms and Conditions define the relationship between Hanuut Express and Users
-         related to the use of the application. You should read them carefully to make sure you understand all
-         conditions specified therein. If you do not agree to any of these terms, you must
-         Stop using the application immediately. If you continue to use the application,
-         This means that you agree to all the terms and conditions mentioned therein. And you should
-         Comply with all terms, conditions and laws in force in the country in which you work
-         Hanuut Express when using the app.{" "}
-       </Paragraph>
      </Container>
   );
 };
