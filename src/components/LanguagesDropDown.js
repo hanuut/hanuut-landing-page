@@ -47,6 +47,7 @@ const MenuItemHeader = styled.div`
 
 const LanguagesDropDown = ({handleChooseLanguage}) => {
   const { t, i18n } = useTranslation();
+
   const handleLanguageChange = (lang) => {
     i18n.changeLanguage(lang);
     localStorage.setItem("preferredLang", lang);
