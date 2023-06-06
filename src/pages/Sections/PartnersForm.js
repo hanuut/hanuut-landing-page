@@ -12,6 +12,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+  
 `;
 
 const PartnerFormStep = styled.form`
@@ -62,6 +63,13 @@ const Step = styled.div`
   animation-fill-mode: forwards;
   animation-name: ${(props) =>
     props.isArabic ? negativeSlideAnimation : slideAnimation};
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+    }
+  
 `;
 
 const FirstStep = styled(Step)`
@@ -143,7 +151,7 @@ const InputWrapper = styled.div`
   margin-bottom: 1Opx;
 
   @media (max-width: 768px) {
-    width: 90%;
+    width: 100%;
     font-size: ${(props) => props.theme.fontsm};
   }
 `;
@@ -158,6 +166,7 @@ const Input = styled.input`
     outline: none;
     border-color: ${(props) => props.theme.primaryColor};
   }
+ 
 `;
 
 const Label = styled.label`
