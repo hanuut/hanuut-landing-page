@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
 import styled from "styled-components";
 import PartnersImg from "../assets/partnersIllustration.svg";
 import { useTranslation } from "react-i18next";
-import PartnersForm from './Sections/PartnersForm';
-
+import PartnersForm from "./Sections/PartnersForm";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -18,7 +17,6 @@ const Section = styled.div`
 `;
 const Container = styled.div`
   width: 80%;
-
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -29,7 +27,6 @@ const Container = styled.div`
     min-height: 100%;
     flex-direction: column-reverse;
     align-items: flex-start;
-  
   }
 `;
 const RightBox = styled.div`
@@ -41,7 +38,6 @@ const RightBox = styled.div`
     width: 100%;
     margin-bottom: 1rem;
   }
-  
 `;
 const PartnersImageContainer = styled.img`
   max-width: 100%;
@@ -52,19 +48,16 @@ const PartnersImageContainer = styled.img`
 `;
 const LeftBox = styled.div`
   width: 40%;
-
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-
   border-radius: 10px;
   justify-content: flex-start;
-
   @media (max-width: 768px) {
     width: 100%;
-    
+    margin-bottom: 1rem;
   }
-// `;
+`;
 
 const PartnersPage = () => {
   const { i18n } = useTranslation();
@@ -72,14 +65,18 @@ const PartnersPage = () => {
     <Section>
       <Container isArabic={i18n.language === "ar"}>
         <LeftBox>
-          <PartnersForm/>
+          <PartnersForm />
         </LeftBox>
         <RightBox>
-        <PartnersImageContainer src={PartnersImg} isArabic={i18n.language === "ar"} alt=""/>
+          <PartnersImageContainer
+            src={PartnersImg}
+            isArabic={i18n.language === "ar"}
+            alt=""
+          />
         </RightBox>
       </Container>
     </Section>
-  )
-}
+  );
+};
 
-export default PartnersPage
+export default PartnersPage;

@@ -10,6 +10,12 @@ const AddressContainer = styled.div`
   align-items: flex-end;
   justify-content: space-between;
   position: relative;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
 `;
 
 const InputWrapper = styled.div`
@@ -19,7 +25,7 @@ const InputWrapper = styled.div`
   padding: 0.5rem 0;
   margin-bottom: 1Opx;
   @media (max-width: 768px) {
-    width: 90%;
+    width: 100%;
     font-size: ${(props) => props.theme.fontsm};
   }
 `;

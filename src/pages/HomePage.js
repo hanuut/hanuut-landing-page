@@ -40,7 +40,6 @@ const Container = styled.div`
 
 const RightBox = styled.div`
   width: 50%;
-  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,6 +57,7 @@ const LeftBox = styled.div`
   justify-content: center;
   @media (max-width: 768px) {
     width: 100%;
+    margin-bottom: 1rem;
   }
 `;
 
