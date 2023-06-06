@@ -24,11 +24,17 @@ h1, h2, h3, h4, h5, h6{
     padding: 0;
 }
 
-a, input, textarea, select{
+a, input, textarea{
     color: inherit;
     text-decoration: none;
     font-family: ${props => props.isArabic ? "'Cairo Variable', sans-serif" : "'Ubuntu Condensed', sans-serif"};
 }
+
+select{
+    font-family: ${props => props.isArabic ? "'Cairo Variable', sans-serif" : "'Ubuntu Condensed', sans-serif"};
+}
+
+
 button{
     font-family: ${props => props.isArabic ? "'Cairo Variable', sans-serif" : "'Ubuntu Condensed', sans-serif"};
     letter-spacing: ${props => props.isArabic ? "0" : "1px"};

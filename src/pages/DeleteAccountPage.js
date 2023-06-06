@@ -45,6 +45,7 @@ const Form = styled.form`
 `;
 
 const InputWrapper = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
@@ -187,12 +188,10 @@ const DeleteAccountPage = () => {
         },
         body: JSON.stringify(data)
       });
-     //  const result = await response.json();
-      // console.log('submitted with success');
-      // console.log('Request sent successfully:', result);
+
       setIsSubmitting(false);
     } catch (error) {
-      console.log('notSubbmitted');
+
       console.error('Error sending request:', error);
       setIsSubmitting(false);
     }
@@ -240,7 +239,6 @@ const DeleteAccountPage = () => {
             id="reason"
             value={reason}
             onChange={handleReasonChange}
-          
           >
             <Option value="" disabled>
             {t('deleteAccountReasonHeader')}
@@ -281,7 +279,7 @@ const DeleteAccountPage = () => {
         />
        {t('deleteAccountWithData')}
       </Label>
-        <Button ttype="submit" className={isSubmitting ? 'submitting' : ''} disabled={isSubmitting}>
+        <Button type="submit" className={isSubmitting ? 'submitting' : ''} disabled={isSubmitting}>
         {isSubmitting ? t('buttonIsSubmitting') : t('buttonSubmit')}
       </Button>
       </Form>
