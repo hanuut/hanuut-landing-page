@@ -18,7 +18,7 @@ const Logo = () => {
   const isArabic = i18n.language === "ar";
 
   return (
-    <Section issArabic={isArabic} href='/'>
+    <Section isArabic={isArabic} href='/'>
         {t('appTitle')}
     </Section>
   )

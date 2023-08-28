@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { useTranslation } from "react-i18next";
-import AddressesDropDown from "../../components/AddressesDropDown";
-import { isValidEmail, isValidPhone } from "../../components/validators";
-import Sparkles from "../../assets/sparkles.png";
+import AddressesDropDown from "../../../components/AddressesDropDown";
+import { isValidEmail, isValidPhone } from "../../../components/validators";
+import Sparkles from "../../../assets/sparkles.png";
 import { Link } from "react-router-dom";
 
 const Container = styled.div`

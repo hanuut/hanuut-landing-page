@@ -1,19 +1,16 @@
 import styled from "styled-components";
 import AboutUsIllutstration from "../../assets/aboutUs.svg";
 import MissionIllustration from "../../assets/mission.svg";
-import Values from "./Values";
+
 import { useTranslation } from "react-i18next";
 const Section = styled.div`
-  min-height: 50vh;
+  min-height: 60vh;
   background-color: ${(props) => props.theme.body};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  @media (max-width: 768px) {
-    justify-content: flex-start;
-  }
 `;
 
 const Container = styled.div`
@@ -24,9 +21,9 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-
   @media (max-width: 768px) {
     width: 90%;
+    flex-direction: column;
     align-items: flex-start;
   }
 `;
@@ -64,6 +61,21 @@ const MissionContainer = styled.div`
     padding-left: ${(props) => (props.isArabic ? "0" : "2rem")};
     padding-right: ${(props) => (props.isArabic ? "2rem" : "0")};
   }
+
+  @media (max-width: 768px) {
+    margin-top: 1rem;
+    max-width: 100%;
+    padding: 0.7rem 0.4rem;
+    box-shadow: ${(props) =>
+      props.isArabic
+        ? `-10px 10px rgba(${props.theme.primaryColorRgba}, 0.75)`
+        : `10px 10px rgba(${props.theme.primaryColorRgba}, 0.75)`};
+    .missionText {
+      font-size: ${(props) => props.theme.fontlg};
+      padding-left: ${(props) => (props.isArabic ? "0" : "1rem")};
+      padding-right: ${(props) => (props.isArabic ? "1rem" : "0")};
+    }
+  }
 `;
 
 const MissionHeaderContainer = styled.div`
@@ -75,7 +87,14 @@ const MissionHeaderContainer = styled.div`
   gap: 1rem;
   .mission {
     font-size: ${(props) => props.theme.fontxxxl};
+    @media (max-width: 768px) {
+      font-size: ${(props) => props.theme.fontxl};
+    }
   }
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+  }
+ 
 `;
 const MissionIllutstrationContainer = styled.img`
   max-width: 15%;
@@ -83,6 +102,8 @@ const MissionIllutstrationContainer = styled.img`
   object-fit: fill;
   @media (max-width: 768px) {
     width: auto;
+ 
+
   }
 `;
 
@@ -107,12 +128,18 @@ const AboutUsIllutstrationContainer = styled.img`
 const AboutTitle = styled.h1`
   color: ${(props) => props.theme.primaryColor};
   font-weight: bold;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontxxxl};
+  }
 `;
 
 const AboutText = styled.p`
   font-size: ${(props) => props.theme.fontxxl};
   color: ${(props) => props.theme.text};
   line-height: 1.5;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontlg};
+  }
 `;
 
 function AboutUs() {
@@ -139,8 +166,8 @@ function AboutUs() {
           </MissionContainer>
         </RightBox>
       </Container>
-      <AboutTitle>{t("aboutUsValues")}</AboutTitle>
-      <Values />
+      {/* <AboutTitle>{t("aboutUsValues")}</AboutTitle>
+      <Values /> */}
     </Section>
   );
 }

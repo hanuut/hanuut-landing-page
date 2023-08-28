@@ -5,15 +5,16 @@ import HomeCarousel from "../components/Carousel";
 import HomeIllustration1 from "../assets/screenshot1.png";
 import HomeIllustration2 from "../assets/screenshot2.png";
 import HomeIllustration3 from "../assets/screenshot3.png";
+import Playstore from "../assets/playstore.png";
 import { Link } from "react-router-dom";
-// import AboutUs from "./Sections/AboutUs";
-// import HowItWorks from "./Sections/HowItWorks";
+import AboutUs from "./Sections/AboutUs";
+import HowItWorks from "./Sections/HowItWorks";
 // import Testimonials from "./Sections/Testimonials";
-// import Partners from "./Sections/Partners";
+// import Partners from "./Partners/Partners";
 // import CallToAction from "./Sections/CallToAction";
 
 const Section = styled.div`
-  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
+  min-height: ${(props) => `calc(79vh - ${props.theme.navHeight})`};
   background-color: ${(props) => props.theme.body};
   display: flex;
   flex-direction: column;
@@ -98,7 +99,12 @@ const Paragraph = styled.p`
 `;
 
 const Button = styled.button`
-  background-color: ${(props) => props.theme.primaryColor};
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background-color: ${(props) => props.theme.downloadButtonColor};
   color: #fff;
   border: none;
   border-radius: ${(props) => props.theme.defaultRadius};
@@ -107,7 +113,6 @@ const Button = styled.button`
   cursor: pointer;
   transition: all 0.5s ease;
   margin-bottom: 0.5rem;
-
   &:hover {
     transform: scale(1.03);
   }
@@ -129,36 +134,48 @@ const SmallParagraph = styled.p`
   }
 `;
 
+const PlayIcon = styled.img`
+  height: 1.5rem;
+  object-fit: cover;
+  -webkit-transform:${(props) => (props.isArabic ? "scaleX(-1)" : "")};
+  transform: ${(props) => (props.isArabic ? "scaleX(-1)" : "")}; ;
+  @media (max-width: 768px) {
+    width: auto;
+  }
+`;
 const HomePage = () => {
   const { t, i18n } = useTranslation();
-  const link = "https://docs.google.com/forms/d/e/1FAIpQLScDMEL5ruTmJNRXrlzKOaMq6637CfDqwr7RUxk2aFdlxdI-NA/viewform";
+  const link = "https://play.google.com/store/apps/details?id=com.hanuut.shop";
 
-  return (<>
-    <Section>
-      <Container isArabic={i18n.language === "ar"}>
-        <LeftBox>
-          <Heading>{t("homeHeading")}</Heading>
-          <SubHeading>{t("homeSubHeading")}</SubHeading>
-          <Paragraph>{t("homeParagraph")}</Paragraph>
-          <Link to={link}>
-            <Button>{t("homeInputButton")}</Button>
-          </Link>
-          <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>
-        </LeftBox>
-        <RightBox>
-          <HomeCarousel
-            images={[HomeIllustration1, HomeIllustration2, HomeIllustration3]}
-          />
-        </RightBox>
-      </Container>
-    </Section>
-    {/* <AboutUs />
+  return (
+    <>
+      <Section>
+        <Container isArabic={i18n.language === "ar"}>
+          <LeftBox>
+            <Heading>{t("homeHeading")}</Heading>
+            <SubHeading>{t("homeSubHeading")}</SubHeading>
+            <Paragraph>{t("homeParagraph")}</Paragraph>
+            <Link to={link}>
+              <Button>
+                {t("homeInputButton")} <PlayIcon src={Playstore} isArabic={i18n.language === "ar"}/>
+              </Button>
+            </Link>
+            <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>
+          </LeftBox>
+          <RightBox>
+            <HomeCarousel
+              images={[HomeIllustration1, HomeIllustration2, HomeIllustration3]}
+            />
+          </RightBox>
+        </Container>
+      </Section>
+      <AboutUs />
 
-    <HowItWorks />
-
+      <HowItWorks />
+      {/* 
     <Testimonials />
     <Partners /> 
-    <CallToAction />*/}
+    <CallToAction /> */}
     </>
   );
 };
