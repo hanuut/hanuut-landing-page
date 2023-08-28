@@ -6,7 +6,9 @@ export const light = {
   textRgba: "32, 32, 32",
   secondaryColor: "#003F7D", //blue
   primaryColor: "#5BC28B", //green
+  downloadButtonColor: "#182018", //grey
   primaryColorRgba: "91 ,194 ,139",
+  
   //fonts
   fontxs: "0.625em", // 10px: This is a small font size, often used for fine print or disclaimers.
   fontsm: "0.75em", // 12px: This is a common font size for body text on desktop screens, but may be toosmall for mobile screens.

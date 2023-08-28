@@ -1,10 +1,13 @@
 import React from "react";
 import styled from "styled-components";
-import PartnersImg from "../assets/partnersIllustration.svg";
+import PartnersImg from "../../assets/partnersIllustration.svg";
 import { useTranslation } from "react-i18next";
-import PartnersForm from "./Sections/PartnersForm";
+import PartnersForm from "./components/PartnersForm";
+import ShopsContainer from "./components/ShopsContainer";
 
 const Section = styled.div`
+  width: 80%;
+  margin: 0 auto;
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
   background-color: ${(props) => props.theme.body};
   display: flex;
@@ -15,8 +18,9 @@ const Section = styled.div`
     min-height: 100vh;
   }
 `;
-const Container = styled.div`
-  width: 80%;
+const UpperBox = styled.div`
+  min-height: 70vh;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -29,6 +33,7 @@ const Container = styled.div`
     align-items: flex-start;
   }
 `;
+
 const RightBox = styled.div`
   width: 40%;
   display: flex;
@@ -58,12 +63,36 @@ const LeftBox = styled.div`
     margin-bottom: 1rem;
   }
 `;
+const LowerBox = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  .shopLinkWrapper{
+    width: 30%;
+  }
+  }
+`;
 
+const Title = styled.h2`
+  align-self: start;
+  font-size: ${(props) => props.theme.fontLargest};
+  font-weight: bold;
+  color: ${(props) => props.theme.primaryColor};
+  @media (max-width: 768px) {
+    margin-top: 2rem;
+    font-size: ${(props) => props.theme.fontxxxl};
+  }
+`;
 const PartnersPage = () => {
   const { i18n } = useTranslation();
+
   return (
     <Section>
-      <Container isArabic={i18n.language === "ar"}>
+      <UpperBox isArabic={i18n.language === "ar"}>
         <LeftBox>
           <PartnersForm />
         </LeftBox>
@@ -71,10 +100,14 @@ const PartnersPage = () => {
           <PartnersImageContainer
             src={PartnersImg}
             isArabic={i18n.language === "ar"}
-            alt=""
+            alt="Partners"
           />
         </RightBox>
-      </Container>
+      </UpperBox>
+      {/* <LowerBox>
+        <Title>Our Partners</Title>
+        <ShopsContainer />
+      </LowerBox> */}
     </Section>
   );
 };

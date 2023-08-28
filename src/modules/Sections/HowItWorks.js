@@ -23,10 +23,10 @@ const Container = styled.div`
   flex-direction: Column;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 3rem;
+  gap: 1rem;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
-    width: 90%;
+    width: 100%;
     align-items: flex-start;
   }
 `;
@@ -35,6 +35,10 @@ const HowItWorksTitle = styled.h2`
   font-size: ${(props) => props.theme.fontLargest};
   font-weight: bold;
   color: ${(props) => props.theme.primaryColor};
+  @media (max-width: 768px) {
+    margin-top: 2rem;
+    font-size: ${(props) => props.theme.fontxxxl};
+  }
 `;
 
 const CardsContainer = styled.div`
@@ -44,6 +48,10 @@ const CardsContainer = styled.div`
   align-items: flex-start;
   justify-content: space-between;
   transition: all 0.3s ease;
+  @media (max-width: 768px) {
+   flex-direction : column;
+   gap: 2rem;
+  }
 `;
 
 const HowItWorksCard = styled.div`
@@ -52,15 +60,18 @@ const HowItWorksCard = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5rem;
-
+  @media (max-width: 768px) {
+    width: 100%;
+   }
 `;
 
 const HowItWorksIcon = styled.img`
-  width: 100%;
-  height: 35vh;
+  width: 75%;
+  height: 30vh;
   object-fit: fill;
   @media (max-width: 768px) {
-    width: auto;
+    width: 75%;
+   }
 `;
 
 const HowItWorksStep = styled.h1`
@@ -70,14 +81,19 @@ const HowItWorksStep = styled.h1`
   align-items: center;
   justify-content: center;
   background-color: ${(props) => props.theme.primaryColor};
+  color: ${(props) => props.theme.body};
   font-size: ${(props) => props.theme.fontxl};
   border-radius: 50%;
   margin-left: ${(props) => (props.isArabic ? "0" : "1.25rem")};
   margin-right: ${(props) => (props.isArabic ? "1.25rem" : "0")};
+  font-family: 'Ubuntu', sans-serif;
+  @media (max-width: 768px) {
+    align-self: flex-start;
+   }
 `;
 
 const HowItWorksText = styled.p`
-  width: 90%;
+
   font-size: ${(props) => props.theme.fontlg};
   color: rgb(${(props) => props.theme.textRgba}, 0.75);
   line-height: 1.5;
@@ -90,7 +106,7 @@ function HowItWorks() {
   return (
     <Section>
      <Container isArabic={i18n.language === "ar"}>
-        <HowItWorksTitle>{t("howItWorksTitle")}</HowItWorksTitle>
+        <HowItWorksTitle isArabic={i18n.language === "ar"}>{t("howItWorksTitle")}</HowItWorksTitle>
         <CardsContainer>
           <HowItWorksCard>
             <HowItWorksIcon src={AddToCart} alt="Shop and Add to cart" />
