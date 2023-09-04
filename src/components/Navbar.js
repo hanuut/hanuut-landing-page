@@ -102,9 +102,8 @@ const HamburgerMenu = styled.span`
   background-color: ${(props) => props.theme.text};
   position: absolute;
   top: 2.5rem;
-  right: ${(props) => (props.isArabic ? "85%" : "0")};
+  right: ${(props) => (props.isArabic ? "80%" : "0")};
   transform: translateX(-100%);
-
   display: none;
   align-items: center;
   justify-content: center;

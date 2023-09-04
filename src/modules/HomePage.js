@@ -137,8 +137,8 @@ const SmallParagraph = styled.p`
 const PlayIcon = styled.img`
   height: 1.5rem;
   object-fit: cover;
-  -webkit-transform:${(props) => (props.isArabic ? "scaleX(-1)" : "")};
-  transform: ${(props) => (props.isArabic ? "scaleX(-1)" : "")}; ;
+  -webkit-transform: ${(props) => (props.isArabic ? "scaleX(-1)" : "")};
+  transform: ${(props) => (props.isArabic ? "scaleX(-1)" : "")};
   @media (max-width: 768px) {
     width: auto;
   }
@@ -157,7 +157,8 @@ const HomePage = () => {
             <Paragraph>{t("homeParagraph")}</Paragraph>
             <Link to={link}>
               <Button>
-                {t("homeInputButton")} <PlayIcon src={Playstore} isArabic={i18n.language === "ar"}/>
+                <PlayIcon src={Playstore} isArabic={i18n.language === "ar"} />{" "}
+                {t("homeInputButton")}
               </Button>
             </Link>
             <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>

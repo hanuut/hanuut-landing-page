@@ -4,10 +4,10 @@ import { reducer as imagesReducer } from "./modules/Images/state/reducers";
 import { reducer as categoriesReducer } from "./modules/Categories/state/reducers";
 import { reducer as dishesReducer } from "./modules/Dish/state/reducers";
 const rootReducer = combineReducers({
-  // shops: shopsReducer,
-  // images: imagesReducer,
-  // categories: categoriesReducer,
-  // dishes: dishesReducer
+  shops: shopsReducer,
+  images: imagesReducer,
+  categories: categoriesReducer,
+  dishes: dishesReducer
 });
 
 const store = configureStore({

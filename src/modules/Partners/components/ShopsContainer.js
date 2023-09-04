@@ -12,6 +12,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Loader from "../../../components/Loader";
 
+
 const Section = styled.div`
   min-height: 50vh;
   width: 100%;
@@ -22,10 +23,7 @@ const Section = styled.div`
   gap: 2rem;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
-    width: 90%;
-    min-height: 100%;
-    flex-direction: column-reverse;
-    align-items: flex-start;
+    width: 100%;
   }
 `;
 const Container = styled.div`
@@ -36,14 +34,28 @@ const Container = styled.div`
   justify-content: flex-start;
   gap: 1.5rem;
   flex-wrap: wrap;
-  .shopLinkWrapper{
+  .shopLinkWrapper {
     width: 30%;
   }
+  @media (max-width: 768px) {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
-
+const Title = styled.h2`
+  align-self: start;
+  font-size: ${(props) => props.theme.fontLargest};
+  font-weight: bold;
+  color: ${(props) => props.theme.primaryColor};
+  @media (max-width: 768px) {
+    margin-top: 2rem;
+    font-size: ${(props) => props.theme.fontxxxl};
+  }
+`;
 const ShopsContainer = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
   const dispatch = useDispatch();
   const { shops, loading, error } = useSelector(selectShops);
   const { images, imagesLoading } = useSelector(selectShopsImages);
@@ -79,7 +91,11 @@ const ShopsContainer = () => {
     <Section isArabic={i18n.language === "ar"}>
       {loading || imagesLoading ? (
         <Loader />
+      ) : shops.length <= 0 ? (
+        <></> // Render the component to inform that there are no valid shops yet
       ) : (
+        <>
+        <Title>{t('ourPartners')}</Title>
         <Container>
           {shopsWithImages.map((shop) => (
             <Link
@@ -99,9 +115,9 @@ const ShopsContainer = () => {
             </Link>
           ))}
         </Container>
+        </>
       )}
     </Section>
   );
 };
-
 export default ShopsContainer;

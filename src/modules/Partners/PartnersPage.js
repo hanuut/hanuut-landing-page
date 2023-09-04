@@ -4,6 +4,7 @@ import PartnersImg from "../../assets/partnersIllustration.svg";
 import { useTranslation } from "react-i18next";
 import PartnersForm from "./components/PartnersForm";
 import ShopsContainer from "./components/ShopsContainer";
+import { t } from "i18next";
 
 const Section = styled.div`
   width: 80%;
@@ -15,6 +16,7 @@ const Section = styled.div`
   align-items: center;
   justify-content: center;
   @media (max-width: 768px) {
+    width: 100%;
     min-height: 100vh;
   }
 `;
@@ -65,28 +67,28 @@ const LeftBox = styled.div`
 `;
 const LowerBox = styled.div`
   width: 100%;
+  margin-bottom: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   gap: 1.5rem;
   flex-wrap: wrap;
+  @media (max-width: 768px) {
+    width: 90%;
+    margin-bottom: 1rem;
+  }
+  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   .shopLinkWrapper{
     width: 30%;
+    @media (max-width: 768px) {
+      width: 90%;
+    }
   }
-  }
+
 `;
 
-const Title = styled.h2`
-  align-self: start;
-  font-size: ${(props) => props.theme.fontLargest};
-  font-weight: bold;
-  color: ${(props) => props.theme.primaryColor};
-  @media (max-width: 768px) {
-    margin-top: 2rem;
-    font-size: ${(props) => props.theme.fontxxxl};
-  }
-`;
+
 const PartnersPage = () => {
   const { i18n } = useTranslation();
 
@@ -104,10 +106,9 @@ const PartnersPage = () => {
           />
         </RightBox>
       </UpperBox>
-      {/* <LowerBox>
-        <Title>Our Partners</Title>
+      <LowerBox isArabic={i18n.language === "ar"}>
         <ShopsContainer />
-      </LowerBox> */}
+      </LowerBox>
     </Section>
   );
 };
