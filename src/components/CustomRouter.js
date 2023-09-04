@@ -20,7 +20,7 @@ const CustomRouter = () => {
       <Route path="/delete account" element={<DeleteAccountPage />} />
       <Route path="/privacy policy" element={<PrivacyPolicy />} />
       <Route path="/terms and conditions" element={<TermsAndConditions />} />
-      {/* <Route path="/shop/:shopName" element={<ShopPage/>} /> */}
+      <Route path="/shop/:shopName" element={<ShopPage/>} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

@@ -107,6 +107,7 @@ const FooterText = styled.p`
 const Footer = () => {
   const { t, i18n } = useTranslation();
   const instagramLink = "https://www.instagram.com/hanuut_app/";
+  const facebookLink = "https://web.facebook.com/hanuutapp"
   return (
     <Section isArabic={i18n.language === "ar"}>
       <UpperBox>
@@ -116,7 +117,7 @@ const Footer = () => {
         <RightBox>
           <Title>{t("footerFindUs")}</Title>
           <SotialMediaContainer isArabic={i18n.language === "ar"}>
-            <Link to="#">
+            <Link to={facebookLink}>
               <SocialMediaIcon>
                 <FaFacebook />
               </SocialMediaIcon>

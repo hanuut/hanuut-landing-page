@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useEffect } from "react";
 
-
 const Container = styled.div`
   width: 100%;
   height: 7rem;
@@ -17,21 +16,25 @@ const Container = styled.div`
   justify-content: center;
   gap: 1rem;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  @media (max-width: 768px) {
-    width: 90%;
-    min-height: 100%;
-    flex-direction: column-reverse;
-    align-items: flex-start;
-  }
+
   &.headingShopCart {
-    width: 80%;
-    background-color: ${(props) => props.theme.body};
+    width: 33%;
+    height: 100%;
+    align-items: flex-start;
+    justify-content: flex-start;
+    border: none;
+    border-radius: 0;
     @media (max-width: 768px) {
       width: 90%;
       min-height: 100%;
-      flex-direction: column-reverse;
+
       align-items: flex-start;
     }
+  }
+  @media (max-width: 768px) {
+    width: 100%;
+    gap: 0.5rem;
+    padding: 0px 10px;
   }
 `;
 
@@ -41,7 +44,8 @@ const ShopIcon = styled.img`
   border-radius: ${(props) => props.theme.defaultRadius};
   object-fit: cover;
   @media (max-width: 768px) {
-    width: auto;
+    width: 4rem;
+    height: 4rem;
   }
 `;
 
@@ -51,7 +55,9 @@ const ShopInfo = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const ShopHeader = styled.div`
@@ -62,16 +68,11 @@ const ShopHeader = styled.div`
   justify-content: space-between;
 `;
 
-const ShopName = styled.h3`
+const ShopName = styled.h2`
   font-family: "Tajawal", sans-serif;
-`;
-const Availability = styled.h4`
-  padding: 7px 20px;
-  color: ${(props) => props.theme.body};
-  background-color: ${(props) =>
-    props.isOpen ? props.theme.primaryColor : "red"};
-  border-radius: 20px;
-  line-height: 1;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontlg};
+  }
 `;
 
 const ShopBody = styled.div`
@@ -86,21 +87,22 @@ const ShopDesc = styled.h5`
   text-overflow: ellipsis;
   overflow: hidden;
   font-family: "Tajawal", sans-serif;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontsm};
+    font-weight: 100;
+  }
 `;
-const ClosingTime = styled.h5`
-  padding: 2px 10px;
-`;
+
 const ShopCart = ({ shop, imageData, className, isImageLoading }) => {
   const { i18n } = useTranslation();
   const [imageSrc, setImageSrc] = useState("");
- 
+
   useEffect(() => {
     const bufferData = imageData.buffer.data;
     const uint8Array = new Uint8Array(bufferData);
     const blob = new Blob([uint8Array], { type: "image/jpeg" });
     const imageUrl = URL.createObjectURL(blob);
     setImageSrc(imageUrl);
-
   }, [imageData]);
 
   return (
@@ -109,15 +111,9 @@ const ShopCart = ({ shop, imageData, className, isImageLoading }) => {
       <ShopInfo>
         <ShopHeader>
           <ShopName>{shop.name}</ShopName>
-          {shop.isOpen ? (
-            <Availability isOpen={shop.isOpen}>Open</Availability>
-          ) : (
-            <Availability isOpen={shop.isOpen}>Closed</Availability>
-          )}
         </ShopHeader>
         <ShopBody>
           <ShopDesc>{shop.description}</ShopDesc>
-          <ClosingTime>till {shop.closingTime}</ClosingTime>
         </ShopBody>
       </ShopInfo>
     </Container>

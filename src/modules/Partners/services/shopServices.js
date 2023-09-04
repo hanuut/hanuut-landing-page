@@ -11,7 +11,7 @@ const headers = {
 };
 
 export const getShops = () => {
-  return axios.get(`${prodUrl}/shop`, { headers });
+  return axios.get(`${prodUrl}/shop/validated`, { headers });
 };
 
 export const getShopById = (id) => {

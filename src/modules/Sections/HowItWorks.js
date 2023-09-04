@@ -38,6 +38,7 @@ const HowItWorksTitle = styled.h2`
   @media (max-width: 768px) {
     margin-top: 2rem;
     font-size: ${(props) => props.theme.fontxxxl};
+    margin-left: 5%;
   }
 `;
 
@@ -49,8 +50,8 @@ const CardsContainer = styled.div`
   justify-content: space-between;
   transition: all 0.3s ease;
   @media (max-width: 768px) {
-   flex-direction : column;
-   gap: 2rem;
+    flex-direction: column;
+    gap: 2rem;
   }
 `;
 
@@ -62,7 +63,7 @@ const HowItWorksCard = styled.div`
   gap: 0.5rem;
   @media (max-width: 768px) {
     width: 100%;
-   }
+  }
 `;
 
 const HowItWorksIcon = styled.img`
@@ -71,7 +72,7 @@ const HowItWorksIcon = styled.img`
   object-fit: fill;
   @media (max-width: 768px) {
     width: 75%;
-   }
+  }
 `;
 
 const HowItWorksStep = styled.h1`
@@ -86,14 +87,16 @@ const HowItWorksStep = styled.h1`
   border-radius: 50%;
   margin-left: ${(props) => (props.isArabic ? "0" : "1.25rem")};
   margin-right: ${(props) => (props.isArabic ? "1.25rem" : "0")};
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   @media (max-width: 768px) {
     align-self: flex-start;
-   }
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: ${(props) => props.theme.fontlg};
+  }
 `;
 
 const HowItWorksText = styled.p`
-
   font-size: ${(props) => props.theme.fontlg};
   color: rgb(${(props) => props.theme.textRgba}, 0.75);
   line-height: 1.5;
@@ -105,28 +108,30 @@ function HowItWorks() {
   const { t, i18n } = useTranslation();
   return (
     <Section>
-     <Container isArabic={i18n.language === "ar"}>
-        <HowItWorksTitle isArabic={i18n.language === "ar"}>{t("howItWorksTitle")}</HowItWorksTitle>
+      <Container isArabic={i18n.language === "ar"}>
+        <HowItWorksTitle isArabic={i18n.language === "ar"}>
+          {t("howItWorksTitle")}
+        </HowItWorksTitle>
         <CardsContainer>
           <HowItWorksCard>
             <HowItWorksIcon src={AddToCart} alt="Shop and Add to cart" />
             <HowItWorksStep isArabic={i18n.language === "ar"}>1</HowItWorksStep>
             <HowItWorksText isArabic={i18n.language === "ar"}>
-            {t("howItWorksShoping")}
+              {t("howItWorksShoping")}
             </HowItWorksText>
           </HowItWorksCard>
           <HowItWorksCard>
             <HowItWorksIcon src={CartManagment} alt="Proceed To Delivery" />
             <HowItWorksStep isArabic={i18n.language === "ar"}>2</HowItWorksStep>
             <HowItWorksText isArabic={i18n.language === "ar"}>
-            {t("howItWorkCartManagment")}
+              {t("howItWorkCartManagment")}
             </HowItWorksText>
           </HowItWorksCard>
-          <HowItWorksCard >
+          <HowItWorksCard>
             <HowItWorksIcon src={Delivery} alt="Receive your item" />
             <HowItWorksStep isArabic={i18n.language === "ar"}>3</HowItWorksStep>
             <HowItWorksText isArabic={i18n.language === "ar"}>
-            {t("howItWorksDelivery")}
+              {t("howItWorksDelivery")}
             </HowItWorksText>
           </HowItWorksCard>
         </CardsContainer>

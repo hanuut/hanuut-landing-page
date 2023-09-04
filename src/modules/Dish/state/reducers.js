@@ -1,4 +1,4 @@
-// categoriesSlice.js
+
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getDishesByShopAndCategory } from "../services/dishServices";
 
