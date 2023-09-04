@@ -38,7 +38,8 @@ const HowItWorksTitle = styled.h2`
   @media (max-width: 768px) {
     margin-top: 2rem;
     font-size: ${(props) => props.theme.fontxxxl};
-    margin-left: 5%;
+    margin-left:  ${(props) => (props.isArabic ? "" : "5%")};
+    margin-right:  ${(props) => (props.isArabic ? "5%" : "")};
   }
 `;
 
