@@ -71,7 +71,7 @@ const AddressesDropDown = ({ onChooseAddress }) => {
   const handleChoosedState = (event) => {
     setChoosedState(event.target.value);
     let tempCities = [];
-    if( i18n.language === "ar") {
+    if (i18n.language === "ar") {
       cities.forEach((city) => {
         if (city.wilaya_name === event.target.value) tempCities.push(city);
       });
@@ -91,12 +91,12 @@ const AddressesDropDown = ({ onChooseAddress }) => {
     });
 
     setFilteredCities(sortedArray);
-    onChooseAddress(event.target.value + ", " + choosedCity);
+    onChooseAddress({ wilaya: event.target.value, commune: choosedCity });
   };
 
   const handleChoosedCity = (event) => {
     setChoosedCity(event.target.value);
-    onChooseAddress(choosedState + ", " + event.target.value);
+    onChooseAddress({ wilaya: choosedState, commune: event.target.value });
   };
 
   return (
@@ -132,11 +132,14 @@ const AddressesDropDown = ({ onChooseAddress }) => {
             {choosedCity === "" ? t("partnersFormAddressCity") : choosedCity}
           </Option>
           {filteredCities.map((element) => (
-            <Option key={element.id}  value={
+            <Option
+              key={element.id}
+              value={
                 i18n.language === "ar"
                   ? element.commune_name
                   : element.commune_name_ascii
-              }>
+              }
+            >
               {i18n.language === "ar"
                 ? element.commune_name
                 : element.commune_name_ascii}

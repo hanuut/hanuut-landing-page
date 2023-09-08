@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import PartnersImg from "../../assets/partnersIllustration.svg";
 import { useTranslation } from "react-i18next";
 import PartnersForm from "./components/PartnersForm";
 import ShopsContainer from "./components/ShopsContainer";
-import { t } from "i18next";
+
 
 const Section = styled.div`
   width: 80%;
@@ -14,7 +14,7 @@ const Section = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   @media (max-width: 768px) {
     width: 100%;
     min-height: 100vh;
@@ -50,7 +50,7 @@ const PartnersImageContainer = styled.img`
   max-width: 100%;
   object-fit: cover;
   @media (max-width: 768px) {
-    width: auto;
+    width: ${(props) => (props.hide ? "0" : "100%")};
   }
 `;
 const LeftBox = styled.div`
@@ -79,30 +79,33 @@ const LowerBox = styled.div`
     margin-bottom: 1rem;
   }
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  .shopLinkWrapper{
+  .shopLinkWrapper {
     width: 30%;
     @media (max-width: 768px) {
       width: 90%;
     }
   }
-
 `;
-
 
 const PartnersPage = () => {
   const { i18n } = useTranslation();
-
+  const [formStep, setFormStep] = useState(0);
+  console.log(formStep);
+  const setStep = (step) => {
+    setFormStep(step);
+  };
   return (
     <Section>
       <UpperBox isArabic={i18n.language === "ar"}>
         <LeftBox>
-          <PartnersForm />
+          <PartnersForm setStep={setStep} />
         </LeftBox>
         <RightBox>
           <PartnersImageContainer
             src={PartnersImg}
             isArabic={i18n.language === "ar"}
             alt="Partners"
+            hide={formStep !== 0}
           />
         </RightBox>
       </UpperBox>

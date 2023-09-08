@@ -12,7 +12,6 @@ const Container = styled.div`
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  
 `;
 
 const PartnerFormStep = styled.form`
@@ -63,13 +62,12 @@ const Step = styled.div`
   animation-fill-mode: forwards;
   animation-name: ${(props) =>
     props.isArabic ? negativeSlideAnimation : slideAnimation};
-    @media (max-width: 768px) {
-      flex-direction: column;
-      width: 100%;
-      align-items: center;
-      justify-content: center;
-    }
-  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
 `;
 
 const FirstStep = styled(Step)`
@@ -124,8 +122,9 @@ const SubHeading = styled.h2`
   margin-bottom: 2rem;
 
   @media (max-width: 768px) {
-    width: 90%;
+    width: 100%;
     font-size: ${(props) => props.theme.fontxl};
+    margin-bottom: 1rem;
   }
   &.greenSubHeading {
     color: ${(props) => props.theme.primaryColor};
@@ -166,7 +165,6 @@ const Input = styled.input`
     outline: none;
     border-color: ${(props) => props.theme.primaryColor};
   }
- 
 `;
 
 const Label = styled.label`
@@ -220,8 +218,10 @@ const Button = styled.button`
   }
 
   @media (max-width: 768px) {
+    
     font-size: ${(props) => props.theme.fontlg};
     padding: ${(props) => props.theme.actionButtonPaddingMobile};
+    margin-top: 10px;
   }
 `;
 
@@ -286,7 +286,7 @@ const ErrorMessage = styled.div`
     font-size: ${(props) => props.theme.fontmd};
   }
 `;
-const PartnersForm = () => {
+const PartnersForm = ({ setStep }) => {
   const { t, i18n } = useTranslation();
   const [formStep, setFormStep] = useState(0);
   const [email, setEmail] = useState("");
@@ -334,6 +334,7 @@ const PartnersForm = () => {
     setIsSubmitting(true);
     setErrorMessage("");
     setFormStep(1);
+    setStep(1);
     setIsSubmitting(false);
   };
 
@@ -362,6 +363,7 @@ const PartnersForm = () => {
     setIsSubmitting(true);
     setErrorMessage("");
     setFormStep(2);
+    setStep(2);
     setIsSubmitting(false);
   };
 
@@ -375,13 +377,15 @@ const PartnersForm = () => {
 
     setIsSubmitting(true);
     const data = {
-      fullName,
-      phone,
-      email,
-      address,
-      domain,
-      channel,
+      fullName: fullName,
+      phone: phone,
+      email: email,
+      wilaya: address.wilaya,
+      commune: address.commune,
+      domain: domain,
+      channel: channel,
     };
+
     //  const testUrl = process.env.REACT_APP_API_TEST_URL;
     const prodUrl = process.env.REACT_APP_API_PROD_URL;
     try {
@@ -396,11 +400,13 @@ const PartnersForm = () => {
       if (response.ok) {
         setErrorMessage("");
         setFormStep(3);
+        setStep(3);
         setIsSubmitting(false);
       } else {
         console.error("Request failed with status:", response.status);
         setErrorMessage(t("errorCouldNotSubscribe"));
         setFormStep(0);
+        setStep(0);
         setIsSubmitting(false);
       }
     } catch (error) {
