@@ -38,8 +38,10 @@ const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: ${(props) => props.theme.primaryColor};
-  }
+    border-color: ${(props) =>
+      props.target === "tawsila"
+        ? props.theme.secondaryColor
+        : props.theme.primaryColor};
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontmd};
   }
@@ -59,7 +61,7 @@ const Label = styled.label`
     font-size: ${(props) => props.theme.fontmd};
   }
 `;
-const AddressesDropDown = ({ onChooseAddress }) => {
+const AddressesDropDown = ({ target, onChooseAddress }) => {
   const { t, i18n } = useTranslation();
 
   const [cities] = useState(Cities);
@@ -70,6 +72,7 @@ const AddressesDropDown = ({ onChooseAddress }) => {
 
   const handleChoosedState = (event) => {
     setChoosedState(event.target.value);
+    setChoosedCity("")
     let tempCities = [];
     if (i18n.language === "ar") {
       cities.forEach((city) => {
@@ -103,7 +106,13 @@ const AddressesDropDown = ({ onChooseAddress }) => {
     <AddressContainer>
       <InputWrapper>
         <Label htmlFor="address">{t("partnersFormAddress")}</Label>
-        <Select id="state" value="" onChange={handleChoosedState} required>
+        <Select
+          id="state"
+          value=""
+          onChange={handleChoosedState}
+          required
+          target={target}
+        >
           <Option value="" disabled>
             {choosedState === "" ? t("partnersFormAddressState") : choosedState}
           </Option>
@@ -127,7 +136,13 @@ const AddressesDropDown = ({ onChooseAddress }) => {
       </InputWrapper>
 
       <InputWrapper>
-        <Select id="city" value="" onChange={handleChoosedCity} required>
+        <Select
+          id="city"
+          value=""
+          onChange={handleChoosedCity}
+          required
+          target={target}
+        >
           <Option value="" disabled>
             {choosedCity === "" ? t("partnersFormAddressCity") : choosedCity}
           </Option>

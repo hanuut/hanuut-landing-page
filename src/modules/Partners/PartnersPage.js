@@ -90,7 +90,6 @@ const LowerBox = styled.div`
 const PartnersPage = () => {
   const { i18n } = useTranslation();
   const [formStep, setFormStep] = useState(0);
-  console.log(formStep);
   const setStep = (step) => {
     setFormStep(step);
   };

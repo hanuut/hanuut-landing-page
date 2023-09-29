@@ -184,6 +184,11 @@ const Navbar = () => {
           {t('navContact')}
             </Link>
           </MenuItem> */}
+          <MenuItem>
+          <Link to="/tawsila" onClick={handleMenuItemClick}>
+          {t('navTawsila')}
+            </Link>
+          </MenuItem>
           <LanguageMenuItem>
           <LanguagesDropDown className="languageMenuItem" handleChooseLanguage= {handleMenuItemClick}/>
           </LanguageMenuItem>

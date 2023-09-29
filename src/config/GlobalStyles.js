@@ -22,13 +22,23 @@ h1, h2, h3, h4, h5, h6{
     font-family: ${props => props.isArabic ? "'Tajawal', sans-serif" : "'Ubuntu', sans-serif"};
     margin: 0;
     padding: 0;
+    line-height: 1;
 }
 
 a, input, textarea{
     color: inherit;
     text-decoration: none;
     font-family: ${props => props.isArabic ? "'Cairo Variable', sans-serif" : "'Ubuntu Condensed', sans-serif"};
+    line-height: ;
 }
+
+p{
+    color: inherit;
+    text-decoration: none;
+    font-family: ${props => props.isArabic ? "'Cairo Variable', sans-serif" : "'Cairo Variable', sans-serif"};
+    line-height: 1.25;
+}
+
 
 select{
     font-family: ${props => props.isArabic ? "'Cairo Variable', sans-serif" : "'Ubuntu Condensed', sans-serif"};

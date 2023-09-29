@@ -4,10 +4,12 @@ export const light = {
   text: "#202020",
   bodyRgba: "255, 252, 248",
   textRgba: "32, 32, 32",
-  secondaryColor: "#003F7D", //blue
-  primaryColor: "#5BC28B", //green
+  primaryColor: "#5BC28B", 
+  secondaryColor: "#0A99FF",//blue
+  secondaryColorDark: "#0066CA", //dark blue
   downloadButtonColor: "#182018", //grey
   primaryColorRgba: "91 ,194 ,139",
+  white: "#fff",
   
   //fonts
   fontxs: "0.625em", // 10px: This is a small font size, often used for fine print or disclaimers.
@@ -24,4 +26,6 @@ export const light = {
   actionButtonPadding: "0.7rem 1.5rem",
   actionButtonPaddingMobile : "0.5rem 0.9rem",
   defaultRadius:"10px",
+  smallRadius:"5px",
+  bigRadius:"20px",
 };

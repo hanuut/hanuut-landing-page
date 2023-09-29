@@ -4,13 +4,13 @@ export function isValidEmail(email) {
 }
 
 export function isValidPhone(phone) {
-  const frenchPhonePattern = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+  const algerianPhonePattern = /^(00213|\+213|0)(5|6|7)[0-9]{8}$/
 
   // Remove any non-numeric characters from phone number
   const numericPhone = phone.replace(/\D/g, '');
 
-  // Check that numeric phone number matches French phone number pattern
-  if (!frenchPhonePattern.test(numericPhone)) {
+  // Check that numeric phone number matches Algerian phone number pattern
+  if (!algerianPhonePattern.test(numericPhone)) {
     return false;
   }
 

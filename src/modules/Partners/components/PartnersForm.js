@@ -181,6 +181,7 @@ const EmailInputWrapper = styled(InputWrapper)`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   border-radius: ${(props) => props.theme.defaultRadius};
   padding: 0.5rem;
   border: 1px solid ${(props) => props.theme.primaryColor};
@@ -218,13 +219,14 @@ const Button = styled.button`
   }
 
   @media (max-width: 768px) {
-    
     font-size: ${(props) => props.theme.fontlg};
     padding: ${(props) => props.theme.actionButtonPaddingMobile};
     margin-top: 10px;
   }
 `;
-
+const EmailButton = styled(Button)`
+  margin-top: 0px;
+`;
 const SmallParagraph = styled.p`
   width: 100%;
   font-size: ${(props) => props.theme.fontmd};
@@ -432,7 +434,7 @@ const PartnersForm = ({ setStep }) => {
                 onChange={(event) => setEmail(event.target.value)}
                 required
               />
-              <Button
+              <EmailButton
                 onClick={handleSubscribe}
                 className={isSubmitting ? "submitting" : ""}
                 disabled={isSubmitting}
@@ -440,7 +442,7 @@ const PartnersForm = ({ setStep }) => {
                 {isSubmitting
                   ? t("buttonIsSubmitting")
                   : t("partnerInputButton")}
-              </Button>
+              </EmailButton>
             </EmailInputWrapper>
             <SmallParagraph>{t("partnerSmallerParagraph")}</SmallParagraph>
           </FirstStep>
@@ -469,7 +471,10 @@ const PartnersForm = ({ setStep }) => {
                 required
               />
             </InputWrapper>
-            <AddressesDropDown onChooseAddress={handleChooseAddress} />
+            <AddressesDropDown
+              target="partners"
+              onChooseAddress={handleChooseAddress}
+            />
 
             <Button
               onClick={handleNext}
