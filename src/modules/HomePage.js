@@ -9,6 +9,7 @@ import Playstore from "../assets/playstore.png";
 import { Link } from "react-router-dom";
 import AboutUs from "./Sections/AboutUs";
 import HowItWorks from "./Sections/HowItWorks";
+import ButtonWithIcon from "../components/ButtonWithIcon";
 // import Testimonials from "./Sections/Testimonials";
 // import Partners from "./Partners/Partners";
 // import CallToAction from "./Sections/CallToAction";
@@ -98,30 +99,6 @@ const Paragraph = styled.p`
   }
 `;
 
-const Button = styled.button`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  background-color: ${(props) => props.theme.downloadButtonColor};
-  color: #fff;
-  border: none;
-  border-radius: ${(props) => props.theme.defaultRadius};
-  padding: ${(props) => props.theme.actionButtonPadding};
-  font-size: ${(props) => props.theme.fontxl};
-  cursor: pointer;
-  transition: all 0.5s ease;
-  margin-bottom: 0.5rem;
-  &:hover {
-    transform: scale(1.03);
-  }
-
-  @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontmd};
-    padding: ${(props) => props.theme.actionButtonPaddingMobile};
-  }
-`;
 
 const SmallParagraph = styled.p`
   width: 100%;
@@ -134,15 +111,7 @@ const SmallParagraph = styled.p`
   }
 `;
 
-const PlayIcon = styled.img`
-  height: 1.5rem;
-  object-fit: cover;
-  -webkit-transform: ${(props) => (props.isArabic ? "scaleX(-1)" : "")};
-  transform: ${(props) => (props.isArabic ? "scaleX(-1)" : "")};
-  @media (max-width: 768px) {
-    width: auto;
-  }
-`;
+
 const HomePage = () => {
   const { t, i18n } = useTranslation();
   const link = "https://play.google.com/store/apps/details?id=com.hanuut.shop";
@@ -156,10 +125,7 @@ const HomePage = () => {
             <SubHeading>{t("homeSubHeading")}</SubHeading>
             <Paragraph>{t("homeParagraph")}</Paragraph>
             <Link to={link}>
-              <Button>
-                <PlayIcon src={Playstore} isArabic={i18n.language === "ar"} />{" "}
-                {t("homeInputButton")}
-              </Button>
+              <ButtonWithIcon image={Playstore} backgroundColor="#000000"> {t("homeInputButton")}</ButtonWithIcon>
             </Link>
             <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>
           </LeftBox>

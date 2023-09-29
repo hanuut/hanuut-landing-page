@@ -9,6 +9,7 @@ import TermsAndConditions from "../modules/TermsAndConditions";
 import PartnersPage from "../modules/Partners/PartnersPage";
 import DeleteAccountPage from "../modules/DeleteAccountPage";
 import ShopPage from "../modules/Partners/components/ShopPage";
+import Tawsila from "../modules/Tawsila/Tawsila";
 
 const CustomRouter = () => {
   return (
@@ -20,6 +21,7 @@ const CustomRouter = () => {
       <Route path="/delete account" element={<DeleteAccountPage />} />
       <Route path="/privacy policy" element={<PrivacyPolicy />} />
       <Route path="/terms and conditions" element={<TermsAndConditions />} />
+      <Route path="/tawsila" element={<Tawsila />} />
       <Route path="/shop/:shopName" element={<ShopPage/>} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
