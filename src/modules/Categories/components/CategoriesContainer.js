@@ -33,14 +33,17 @@ const CategoriesContainer = ({ shopData }) => {
     error: categoriesError,
   } = useSelector(selectCategories);
   const { dishes } = useSelector(selectDishes);
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [loadedCategories, setLoadedCategories] = useState([]);
 
   const filterAvailableCategories = (categories, hiddenCategories) => {
-    const availableCategories = categories.filter(
-      (category) => !hiddenCategories.includes(category)
-    );
-    return availableCategories;
+    if (categories) {
+      const availableCategories = categories.filter(
+        (category) => !hiddenCategories.includes(category)
+      );
+      return availableCategories;
+    } else {
+      return <Loader />;
+    }
   };
 
   useEffect(() => {
@@ -49,10 +52,10 @@ const CategoriesContainer = ({ shopData }) => {
       shopData.hiddenCategories
     );
     dispatch(fetchCategories(availableCategories));
-  }, [dispatch, shopData.categories]);
+  }, [dispatch, shopData.categories, shopData.hiddenCategories]);
 
   const handleCategoryClick = async (categoryId) => {
-    setSelectedCategory(categoryId);
+
     if (!loadedCategories.includes(categoryId)) {
       dispatch(fetchDishesByCategory({ shopId: shopData.id, categoryId }));
       setLoadedCategories([...loadedCategories, categoryId]);
@@ -60,7 +63,7 @@ const CategoriesContainer = ({ shopData }) => {
   };
 
   if (categoriesLoading) return <Loader />;
-  if (categoriesError) return <div>Error: {categoriesError}</div>;
+  if (categoriesError) return <div>Error: No categories available</div>;
 
   return (
     <Section>

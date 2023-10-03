@@ -55,7 +55,6 @@ const Title = styled.h2`
 `;
 const ShopsContainer = () => {
   const { t, i18n } = useTranslation();
-  
   const dispatch = useDispatch();
   const { shops, loading, error } = useSelector(selectShops);
   const { images, imagesLoading } = useSelector(selectShopsImages);
@@ -99,7 +98,7 @@ const ShopsContainer = () => {
         <Container>
           {shopsWithImages.map((shop) => (
             <Link
-              to={`/shop/${shop.shopData.name}`}
+              to={`/shop/${shop.shopData.username}`}
               state={{
                 shopData: shop.shopData,
                 shopImage: shop.shopImage.image,

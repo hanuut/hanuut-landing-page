@@ -14,6 +14,8 @@ import { light } from "../../config/Themes";
 import ScrollDownIcon from "../../assets/arrowDownIcon.svg";
 import Steps from "./components/Steps";
 import MessageWithLink from "../../components/MessageWithLink";
+import { BlueActionButton } from "../../components/ActionButton";
+import { Link } from "react-router-dom";
 
 const HeroSection = styled.div`
   position: relative;
@@ -48,7 +50,8 @@ const FormContainerOverlay = styled.div`
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   position: absolute;
   width: 25%;
-  padding: 5rem 0;
+  margin: 1rem 0;
+  padding: 2.5rem 0;
   right: ${(props) => (props.isArabic ? "65%" : "10%")};
   display: flex;
   flex-direction: column;
@@ -77,7 +80,6 @@ const ContentOverlay = styled.div`
   align-items: flex-start;
   color: ${(props) => props.theme.text};
   border-radius: ${(props) => props.theme.bigRadius};
-
   transition: all 0.2s ease;
   @media (max-width: 768px) {
     position: static;
@@ -172,22 +174,37 @@ const Heading = styled.h1`
 const Subheading = styled.h1`
   max-width: 80%;
   color: ${(props) => props.theme.text};
-  font-size: ${(props) => props.theme.fontLargest};
-  padding: 0.5rem 0;
+  font-size: ${(props) => props.theme.fontxxxl};
+  margin: 0.5rem 0;
   text-shadow: -1px -1px 0 ${(props) => props.theme.body},
     1px -1px 0 ${(props) => props.theme.body},
     -1px 1px 0 ${(props) => props.theme.body},
     1px 1px 0 ${(props) => props.theme.body};
   @media (max-width: 768px) {
     width: 90%;
-    font-size: ${(props) => props.theme.fontxxxl};
+    font-size: ${(props) => props.theme.fontxl};
   }
 `;
 const Text = styled.p`
   max-width: 100%;
   color: ${(props) => props.theme.text};
-  font-size: ${(props) => props.theme.fontLargest};
-  padding: 0.5rem 0;
+  font-size: ${(props) => props.theme.fontxxxl};
+  margin: 0.5rem 0;
+  text-shadow: -1px -1px 0 ${(props) => props.theme.body},
+    1px -1px 0 ${(props) => props.theme.body},
+    -1px 1px 0 ${(props) => props.theme.body},
+    1px 1px 0 ${(props) => props.theme.body};
+  margin-bottom: 1rem;
+  @media (max-width: 768px) {
+    width: 90%;
+    font-size: ${(props) => props.theme.fontxl};
+  }
+`;
+const FormTitle = styled.p`
+  max-width: 100%;
+  color: ${(props) => props.theme.text};
+  font-size: ${(props) => props.theme.fontxxxl};
+  font-weight: 600;
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontxl};
@@ -287,6 +304,12 @@ const Tawsila = () => {
           <Heading>{t("tawsilaHeading")}</Heading>
           <Subheading>{t("tawsilaSubHeading")}</Subheading>
           <Text>{t("tawsilaText")}</Text>
+          <Link to="/get started with Tawsila">
+            <BlueActionButton onClick={() => {}}>
+              {" "}
+              {"> "} {t("getStarted")}{" "}
+            </BlueActionButton>
+          </Link>
         </ContentOverlay>
         <FormContainerOverlay isArabic={i18n.language === "ar"}>
           {successMessage ? (
@@ -308,7 +331,7 @@ const Tawsila = () => {
             </>
           ) : (
             <FormContainer onSubmit={handleSubscribe}>
-              <Text>{t("signUp")}</Text>
+              <FormTitle>{t("signUp")}</FormTitle>
               <FormGroup>
                 <Input
                   type="text"

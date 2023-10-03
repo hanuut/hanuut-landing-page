@@ -2,17 +2,19 @@ import React from "react";
 import styled from "styled-components";
 
 const Button = styled.button`
-  background-color: ${(props) => props.theme.primaryColor};
-  color: ${(props) => props.theme.body};
-  border: none;
+  background-color: ${(props) => props.theme.body};
+  color: ${(props) => props.theme.secondaryColor};
+  border: 1px solid ${(props) => props.theme.secondaryColor};
   padding: ${(props) => props.theme.actionButtonPadding};
   border-radius: ${(props) => props.theme.defaultRadius};
-  font-size: ${(props) => props.theme.fontxxxl};
+  font-size: ${(props) => props.theme.fontxxl};
   cursor: pointer;
   transition: all 0.5s ease;
   
   &:hover {
     transform: scale(1.03);
+    background-color: ${(props) => props.theme.secondaryColor};
+    color: ${(props) => props.theme.body};
   }
 
   &:active {
@@ -24,16 +26,8 @@ const Button = styled.button`
   }
 `;
 
-const SecondaryButton = styled(Button)`
-  background-color: ${(props) => props.theme.secondaryColor};
-`;
-
-const ActionButton = ({ children, onClick }) => {
+const SecondaryButton = ({ children, onClick }) => {
   return <Button onClick={onClick}>{children}</Button>;
 };
 
-const BlueActionButton = ({ children, onClick }) => {
-  return <SecondaryButton onClick={onClick}>{children}</SecondaryButton>;
-};
-
-export { ActionButton, BlueActionButton };
+export default SecondaryButton;

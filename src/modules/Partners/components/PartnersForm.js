@@ -133,7 +133,7 @@ const SubHeading = styled.h2`
 
 const Paragraph = styled.p`
   width: 100%;
-  font-size: ${(props) => props.theme.fontxl};
+  font-size: ${(props) => props.theme.fontxxxl};
   margin-bottom: 1rem;
 
   @media (max-width: 768px) {

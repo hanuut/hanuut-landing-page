@@ -29,7 +29,6 @@ export const fetchShopsImages = createAsyncThunk(
 export const fetchDishesImages = createAsyncThunk(
   "images/fetchDishesImages",
   async (dishes) => {
-
     try {
       const filteredDishes = dishes.filter((dish) => dish.dish.imageId); // Filter out dishes with empty or null imageId
       const imageIds = filteredDishes.map((dish) => dish.dish.imageId);
@@ -50,13 +49,27 @@ export const fetchDishesImages = createAsyncThunk(
   }
 );
 
+export const fetchShopImage = createAsyncThunk(
+  "images/fetchShopImage",
+  async (imageId) => {
+    try {
+      const response = await getImage(imageId);
+      return response.data;
+    } catch (error) {
+      throw new Error(`Failed to fetch shop image with ID: ${imageId}`);
+    }
+  }
+);
+
 const imageSlice = createSlice({
   name: "images",
   initialState: {
     images: [],
+    selectedShopImage: {},
     dishesImages: [],
     imagesLoading: false,
-    error: null,
+    selectedImageLoading: false,
+    error: '',
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -84,6 +97,18 @@ const imageSlice = createSlice({
       .addCase(fetchDishesImages.rejected, (state, action) => {
         state.imagesLoading = false;
         state.error = action.error.message;
+      })
+      .addCase(fetchShopImage.pending, (state) => {
+        state.selectedImageLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchShopImage.fulfilled, (state, action) => {
+        state.selectedImageLoading = false;
+        state.selectedShopImage = action.payload;
+      })
+      .addCase(fetchShopImage.rejected, (state, action) => {
+        state.selectedImageLoading = false;
+        state.error = action.error.message;
       });
   },
 });
@@ -91,3 +116,5 @@ const imageSlice = createSlice({
 export const { reducer, actions } = imageSlice;
 export const selectShopsImages = (state) => state.images;
 export const selectDishesImages = (state) => state.images.dishesImages;
+export const selectSelectedShopImage = (state) =>
+  state.images.selectedShopImage;
