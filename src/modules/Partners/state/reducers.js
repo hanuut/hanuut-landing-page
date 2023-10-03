@@ -1,17 +1,21 @@
 // shopSlice.js
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getShops, getShopById } from '../services/shopServices';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  getShops,
+  getShopById,
+  getShopByUsername,
+} from "../services/shopServices";
 
-export const fetchShops = createAsyncThunk('shops/fetchShops', async () => {
+export const fetchShops = createAsyncThunk("shops/fetchShops", async () => {
   try {
     const response = await getShops();
     return response.data;
   } catch (error) {
-    throw new Error('Failed to fetch shops');
+    throw new Error("Failed to fetch shops");
   }
 });
 
-export const fetchShop = createAsyncThunk('shops/fetchShop', async (shopId) => {
+export const fetchShop = createAsyncThunk("shops/fetchShop", async (shopId) => {
   try {
     const response = await getShopById(shopId);
     return response.data;
@@ -20,15 +24,27 @@ export const fetchShop = createAsyncThunk('shops/fetchShop', async (shopId) => {
   }
 });
 
+export const fetchShopWithUsername = createAsyncThunk(
+  "shops/fetchShopWithUsername",
+  async (username) => {
+    try {
+      const response = await getShopByUsername(username);
+      return response.data;
+    } catch (error) {
+      throw new Error(`Failed to fetch shop with username: ${username}`);
+    }
+  }
+);
+
 const initialState = {
   shops: [],
-  selectedShop: null,
+  selectedShop: {},
   loading: false,
-  error: null
+  error: null,
 };
 
 const shopSlice = createSlice({
-  name: 'shops',
+  name: "shops",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -41,19 +57,19 @@ const shopSlice = createSlice({
         state.loading = false;
         state.shops = action.payload;
       })
-      .addCase(fetchShops.rejected, (state, action) => {
+      .addCase(fetchShop.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
-      .addCase(fetchShop.pending, (state) => {
+      .addCase(fetchShopWithUsername.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchShop.fulfilled, (state, action) => {
+      .addCase(fetchShopWithUsername.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedShop = action.payload;
       })
-      .addCase(fetchShop.rejected, (state, action) => {
+      .addCase(fetchShopWithUsername.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });

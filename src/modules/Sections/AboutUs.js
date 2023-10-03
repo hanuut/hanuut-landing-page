@@ -102,8 +102,6 @@ const MissionIllutstrationContainer = styled.img`
   object-fit: fill;
   @media (max-width: 768px) {
     width: auto;
- 
-
   }
 `;
 

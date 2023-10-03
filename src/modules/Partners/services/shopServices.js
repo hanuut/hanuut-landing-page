@@ -18,3 +18,7 @@ export const getShopById = (id) => {
   return axios.get(`${prodUrl}/shop/${id}`, { headers });
 };
 
+export const getShopByUsername = (username) => {
+  return axios.get(`${prodUrl}/shop/findByUsername/${username}`, { headers });
+};
+

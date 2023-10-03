@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useEffect } from "react";
+import Loader from "../../../components/Loader";
 
 const Container = styled.div`
   width: 100%;
@@ -93,29 +94,46 @@ const ShopDesc = styled.h5`
   }
 `;
 
-const ShopCart = ({ shop, imageData, className, isImageLoading }) => {
+const ShopCart = ({ shop, imageData, className }) => {
   const { i18n } = useTranslation();
   const [imageSrc, setImageSrc] = useState("");
 
   useEffect(() => {
-    const bufferData = imageData.buffer.data;
-    const uint8Array = new Uint8Array(bufferData);
-    const blob = new Blob([uint8Array], { type: "image/jpeg" });
-    const imageUrl = URL.createObjectURL(blob);
-    setImageSrc(imageUrl);
+    const loadImage = async () => {
+      try {
+        const bufferData = imageData.buffer.data;
+        const uint8Array = new Uint8Array(bufferData);
+        const blob = new Blob([uint8Array], { type: "image/jpeg" });
+        const imageUrl = URL.createObjectURL(blob);
+        setImageSrc(imageUrl);
+      } catch (error) {
+        console.error("Error loading image:", error);
+        // Handle the error, e.g., display a placeholder image or show an error message
+      }
+    };
+
+    if (imageData && imageData.buffer) {
+      loadImage();
+    }
   }, [imageData]);
 
   return (
     <Container isArabic={i18n.language === "ar"} className={className}>
-      <ShopIcon src={imageSrc} alt="shop image" />
-      <ShopInfo>
-        <ShopHeader>
-          <ShopName>{shop.name}</ShopName>
-        </ShopHeader>
-        <ShopBody>
-          <ShopDesc>{shop.description}</ShopDesc>
-        </ShopBody>
-      </ShopInfo>
+      {imageSrc ? (
+        <>
+          <ShopIcon src={imageSrc} alt="shop image" />
+          <ShopInfo>
+            <ShopHeader>
+              <ShopName>{shop.name}</ShopName>
+            </ShopHeader>
+            <ShopBody>
+              <ShopDesc>{shop.description}</ShopDesc>
+            </ShopBody>
+          </ShopInfo>{" "}
+        </>
+      ) : (
+        <Loader />
+      )}
     </Container>
   );
 };
