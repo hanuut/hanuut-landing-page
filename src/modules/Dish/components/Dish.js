@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { t } from "i18next";
@@ -24,13 +24,13 @@ const Card = styled.div`
 //   height: auto;
 //   margin-bottom: 8px;
 // `;
+
 const Body = styled.div`
   display: flex;
   width: 100%;
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
-
 `;
 const Name = styled.h5`
   font-family: "Tajawal", sans-serif;
@@ -67,6 +67,7 @@ const Dish = ({ dish, imageData }) => {
   const { i18n } = useTranslation();
   const { name, sellingPrice } = dish;
   const { ingredients } = dish;
+  const filteredIngredients = ingredients.filter((item) => item.trim() !== "");
   // const [imageSrc, setImageSrc] = useState("");
   // useEffect(() => {
   //   const bufferData = imageData.buffer.data;
@@ -75,6 +76,7 @@ const Dish = ({ dish, imageData }) => {
   //   const imageUrl = URL.createObjectURL(blob);
   //   setImageSrc(imageUrl);
   // }, [dish]);
+
   return (
     // <Card>
     //   {/* <Image src={imageSrc} alt="" /> */}
@@ -91,12 +93,17 @@ const Dish = ({ dish, imageData }) => {
     <Card isArabic={i18n.language === "ar"}>
       <Name>{name}</Name>
       <Body>
-        <Ingredients>
-          {" "}
-          {ingredients.map((ingredient, index) => (
-            <Ingredient key={index}> {ingredient} </Ingredient>
-          ))}
-        </Ingredients>
+        {filteredIngredients.length > 0 ? (
+          <Ingredients>
+            {filteredIngredients.map((ingredient, index) => (
+              <Ingredient key={index}>
+                {ingredient}
+                {index !== filteredIngredients.length - 1 ? " - " : ""}
+              </Ingredient>
+            ))}
+          </Ingredients>
+        ) : null}
+
         <PriceContainer isArabic={i18n.language === "ar"}>
           {t("dzd")}
           <Price>{sellingPrice}</Price>
