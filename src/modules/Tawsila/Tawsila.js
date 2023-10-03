@@ -304,12 +304,12 @@ const Tawsila = () => {
           <Heading>{t("tawsilaHeading")}</Heading>
           <Subheading>{t("tawsilaSubHeading")}</Subheading>
           <Text>{t("tawsilaText")}</Text>
-          <Link to="/get started with Tawsila">
+          {/* <Link to="/get started with Tawsila">
             <BlueActionButton onClick={() => {}}>
               {" "}
               {"> "} {t("getStarted")}{" "}
             </BlueActionButton>
-          </Link>
+          </Link> */}
         </ContentOverlay>
         <FormContainerOverlay isArabic={i18n.language === "ar"}>
           {successMessage ? (
