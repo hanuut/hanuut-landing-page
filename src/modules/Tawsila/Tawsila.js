@@ -14,8 +14,8 @@ import { light } from "../../config/Themes";
 import ScrollDownIcon from "../../assets/arrowDownIcon.svg";
 import Steps from "./components/Steps";
 import MessageWithLink from "../../components/MessageWithLink";
-import { BlueActionButton } from "../../components/ActionButton";
-import { Link } from "react-router-dom";
+// import { BlueActionButton } from "../../components/ActionButton";
+// import { Link } from "react-router-dom";
 
 const HeroSection = styled.div`
   position: relative;
@@ -234,6 +234,7 @@ const Tawsila = () => {
     setPhone("");
     setAddress(null);
     setErrorMessage("");
+    setIsAccepted(false)
 
     const element = document.getElementById("stepsSection");
     if (element) {
@@ -274,6 +275,7 @@ const Tawsila = () => {
         setIsAccepted(true);
       } else {
         setSuccessMessage(t("messagePhoneIsUsed"));
+        setIsAccepted(false);
       }
       setIsSubmitting(false);
       return;
