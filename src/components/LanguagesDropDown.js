@@ -25,7 +25,7 @@ const Menu = styled.div`
   }
 `;
 
-const MenuItem = styled.div` 
+const MenuItem = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -45,7 +45,7 @@ const MenuItemHeader = styled.div`
   padding: 0.5rem 1rem;
 `;
 
-const LanguagesDropDown = ({handleChooseLanguage}) => {
+const LanguagesDropDown = ({ handleChooseLanguage }) => {
   const { t, i18n } = useTranslation();
 
   const handleLanguageChange = (lang) => {
@@ -57,8 +57,17 @@ const LanguagesDropDown = ({handleChooseLanguage}) => {
   return (
     <Container>
       <MenuItemHeader>
-        <Flag country={i18n.language === "ar" ? "DZ" : "GB"} andValue />
-        {i18n.language === "ar" ? t("العربية") : t("English")}
+        <Flag
+          country={
+            i18n.language === "ar" ? "DZ" : i18n.language === "en" ? "GB" : "FR"
+          }
+          andValue
+        />
+        {i18n.language === "ar"
+          ? t("العربية")
+          : i18n.language === "en"
+          ? t("English")
+          : t("French")}
       </MenuItemHeader>
       <Menu>
         <MenuItem onClick={() => handleLanguageChange("ar")}>
@@ -68,6 +77,10 @@ const LanguagesDropDown = ({handleChooseLanguage}) => {
         <MenuItem onClick={() => handleLanguageChange("en")}>
           <Flag country="GB" />
           {t("English")}
+        </MenuItem>
+        <MenuItem onClick={() => handleLanguageChange("fr")}>
+          <Flag country="FR" />
+          {t("French")}
         </MenuItem>
       </Menu>
     </Container>

@@ -5,7 +5,13 @@ import AddressesDropDown from "../../../components/AddressesDropDown";
 import { isValidEmail, isValidPhone } from "../../../components/validators";
 import Sparkles from "../../../assets/sparkles.png";
 import { Link } from "react-router-dom";
-
+import {
+  checkPhoneNumberAvailability,
+  getSubscribeRequest,
+  postSubscribeRequest,
+} from "../../SubscribeRequest/services/SubscribeRequest";
+import { light } from "../../../config/Themes";
+import MessageWithLink from "../../../components/MessageWithLink";
 const Container = styled.div`
   width: 100%;
   display: flex;
@@ -300,7 +306,8 @@ const PartnersForm = ({ setStep }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isAccepted, setIsAccepted] = useState(false);
   const options = [
     {
       id: 0,
@@ -322,22 +329,39 @@ const PartnersForm = ({ setStep }) => {
     },
   ];
 
-  const handleSubscribe = (event) => {
+  const handleSubscribe = async (event) => {
     event.preventDefault();
 
-    if (!email) {
+    if (!phone) {
       setErrorMessage(t("errorFillAllFields"));
       return;
     }
-    if (!isValidEmail(email)) {
-      setErrorMessage(t("errorEmailNotValid"));
+    if (!isValidPhone(phone)) {
+      setErrorMessage(t("errorPhoneNotValid"));
       return;
     }
     setIsSubmitting(true);
     setErrorMessage("");
-    setFormStep(1);
-    setStep(1);
-    setIsSubmitting(false);
+
+    const isPhoneUsed = await checkPhoneNumberAvailability(phone);
+    if (isPhoneUsed === true) {
+      const subscribeRequest = await getSubscribeRequest(phone);
+      if (subscribeRequest.isAccepted === true) {
+        setSuccessMessage(t("clickToDownloadApp"));
+        setIsAccepted(true);
+      } else {
+        setSuccessMessage(t("messagePhoneIsUsed"));
+      }
+      setErrorMessage("");
+      setFormStep(3);
+      setStep(3);
+      setIsSubmitting(false);
+      return;
+    } else {
+      setFormStep(1);
+      setStep(1);
+      setIsSubmitting(false);
+    }
   };
 
   const handleChooseAddress = (newAddress) => {
@@ -354,12 +378,12 @@ const PartnersForm = ({ setStep }) => {
   const handleNext = (event) => {
     event.preventDefault();
 
-    if (!fullName || !phone || !address) {
+    if (!fullName || !email || !address) {
       setErrorMessage(t("errorFillAllFields"));
       return;
     }
-    if (!isValidPhone(phone)) {
-      setErrorMessage(t("errorPhoneNotValid"));
+    if (!isValidEmail(email)) {
+      setErrorMessage(t("errorEmailNotValid"));
       return;
     }
     setIsSubmitting(true);
@@ -368,55 +392,78 @@ const PartnersForm = ({ setStep }) => {
     setStep(2);
     setIsSubmitting(false);
   };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!domain) {
+    if (
+      !fullName ||
+      !phone ||
+      !address ||
+      !email ||
+      !address.wilaya ||
+      !address.commune ||
+      !channel ||
+      !domain
+    ) {
       setErrorMessage(t("errorFillAllFields"));
+
+      return;
+    }
+
+    if (!isValidPhone(phone)) {
+      setErrorMessage(t("errorPhoneNotValid"));
+
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setErrorMessage(t("errorEmailNotValid"));
+
       return;
     }
 
     setIsSubmitting(true);
-    const data = {
-      fullName: fullName,
-      phone: phone,
-      email: email,
-      wilaya: address.wilaya,
-      commune: address.commune,
-      domain: domain,
-      channel: channel,
-    };
 
-    //  const testUrl = process.env.REACT_APP_API_TEST_URL;
-    const prodUrl = process.env.REACT_APP_API_PROD_URL;
-    try {
-      const response = await fetch(prodUrl + "/partnerSubscribeRequest", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      if (response.ok) {
-        setErrorMessage("");
-        setFormStep(3);
-        setStep(3);
-        setIsSubmitting(false);
+    const isPhoneUsed = await checkPhoneNumberAvailability(phone);
+
+    if (isPhoneUsed === true) {
+      const subscribeRequest = await getSubscribeRequest(phone);
+      if (subscribeRequest.isAccepted === true) {
+        setSuccessMessage(t("clickToDownloadApp"));
+        setIsAccepted(true);
       } else {
-        console.error("Request failed with status:", response.status);
+        setSuccessMessage(t("messagePhoneIsUsed"));
+      }
+      setErrorMessage("");
+      setFormStep(3);
+      setStep(3);
+      setIsSubmitting(false);
+      return;
+    } else {
+      const data = {
+        fullName: fullName,
+        phone: phone,
+        email: email,
+        wilaya: address.wilaya,
+        commune: address.commune,
+        type: "partner",
+        channel: channel,
+        domain: domain,
+      };
+
+      const response = postSubscribeRequest(data);
+
+      if (!response) {
         setErrorMessage(t("errorCouldNotSubscribe"));
         setFormStep(0);
         setStep(0);
-        setIsSubmitting(false);
+      } else {
+        setFormStep(3);
+        setStep(3);
       }
-    } catch (error) {
-      console.error("Error sending request:", error);
       setIsSubmitting(false);
     }
   };
-
   return (
     <Container>
       <PartnerFormStep>
@@ -428,10 +475,10 @@ const PartnersForm = ({ setStep }) => {
             <ErrorMessage>{errorMessage && <p>{errorMessage}</p>}</ErrorMessage>
             <EmailInputWrapper>
               <EmailInput
-                type="email"
-                placeholder={t("partnerInputText")}
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                type="phone"
+                placeholder={t("partnerInputTextPhone")}
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
                 required
               />
               <EmailButton
@@ -444,7 +491,6 @@ const PartnersForm = ({ setStep }) => {
                   : t("partnerInputButton")}
               </EmailButton>
             </EmailInputWrapper>
-            <SmallParagraph>{t("partnerSmallerParagraph")}</SmallParagraph>
           </FirstStep>
         )}
         {formStep === 1 && (
@@ -462,15 +508,16 @@ const PartnersForm = ({ setStep }) => {
               />
             </InputWrapper>
             <InputWrapper>
-              <Label htmlFor="phone">{t("partnersFormPhone")}</Label>
+              <Label htmlFor="phone">{t("partnersFormEmail")}</Label>
               <Input
-                type="phone"
-                placeholder={t("partnerInputTextPhone")}
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
+                type="email"
+                placeholder={t("partnerInputText")}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 required
               />
             </InputWrapper>
+            <SmallParagraph>{t("partnerSmallerParagraph")}</SmallParagraph>
             <AddressesDropDown
               target="partners"
               onChooseAddress={handleChooseAddress}
@@ -517,7 +564,13 @@ const PartnersForm = ({ setStep }) => {
                 ))}
               </OptionsWrapper>
             </InputWrapper>
-
+            {errorMessage ? (
+              <ErrorMessage>
+                {errorMessage && <p>{errorMessage}</p>}
+              </ErrorMessage>
+            ) : (
+              ""
+            )}
             <Button
               onClick={handleSubmit}
               className={isSubmitting ? "submitting" : ""}
@@ -531,14 +584,36 @@ const PartnersForm = ({ setStep }) => {
         )}
         {formStep === 3 && (
           <FourthStep isArabic={i18n.language === "ar"}>
-            <SuccessIllustration src={Sparkles} />
-            <SubHeading className="greenSubHeading">
-              {t("partnersFormThankYouTitle")}
-            </SubHeading>
-            <Paragraph>{t("partnersFormThankYouSubTitle")}</Paragraph>
-            <Link to="/">
-              <Button>{t("navHome")}</Button>
-            </Link>
+            {successMessage ? (
+              <>
+                {successMessage && (
+                  <MessageWithLink
+                    message={successMessage}
+                    link={isAccepted ? "TawsilaDownloadLink" : ""}
+                    linkText={isAccepted ? t("downloadMyHanuut") : ""}
+                    textColor={light.primaryColor}
+                  />
+                )}
+                {isAccepted ? (
+                  ""
+                ) : (
+                  <Link to="/partners">
+                    <Button>{t("navHome")}</Button>
+                  </Link>
+                )}
+              </>
+            ) : (
+              <>
+                <SuccessIllustration src={Sparkles} />
+                <SubHeading className="greenSubHeading">
+                  {t("partnersFormThankYouTitle")}
+                </SubHeading>
+                <Paragraph>{t("partnersFormThankYouSubTitle")}</Paragraph>
+                <Link to="/">
+                  <Button>{t("navHome")}</Button>
+                </Link>
+              </>
+            )}
           </FourthStep>
         )}
       </PartnerFormStep>

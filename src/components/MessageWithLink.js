@@ -14,16 +14,17 @@ const Section = styled.div`
   }
   a {
     margin-top: 3px;
-    color: ${(props) => props.theme.secondaryColor};
+    color: ${(props) => props.textColor || props.theme.downloadButtonColor};
     font-size: ${(props) => props.theme.fontxxxl};
     text-align: center;
   }
 `;
-const MessageWithLink = ({ message, link, linkText }) => {
+
+const MessageWithLink = ({ message, link, linkText, textColor }) => {
   return (
     <Section>
-      <p>{message}</p>
-      <a href={link + ""}>{linkText}</a>
+      <p >{message}</p>
+      <a style={{ color: textColor }} href={link + ""}>{linkText}</a>
     </Section>
   );
 };
