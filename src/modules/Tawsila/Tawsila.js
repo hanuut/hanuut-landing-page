@@ -280,6 +280,7 @@ const Tawsila = () => {
       setIsSubmitting(false);
       return;
     } else {
+      setIsAccepted(false);
       const data = {
         fullName: fullName,
         phone: phone,
