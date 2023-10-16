@@ -45,6 +45,7 @@
     "partnersFormFullName": "الاسم الكامل",
     "partnerInputTextFullName": "أدخل اسمك الكامل",
     "partnersFormPhone": "رقم الهاتف",
+    "partnersFormEmail": "البريدك الإلكتروني",
     "partnerInputTextPhone": "أدخل رقم هاتفك",
     "partnersFormAddress": "العنوان",
     "partnersFormAddressState": "الولاية",
@@ -93,6 +94,7 @@
     "secondJoinStepText": "بعد التحقق من Hannut، ستتلقى بريدًا إلكترونيًا يحتوي على تطبيق توصيلة وتعليمات تثبيته",
     "thirdJoinStepTitle": "قم بالتوصيل",
     "thirdJoinStepText": "كن متصلًا بالإنترنت، استلم مهمات التوصيل واحصل على أجر لكل مهمة بشكل منفصل",
-    "clickToDownloadTawsila": "تم قبول طلبك. انقر على الرابط أدناه لتحميل التوصيلة",
-    "downloadTawsila": "تحميل توصيلة"
+    "clickToDownloadApp": "تم قبول طلبك. انقر على الرابط أدناه للتحميل ",
+    "downloadTawsila": "تحميل توصيلة",
+    "downloadMyHanuut": "تحميل ماي حانووت"
 }

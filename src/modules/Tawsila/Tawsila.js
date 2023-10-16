@@ -8,7 +8,7 @@ import {
   checkPhoneNumberAvailability,
   getSubscribeRequest,
   postSubscribeRequest,
-} from "./services/Tawsila";
+} from "../SubscribeRequest/services/SubscribeRequest";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
 import { light } from "../../config/Themes";
 import ScrollDownIcon from "../../assets/arrowDownIcon.svg";
@@ -220,6 +220,7 @@ const Tawsila = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isAccepted, setIsAccepted] = useState(false);
 
   const TawsilaDownloadLink = process.env.REACT_APP_TAWSILA_DOWNLOAD_LINK + "";
 
@@ -236,7 +237,6 @@ const Tawsila = () => {
 
     const element = document.getElementById("stepsSection");
     if (element) {
-      // 👇 Will scroll smoothly to the top of the next section
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
@@ -262,14 +262,16 @@ const Tawsila = () => {
       setErrorMessage(t("errorEmailNotValid"));
       return;
     }
+    setErrorMessage("");
     setIsSubmitting(true);
+
     const isPhoneUsed = await checkPhoneNumberAvailability(phone);
+
     if (isPhoneUsed === true) {
       const subscribeRequest = await getSubscribeRequest(phone);
-
-      if (subscribeRequest.isAccepted) {
-        // setSuccessMessage(t("messagePhoneIsUsed"));
-        setSuccessMessage(t("clickToDownloadTawsila"));
+      if (subscribeRequest.isAccepted === true) {
+        setSuccessMessage(t("clickToDownloadApp"));
+        setIsAccepted(true);
       } else {
         setSuccessMessage(t("messagePhoneIsUsed"));
       }
@@ -284,6 +286,7 @@ const Tawsila = () => {
         commune: address.commune,
         type: "driver",
       };
+
       const response = postSubscribeRequest(data);
       if (!response) {
         setErrorMessage(t("errorCouldNotSubscribe"));
@@ -304,7 +307,7 @@ const Tawsila = () => {
           <Heading>{t("tawsilaHeading")}</Heading>
           <Subheading>{t("tawsilaSubHeading")}</Subheading>
           <Text>{t("tawsilaText")}</Text>
-          {/* <Link to="/get started with Tawsila">
+          {/* <Link to="/get-started-with-Tawsila">
             <BlueActionButton onClick={() => {}}>
               {" "}
               {"> "} {t("getStarted")}{" "}
@@ -316,9 +319,10 @@ const Tawsila = () => {
             <>
               {successMessage && (
                 <MessageWithLink
-                  message={t("clickToDownloadTawsila")}
-                  link={TawsilaDownloadLink}
-                  linkText={t("downloadTawsila")}
+                  message={successMessage}
+                  link={isAccepted ? TawsilaDownloadLink : ""}
+                  linkText={isAccepted ? t("downloadTawsila") : ""}
+                  textColor={light.secondaryColor}
                 />
               )}
               <ButtonWithIcon

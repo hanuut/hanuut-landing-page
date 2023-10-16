@@ -9,7 +9,6 @@ const headers = {
 };
 
 export const postSubscribeRequest = async (data) => {
-
   try {
     const response = await axios.post(
       prodUrl + "/partnerSubscribeRequest",
@@ -25,14 +24,13 @@ export const postSubscribeRequest = async (data) => {
 };
 
 export const checkPhoneNumberAvailability = async (phoneNumber) => {
-
   try {
     const response = await axios.get(
       prodUrl + `/partnerSubscribeRequest/isPhoneUsed/${phoneNumber}`,
       {
         headers: headers,
       }
-    ); 
+    );
 
     return response.data;
   } catch (error) {
@@ -41,8 +39,6 @@ export const checkPhoneNumberAvailability = async (phoneNumber) => {
     throw error;
   }
 };
-
-
 export const getSubscribeRequest = async (phoneNumber) => {
   try {
     const response = await axios.get(
@@ -50,7 +46,7 @@ export const getSubscribeRequest = async (phoneNumber) => {
       {
         headers: headers,
       }
-    ); 
+    );
     return response.data;
   } catch (error) {
     // Handle error if the request fails
