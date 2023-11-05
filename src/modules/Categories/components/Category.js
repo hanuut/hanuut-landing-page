@@ -3,7 +3,7 @@ import styled from "styled-components";
 import DishesContainer from "../../Dish/components/DishesContainer";
 
 const Section = styled.button`
-  width: 90%;
+  width: 100%;
   align-self: center;
   background-color: ${(props) => props.theme.body};
   color: ${(props) => props.theme.text};

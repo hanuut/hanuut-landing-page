@@ -1,6 +1,8 @@
 {
     "dzd": "da",
     "appTitle": "hanuut",
+    "getItOn": "Obtenez-le sur",
+    "googlePlay": "Google Play",
     "navHome": "Accueil",
     "navPartners": "Partenaires",
     "navSolution": "Solutions",
@@ -11,7 +13,7 @@
     "footerAllRightsReserved": "© 2023 hanuut Express. Tous droits réservés | ",
     "footerPrivacyAndPolicy": "Politique de confidentialité | ",
     "footerTermsOfUse": "Conditions d'utilisation",
-    "homeHeading": "Le marché algérien le plus proche et le plus fiable",
+    "homeHeading": "Une marketplace en ligne fiable et sécurisée",
     "homeSubHeading": "Nous apportons les magasins de confiance sur votre téléphone portable",
     "homeParagraph": "Achetez de manière intelligente, pas difficilement, avec notre marché en ligne où vous pouvez trouver une grande variété de produits en un seul endroit.",
     "homeInputButton": "Télécharger",

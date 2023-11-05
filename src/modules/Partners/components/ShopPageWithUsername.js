@@ -1,13 +1,17 @@
-import React, { useEffect} from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import ShopCart from "./ShopCart";
-import { useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import BackgroundImage from "../../../assets/background.png";
 import CategoriesContainer from "../../Categories/components/CategoriesContainer";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import Playstore from "../../../assets/playstore.png";
-import { fetchShopWithUsername, selectShop, selectShops } from "../state/reducers";
+import {
+  fetchShopWithUsername,
+  selectShop,
+  selectShops,
+} from "../state/reducers";
 import {
   fetchShopImage,
   selectSelectedShopImage,
@@ -15,6 +19,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../../components/Loader";
 import NotFoundPage from "../../NotFoundPage";
+import ButtonWithIcon from "../../../components/ButtonWithIcon";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -39,7 +44,7 @@ const ShopPageContainer = styled.div`
 `;
 const UpperBoxCover = styled.div`
   width: 100%;
-  padding: 1.5rem 0rem;
+  padding: 2rem 0rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,38 +83,7 @@ const Title = styled.h3`
     font-size: ${(props) => props.theme.fontsm};
   }
 `;
-const Button = styled.button`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  background-color: ${(props) => props.theme.downloadButtonColor};
-  color: #fff;
-  border: none;
-  border-radius: ${(props) => props.theme.defaultRadius};
-  padding: ${(props) => props.theme.actionButtonPadding};
-  font-size: ${(props) => props.theme.fontxl};
-  cursor: pointer;
-  transition: all 0.5s ease;
-  &:hover {
-    transform: scale(1.03);
-  }
-  @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontsm};
-    padding: ${(props) => props.theme.actionButtonPaddingMobile};
-  }
-`;
-const PlayIcon = styled.img`
-  height: 1.5rem;
-  object-fit: cover;
-  -webkit-transform: ${(props) => (props.isArabic ? "scaleX(-1)" : "")};
-  transform: ${(props) => (props.isArabic ? "scaleX(-1)" : "")};
-  @media (max-width: 768px) {
-    height: 0.8rem;
-  }
-`;
+
 const LowerBox = styled.div`
   width: 80%;
   display: flex;
@@ -127,8 +101,6 @@ const ShopPageWithUsername = () => {
   const selectedShop = useSelector(selectShop);
   const selectedShopImage = useSelector(selectSelectedShopImage);
 
-
-
   useEffect(() => {
     dispatch(fetchShopWithUsername(username));
   }, [dispatch, username]);
@@ -139,10 +111,9 @@ const ShopPageWithUsername = () => {
     }
   }, [dispatch, selectedShop]);
 
- 
-if(error){
-    return <NotFoundPage />
-}
+  if (error) {
+    return <NotFoundPage />;
+  }
   if (!selectedShop || !selectedShopImage || loading) {
     return <Loader />;
   }
@@ -165,10 +136,12 @@ if(error){
             <OrderAndDownload>
               <Title>{t("toOrder")}</Title>
               <Link to={link}>
-                <Button>
-                  {t("homeInputButton")}{" "}
-                  <PlayIcon src={Playstore} isArabic={i18n.language === "ar"} />
-                </Button>
+                <ButtonWithIcon
+                  image={Playstore}
+                  backgroundColor="#000000"
+                  text1={t("getItOn")}
+                  text2={t("googlePlay")}
+                ></ButtonWithIcon>
               </Link>
             </OrderAndDownload>
           </UpperBox>

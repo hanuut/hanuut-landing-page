@@ -1260,6 +1260,11 @@
   resolved "https://registry.npmjs.org/@fontsource-variable/cairo/-/cairo-5.0.1.tgz"
   integrity sha512-m9XO5VmIg7CvpaKMWi4kKIUyXIgkvadCpk3vnILatmq27h1ZwieAXSuzAmRIYIgCH+AR/dfR7QYIk0PTIeUmIw==
 
+"@fontsource/roboto@^5.0.8":
+  version "5.0.8"
+  resolved "https://registry.npmjs.org/@fontsource/roboto/-/roboto-5.0.8.tgz"
+  integrity sha512-XxPltXs5R31D6UZeLIV1td3wTXU3jzd3f2DLsXI8tytMGBkIsGcc9sIyiupRtA8y73HAhuSCeweOoBqf6DbWCA==
+
 "@fontsource/tajawal@^5.0.1":
   version "5.0.1"
   resolved "https://registry.npmjs.org/@fontsource/tajawal/-/tajawal-5.0.1.tgz"
