@@ -7,6 +7,7 @@ import CategoriesContainer from "../../Categories/components/CategoriesContainer
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import Playstore from "../../../assets/playstore.png";
+import ButtonWithIcon from "../../../components/ButtonWithIcon";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -130,10 +131,12 @@ const ShopPage = () => {
             <OrderAndDownload>
               <Title>{t("toOrder")}</Title>
               <Link to={link}>
-                <Button>
-                  {t("homeInputButton")}{" "}
-                  <PlayIcon src={Playstore} isArabic={i18n.language === "ar"} />
-                </Button>
+              <ButtonWithIcon
+                image={Playstore}
+                backgroundColor="#000000"
+                text1={t("getItOn")}
+                text2={t("googlePlay")}
+              ></ButtonWithIcon>
               </Link>
             </OrderAndDownload>
           </UpperBox>

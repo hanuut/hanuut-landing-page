@@ -99,7 +99,6 @@ const Paragraph = styled.p`
   }
 `;
 
-
 const SmallParagraph = styled.p`
   width: 100%;
   font-size: ${(props) => props.theme.fontmd};
@@ -110,7 +109,6 @@ const SmallParagraph = styled.p`
     font-size: ${(props) => props.theme.fontsm};
   }
 `;
-
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();
@@ -125,7 +123,12 @@ const HomePage = () => {
             <SubHeading>{t("homeSubHeading")}</SubHeading>
             <Paragraph>{t("homeParagraph")}</Paragraph>
             <Link to={link}>
-              <ButtonWithIcon image={Playstore} backgroundColor="#000000"> {t("homeInputButton")}</ButtonWithIcon>
+              <ButtonWithIcon
+                image={Playstore}
+                backgroundColor="#000000"
+                text1={t("getItOn")}
+                text2={t("googlePlay")}
+              ></ButtonWithIcon>
             </Link>
             <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>
           </LeftBox>
@@ -137,7 +140,6 @@ const HomePage = () => {
         </Container>
       </Section>
       <AboutUs />
-
       <HowItWorks />
       {/* 
     <Testimonials />

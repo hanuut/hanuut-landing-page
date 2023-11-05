@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@fontsource-variable/cairo": "^5.0.1",
+    "@fontsource/roboto": "^5.0.8",
     "@fontsource/tajawal": "^5.0.1",
     "@fontsource/ubuntu": "^5.0.1",
     "@fontsource/ubuntu-condensed": "^5.0.1",
