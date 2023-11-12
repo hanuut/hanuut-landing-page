@@ -1,48 +1,41 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Loader from "../../../components/Loader";
 
 const Container = styled.div`
   width: 100%;
-  height: 7rem;
-  padding: 2px 5px;
-  border: 2px solid ${(props) => props.theme.primaryColor};
+
   border-radius: ${(props) => props.theme.defaultRadius};
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
 
   &.headingShopCart {
     width: 33%;
-    height: 100%;
-    align-items: flex-start;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: center;
     border: none;
     border-radius: 0;
     @media (max-width: 768px) {
-      width: 90%;
+      width: 100%;
       min-height: 100%;
-
-      align-items: flex-start;
     }
   }
   @media (max-width: 768px) {
     width: 100%;
+    flex-wrap: wrap;
     gap: 0.5rem;
-    padding: 0px 10px;
   }
-`;
 
-const ShopIcon = styled.img`
-  width: 5rem;
-  height: 5rem;
-  border-radius: ${(props) => props.theme.defaultRadius};
+  box-sizing: border-box; /* Add this line to include padding in the width */
+`;
+const ShopImage = styled.img`
+  width: 4.3rem;
+  height: 4.3rem;
+  border-radius: 50%;
   object-fit: cover;
   @media (max-width: 768px) {
     width: 4rem;
@@ -51,46 +44,44 @@ const ShopIcon = styled.img`
 `;
 
 const ShopInfo = styled.div`
-  height: 50%;
-  width: 72%;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  @media (max-width: 768px) {
-    width: 100%;
-  }
+  justify-content: space-between;
+
 `;
 
 const ShopHeader = styled.div`
-  width: 100%;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
   justify-content: space-between;
+  margin-bottom: 0.5rem;
 `;
 
-const ShopName = styled.h2`
+const ShopName = styled.h3`
   font-family: "Tajawal", sans-serif;
+  font-size: ${(props) => props.theme.fontLargest};
+  line-height: 0.5;
+  font-weight: bold;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+    font-size: ${(props) => props.theme.fontxxl};
   }
 `;
 
 const ShopBody = styled.div`
-  width: 100%;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
   justify-content: space-between;
 `;
-const ShopDesc = styled.h5`
-  width: 70%;
-  text-overflow: ellipsis;
+
+const ShopDesc = styled.p`
+  width: 100%;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   font-family: "Tajawal", sans-serif;
+  font-size: ${(props) => props.theme.fontxl};
+  font-weight: 100;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontsm};
-    font-weight: 100;
+    font-size: ${(props) => props.theme.fontlg};
   }
 `;
 
@@ -121,7 +112,7 @@ const ShopCart = ({ shop, imageData, className }) => {
     <Container isArabic={i18n.language === "ar"} className={className}>
       {imageSrc ? (
         <>
-          <ShopIcon src={imageSrc} alt="shop image" />
+          <ShopImage src={imageSrc} alt="shop image" loading="lazy" />
           <ShopInfo>
             <ShopHeader>
               <ShopName>{shop.name}</ShopName>
@@ -129,7 +120,7 @@ const ShopCart = ({ shop, imageData, className }) => {
             <ShopBody>
               <ShopDesc>{shop.description}</ShopDesc>
             </ShopBody>
-          </ShopInfo>{" "}
+          </ShopInfo>
         </>
       ) : (
         <Loader />

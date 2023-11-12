@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { t } from "i18next";
 const Card = styled.div`
-  width: 45%;
+  width: 30%;
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 16px;

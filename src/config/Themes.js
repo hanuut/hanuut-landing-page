@@ -8,6 +8,7 @@ export const light = {
   secondaryColor: "#0A99FF",//blue
   secondaryColorDark: "#0066CA", //dark blue
   downloadButtonColor: "#182018", //grey
+  orangeColor: "#F0A46A",
   primaryColorRgba: "91 ,194 ,139",
   white: "#fff",
   
@@ -25,6 +26,7 @@ export const light = {
   navHeight: "5rem",
   actionButtonPadding: "0.5rem 1rem",
   actionButtonPaddingMobile : "0.5rem 0.9rem",
+  smallPadding: "0.4rem 0.7rem",
   defaultRadius:"10px",
   smallRadius:"5px",
   bigRadius:"20px",

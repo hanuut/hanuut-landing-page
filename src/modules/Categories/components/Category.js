@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import DishesContainer from "../../Dish/components/DishesContainer";
 
 const Section = styled.button`
   width: 100%;
   align-self: center;
-  background-color: ${(props) => props.theme.body};
-  color: ${(props) => props.theme.text};
+  background-color: ${(props) =>
+    props.selected ? props.theme.primaryColor : props.theme.body};
   border: none;
   padding: 1rem 0rem;
   font-size: ${(props) => props.theme.fontxxxl};
@@ -17,10 +16,12 @@ const Section = styled.button`
   gap: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  border: 1px solid ${(props) => props.theme.primaryColor};
+  border-radius: ${(props) => props.theme.defaultRadius};
 
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontxl};
-    padding: 0.8rem 0rem;
+    padding: 0.8rem 1rem; /* Adjust the padding values as needed */
   }
 `;
 
@@ -32,51 +33,36 @@ const Heading = styled.div`
   justify-content: space-between;
 `;
 
-const CategoryName = styled.h4`
+const CategoryName = styled.h5`
+  width: 100%;
+  text-align: center;
   transition: all 0.3s ease;
   font-family: "Tajawal", sans-serif;
-  color: ${(props) => (props.expanded ? props.theme.primaryColor : "")};
+  font-size: ${(props) =>
+    props.selected ? props.theme.fontmd : props.theme.fontsm};
+  color: ${(props) =>
+    props.selected ? props.theme.body : props.theme.primaryColor};
+
   @media (max-width: 768px) {
-    font-size: ${(props) =>
-      props.expanded ? props.theme.fontxl : props.theme.fontmd};
+    font-size: ${(props) => props.theme.fontsm};
+
   }
 `;
-
-const Arrow = styled.h4`
-  transition: all 0.3s ease;
-  font-family: "Tajawal", sans-serif;
-  @media (max-width: 768px) {
-    font-size: ${(props) =>
-      props.expanded ? props.theme.fontxl : props.theme.fontmd};
-  }
-`;
-
-const Category = ({ category, shopId, onCategoryClick, dishes }) => {
-  const [expanded, setExpanded] = useState(false);
-
-  const filteredDishes = dishes.filter(
-    (dish) => dish.categoryId === category.id && dish.shopId === shopId
-  );
-
+const Category = ({ category, onCategoryClick, selectedCategory }) => {
   const handleHeadingClick = () => {
-    setExpanded(!expanded);
     onCategoryClick(category.id);
   };
 
   return (
-    <Section onClick={handleHeadingClick}>
+    <Section
+      onClick={handleHeadingClick}
+      selected={selectedCategory === category.id}
+    >
       <Heading>
-        <CategoryName expanded={expanded}>{category.name}</CategoryName>
-        <Arrow expanded={expanded}>{expanded ? "-" : "+"}</Arrow>
+        <CategoryName selected={selectedCategory === category.id}>
+          {category.name}
+        </CategoryName>
       </Heading>
-      {expanded && (
-        <DishesContainer
-          categoryId={category.id}
-          shopId={shopId}
-          dishes={filteredDishes}
-          expanded={expanded}
-        />
-      )}
     </Section>
   );
 };

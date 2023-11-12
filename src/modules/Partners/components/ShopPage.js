@@ -14,7 +14,7 @@ const Section = styled.div`
   background-color: ${(props) => props.theme.body};
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   @media (max-width: 768px) {
     justify-content: flex-start;
