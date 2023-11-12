@@ -23,7 +23,7 @@ const Section = styled.div`
   gap: 2rem;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
-    width: 100%;
+    width: 90%;
   }
 `;
 const Container = styled.div`
@@ -97,6 +97,7 @@ const ShopsContainer = () => {
         <Title>{t('ourPartners')}</Title>
         <Container>
           {shopsWithImages.map((shop) => (
+            (shop.shopData.domainId === "6357da1c6c62b4f58636879a") ? 
             <Link
               to={`/shop/${shop.shopData.username}`}
               state={{
@@ -112,6 +113,7 @@ const ShopsContainer = () => {
                 imageData={shop.shopImage.image}
               />
             </Link>
+            : <></>
           ))}
         </Container>
         </>

@@ -25,7 +25,7 @@ const CustomRouter = () => {
       <Route path="/terms and conditions" element={<TermsAndConditions />} />
       {/* <Route path="/shop/:shopName" element={<ShopPage/>} /> */}
       <Route path="/shop/:username" element={<ShopPageWithUsername/>} />
-      <Route path="/tawsila" element={<Tawsila />} />
+      {/* <Route path="/tawsila" element={<Tawsila />} /> */}
       {/* <Route path="/get-started-with-Tawsila" element={<GetStarted />} /> */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

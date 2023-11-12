@@ -52,7 +52,7 @@ const RightBox = styled.div`
 `;
 
 const LeftBox = styled.div`
-  width: 40%;
+  width: 50%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -64,9 +64,9 @@ const LeftBox = styled.div`
 `;
 
 const Heading = styled.h1`
-  width: 80%;
+  width: 100%;
   margin-bottom: 0.5rem;
-  font-size: ${(props) => props.theme.fontLargest};
+  font-size: 4rem;
   color: ${(props) => props.theme.primaryColor};
   font-weight: 900;
   text-transform: uppercase;
@@ -128,6 +128,7 @@ const HomePage = () => {
                 backgroundColor="#000000"
                 text1={t("getItOn")}
                 text2={t("googlePlay")}
+                className= "homeDownloadButton"
               ></ButtonWithIcon>
             </Link>
             <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>

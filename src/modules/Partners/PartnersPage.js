@@ -75,14 +75,16 @@ const LowerBox = styled.div`
   gap: 1.5rem;
   flex-wrap: wrap;
   @media (max-width: 768px) {
-    width: 90%;
+    width: 100%;
     margin-bottom: 1rem;
+    align-items: center;
+  justify-content: center;
   }
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   .shopLinkWrapper {
     width: 30%;
     @media (max-width: 768px) {
-      width: 90%;
+      width: 100%;
     }
   }
 `;

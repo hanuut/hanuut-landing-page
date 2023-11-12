@@ -22,7 +22,7 @@ import NotFoundPage from "../../NotFoundPage";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 
 const Section = styled.div`
-  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
+  min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
   background-color: ${(props) => props.theme.body};
   display: flex;
   flex-direction: column;
@@ -30,6 +30,7 @@ const Section = styled.div`
   justify-content: flex-start;
   @media (max-width: 768px) {
     justify-content: flex-start;
+    width: 100%;
   }
 `;
 const ShopPageContainer = styled.div`
@@ -58,29 +59,40 @@ const UpperBox = styled.div`
   height: 100%;
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
   @media (max-width: 768px) {
-    width: 96%;
     flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 90%;
   }
 `;
 
 const OrderAndDownload = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 0.5rem;
   @media (max-width: 768px) {
     gap: 0.25rem;
-    padding: 0rem 0.5rem;
-    margin-top: 0.7rem;
+    margin-top: 1rem;
+    align-items: flex-start;
   }
 `;
-const Title = styled.h3`
+const Title = styled.p`
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontsm};
+  }
+`;
+
+const MenuTitle = styled.h1`
+  margin-top: 1rem;
+  font-size:  3rem;
+  color: ${(props) => props.theme.orangeColor};
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontLargest};
   }
 `;
 
@@ -88,7 +100,7 @@ const LowerBox = styled.div`
   width: 80%;
   display: flex;
   @media (max-width: 768px) {
-    width: 100%;
+    width: 90%;
   }
 `;
 
@@ -146,6 +158,7 @@ const ShopPageWithUsername = () => {
             </OrderAndDownload>
           </UpperBox>
         </UpperBoxCover>
+        <MenuTitle>{t('menuTitle')}</MenuTitle>
         <LowerBox>
           {selectedShop ? (
             <CategoriesContainer shopData={selectedShop} />

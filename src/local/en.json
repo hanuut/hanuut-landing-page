@@ -17,7 +17,7 @@
     "homeSubHeading": "We bring the Shops you trust to your mobile phone",
     "homeParagraph": "Shop smarter, not harder with our online marketplace, where you can find a wide variety of products in one place.",
     "homeInputButton": "Download",
-    "toOrder": "Order on hanuut",
+    "toOrder": "Wherever you are, order from Hanuut App",
     "homeSmallerParagraph": "This is an external link. By clicking on the link, it will take you to the Play Store download page.",
     "aboutUsHeading": "About Us",
     "aboutUsText": "At hanuut, we make it easy for you to find everything you need in one place. We partner with a variety of local shops that you trust in your area to offer you a wide range of products right at your fingertips. Whether you're looking for food, household essentials or groceries, we've got you covered.",
@@ -98,5 +98,8 @@
     "thirdJoinStepText": "Go online, receive delivery mission and get paid for each one seperately",
     "clickToDownloadApp": "Your demand has been accepted. Click on the link bellow to download",
     "downloadTawsila": "Download Tawsila",
-    "downloadMyHanuut": "Download My hanuut"
+    "downloadMyHanuut": "Download My hanuut",
+    "selectCategory": "Please select a category",
+    "noDishesAvailable": "No dishes available for this category",
+    "menuTitle":"Menu"
 }

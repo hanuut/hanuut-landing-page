@@ -13,11 +13,11 @@
     "footerAllRightsReserved": "© 2023 hanuut Express. Tous droits réservés | ",
     "footerPrivacyAndPolicy": "Politique de confidentialité | ",
     "footerTermsOfUse": "Conditions d'utilisation",
-    "homeHeading": "Une marketplace en ligne fiable et sécurisée",
+    "homeHeading": "Une marketplace fiable et sécurisée",
     "homeSubHeading": "Nous apportons les magasins de confiance sur votre téléphone portable",
-    "homeParagraph": "Achetez de manière intelligente, pas difficilement, avec notre marché en ligne où vous pouvez trouver une grande variété de produits en un seul endroit.",
+    "homeParagraph": "Faites des achats malins, sans efforts, grâce à notre marché en ligne. Vous pouvez aisément acquérir les produits que vous aimez auprès de magasins de confiance, regroupés en un seul endroit.",
     "homeInputButton": "Télécharger",
-    "toOrder": "Commander sur hanuut",
+    "toOrder": "Commandez depuis Hanuut app, où que vous soyez",
     "homeSmallerParagraph": "Il s'agit d'un lien externe. En cliquant sur le lien, vous serez redirigé vers la page de téléchargement sur le Play Store.",
     "aboutUsHeading": "À propos de nous",
     "aboutUsText": "Chez hanuut, nous facilitons la recherche de tout ce dont vous avez besoin en un seul endroit. Nous nous associons à divers magasins locaux de confiance dans votre région pour vous offrir une large gamme de produits à portée de main. Que vous cherchiez de la nourriture, des produits essentiels pour le foyer ou des courses, nous avons ce qu'il vous faut.",
@@ -98,5 +98,8 @@
     "thirdJoinStepText": "Connectez-vous, recevez des missions de livraison et soyez rémunéré pour chacune d'entre elles",
     "clickToDownloadApp": "Votre demande a été acceptée. Cliquez sur le lien ci-dessous pour télécharger",
     "downloadTawsila": "Télécharger Tawsila",
-    "downloadMyHanuut": "Télécharger My Hanuut"
+    "downloadMyHanuut": "Télécharger My Hanuut",
+    "selectCategory": "Veuillez sélectionner une catégorie",
+    "noDishesAvailable": "Aucun plat disponible pour cette catégorie",
+    "menuTitle":"Menu"
 }
