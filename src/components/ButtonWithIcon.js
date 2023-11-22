@@ -10,7 +10,7 @@ const Button = styled.button`
   justify-content: center;
   gap: 0.5rem;
   background-color: ${(props) =>
-    props.backgroundColor || props.theme.downloadButtonColor};
+    props.backgroundColor || props.theme.primaryColor};
   color: #fff;
   border: none;
   border-radius: ${(props) => props.theme.defaultRadius};

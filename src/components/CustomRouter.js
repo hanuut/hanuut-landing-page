@@ -11,7 +11,7 @@ import DeleteAccountPage from "../modules/DeleteAccountPage";
 // import ShopPage from "../modules/Partners/components/ShopPage";
 import ShopPageWithUsername from "../modules/Partners/components/ShopPageWithUsername";
 import Tawsila from "../modules/Tawsila/Tawsila";
-import PaymentPage from "../modules/PaymentPage";
+import PaymentPage from "../modules/payment/PaymentPage";
 
 // import GetStarted from "../modules/Tawsila/GetStarted";
 
@@ -22,9 +22,9 @@ const CustomRouter = () => {
       <Route path="/partners" element={<PartnersPage />} />
       <Route path="/solutions" element={<SolutionsPage />} />
       <Route path="/contact" element={<ContactPage />} />
-      <Route path="/delete account" element={<DeleteAccountPage />} />
-      <Route path="/privacy policy" element={<PrivacyPolicy />} />
-      <Route path="/terms and conditions" element={<TermsAndConditions />} />
+      <Route path="/delete_account" element={<DeleteAccountPage />} />
+      <Route path="/privacy_policy" element={<PrivacyPolicy />} />
+      <Route path="/terms_and_conditions" element={<TermsAndConditions />} />
       {/* <Route path="/shop/:shopName" element={<ShopPage/>} /> */}
       <Route path="/shop/:username" element={<ShopPageWithUsername/>} />
       <Route path="/confirmPayment" element={<PaymentPage />} />
