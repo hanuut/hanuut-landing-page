@@ -22,7 +22,7 @@ import NotFoundPage from "../../NotFoundPage";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 
 const Section = styled.div`
-  min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
+  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
   background-color: ${(props) => props.theme.body};
   display: flex;
   flex-direction: column;
@@ -89,7 +89,7 @@ const Title = styled.p`
 
 const MenuTitle = styled.h1`
   margin-top: 1rem;
-  font-size:  3rem;
+  font-size: 3rem;
   color: ${(props) => props.theme.orangeColor};
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontLargest};
@@ -127,7 +127,11 @@ const ShopPageWithUsername = () => {
     return <NotFoundPage />;
   }
   if (!selectedShop || !selectedShopImage || loading) {
-    return <Loader />;
+    return (
+      <Section>
+        <Loader />
+      </Section>
+    );
   }
 
   return (
@@ -158,7 +162,7 @@ const ShopPageWithUsername = () => {
             </OrderAndDownload>
           </UpperBox>
         </UpperBoxCover>
-        <MenuTitle>{t('menuTitle')}</MenuTitle>
+        <MenuTitle>{t("menuTitle")}</MenuTitle>
         <LowerBox>
           {selectedShop ? (
             <CategoriesContainer shopData={selectedShop} />

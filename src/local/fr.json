@@ -3,6 +3,8 @@
     "appTitle": "hanuut",
     "getItOn": "Obtenez-le sur",
     "googlePlay": "Google Play",
+    "show": "Afficher",
+    "hide": "Masquer",
     "navHome": "Accueil",
     "navPartners": "Partenaires",
     "navSolution": "Solutions",
@@ -14,6 +16,12 @@
     "footerPrivacyAndPolicy": "Politique de confidentialité | ",
     "footerTermsOfUse": "Conditions d'utilisation",
     "homeHeading": "Une marketplace fiable et sécurisée",
+    "thankYouForPurchase": "Merci pour votre achat !",
+    "somethingWrongHappened": "Désolé ! Quelque chose s'est mal passé",
+    "purchaseSuccess": "Votre commande a été traitée avec succès. Nous vous remercions de votre confiance et espérons avoir le plaisir de vous servir à nouveau.",
+    "purchaseFailure": "Nous nous excusons pour le désagrément. Un problème est survenu lors du traitement de votre commande. Nous faisons tout notre possible pour résoudre le problème.",
+    "order": "Commande",
+    "depositeAmount": "Montant du dépôt",
     "homeSubHeading": "Nous apportons les magasins de confiance sur votre téléphone portable",
     "homeParagraph": "Faites des achats malins, sans efforts, grâce à notre marché en ligne. Vous pouvez aisément acquérir les produits que vous aimez auprès de magasins de confiance, regroupés en un seul endroit.",
     "homeInputButton": "Télécharger",
@@ -63,6 +71,7 @@
     "ourPartners": "Nos partenaires",
     "noShopAvailable": "Aucun magasin disponible",
     "sorryNoShopAvailable": "Désolé, il n'y a actuellement aucun magasin disponible",
+    "errorDescription": "Description de l'erreur",
     "errorFillAllFields": "Veuillez remplir tous les champs",
     "errorEmailNotValid": "Veuillez entrer une adresse e-mail valide",
     "errorPhoneNotValid": "Veuillez entrer un numéro de téléphone valide",
@@ -101,5 +110,5 @@
     "downloadMyHanuut": "Télécharger My Hanuut",
     "selectCategory": "Veuillez sélectionner une catégorie",
     "noDishesAvailable": "Aucun plat disponible pour cette catégorie",
-    "menuTitle":"Menu"
+    "menuTitle": "Menu"
 }

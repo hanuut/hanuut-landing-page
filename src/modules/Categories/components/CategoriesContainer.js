@@ -31,8 +31,8 @@ const Categories = styled.div`
   flex-wrap: nowrap; /* Change flex-wrap to nowrap */
   gap: 1em;
   align-items: center;
-  justify-content: flex-start; 
-  overflow-x: auto; 
+  justify-content: flex-start;
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
@@ -83,7 +83,11 @@ const CategoriesContainer = ({ shopData }) => {
       );
       return availableCategories;
     } else {
-      return <Loader />;
+      return (
+        <Section>
+          <Loader />
+        </Section>
+      );
     }
   };
 
@@ -121,7 +125,12 @@ const CategoriesContainer = ({ shopData }) => {
     }
   };
 
-  if (categoriesLoading) return <Loader />;
+  if (categoriesLoading)
+    return (
+      <Section>
+        <Loader />
+      </Section>
+    );
   if (categoriesError) return <div>Error: No categories available</div>;
 
   return (
@@ -144,7 +153,7 @@ const CategoriesContainer = ({ shopData }) => {
       ) : (
         <SelectCategory>
           {" "}
-          <Content> {t('selectCategory')} </Content>{" "}
+          <Content> {t("selectCategory")} </Content>{" "}
         </SelectCategory>
       )}
     </Section>

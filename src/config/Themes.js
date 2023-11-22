@@ -4,11 +4,13 @@ export const light = {
   text: "#202020",
   bodyRgba: "255, 252, 248",
   textRgba: "32, 32, 32",
-  primaryColor: "#5BC28B", 
+  primaryColor: "#5BC28B", //green
   secondaryColor: "#0A99FF",//blue
   secondaryColorDark: "#0066CA", //dark blue
   downloadButtonColor: "#182018", //grey
   orangeColor: "#F0A46A",
+  redColor: "#FF725E", 
+  redColorRgba: "255 ,114 ,94",
   primaryColorRgba: "91 ,194 ,139",
   white: "#fff",
   
