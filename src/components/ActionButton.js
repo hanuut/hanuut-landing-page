@@ -3,25 +3,23 @@ import styled from "styled-components";
 
 const Button = styled.button`
   background-color: ${(props) => props.theme.primaryColor};
-  color: ${(props) => props.theme.body};
+  color: #fff;
   border: none;
-  padding: ${(props) => props.theme.actionButtonPadding};
   border-radius: ${(props) => props.theme.defaultRadius};
-  font-size: ${(props) => props.theme.fontxxxl};
+  padding: ${(props) => props.theme.actionButtonPaddingMobile};
+  font-size: ${(props) => props.theme.fontxl};
   cursor: pointer;
   transition: all 0.5s ease;
-  
+
   &:hover {
     transform: scale(1.03);
   }
 
-  &:active {
-    background-color: ${(props) => props.theme.secondaryColor};
-  }
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontlg};
-    padding: ${(props) => props.theme.actionButtonPaddingMobile};
+    padding: ${(props) => props.theme.smallPadding};
   }
+  
 `;
 
 const SecondaryButton = styled(Button)`

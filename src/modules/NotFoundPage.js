@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Oops from "../assets/404illustration.svg";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { ActionButton } from '../components/ActionButton';
 
 
 const Section = styled.div`
@@ -106,7 +107,7 @@ const NotFoundPage = () => {
         {t('404Text')}
         </Paragraph>
         <Link to="/">
-        <Button> {t('404Button')} </Button>
+        <ActionButton> {t('404Button')} </ActionButton>
       </Link>
       </LeftBox>
       <RightBox>

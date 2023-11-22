@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { confirmOrder } from "./services/paymentServices";
 import Loader from "../../components/Loader";
 import { SatimConfirmationErrorCodes } from "./models/paymentErrorCodes.js";
-import failure from "../../assets/failure.svg";
-import successful from "../../assets/successful.svg";
 import NotFoundPage from "../NotFoundPage";
+import Success from "./components/Success.js";
+import Failed from "./components/Failed.js";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -19,52 +19,6 @@ const Section = styled.div`
   @media (max-width: 768px) {
     min-height: 100vh;
     justify-content: flex-start;
-  }
-`;
-
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 80%;
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  @media (max-width: 768px) {
-    width: 90%;
-    flex-direction: column;
-  }
-`;
-
-const LeftBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  width: 40%;
-  @media (max-width: 768px) {
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-  }
-
-  img {
-    width: 100%;
-    @media (max-width: 768px) {
-      width: 100%;
-    }
-  }
-`;
-
-const RightBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  width: 40%;
-  @media (max-width: 768px) {
-    width: 100%;
-    align-items: center;
-    justify-content: center;
   }
 `;
 
@@ -145,57 +99,25 @@ const PaymentPage = () => {
   if (!orderId) return <NotFoundPage />;
 
   if (!orderId || !paymentStatus) {
-    return <Loader />;
+    return (
+      <Section>
+        <Loader />
+      </Section>
+    );
   }
 
   const { errorCode, errorMessage } = paymentStatus;
 
   return (
     <Section>
-      <Title isArabic={i18n.language === "ar"}>Payment Check</Title>
-      <Row>
-        <LeftBox>
-          {/* Render the illustration based on errorMessage */}
-          {errorMessage ? (
-            // Render the illustration for error
-            <img src={failure} alt="Error Illustration" />
-          ) : (
-            // Render the illustration for success
-            <img src={successful} alt="Success Illustration" />
-          )}
-        </LeftBox>
-        <RightBox>
-          {errorMessage ? (
-            <>
-              <SubTitle>ERROR</SubTitle>
-              <SubTitle className="error-message">
-                Error: {errorMessage}
-              </SubTitle>
-            </>
-          ) : (
-            <>
-              <Title>Congratulation</Title>
-              <SubTitle isArabic={i18n.language === "ar"}>
-                Order: <span>{orderId}</span>
-              </SubTitle>
-              <SubTitle isArabic={i18n.language === "ar"}>
-                <span>{paymentStatus.cardholderName}</span>
-              </SubTitle>
-              <SubTitle isArabic={i18n.language === "ar"}>
-                <span>
-                  {parseFloat(paymentStatus.depositAmount) / 100} {t("dzd")}
-                </span>
-              </SubTitle>
-              <SubTitle isArabic={i18n.language === "ar"}>
-                <span>{paymentStatus.actionCodeDescription}</span>
-              </SubTitle>
-            </>
-          )}
-          <Link to={"/"}>
-            <Button> {t("404Button")} </Button>
-          </Link>
-        </RightBox>
-      </Row>
+      {errorMessage ? (
+        <Failed orderId={orderId} error={errorMessage}></Failed>
+      ) : (
+        <Success
+          orderId={orderId}
+          depositeAmount={parseFloat(paymentStatus.depositAmount) / 100}
+        ></Success>
+      )}
     </Section>
   );
 };

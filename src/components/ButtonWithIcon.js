@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import "@fontsource/roboto";
+import '@fontsource-variable/cairo';
 
 const Button = styled.button`
   display: flex;
@@ -14,11 +15,11 @@ const Button = styled.button`
   color: #fff;
   border: none;
   border-radius: ${(props) => props.theme.defaultRadius};
-  padding: ${(props) => props.theme.smallPadding};
+  padding: ${(props) => props.theme.actionButtonPaddingMobile};
   font-size: ${(props) => props.theme.fontlg};
   cursor: pointer;
   transition: all 0.5s ease;
-  margin-bottom: 0.5rem;
+
   &:hover {
     transform: scale(1.03);
   }
@@ -59,13 +60,14 @@ const TextContainer = styled.div`
 const Title = styled.p`
   font-size: ${(props) => props.theme.fontxs};
   text-align: start;
-  font-family: ${(props) => (props.isArabic ? "" : "Roboto, sans-serif")};
+  font-family: ${(props) => (props.isArabic ? "'Cairo Variable', sans-serif" : "Roboto, sans-serif")};
 `;
 
 const SubTitle = styled.h6`
   font-size: ${(props) => props.theme.fontsm};
-  text-align: start;
-  font-family: "Roboto", sans-serif;
+
+  font-weight: 500;
+  font-family: ${(props) => (props.isArabic ? "'Cairo Variable', sans-serif" : "Roboto, sans-serif")};
 `;
 
 const ButtonWithIcon = ({
