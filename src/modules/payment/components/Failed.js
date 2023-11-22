@@ -24,8 +24,7 @@ const Container = styled.div`
   padding: 1rem;
 
   @media (max-width: 768px) {
-    height: 100vh;
-    background-size: cover;
+    background-size: 80%;
     background-position: top;
     backdrop-filter: blur(10px);
     padding: 0;
@@ -49,11 +48,11 @@ const GlassBox = styled.div`
   justify-content: space-around;
 
   @media (max-width: 768px) {
-    min-height: 60%;
-    width: 80%;
+    min-height: 70%;
     display: flex;
     flex-direction: column;
     align-items: center;
+
     backdrop-filter: blur(20px);
     box-shadow: 0 0 2px rgba(${(props) => props.theme.redColorRgba}, 0.2),
       ${(props) =>
@@ -96,6 +95,9 @@ const Illustration = styled.img`
   justify-content: center;
   align-items: center;
   justify-content: center;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 const Content = styled.div`
   width: 100%;
@@ -123,6 +125,9 @@ const Description = styled.p`
 const PaymentInfo = styled.div`
   width: 70%;
   color: ${(props) => props.theme.text};
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 const PaymentInfoWrapper = styled.div`
   width: 100%;
@@ -138,7 +143,7 @@ const Label = styled.h3`
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+     font-size: ${(props) => props.theme.fontmd};
   }
 `;
 const ValueWrapper = styled.div`
@@ -149,7 +154,7 @@ const ValueWrapper = styled.div`
   align-items: center;
   gap: 0.5rem;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+    font-size: ${(props) => props.theme.fontsm};
   }
 `;
 

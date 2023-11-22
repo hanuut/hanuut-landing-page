@@ -5,7 +5,6 @@ import successful from "../../../assets/successful.svg";
 import right from "../../../assets/right.svg";
 import left from "../../../assets/left.svg";
 import fireworks from "../../../assets/fireworks.svg";
-import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import { ActionButton } from "../../../components/ActionButton";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -26,9 +25,9 @@ const Container = styled.div`
   padding: 1rem;
 
   @media (max-width: 768px) {
-    height: 100vh;
+
     background-size: cover;
-    background-position: top;
+    background-position: center;
     backdrop-filter: blur(10px);
     padding: 0;
   }
@@ -40,7 +39,7 @@ const GlassBox = styled.div`
   backdrop-filter: blur(7px);
   border-radius: 10px;
   padding: 2rem;
-  box-shadow: 0 0 2px  rgba(${(props) => props.theme.primaryColorRgba}, 0.2),
+  box-shadow: 0 0 2px rgba(${(props) => props.theme.primaryColorRgba}, 0.2),
     ${(props) =>
       props.isArabic
         ? `-15px 15px rgba(${props.theme.primaryColorRgba}, 0.75)`
@@ -51,13 +50,12 @@ const GlassBox = styled.div`
   justify-content: space-around;
 
   @media (max-width: 768px) {
-    min-height: 60%;
-    width: 80%;
+    min-height: 70%;
     display: flex;
     flex-direction: column;
     align-items: center;
 
-    box-shadow: 0 0 2px  rgba(${(props) => props.theme.primaryColorRgba}, 0.2),
+    box-shadow: 0 0 2px rgba(${(props) => props.theme.primaryColorRgba}, 0.2),
       ${(props) =>
         props.isArabic
           ? `-10px 10px rgba(${props.theme.primaryColorRgba}, 0.75)`
@@ -129,6 +127,9 @@ const Description = styled.p`
 const PaymentInfo = styled.div`
   width: 70%;
   color: ${(props) => props.theme.text};
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 const PaymentInfoWrapper = styled.div`
   width: 100%;
@@ -144,7 +145,7 @@ const Label = styled.h3`
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+    font-size: ${(props) => props.theme.fontmd};
   }
 `;
 const ValueWrapper = styled.div`
@@ -154,24 +155,28 @@ const ValueWrapper = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
+  img {
+    max-width: 2rem;
+    @media (max-width: 768px) {
+      max-width: 1.5rem;
+    }
+  }
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+    font-size: ${(props) => props.theme.fontsm};
   }
 `;
 
 const Value = styled.p`
   line-height: 1;
-  overflow: hidden;
+  overflow: ${(props) => (props.expanded ? "" : "hidden")};
   border-radius: ${(props) => props.theme.defaultRadius};
   width: ${(props) => (props.expanded ? "100%" : "4%")};
-  font-size: 1.2rem;
   color: ${(props) => props.theme.body};
   background-color: ${(props) => props.theme.primaryColor};
-  padding: ${(props) => props.theme.actionButtonPaddingMobile};
+  padding: ${(props) => props.theme.smallPadding};
   transition: all 0.5s ease;
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontlg};
-    padding: ${(props) => props.theme.smallPadding};
   }
   &.transparentBackground {
     color: ${(props) => props.theme.text};
@@ -183,7 +188,7 @@ const Value = styled.p`
   }
 `;
 
-const Success = ({orderId, depositeAmount}) => {
+const Success = ({ orderId, depositeAmount }) => {
   const { t, i18n } = useTranslation();
   const [orderValueExpanded, setOrderValueExpanded] = useState(false);
   const handleShowOrderValue = () => {
@@ -204,14 +209,8 @@ const Success = ({orderId, depositeAmount}) => {
               <PaymentInfoWrapper>
                 <Label>{t("order")}</Label>
                 <ValueWrapper>
-                  <Value expanded={orderValueExpanded}>
-                    {orderId}
-                  </Value>
-                  <ButtonWithIcon
-                    image={orderValueExpanded ? left : right}
-                    text2={orderValueExpanded ? t("hide") : t("show")}
-                    onClick={handleShowOrderValue}
-                  />
+                  <Value expanded={orderValueExpanded}>{orderId}</Value>
+                  <img src={orderValueExpanded ? left : right} alt="img" onClick={handleShowOrderValue}/>
                 </ValueWrapper>
               </PaymentInfoWrapper>
               <PaymentInfoWrapper>

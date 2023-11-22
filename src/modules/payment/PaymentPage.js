@@ -119,52 +119,6 @@ const PaymentPage = () => {
         ></Success>
       )}
     </Section>
-    // <Section>
-    //   <Title isArabic={i18n.language === "ar"}>Payment Check</Title>
-    //   <Row>
-    //     <LeftBox>
-    //       {/* Render the illustration based on errorMessage */}
-    //       {errorMessage ? (
-    //         // Render the illustration for error
-    //         <img src={failure} alt="Error Illustration" />
-    //       ) : (
-    //         // Render the illustration for success
-    //         <img src={successful} alt="Success Illustration" />
-    //       )}
-    //     </LeftBox>
-    //     <RightBox>
-    //       {errorMessage ? (
-    //         <>
-    //           <SubTitle>ERROR</SubTitle>
-    //           <SubTitle className="error-message">
-    //             Error: {errorMessage}
-    //           </SubTitle>
-    //         </>
-    //       ) : (
-    //         <>
-    //           <Title>Congratulation</Title>
-    //           <SubTitle isArabic={i18n.language === "ar"}>
-    //             Order: <span>{orderId}</span>
-    //           </SubTitle>
-    //           <SubTitle isArabic={i18n.language === "ar"}>
-    //             <span>{paymentStatus.cardholderName}</span>
-    //           </SubTitle>
-    //           <SubTitle isArabic={i18n.language === "ar"}>
-    //             <span>
-    //               {parseFloat(paymentStatus.depositAmount) / 100} {t("dzd")}
-    //             </span>
-    //           </SubTitle>
-    //           <SubTitle isArabic={i18n.language === "ar"}>
-    //             <span>{paymentStatus.actionCodeDescription}</span>
-    //           </SubTitle>
-    //         </>
-    //       )}
-    //       <Link to={"/"}>
-    //         <Button> {t("404Button")} </Button>
-    //       </Link>
-    //     </RightBox>
-    //   </Row>
-    // </Section>
   );
 };
 
