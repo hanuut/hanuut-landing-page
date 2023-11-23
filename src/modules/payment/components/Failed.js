@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import failure from "../../../assets/failure.svg";
 import noData from "../../../assets/noData.svg";
@@ -21,8 +21,6 @@ const Container = styled.div`
   background-position: top;
   backdrop-filter: blur(10px);
   background-repeat: no-repeat;
-  padding: 1rem;
-
   @media (max-width: 768px) {
     background-size: 80%;
     background-position: top;
@@ -123,7 +121,8 @@ const Description = styled.p`
   }
 `;
 const PaymentInfo = styled.div`
-  width: 70%;
+  margin-top: 0.5rem;
+  width: 100%;
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
     width: 100%;
@@ -140,10 +139,11 @@ const PaymentInfoWrapper = styled.div`
   gap: 0.5rem;
 `;
 const Label = styled.h3`
+  max-width: 30%;
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
-     font-size: ${(props) => props.theme.fontmd};
+    font-size: ${(props) => props.theme.fontsm};
   }
 `;
 const ValueWrapper = styled.div`
@@ -169,25 +169,22 @@ const Value = styled.p`
   padding: ${(props) => props.theme.actionButtonPaddingMobile};
   transition: all 0.5s ease;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+    font-size: ${(props) => props.theme.fontmd};
     padding: ${(props) => props.theme.smallPadding};
   }
   &.transparentBackground {
+    border-radius: 0;
     color: ${(props) => props.theme.text};
     background-color: transparent;
-    padding: 0.1rem 0.5rem;
+    padding: 0.1rem 0;
     @media (max-width: 768px) {
-      font-size: ${(props) => props.theme.fontlg};
+      font-size: ${(props) => props.theme.fontmd};
     }
   }
 `;
 
 const Failed = ({ orderId, error }) => {
   const { t, i18n } = useTranslation();
-  const [orderValueExpanded, setOrderValueExpanded] = useState(false);
-  const handleShowOrderValue = () => {
-    setOrderValueExpanded(!orderValueExpanded);
-  };
   return (
     <Container isArabic={i18n.language === "ar"}>
       <GlassBox>
@@ -203,9 +200,7 @@ const Failed = ({ orderId, error }) => {
               <PaymentInfoWrapper>
                 <Label>{t("order")}</Label>
                 <ValueWrapper>
-                  <Value expanded={true}>
-                    {orderId}
-                  </Value>
+                  <Value expanded={true}>{orderId}</Value>
                 </ValueWrapper>
               </PaymentInfoWrapper>
               <PaymentInfoWrapper>

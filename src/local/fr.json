@@ -21,6 +21,7 @@
     "purchaseSuccess": "Votre commande a été traitée avec succès. Nous vous remercions de votre confiance et espérons avoir le plaisir de vous servir à nouveau.",
     "purchaseFailure": "Nous nous excusons pour le désagrément. Un problème est survenu lors du traitement de votre commande. Nous faisons tout notre possible pour résoudre le problème.",
     "order": "Commande",
+    "orderStatus": "Statut de la commande",
     "depositeAmount": "Montant du dépôt",
     "homeSubHeading": "Nous apportons les magasins de confiance sur votre téléphone portable",
     "homeParagraph": "Faites des achats malins, sans efforts, grâce à notre marché en ligne. Vous pouvez aisément acquérir les produits que vous aimez auprès de magasins de confiance, regroupés en un seul endroit.",
@@ -72,6 +73,7 @@
     "noShopAvailable": "Aucun magasin disponible",
     "sorryNoShopAvailable": "Désolé, il n'y a actuellement aucun magasin disponible",
     "errorDescription": "Description de l'erreur",
+
     "errorFillAllFields": "Veuillez remplir tous les champs",
     "errorEmailNotValid": "Veuillez entrer une adresse e-mail valide",
     "errorPhoneNotValid": "Veuillez entrer un numéro de téléphone valide",

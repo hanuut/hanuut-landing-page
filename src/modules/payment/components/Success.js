@@ -22,14 +22,10 @@ const Container = styled.div`
   background-size: cover; /* Use "cover" instead of "100%" */
   background-position: center;
   backdrop-filter: blur(10px);
-  padding: 1rem;
-
   @media (max-width: 768px) {
-
     background-size: cover;
     background-position: center;
     backdrop-filter: blur(10px);
-    padding: 0;
   }
 `;
 
@@ -125,7 +121,8 @@ const Description = styled.p`
   }
 `;
 const PaymentInfo = styled.div`
-  width: 70%;
+  margin-top: 0.5rem;
+  width: 100%;
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
     width: 100%;
@@ -141,11 +138,14 @@ const PaymentInfoWrapper = styled.div`
   justify-content: flex-start;
   gap: 0.5rem;
 `;
+
 const Label = styled.h3`
+  max-width: 30%;
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontmd};
+    max-width: 30%;
+    font-size: ${(props) => props.theme.fontsm};
   }
 `;
 const ValueWrapper = styled.div`
@@ -153,13 +153,7 @@ const ValueWrapper = styled.div`
   color: ${(props) => props.theme.text};
   display: flex;
   flex-direction: row;
-  align-items: center;
   gap: 0.5rem;
-  img {
-    max-width: 2rem;
-    @media (max-width: 768px) {
-      max-width: 1.5rem;
-    }
   }
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontsm};
@@ -173,22 +167,30 @@ const Value = styled.p`
   width: ${(props) => (props.expanded ? "100%" : "4%")};
   color: ${(props) => props.theme.body};
   background-color: ${(props) => props.theme.primaryColor};
-  padding: ${(props) => props.theme.smallPadding};
+  padding: ${(props) => props.theme.actionButtonPaddingMobile};
   transition: all 0.5s ease;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+    font-size: ${(props) => props.theme.fontsm};
+    padding: ${(props) => props.theme.smallPadding};
   }
   &.transparentBackground {
+    border-radius: 0;
     color: ${(props) => props.theme.text};
     background-color: transparent;
-    padding: 0.1rem 0.5rem;
+    padding: 0.1rem 0;
     @media (max-width: 768px) {
-      font-size: ${(props) => props.theme.fontlg};
+      font-size: ${(props) => props.theme.fontsm};
     }
   }
 `;
-
-const Success = ({ orderId, depositeAmount }) => {
+const ShowValueIcon = styled.img`
+  transform: ${(props) => (props.isArabic ? "rotateY(180deg)" : "none")};
+  max-width: 2rem;
+  @media (max-width: 768px) {
+    max-width: 1.5rem;
+  }
+`;
+const Success = ({ orderId, depositeAmount, successMessage }) => {
   const { t, i18n } = useTranslation();
   const [orderValueExpanded, setOrderValueExpanded] = useState(false);
   const handleShowOrderValue = () => {
@@ -210,7 +212,20 @@ const Success = ({ orderId, depositeAmount }) => {
                 <Label>{t("order")}</Label>
                 <ValueWrapper>
                   <Value expanded={orderValueExpanded}>{orderId}</Value>
-                  <img src={orderValueExpanded ? left : right} alt="img" onClick={handleShowOrderValue}/>
+                  <ShowValueIcon
+                    src={orderValueExpanded ? left : right}
+                    alt="img"
+                    onClick={handleShowOrderValue}
+                    isArabic={i18n.language === "ar"}
+                  />
+                </ValueWrapper>
+              </PaymentInfoWrapper>
+              <PaymentInfoWrapper>
+                <Label>{t("orderStatus")}</Label>
+                <ValueWrapper>
+                  <Value className="transparentBackground" expanded={true}>
+                    {successMessage}
+                  </Value>
                 </ValueWrapper>
               </PaymentInfoWrapper>
               <PaymentInfoWrapper>

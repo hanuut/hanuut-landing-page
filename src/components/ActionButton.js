@@ -16,7 +16,7 @@ const Button = styled.button`
   }
 
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+    font-size: ${(props) => props.theme.fontmd};
     padding: ${(props) => props.theme.smallPadding};
   }
   
