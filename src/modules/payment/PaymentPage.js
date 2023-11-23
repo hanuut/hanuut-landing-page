@@ -22,45 +22,10 @@ const Section = styled.div`
   }
 `;
 
-const Title = styled.h1`
-  margin-top: 1rem;
-  font-size: ${(props) => props.theme.fontLargest};
-  @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontxl};
-  }
-`;
-
-const SubTitle = styled.h2`
-  margin-top: 1rem;
-  font-size: ${(props) => props.theme.fontxxxl};
-  @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontxl};
-  }
-`;
-const Button = styled.button`
-  margin-top: 1rem;
-  background-color: ${(props) => props.theme.primaryColor};
-  color: ${(props) => props.theme.body};
-  border: none;
-  border-radius: ${(props) => props.theme.defaultRadius};
-  padding: ${(props) => props.theme.actionButtonPadding};
-  font-size: ${(props) => props.theme.fontxl};
-  cursor: pointer;
-  transition: all 0.5s ease;
-
-  &:hover {
-    transform: scale(1.03);
-  }
-
-  @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
-    padding: ${(props) => props.theme.actionButtonPaddingMobile};
-  }
-`;
 const PaymentPage = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
-
-  const { t, i18n } = useTranslation();
+  const [success, setSuccess] = useState(false);
+  const { i18n } = useTranslation();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const orderId = queryParams.get("orderId");
@@ -72,15 +37,24 @@ const PaymentPage = () => {
         const response = await confirmOrder(orderId);
         const responseData = response.data;
         if (response) {
+          const errorCodeDescription = errorCodes[responseData.ErrorCode];
           if (
-            responseData.ErrorCode === errorCodes.SUCCESS ||
-            responseData.ErrorCode === errorCodes.ALREADY_CONFIRMED
+            errorCodeDescription.code === errorCodes[0].code ||
+            errorCodeDescription.code === errorCodes[2].code
           ) {
-            setPaymentStatus(responseData);
+            console.log("heree");
+            setSuccess(true);
+            setPaymentStatus({
+              ...responseData,
+              successMessage: errorCodeDescription.description[i18n.language],
+            });
           } else {
+            setSuccess(false);
             setPaymentStatus({
               errorCode: responseData.ErrorCode,
-              errorMessage: responseData.ErrorMessage,
+              errorMessage: responseData.errorMessage,
+              errorCodeDescription:
+                errorCodeDescription.description[i18n.language],
             });
           }
         }
@@ -105,17 +79,15 @@ const PaymentPage = () => {
       </Section>
     );
   }
-
-  const { errorCode, errorMessage } = paymentStatus;
-
   return (
     <Section>
-      {errorMessage ? (
-        <Failed orderId={orderId} error={errorMessage}></Failed>
+      {!success ? (
+        <Failed orderId={orderId} error={paymentStatus.errorCodeDescription}></Failed>
       ) : (
         <Success
           orderId={orderId}
           depositeAmount={parseFloat(paymentStatus.depositAmount) / 100}
+          successMessage={paymentStatus.successMessage}
         ></Success>
       )}
     </Section>

@@ -100,6 +100,7 @@ const Paragraph = styled.p`
 `;
 
 const SmallParagraph = styled.p`
+margin-top: 0.3rem;
   width: 100%;
   font-size: ${(props) => props.theme.fontmd};
   opacity: 0.75;
