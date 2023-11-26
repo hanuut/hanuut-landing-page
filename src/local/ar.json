@@ -111,5 +111,12 @@
     "downloadMyHanuut": "تحميل ماي حانووت",
     "selectCategory": "يرجى اختيار فئة",
     "noDishesAvailable": "لا تتوفر أطباق لهذه الفئة",
-    "menuTitle": "قائمة الطعام"
+    "menuTitle": "قائمة الطعام",
+    "testPayment": "اختبار الدفع عبر الإنترنت!",
+    "testPaymentOrder": "أدخل رقم الطلب!",
+    "testPaymentAmount": "أدخل المبلغ!",
+    "errorCouldNotPay": "تعذر معالجة الدفع، يرجى المحاولة لاحقًا",
+    "errorAmount": "يجب أن يكون المبلغ على الأقل 50",
+    "testPaymentTitle": "اختبار",
+    "testPaymentButton": "متابعة الدفع"
 }

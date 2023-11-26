@@ -12,7 +12,7 @@ import DeleteAccountPage from "../modules/DeleteAccountPage";
 import ShopPageWithUsername from "../modules/Partners/components/ShopPageWithUsername";
 import Tawsila from "../modules/Tawsila/Tawsila";
 import PaymentPage from "../modules/payment/PaymentPage";
-
+import SatimTestPage from "../modules/payment/SatimTestPage";
 // import GetStarted from "../modules/Tawsila/GetStarted";
 
 const CustomRouter = () => {
@@ -28,6 +28,7 @@ const CustomRouter = () => {
       {/* <Route path="/shop/:shopName" element={<ShopPage/>} /> */}
       <Route path="/shop/:username" element={<ShopPageWithUsername/>} />
       <Route path="/confirmPayment" element={<PaymentPage />} />
+      <Route path="/testPayment" element={<SatimTestPage />} />
 
       {/* <Route path="/tawsila" element={<Tawsila />} /> */}
       {/* <Route path="/get-started-with-Tawsila" element={<GetStarted />} /> */}

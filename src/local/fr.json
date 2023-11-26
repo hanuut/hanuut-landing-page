@@ -73,7 +73,6 @@
     "noShopAvailable": "Aucun magasin disponible",
     "sorryNoShopAvailable": "Désolé, il n'y a actuellement aucun magasin disponible",
     "errorDescription": "Description de l'erreur",
-
     "errorFillAllFields": "Veuillez remplir tous les champs",
     "errorEmailNotValid": "Veuillez entrer une adresse e-mail valide",
     "errorPhoneNotValid": "Veuillez entrer un numéro de téléphone valide",
@@ -112,5 +111,12 @@
     "downloadMyHanuut": "Télécharger My Hanuut",
     "selectCategory": "Veuillez sélectionner une catégorie",
     "noDishesAvailable": "Aucun plat disponible pour cette catégorie",
-    "menuTitle": "Menu"
+    "menuTitle": "Menu",
+    "testPayment": "Test de paiement en ligne !",
+    "testPaymentOrder": "Entrez l'identifiant de commande !",
+    "testPaymentAmount": "Entrez le montant !",
+    "errorCouldNotPay": "Impossible de traiter le paiement, veuillez réessayer ultérieurement",
+    "errorAmount": "Le montant doit être d'au moins 50",
+    "testPaymentTitle": "Test",
+    "testPaymentButton": "Procéder au paiement"
 }

@@ -111,5 +111,13 @@
     "downloadMyHanuut": "Download My hanuut",
     "selectCategory": "Please select a category",
     "noDishesAvailable": "No dishes available for this category",
-    "menuTitle":"Menu"
+    "menuTitle":"Menu",
+    "testPayment":"Online Payment Test!",
+    "testPaymentOrder":"Enter OrderId!",
+    "testPaymentAmount":"Enter Amount!",
+    "errorCouldNotPay": "Couldn't process payment, please try later",
+    "errorAmount": "amount must be at least 50",
+    "testPaymentTitle": "Test",
+    "testPaymentButton":"proceed payment"
+    
 }

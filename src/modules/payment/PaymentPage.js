@@ -36,6 +36,7 @@ const PaymentPage = () => {
       try {
         const response = await confirmOrder(orderId);
         const responseData = response.data;
+        console.log(responseData)
         if (response) {
           const errorCodeDescription = errorCodes[responseData.ErrorCode];
           if (
@@ -43,6 +44,7 @@ const PaymentPage = () => {
             errorCodeDescription.code === errorCodes[2].code
           ) {
             console.log("heree");
+        
             setSuccess(true);
             setPaymentStatus({
               ...responseData,
