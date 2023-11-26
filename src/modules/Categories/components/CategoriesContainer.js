@@ -13,25 +13,25 @@ import DishesContainer from "../../Dish/components/DishesContainer";
 import { useTranslation } from "react-i18next";
 const Section = styled.div`
   margin-top: 1rem;
-  background-color: ${(props) => props.theme.body};
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight} - 11rem)`};
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1em;
   align-items: flex-start;
   justify-content: flex-start;
+  @media (max-width: 768px) {
+    margin-top: 0.5rem;
+  }
 `;
 
 const Categories = styled.div`
-  background-color: ${(props) => props.theme.body};
   width: 100%;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap; /* Change flex-wrap to nowrap */
   gap: 1em;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 
@@ -40,26 +40,28 @@ const Categories = styled.div`
   }
 
   @media (max-width: 768px) {
+      justify-content: flex-start;
     gap: 0.5em;
     overflow-x: auto;
   }
 `;
 
 const SelectCategory = styled.div`
-  margin-top: 1rem;
-  background-color: ${(props) => props.theme.body};
+margin-top: 1rem;
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight} - 11rem)`};
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1em;
   align-items: center;
   justify-content: center;
 `;
 
-const Content = styled.h1`
-  @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+const Content = styled.p`
+font-size: 2.5rem;
+@media (max-width: 768px) {
+  margin-top: 1rem;
+  font-size: ${(props) => props.theme.fontxxl};
+}
 `;
 
 const CategoriesContainer = ({ shopData }) => {

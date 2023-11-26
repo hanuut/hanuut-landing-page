@@ -26,6 +26,7 @@ export const light = {
 
   //mesures
   navHeight: "5rem",
+  navHeightMobile: "4rem",
   actionButtonPadding: "0.5rem 1rem",
   actionButtonPaddingMobile : "0.5rem 0.9rem",
   smallPadding: "0.4rem 0.7rem",

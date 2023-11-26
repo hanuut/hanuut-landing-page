@@ -4,26 +4,21 @@ import { useTranslation } from "react-i18next";
 import { t } from "i18next";
 const Card = styled.div`
   width: 30%;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 16px;
-  margin-bottom: 16px;
+  border: 1px solid rgba(${(props) => props.theme.textRgba}, 0.1);
+  border-radius: ${(props) => props.theme.smallRadius};
+  padding: 0.9rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
     width: 100%;
   }
 `;
 
-// const Image = styled.img`
-//   width: 100%;
-//   max-width: 200px;
-//   height: auto;
-//   margin-bottom: 8px;
-// `;
+
 
 const Body = styled.div`
   display: flex;
@@ -34,7 +29,7 @@ const Body = styled.div`
 `;
 const Name = styled.h5`
   font-family: "Tajawal", sans-serif;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem; 
 `;
 const Ingredients = styled.div`
   display: flex;
@@ -63,7 +58,7 @@ const Price = styled.div`
   font-weight: bold;
 `;
 
-const Dish = ({ dish, imageData }) => {
+const Dish = ({ dish }) => {
   const { i18n } = useTranslation();
   const { name, sellingPrice } = dish;
   const { ingredients } = dish;

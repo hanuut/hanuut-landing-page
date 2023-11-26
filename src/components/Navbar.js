@@ -13,8 +13,12 @@ const Section = styled.section`
   background-color: ${(props) => props.theme.body};
   height: ${(props) => props.theme.navHeight};
   z-index: 1000;
+  display: flex; /* Add display: flex */
+  justify-content: center; /* Add justify-content: center */
+  align-items: center; /* Add align-items: center */
   @media (max-width: 768px) {
     position: relative;
+    height: ${(props) => props.theme.navHeightMobile};
   }
 `;
 
@@ -37,12 +41,11 @@ const Menu = styled.ul`
   justify-content: space-between;
   align-items: center;
   list-style: none;
-  
   @media (max-width: 768px) {
     position: absolute;
     top: ${(props) => props.theme.navHeight};
-    left: 0;
-    width: 100%;
+    border-radius: ${(props) => props.theme.smallRadius};
+    width: 90%;
     height: calc(100vh - ${(props) => props.theme.navHeight});
     flex-direction: column;
     justify-content: center;
@@ -59,7 +62,6 @@ const MenuItem = styled.li`
   margin: 0 1rem;
   color: ${(props) => props.theme.text};
   cursor: pointer;
-
   &::after {
     content: " ";
     display: block;
@@ -94,6 +96,9 @@ const HamburgerMenuContainer = styled.div`
   height: 1.5rem;
   width: 1.5rem;
   padding: 2px;
+  display: flex; /* Add display: flex */
+  align-items: center; /* Add align-items: center */
+  justify-content: center; /* Add justify-content: center */
 `;
 
 const HamburgerMenu = styled.span`
@@ -101,9 +106,9 @@ const HamburgerMenu = styled.span`
   height: 2px;
   background-color: ${(props) => props.theme.text};
   position: absolute;
-  top: 2.5rem;
+  top: 50%; /* Change top: 2.5rem to top: 50% */
   right: ${(props) => (props.isArabic ? "80%" : "0")};
-  transform: translateX(-100%);
+  transform: translate(-100%, -50%); /* Change transform: translateX(-100%) to transform: translate(-100%, -50%) */
   display: none;
   align-items: center;
   justify-content: center;
@@ -111,7 +116,7 @@ const HamburgerMenu = styled.span`
   cursor: pointer;
 
   @media (max-width: 768px) {
-    top: 2.4rem;
+    top: 50%; /* Change top: 2.4rem to top: 50% */
     display: flex;
   }
 

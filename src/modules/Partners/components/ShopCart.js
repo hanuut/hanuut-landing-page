@@ -38,8 +38,8 @@ const ShopImage = styled.img`
   border-radius: 50%;
   object-fit: cover;
   @media (max-width: 768px) {
-    width: 4rem;
-    height: 4rem;
+    width: 3.5rem;
+    height: 3.5rem;
   }
 `;
 
@@ -63,7 +63,7 @@ const ShopName = styled.h3`
   line-height: 0.5;
   font-weight: bold;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontxxl};
+    font-size: ${(props) => props.theme.fontlg};
   }
 `;
 
@@ -81,7 +81,7 @@ const ShopDesc = styled.p`
   font-size: ${(props) => props.theme.fontxl};
   font-weight: 100;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+    font-size: ${(props) => props.theme.fontsm};
   }
 `;
 
