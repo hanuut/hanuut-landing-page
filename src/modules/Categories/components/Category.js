@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import styled from "styled-components";
 
 const Section = styled.button`
-  width: 100%;
   align-self: center;
   background-color: ${(props) =>
-    props.selected ? props.theme.primaryColor : props.theme.body};
+    props.selected ? props.theme.primaryColor : "rgba(255, 255, 255, 0.15);"};
   border: none;
-  padding: 1rem 0rem;
-  font-size: ${(props) => props.theme.fontxxxl};
+  padding: ${(props) => props.theme.actionButtonPaddingMobile};
+  font-size: ${(props) => props.theme.fontxxl};
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -18,19 +17,12 @@ const Section = styled.button`
   transition: all 0.3s ease;
   border: 1px solid ${(props) => props.theme.primaryColor};
   border-radius: ${(props) => props.theme.defaultRadius};
-
+  text-align: center;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontxl};
-    padding: 0.8rem 1rem; /* Adjust the padding values as needed */
+    font-size: ${(props) => props.theme.fontlg};
+    padding: ${(props) => props.theme.smallPadding};
+    border-radius: ${(props) => props.theme.smallRadius};
   }
-`;
-
-const Heading = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
 `;
 
 const CategoryName = styled.h5`
@@ -45,7 +37,6 @@ const CategoryName = styled.h5`
 
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontsm};
-
   }
 `;
 const Category = ({ category, onCategoryClick, selectedCategory }) => {
@@ -58,11 +49,10 @@ const Category = ({ category, onCategoryClick, selectedCategory }) => {
       onClick={handleHeadingClick}
       selected={selectedCategory === category.id}
     >
-      <Heading>
         <CategoryName selected={selectedCategory === category.id}>
           {category.name}
         </CategoryName>
-      </Heading>
+  
     </Section>
   );
 };

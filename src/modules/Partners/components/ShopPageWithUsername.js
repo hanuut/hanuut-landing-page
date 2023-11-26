@@ -23,40 +23,62 @@ import ButtonWithIcon from "../../../components/ButtonWithIcon";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
-  background-color: ${(props) => props.theme.body};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  background-image: url(${BackgroundImage});
+  background-size: 100%; 
+  background-position: center;
+  padding: 2rem 0;
   @media (max-width: 768px) {
     justify-content: flex-start;
     width: 100%;
   }
 `;
+
 const ShopPageContainer = styled.div`
-  width: 100%;
+  width: 80%;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  background: hsla(147, 45%, 80%, 1);
+
+  background: linear-gradient(
+    90deg,
+    hsla(147, 45%, 80%, 1) 0%,
+    hsla(148, 46%, 92%, 1) 48%,
+    hsla(0, 0%, 100%, 1) 100%
+  );
+
+  background: -moz-linear-gradient(
+    90deg,
+    hsla(147, 45%, 80%, 1) 0%,
+    hsla(148, 46%, 92%, 1) 48%,
+    hsla(0, 0%, 100%, 1) 100%
+  );
+
+  background: -webkit-linear-gradient(
+    90deg,
+    hsla(147, 45%, 80%, 1) 0%,
+    hsla(148, 46%, 92%, 1) 48%,
+    hsla(0, 0%, 100%, 1) 100%
+  );
+
+  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#B5E3CA", endColorstr="#E1F4EA", GradientType=1 );
+  border-radius: ${(props) => props.theme.defaultRadius};
+  box-shadow: 0 0 2px rgba(${(props) => props.theme.primaryColorRgba}, 0.2);
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
+    padding: ${(props) => props.theme.smallPadding};
+    width: 85%;
   }
 `;
-const UpperBoxCover = styled.div`
-  width: 100%;
-  padding: 2rem 0rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: url(${BackgroundImage}) center/cover no-repeat;
-  @media (max-width: 768px) {
-    padding: 1rem 0rem;
-  }
-`;
+
 const UpperBox = styled.div`
-  width: 80%;
-  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: flex-end;
@@ -65,7 +87,6 @@ const UpperBox = styled.div`
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    width: 90%;
   }
 `;
 
@@ -88,19 +109,19 @@ const Title = styled.p`
 `;
 
 const MenuTitle = styled.h1`
-  margin-top: 1rem;
   font-size: 3rem;
   color: ${(props) => props.theme.orangeColor};
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontLargest};
+    margin-top: 1rem;
+    font-size: ${(props) => props.theme.fontxxxl};
   }
 `;
 
 const LowerBox = styled.div`
-  width: 80%;
+  width: 100%;
   display: flex;
   @media (max-width: 768px) {
-    width: 90%;
+    width: 100%;
   }
 `;
 
@@ -137,31 +158,29 @@ const ShopPageWithUsername = () => {
   return (
     <Section>
       <ShopPageContainer isArabic={i18n.language === "ar"}>
-        <UpperBoxCover>
-          <UpperBox>
-            {selectedShop && selectedShopImage ? (
-              <ShopCart
-                className="headingShopCart"
-                key={selectedShop.id}
-                shop={selectedShop}
-                imageData={selectedShopImage}
-              />
-            ) : (
-              <Loader />
-            )}
-            <OrderAndDownload>
-              <Title>{t("toOrder")}</Title>
-              <Link to={link}>
-                <ButtonWithIcon
-                  image={Playstore}
-                  backgroundColor="#000000"
-                  text1={t("getItOn")}
-                  text2={t("googlePlay")}
-                ></ButtonWithIcon>
-              </Link>
-            </OrderAndDownload>
-          </UpperBox>
-        </UpperBoxCover>
+        <UpperBox>
+          {selectedShop && selectedShopImage ? (
+            <ShopCart
+              className="headingShopCart"
+              key={selectedShop.id}
+              shop={selectedShop}
+              imageData={selectedShopImage}
+            />
+          ) : (
+            <Loader />
+          )}
+          <OrderAndDownload>
+            <Title>{t("toOrder")}</Title>
+            <Link to={link}>
+              <ButtonWithIcon
+                image={Playstore}
+                backgroundColor="#000000"
+                text1={t("getItOn")}
+                text2={t("googlePlay")}
+              ></ButtonWithIcon>
+            </Link>
+          </OrderAndDownload>
+        </UpperBox>
         <MenuTitle>{t("menuTitle")}</MenuTitle>
         <LowerBox>
           {selectedShop ? (

@@ -10,14 +10,13 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 const Container = styled.div`
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  min-height: calc(100vh - ${(props) => props.theme.navHeight});
+  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
   width: 100%;
   background-color: ${(props) => props.theme.body};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   background-image: url(${celebration});
   background-size: cover; /* Use "cover" instead of "100%" */
   background-position: center;
