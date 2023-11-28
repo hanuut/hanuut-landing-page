@@ -117,6 +117,12 @@
     "testPaymentAmount": "Entrez le montant !",
     "errorCouldNotPay": "Impossible de traiter le paiement, veuillez réessayer ultérieurement",
     "errorAmount": "Le montant doit être d'au moins 50",
-    "testPaymentTitle": "Test",
-    "testPaymentButton": "Procéder au paiement"
+    "testPaymentTitle": "Test d'Enregistrement de Commande",
+    "testPaymentSubHeading": "Veuillez noter que cette page est uniquement destinée à tester l'intégrité des fonctions de paiement en ligne via SATIM",
+    "testPaymentParagraph": "J'espère que vous comprenez que la passerelle de paiement SATIM sera utilisée dans nos applications mobiles, et cette page de test vous donne un aperçu de nos fonctions d'API",
+    "testPaymentParagraph2": "Sur cette page, vous pouvez tester :",
+    "testPaymentRegisterOrder": "Test d'Enregistrement de Commande",
+    "testPaymentRefundOrder": "Test de Remboursement de Commande",
+    "testPaymentButton": "Poursuivre le Paiement",
+    "redirecting": "Redirection en cours..."
 }
