@@ -10,9 +10,15 @@ const headers = {
 };
 
 export const registerOrder = (data) => {
-  console.log(data)
   return axios.get(
     `${prodUrl}/payment/registerOrder/${data.orderId}/${data.amount}`,
+    { headers }
+  );
+};
+
+export const refund = (data) => {
+  return axios.get(
+    `${prodUrl}/payment/refundOrder/${data.orderId}/${data.amount}`,
     { headers }
   );
 };

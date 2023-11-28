@@ -117,6 +117,12 @@
     "testPaymentAmount": "أدخل المبلغ!",
     "errorCouldNotPay": "تعذر معالجة الدفع، يرجى المحاولة لاحقًا",
     "errorAmount": "يجب أن يكون المبلغ على الأقل 50",
-    "testPaymentTitle": "اختبار",
-    "testPaymentButton": "متابعة الدفع"
+    "testPaymentTitle": "اختبار تسجيل الطلب",
+    "testPaymentSubHeading": "يرجى ملاحظة أن هذه الصفحة مخصصة لاختبار سلامة وظائف الدفع الإلكتروني من خلال SATIM",
+    "testPaymentParagraph": "آمل أن تفهم أن بوابة الدفع SATIM ستستخدم في تطبيقاتنا المحمولة، وأن هذه الصفحة مجرد صفحة اختبار لإعطائك نظرة على وظائف واجهة برمجة التطبيقات الخاصة بنا",
+    "testPaymentParagraph2": "في هذه الصفحة يمكنك اختبار:",
+    "testPaymentRegisterOrder": "اختبار تسجيل الطلب",
+    "testPaymentRefundOrder": "اختبار طلب الاسترداد",
+    "testPaymentButton": "متابعة الدفع",
+    "redirecting": "جاري التوجيه..."
 }
