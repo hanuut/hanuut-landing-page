@@ -107,7 +107,7 @@ const FooterText = styled.p`
 const Footer = () => {
   const { t, i18n } = useTranslation();
   const instagramLink = "https://www.instagram.com/hanuut_app/";
-  const facebookLink = "https://web.facebook.com/hanuutapp"
+  const facebookLink = "https://web.facebook.com/hanuutapp";
   return (
     <Section isArabic={i18n.language === "ar"}>
       <UpperBox>
@@ -133,10 +133,10 @@ const Footer = () => {
       <LowerBox>
         <FooterText isArabic={i18n.language === "ar"}>
           {t("footerAllRightsReserved")}
-          <Link className="footerLink" to="/privacy policy">
+          <Link className="footerLink" to="/privacy_policy">
             {t("footerPrivacyAndPolicy")}
           </Link>
-          <Link className="footerLink" to="/terms and conditions">
+          <Link className="footerLink" to="/terms_and_conditions">
             {t("footerTermsOfUse")}
           </Link>
         </FooterText>
