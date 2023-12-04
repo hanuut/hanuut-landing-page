@@ -18,7 +18,7 @@ const Button = styled.button`
   padding: ${(props) => props.theme.actionButtonPaddingMobile};
   font-size: ${(props) => props.theme.fontlg};
   cursor: ${(props) => (props.disabled ? "not-allowed" : "cursor")};
-  opacity:${(props) => (props.disabled ? "0.5" : "1")};
+  opacity: ${(props) => (props.disabled ? "0.5" : "1")};
   transition: all 0.5s ease;
 
   &:hover {
@@ -39,6 +39,10 @@ const Button = styled.button`
     }
     img {
       height: 1.7rem;
+    }
+    @media (max-width: 768px) {
+      font-size: ${(props) => props.theme.fontmd};
+      padding: ${(props) => props.theme.smallPadding};
     }
   }
 `;
@@ -67,7 +71,6 @@ const Title = styled.p`
 
 const SubTitle = styled.h6`
   font-size: ${(props) => props.theme.fontsm};
-
   font-weight: 500;
   font-family: ${(props) =>
     props.isArabic ? "'Cairo Variable', sans-serif" : "Roboto, sans-serif"};
@@ -93,7 +96,9 @@ const ButtonWithIcon = ({
       <Icon src={image} isArabic={i18n.language === "ar"} />{" "}
       <TextContainer>
         <Title isArabic={i18n.language === "ar"}>{text1}</Title>
-        <SubTitle isArabic={i18n.language === "ar"}>{text2} </SubTitle>
+        <SubTitle className={className} isArabic={i18n.language === "ar"}>
+          {text2}{" "}
+        </SubTitle>
       </TextContainer>
     </Button>
   );

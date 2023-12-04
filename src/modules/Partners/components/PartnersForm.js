@@ -3,8 +3,8 @@ import styled, { keyframes } from "styled-components";
 import { useTranslation } from "react-i18next";
 import AddressesDropDown from "../../../components/AddressesDropDown";
 import { isValidEmail, isValidPhone } from "../../../components/validators";
-import Sparkles from "../../../assets/sparkles.png";
-import { Link } from "react-router-dom";
+import Left from "../../../assets/left.svg";
+import Right from "../../../assets/rightOrange.svg";
 import {
   checkPhoneNumberAvailability,
   getSubscribeRequest,
@@ -12,21 +12,27 @@ import {
 } from "../../SubscribeRequest/services/SubscribeRequest";
 import { light } from "../../../config/Themes";
 import MessageWithLink from "../../../components/MessageWithLink";
+import DomainsDropDown from "../../../components/DomainsDropDown";
+import { TextButton } from "../../../components/ActionButton";
+import ButtonWithIcon from "../../../components/ButtonWithIcon";
+import Send from "../../../assets/send.svg";
 const Container = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
+  @media (max-width: 768px) {
+    width: 90%;
+  }
 `;
 
 const PartnerFormStep = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  transition: all 5s ease;
+  align-items: center;
+  justify-content: center;
 `;
 
 const slideAnimation = keyframes`
@@ -60,7 +66,7 @@ const PopUpAnimation = keyframes`
   }
 `;
 const Step = styled.div`
-  width: 100%;
+  width: 90%;
   display: flex;
   flex-direction: column;
   animation-duration: 0.5s;
@@ -69,30 +75,45 @@ const Step = styled.div`
   animation-name: ${(props) =>
     props.isArabic ? negativeSlideAnimation : slideAnimation};
   @media (max-width: 768px) {
-    flex-direction: column;
     width: 100%;
-    align-items: center;
-    justify-content: center;
+  }
+`;
+const Heading = styled.h1`
+  text-align: center;
+  font-size: ${(props) => props.theme.fontLargest};
+  text-transform: uppercase;
+  color: ${(props) => props.theme.primaryColor};
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontxxxl};
+  }
+`;
+const SubHeading = styled.h2`
+  text-align: center;
+  font-size: ${(props) => props.theme.fontxxxl};
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontxxl};
+  }
+  &.greenSubHeading {
+    color: ${(props) => props.theme.primaryColor};
   }
 `;
 
 const FirstStep = styled(Step)`
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 `;
-
 const SecondStep = styled(Step)`
   align-items: flex-end;
-  justify-content: center;
+  justify-content: flex-start;
 `;
 
 const ThirdStep = styled(Step)`
   align-items: flex-end;
-  justify-content: center;
+  justify-content: flex-start;
 `;
 
 const FourthStep = styled(Step)`
-  width: 80%;
   align-items: center;
   justify-content: center;
   align-self: center;
@@ -101,60 +122,25 @@ const FourthStep = styled(Step)`
   animation-name: ${PopUpAnimation};
   animation-duration: 0.75s;
 `;
-const SuccessIllustration = styled.img`
-  max-width: 50%;
-  object-fit: cover;
-  @media (max-width: 768px) {
-    width: auto;
-  }
-`;
-const Heading = styled.h1`
-  width: 80%;
-  margin-bottom: 0.5rem;
-  font-size: ${(props) => props.theme.fontLargest};
-  color: ${(props) => props.theme.primaryColor};
-  font-weight: 900;
-  text-transform: uppercase;
-
-  @media (max-width: 768px) {
-    width: 90%;
-    font-size: ${(props) => props.theme.fontxxxl};
-  }
-`;
-
-const SubHeading = styled.h2`
-  width: 100%;
-  font-size: ${(props) => props.theme.fontxxxl};
-  margin-bottom: 2rem;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    font-size: ${(props) => props.theme.fontxl};
-    margin-bottom: 1rem;
-  }
-  &.greenSubHeading {
-    color: ${(props) => props.theme.primaryColor};
-  }
+const Icon = styled.img`
+  height: 2rem;
+  width: 2rem;
 `;
 
 const Paragraph = styled.p`
+  text-align: center;
   width: 100%;
-  font-size: ${(props) => props.theme.fontxxxl};
-  margin-bottom: 1rem;
-
+  font-size: ${(props) => props.theme.fontxl};
   @media (max-width: 768px) {
-    width: 90%;
     font-size: ${(props) => props.theme.fontmd};
   }
 `;
 
 const InputWrapper = styled.div`
   width: 100%;
+  margin: 0.5rem 0;
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 0;
-  margin-bottom: 1Opx;
-
   @media (max-width: 768px) {
     width: 100%;
     font-size: ${(props) => props.theme.fontsm};
@@ -162,11 +148,11 @@ const InputWrapper = styled.div`
 `;
 
 const Input = styled.input`
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  border-radius: ${(props) => props.theme.smallRadius};
+  padding: ${(props) => props.theme.smallPadding};
+  border: 1px solid rgba(${(props) => props.theme.primaryColorRgba}, 0.5);
   font-size: ${(props) => props.theme.fontxl};
-
+  background-color: transparent;
   &:focus {
     outline: none;
     border-color: ${(props) => props.theme.primaryColor};
@@ -174,37 +160,34 @@ const Input = styled.input`
 `;
 
 const Label = styled.label`
-  font-size: ${(props) => props.theme.fontlg};
-  margin-bottom: 5px;
-
+  margin: 0.5rem 0;
+  font-size: ${(props) => props.theme.fontxl};
+  font-weight: bold;
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontmd};
   }
 `;
 
-const EmailInputWrapper = styled(InputWrapper)`
-  width: 80%;
+const PhoneInputWrapper = styled(InputWrapper)`
+  margin: 0.5rem 0;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   border-radius: ${(props) => props.theme.defaultRadius};
-  padding: 0.5rem;
   border: 1px solid ${(props) => props.theme.primaryColor};
-  margin-bottom: 0.5rem;
-
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontsm};
   }
 `;
 
-const EmailInput = styled(Input)`
+const PhoneInput = styled(Input)`
   flex: 1;
   border: none;
   font-size: ${(props) => props.theme.fontxl};
-  background-color: ${(props) => props.theme.body};
-
+  background-color: transparent;
   &:focus {
     outline: none;
   }
@@ -227,19 +210,15 @@ const Button = styled.button`
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontlg};
     padding: ${(props) => props.theme.actionButtonPaddingMobile};
-    margin-top: 10px;
   }
 `;
 const EmailButton = styled(Button)`
-  margin-top: 0px;
+  margin: 0.5rem;
 `;
 const SmallParagraph = styled.p`
   width: 100%;
   font-size: ${(props) => props.theme.fontmd};
-  margin-bottom: 1rem;
-
   @media (max-width: 768px) {
-    width: 90%;
     font-size: ${(props) => props.theme.fontsm};
   }
 `;
@@ -252,22 +231,20 @@ const OptionsWrapper = styled.div`
 `;
 
 const Option = styled.button`
-  padding: 0.5rem 1rem;
-  background-color: #fff;
+  background-color: transparent;
   color: ${(props) => props.theme.primaryColor};
   border: 1px solid ${(props) => props.theme.primaryColor};
   border-radius: ${(props) => props.theme.defaultRadius};
   font-size: ${(props) => props.theme.fontmd};
   cursor: pointer;
   transition: all 0.5s ease;
-
+  padding: ${(props) => props.theme.smallPadding};
   &:hover {
     transform: scale(1.03);
   }
 
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontlg};
-    padding: ${(props) => props.theme.actionButtonPaddingMobile};
   }
 
   &.selected {
@@ -279,22 +256,24 @@ const Option = styled.button`
 `;
 
 const ErrorMessage = styled.div`
-  margin: 0.5rem 0;
+  width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   align-self: flex-start;
-
   p {
+    width: fit-content;
     background-color: #ffbaba;
     color: #d8000c;
-    padding: 0.5rem 1rem;
+    padding: ${(props) => props.theme.smallPadding};
     border: 1px solid #d8000c;
     border-radius: ${(props) => props.theme.defaultRadius};
     font-size: ${(props) => props.theme.fontmd};
   }
 `;
 const PartnersForm = ({ setStep }) => {
+  const myHanuutDownloadLink = process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK;
+
   const { t, i18n } = useTranslation();
   const [formStep, setFormStep] = useState(0);
   const [email, setEmail] = useState("");
@@ -302,12 +281,29 @@ const PartnersForm = ({ setStep }) => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [domain, setDomain] = useState("");
+  const [businessName, setBusinessName] = useState("");
   const [channel, setChannel] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isAccepted, setIsAccepted] = useState(false);
+
+  const resetForm = () => {
+    setEmail("");
+    setFullName("");
+    setPhone("");
+    setAddress("");
+    setDomain("");
+    setBusinessName("");
+    setChannel("");
+    setIsSubmitting(false);
+    setSelectedOption(null);
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsAccepted(false);
+  };
+
   const options = [
     {
       id: 0,
@@ -328,6 +324,11 @@ const PartnersForm = ({ setStep }) => {
       value: "referral shop owner",
     },
   ];
+
+  const handleLeftClick = () => {
+    resetForm();
+    setFormStep(0);
+  };
 
   const handleSubscribe = async (event) => {
     event.preventDefault();
@@ -368,6 +369,10 @@ const PartnersForm = ({ setStep }) => {
     setAddress(newAddress);
   };
 
+  const handleChooseDomain = (newDomain) => {
+    setDomain(newDomain);
+  };
+
   const handleOptionClick = (event) => {
     event.preventDefault();
     const optionId = parseInt(event.target.value);
@@ -394,7 +399,7 @@ const PartnersForm = ({ setStep }) => {
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    console.log({ domain: domain });
     if (
       !fullName ||
       !phone ||
@@ -403,7 +408,8 @@ const PartnersForm = ({ setStep }) => {
       !address.wilaya ||
       !address.commune ||
       !channel ||
-      !domain
+      !domain ||
+      !businessName
     ) {
       setErrorMessage(t("errorFillAllFields"));
 
@@ -449,10 +455,10 @@ const PartnersForm = ({ setStep }) => {
         type: "partner",
         channel: channel,
         domain: domain,
+        businessName: businessName,
       };
 
       const response = postSubscribeRequest(data);
-
       if (!response) {
         setErrorMessage(t("errorCouldNotSubscribe"));
         setFormStep(0);
@@ -469,12 +475,11 @@ const PartnersForm = ({ setStep }) => {
       <PartnerFormStep>
         {formStep === 0 && (
           <FirstStep isArabic={i18n.language === "ar"}>
-            <Heading> {t("partnerHeading")}</Heading>
-            <SubHeading>{t("partnerSubHeading")}</SubHeading>
-            <Paragraph>{t("partnerParagraph")}</Paragraph>
-            <ErrorMessage>{errorMessage && <p>{errorMessage}</p>}</ErrorMessage>
-            <EmailInputWrapper>
-              <EmailInput
+            <Heading>{t("joinOurCommunity")}</Heading>
+            <SubHeading>{t("partnersFormFirstStepSubHeading")}</SubHeading>
+            <Paragraph>{t("partnersFormFirstStepParagrapho")}</Paragraph>
+            <PhoneInputWrapper>
+              <PhoneInput
                 type="phone"
                 placeholder={t("partnerInputTextPhone")}
                 value={phone}
@@ -490,13 +495,15 @@ const PartnersForm = ({ setStep }) => {
                   ? t("buttonIsSubmitting")
                   : t("partnerInputButton")}
               </EmailButton>
-            </EmailInputWrapper>
+            </PhoneInputWrapper>
+            <ErrorMessage>{errorMessage && <p>{errorMessage}</p>}</ErrorMessage>
           </FirstStep>
         )}
         {formStep === 1 && (
           <SecondStep isArabic={i18n.language === "ar"}>
-            <SubHeading>{t("secondStepTitle")} </SubHeading>
-            <ErrorMessage>{errorMessage && <p>{errorMessage}</p>}</ErrorMessage>
+            <Heading className="greenSubHeading">
+              {t("secondStepTitle")}{" "}
+            </Heading>
             <InputWrapper>
               <Label htmlFor="fullname">{t("partnersFormFullName")}</Label>
               <Input
@@ -522,8 +529,8 @@ const PartnersForm = ({ setStep }) => {
               target="partners"
               onChooseAddress={handleChooseAddress}
             />
-
-            <Button
+            <ErrorMessage>{errorMessage && <p>{errorMessage}</p>}</ErrorMessage>
+            <TextButton
               onClick={handleNext}
               className={isSubmitting ? "submitting" : ""}
               disabled={isSubmitting}
@@ -532,21 +539,29 @@ const PartnersForm = ({ setStep }) => {
               {isSubmitting
                 ? t("buttonIsSubmitting")
                 : t("partnersFormNextButton")}
-            </Button>
+            </TextButton>
           </SecondStep>
         )}
         {formStep === 2 && (
           <ThirdStep isArabic={i18n.language === "ar"}>
-            <SubHeading>{t("thirdStepTitle")}</SubHeading>
-            <ErrorMessage>{errorMessage && <p>{errorMessage}</p>}</ErrorMessage>
+            <Heading className="greenSubHeading">
+              {" "}
+              {t("thirdStepTitle")}
+            </Heading>
             <InputWrapper>
-              <Label htmlFor="domain">{t("partnersFormDomain")}</Label>
+              <Label htmlFor="businessName">
+                {t("partnersFormBusinessName")}
+              </Label>
               <Input
                 type="text"
-                placeholder={t("partnerInputTextForm")}
-                value={domain}
-                onChange={(event) => setDomain(event.target.value)}
+                placeholder={t("partnerInputTextBusinessName")}
+                value={businessName}
+                onChange={(event) => setBusinessName(event.target.value)}
+                required
               />
+            </InputWrapper>
+            <InputWrapper>
+              <DomainsDropDown onChooseDomain={handleChooseDomain} />
             </InputWrapper>
             <InputWrapper>
               <Label htmlFor="channel">{t("partnersFormSource")}</Label>
@@ -571,15 +586,17 @@ const PartnersForm = ({ setStep }) => {
             ) : (
               ""
             )}
-            <Button
-              onClick={handleSubmit}
-              className={isSubmitting ? "submitting" : ""}
+            <ButtonWithIcon
+              image={Send}
+              text2={
+                isSubmitting
+                  ? t("buttonIsSubmitting")
+                  : t("partnersFormSubmitButton")
+              }
+              className="homeDownloadButton"
               disabled={isSubmitting}
-            >
-              {isSubmitting
-                ? t("buttonIsSubmitting")
-                : t("partnersFormSubmitButton")}
-            </Button>
+              onClick={(e) => handleSubmit(e)}
+            ></ButtonWithIcon>
           </ThirdStep>
         )}
         {formStep === 3 && (
@@ -589,31 +606,25 @@ const PartnersForm = ({ setStep }) => {
                 {successMessage && (
                   <MessageWithLink
                     message={successMessage}
-                    link={isAccepted ? "TawsilaDownloadLink" : ""}
+                    link={isAccepted ? myHanuutDownloadLink : ""}
                     linkText={isAccepted ? t("downloadMyHanuut") : ""}
                     textColor={light.primaryColor}
                   />
                 )}
-                {isAccepted ? (
-                  ""
-                ) : (
-                  <Link to="/partners">
-                    <Button>{t("navHome")}</Button>
-                  </Link>
-                )}
               </>
             ) : (
               <>
-                <SuccessIllustration src={Sparkles} />
-                <SubHeading className="greenSubHeading">
+                <Heading className="greenSubHeading">
                   {t("partnersFormThankYouTitle")}
-                </SubHeading>
-                <Paragraph>{t("partnersFormThankYouSubTitle")}</Paragraph>
-                <Link to="/">
-                  <Button>{t("navHome")}</Button>
-                </Link>
+                </Heading>
+                <SubHeading>{t("partnersFormThankYouSubTitle")}</SubHeading>
+                <Icon src={Left} onClick={() => handleLeftClick()} />
               </>
             )}
+            <Icon
+              src={i18n.language === "ar" ? Right : Left}
+              onClick={() => handleLeftClick()}
+            />
           </FourthStep>
         )}
       </PartnerFormStep>

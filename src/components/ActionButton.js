@@ -26,6 +26,13 @@ const SecondaryButton = styled(Button)`
   background-color: ${(props) => props.theme.secondaryColor};
 `;
 
+const TextStyleButton = styled(Button)`
+  background-color: transparent;
+  color: ${(props) => props.theme.primaryColor};
+  border: 1px solid ${(props) => props.theme.primaryColor};
+  padding: ${(props) => props.theme.smallPadding};
+`;
+
 const ActionButton = ({ children, onClick }) => {
   return <Button onClick={onClick}>{children}</Button>;
 };
@@ -34,4 +41,8 @@ const BlueActionButton = ({ children, onClick }) => {
   return <SecondaryButton onClick={onClick}>{children}</SecondaryButton>;
 };
 
-export { ActionButton, BlueActionButton };
+const TextButton = ({ children, onClick }) => {
+  return <TextStyleButton onClick={onClick}>{children}</TextStyleButton>;
+};
+
+export { ActionButton, BlueActionButton, TextButton};

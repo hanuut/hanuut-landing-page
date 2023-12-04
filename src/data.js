@@ -15703,3 +15703,90 @@ export const Wilayas = [
         "wilaya_name_ar": "المنيعة"
     }
 ];
+
+export const Domains = [
+    {
+        "domain_code": "01",
+        "domain_name_en": "Supermarket",
+        "domain_name_ar": "سوبرماركت",
+        "domain_name_fr": "supérette et grand éspace"
+    },
+    {
+        "domain_code": "02",
+        "domain_name_en": "Food",
+        "domain_name_ar": "الإطعام",
+        "domain_name_fr": "Alimentation"
+    },
+    {
+        "domain_code": "03",
+        "domain_name_en": "Beauty and Cosmetics",
+        "domain_name_ar": "الجمال ومستحضرات التجميل",
+        "domain_name_fr": "Beauté et cosmétiques"
+    },
+    {
+        "domain_code": "04",
+        "domain_name_en": "Libraries and Books",
+        "domain_name_ar": "المكتبات والكتب",
+        "domain_name_fr": "Bibliothèques et livres"
+    },
+    {
+        "domain_code": "05",
+        "domain_name_en": "Sports, Fitness and Outdoor",
+        "domain_name_ar": "الرياضة واللياقة البدنية",
+        "domain_name_fr": "Sports, fitness et plein air"
+    },
+    {
+        "domain_code": "06",
+        "domain_name_en": "Pet supplies",
+        "domain_name_ar": "مستلزمات الحيوانات الأليفة",
+        "domain_name_fr": "Fournitures pour animaux de compagnie"
+    },
+    {
+        "domain_code": "07",
+        "domain_name_en": "Furniture and Home decor",
+        "domain_name_ar": "الأثاث وديكور المنزل",
+        "domain_name_fr": "Mobilier et décoration intérieure"
+    },
+    {
+        "domain_code": "08",
+        "domain_name_en": "Travelling and Camping",
+        "domain_name_ar": "السفر والتخييم",
+        "domain_name_fr": "Voyages et camping"
+    },
+    {
+        "domain_code": "09",
+        "domain_name_en": "Industrial and Hardware",
+        "domain_name_ar": "الصناعة والأدوات الصناعية",
+        "domain_name_fr": "Industriel et quincaillerie"
+    },
+    {
+        "domain_code": "10",
+        "domain_name_en": "Home appliance, Tools and improvements",
+        "domain_name_ar": "أجهزة المنزل والتحسينات",
+        "domain_name_fr": "Électroménager, outils et améliorations"
+    },
+    {
+        "domain_code": "11",
+        "domain_name_en": "Lights, LEDs and Electrical equipments",
+        "domain_name_ar": "الأضواء والمصابيح والمعدات الكهربائية",
+        "domain_name_fr": "Éclairage, LED et équipements électriques"
+    },
+    {
+        "domain_code": "12",
+        "domain_name_en": "Electronics",
+        "domain_name_ar": "الإلكترونيات",
+        "domain_name_fr": "Électronique"
+    },
+    {
+        "domain_code": "13",
+        "domain_name_en": "Gifts",
+        "domain_name_ar": "الهدايا",
+        "domain_name_fr": "Cadeaux"
+    },
+    {
+        "domain_code": "14",
+        "domain_name_en": "Market",
+        "domain_name_ar": "السوق",
+        "domain_name_fr": "Marché"
+    }
+];
