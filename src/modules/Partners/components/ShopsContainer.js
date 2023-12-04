@@ -14,7 +14,6 @@ import Loader from "../../../components/Loader";
 
 
 const Section = styled.div`
-  min-height: 50vh;
   width: 100%;
   display: flex;
   flex-direction: column;

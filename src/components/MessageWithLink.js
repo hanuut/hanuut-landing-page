@@ -11,20 +11,31 @@ const Section = styled.div`
     color: ${(props) => props.theme.text};
     font-size: ${(props) => props.theme.fontxxl};
     text-align: center;
+    @media (max-width: 768px) {
+      font-size: ${(props) => props.theme.fontlg};
+    }
   }
   a {
     margin-top: 3px;
     color: ${(props) => props.textColor || props.theme.downloadButtonColor};
     font-size: ${(props) => props.theme.fontxxxl};
     text-align: center;
+    @media (max-width: 768px) {
+      font-size: ${(props) => props.theme.fontxl};
+    }
+  }
+  @media (max-width: 768px) {
+    padding: 1rem;
   }
 `;
 
 const MessageWithLink = ({ message, link, linkText, textColor }) => {
   return (
     <Section>
-      <p >{message}</p>
-      <a style={{ color: textColor }} href={link + ""}>{linkText}</a>
+      <p>{message}</p>
+      <a style={{ color: textColor }} href={link}>
+        {linkText}
+      </a>
     </Section>
   );
 };

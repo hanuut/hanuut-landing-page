@@ -31,9 +31,11 @@ const InputWrapper = styled.div`
 `;
 
 const Select = styled.select`
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+padding: 10px;
+border-radius: 5px;
+border: 1px solid rgba(${(props) => props.theme.primaryColorRgba}, 0.5);
+font-size: ${(props) => props.theme.fontxl};
+background-color: transparent;
   font-size: ${(props) => props.theme.fontlg};
 
   &:focus {
@@ -55,15 +57,15 @@ const Option = styled.option`
 `;
 
 const Label = styled.label`
-  font-size: ${(props) => props.theme.fontlg};
-  margin-bottom: 5px;
+  margin: 0.5rem 0;
+  font-size: ${(props) => props.theme.fontxl};
+  font-weight: bold;
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontmd};
   }
 `;
 const AddressesDropDown = ({ target, onChooseAddress }) => {
   const { t, i18n } = useTranslation();
-
   const [cities] = useState(Cities);
   const [states] = useState(Wilayas);
   const [filteredCities, setFilteredCities] = useState([]);
@@ -72,7 +74,7 @@ const AddressesDropDown = ({ target, onChooseAddress }) => {
 
   const handleChoosedState = (event) => {
     setChoosedState(event.target.value);
-    setChoosedCity("")
+    setChoosedCity("");
     let tempCities = [];
     if (i18n.language === "ar") {
       cities.forEach((city) => {
