@@ -29,10 +29,59 @@ const Container = styled.div`
 
 const PartnerFormStep = styled.form`
   width: 100%;
+  height: 60vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  position: relative;
+`;
+
+const FormStepsIndicator = styled.div`
+  position: absolute;
+
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  max-width: 50%;
+  padding: ${(props) => props.theme.smallPadding};
+  border-radius: ${(props) => props.theme.bigRadius};
+
+  background: hsla(146, 45%, 80%, 1);
+
+  background: linear-gradient(
+    -45deg,
+    hsla(146, 45%, 80%, 1) 50%,
+    hsla(26, 80%, 80%, 1) 100%
+  );
+
+  background: -moz-linear-gradient(
+    -45deg,
+    hsla(146, 45%, 80%, 1) 50%,
+    hsla(26, 80%, 80%, 1) 100%
+  );
+
+  background: -webkit-linear-gradient(
+    -45deg,
+    hsla(146, 45%, 80%, 1) 50%,
+    hsla(26, 80%, 80%, 1) 100%
+  );
+
+  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#B5E3C9", endColorstr="#F5C7A3", GradientType=1 );
+
+  @media (max-width: 768px) {
+    bottom: 5%;
+  }
+`;
+
+const StepIndicator = styled.div`
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  background-color: ${(props) => props.theme.primaryColor};
 `;
 
 const slideAnimation = keyframes`
@@ -66,6 +115,8 @@ const PopUpAnimation = keyframes`
   }
 `;
 const Step = styled.div`
+  position: relative;
+  z-index: 10;
   width: 90%;
   display: flex;
   flex-direction: column;
@@ -79,6 +130,15 @@ const Step = styled.div`
   }
 `;
 const Heading = styled.h1`
+  font-size: ${(props) => props.theme.fontLargest};
+  text-transform: uppercase;
+  color: ${(props) => props.theme.primaryColor};
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontxxxl};
+  }
+`;
+
+const Title = styled.h1`
   text-align: center;
   font-size: ${(props) => props.theme.fontLargest};
   text-transform: uppercase;
@@ -275,7 +335,7 @@ const PartnersForm = ({ setStep }) => {
   const myHanuutDownloadLink = process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK;
 
   const { t, i18n } = useTranslation();
-  const [formStep, setFormStep] = useState(0);
+  const [formStep, setFormStep] = useState(1);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -304,6 +364,12 @@ const PartnersForm = ({ setStep }) => {
     setIsAccepted(false);
   };
 
+  const handleLeftClick = () => {
+    resetForm();
+    setFormStep(1);
+    setStep(1);
+  };
+
   const options = [
     {
       id: 0,
@@ -324,11 +390,6 @@ const PartnersForm = ({ setStep }) => {
       value: "referral shop owner",
     },
   ];
-
-  const handleLeftClick = () => {
-    resetForm();
-    setFormStep(0);
-  };
 
   const handleSubscribe = async (event) => {
     event.preventDefault();
@@ -354,13 +415,13 @@ const PartnersForm = ({ setStep }) => {
         setSuccessMessage(t("messagePhoneIsUsed"));
       }
       setErrorMessage("");
-      setFormStep(3);
-      setStep(3);
+      setFormStep(4);
+      setStep(4);
       setIsSubmitting(false);
       return;
     } else {
-      setFormStep(1);
-      setStep(1);
+      setFormStep(2);
+      setStep(2);
       setIsSubmitting(false);
     }
   };
@@ -393,8 +454,8 @@ const PartnersForm = ({ setStep }) => {
     }
     setIsSubmitting(true);
     setErrorMessage("");
-    setFormStep(2);
-    setStep(2);
+    setFormStep(3);
+    setStep(3);
     setIsSubmitting(false);
   };
   const handleSubmit = async (event) => {
@@ -441,8 +502,8 @@ const PartnersForm = ({ setStep }) => {
         setSuccessMessage(t("messagePhoneIsUsed"));
       }
       setErrorMessage("");
-      setFormStep(3);
-      setStep(3);
+      setFormStep(4);
+      setStep(4);
       setIsSubmitting(false);
       return;
     } else {
@@ -461,11 +522,11 @@ const PartnersForm = ({ setStep }) => {
       const response = postSubscribeRequest(data);
       if (!response) {
         setErrorMessage(t("errorCouldNotSubscribe"));
-        setFormStep(0);
-        setStep(0);
+        setFormStep(1);
+        setStep(1);
       } else {
-        setFormStep(3);
-        setStep(3);
+        setFormStep(4);
+        setStep(4);
       }
       setIsSubmitting(false);
     }
@@ -473,9 +534,9 @@ const PartnersForm = ({ setStep }) => {
   return (
     <Container>
       <PartnerFormStep>
-        {formStep === 0 && (
+        {formStep === 1 && (
           <FirstStep isArabic={i18n.language === "ar"}>
-            <Heading>{t("joinOurCommunity")}</Heading>
+            <Title>{t("joinOurCommunity")}</Title>
             <SubHeading>{t("partnersFormFirstStepSubHeading")}</SubHeading>
             <Paragraph>{t("partnersFormFirstStepParagrapho")}</Paragraph>
             <PhoneInputWrapper>
@@ -499,7 +560,7 @@ const PartnersForm = ({ setStep }) => {
             <ErrorMessage>{errorMessage && <p>{errorMessage}</p>}</ErrorMessage>
           </FirstStep>
         )}
-        {formStep === 1 && (
+        {formStep === 2 && (
           <SecondStep isArabic={i18n.language === "ar"}>
             <Heading className="greenSubHeading">
               {t("secondStepTitle")}{" "}
@@ -542,7 +603,7 @@ const PartnersForm = ({ setStep }) => {
             </TextButton>
           </SecondStep>
         )}
-        {formStep === 2 && (
+        {formStep === 3 && (
           <ThirdStep isArabic={i18n.language === "ar"}>
             <Heading className="greenSubHeading">
               {" "}
@@ -599,7 +660,7 @@ const PartnersForm = ({ setStep }) => {
             ></ButtonWithIcon>
           </ThirdStep>
         )}
-        {formStep === 3 && (
+        {formStep === 4 && (
           <FourthStep isArabic={i18n.language === "ar"}>
             {successMessage ? (
               <>
@@ -618,7 +679,6 @@ const PartnersForm = ({ setStep }) => {
                   {t("partnersFormThankYouTitle")}
                 </Heading>
                 <SubHeading>{t("partnersFormThankYouSubTitle")}</SubHeading>
-                <Icon src={Left} onClick={() => handleLeftClick()} />
               </>
             )}
             <Icon
@@ -627,6 +687,12 @@ const PartnersForm = ({ setStep }) => {
             />
           </FourthStep>
         )}
+
+        <FormStepsIndicator>
+          {Array.from({ length: formStep }, (_, index) => (
+            <StepIndicator key={index} active={index === formStep} />
+          ))}
+        </FormStepsIndicator>
       </PartnerFormStep>
     </Container>
   );
