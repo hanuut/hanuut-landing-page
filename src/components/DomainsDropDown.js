@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Domains } from "../data";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -12,7 +12,7 @@ const Menu = styled.div`
   position: absolute;
   top: 100%;
   z-index: 99;
-  background-color: #fff;
+  background-color: ${(props) => props.theme.body};
   border: 1px solid ${(props) => props.theme.primaryColor};
   border-radius: ${(props) => props.theme.defaultRadius};
   padding: ${(props) => props.theme.smallPadding};
@@ -75,7 +75,7 @@ const Input = styled.input`
 `;
 
 const DomainsDropDown = ({ onChooseDomain }) => {
-  const [domains, setDomains] = useState(Domains);
+  const [domains] = useState(Domains);
   const { t, i18n } = useTranslation();
   const [choosedDomain, setChoosedDomain] = useState("");
   const [isOpen, setIsOpen] = useState(false);
