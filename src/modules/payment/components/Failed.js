@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import failure from "../../../assets/failure.svg";
 import noData from "../../../assets/noData.svg";
-import { ActionButton } from "../../../components/ActionButton";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { ActionButton } from "../../../components/ActionButton";
 
 const Container = styled.div`
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
@@ -182,9 +182,9 @@ const Value = styled.p`
     }
   }
 `;
-
-const Failed = ({ orderId, error }) => {
+const Failed = ({ orderId, responseData, error }) => {
   const { t, i18n } = useTranslation();
+  console.log(error);
   return (
     <Container isArabic={i18n.language === "ar"}>
       <GlassBox>

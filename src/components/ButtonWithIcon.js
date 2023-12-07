@@ -52,6 +52,9 @@ const Icon = styled.img`
   object-fit: cover;
   -webkit-transform: ${(props) => (props.isArabic ? "scaleX(-1)" : "")};
   transform: ${(props) => (props.isArabic ? "scaleX(-1)" : "")};
+  &.noFlipIcon {
+    transform: scaleX(1);
+  }
   @media (max-width: 768px) {
     width: auto;
   }
@@ -93,7 +96,11 @@ const ButtonWithIcon = ({
       className={className}
       disabled={disabled}
     >
-      <Icon src={image} isArabic={i18n.language === "ar"} />{" "}
+      <Icon
+        src={image}
+        isArabic={i18n.language === "ar"}
+        className={className}
+      />{" "}
       <TextContainer>
         <Title isArabic={i18n.language === "ar"}>{text1}</Title>
         <SubTitle className={className} isArabic={i18n.language === "ar"}>

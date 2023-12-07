@@ -147,6 +147,13 @@
     "testPaymentParagraph2": "في هذه الصفحة يمكنك اختبار:",
     "testPaymentRegisterOrder": "اختبار تسجيل الطلب",
     "testPaymentRefundOrder": "اختبار طلب الاسترداد",
-    "testPaymentButton": "متابعة الدفع",
+    "testPaymentAmountShow": "المبلغ المطلوب للدفع :",
+    "testPaymentTermsError": "يرجى تأكيد الشروط والأحكام.",
+    "testPaymentAmountShowRefund": "المبلغ المطلوب الاسترداد هو:",
+    "testPaymentButton": "استكمال الدفع",
+    "testPaymentCaptchaVerify": "تحقق",
+    "testPaymentCaptcha": "تأكيد الأمان",
+    "testPaymentTerms": "الشروط والأحكام",
+    "testPaymentCaptchaError": "تحقق من أنك إنسان",
     "redirecting": "جاري التوجيه..."
 }

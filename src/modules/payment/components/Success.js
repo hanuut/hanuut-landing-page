@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import celebration from "../../../assets/celebration.svg";
 import successful from "../../../assets/successful.svg";
@@ -8,6 +8,14 @@ import fireworks from "../../../assets/fireworks.svg";
 import { ActionButton } from "../../../components/ActionButton";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import emailjs from "@emailjs/browser";
+import { responseToPdf, sendEmail } from "../services/utils";
+import ButtonWithIcon from "../../../components/ButtonWithIcon";
+import Print from "../../../assets/print.svg";
+import Send from "../../../assets/send.svg";
+import Pdf from "../../../assets/pdf.svg";
+import { light } from "../../../config/Themes";
+import { TextButton } from "../../../components/ActionButton";
 const Container = styled.div`
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -139,7 +147,6 @@ const PaymentInfoWrapper = styled.div`
 `;
 
 const Label = styled.h3`
-  max-width: 30%;
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
@@ -189,12 +196,160 @@ const ShowValueIcon = styled.img`
     max-width: 1.5rem;
   }
 `;
-const Success = ({ orderId, depositeAmount, successMessage }) => {
+
+const ButtonsWrapper = styled.div`
+  width: 100%;
+  gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontsm};
+  }
+`;
+
+const Popup = styled.div`
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 40%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border: 1px solid ${(props) => props.theme.primaryColor};
+  border-radius: 4px;
+  z-index: 999;
+`;
+const PopupButtonWrapper = styled.div`
+  gap: 1rem;
+  display: flex;
+  align-self: flex-end;
+  justify-content: flex-end;
+  margin-top: 20px;
+`;
+const FormGroup = styled.div`
+display: flex;
+flex-direction: row;
+align-items: center;
+justify-content: flex-start;
+width: 90%;
+display; flex;
+@media (max-width: 768px) {
+  max-width: 75%;
+  width: 90%;
+}
+`;
+
+const InputLabel = styled.label`
+  margin: 0 1rem;
+  font-size: ${(props) => props.theme.fontlg};
+  color: ${(props) => props.theme.text};
+  @media (max-width: 768px) {
+    width: 100%;
+    font-size: ${(props) => props.theme.fontsm};
+  }
+`;
+const Input = styled.input`
+  flex: 1;
+  margin-top: 1rem;
+  padding: 10px;
+  border: 1px solid;
+  border-radius: ${(props) => props.theme.smallRadius};
+  font-size: ${(props) => props.theme.fontxl};
+  &:focus {
+    outline: none;
+    border-color: ${(props) => props.theme.secondaryColor};
+  }
+  @media (max-width: 768px) {
+    position: static;
+    font-size: ${(props) => props.theme.fontmd};
+  }
+`;
+const Success = ({ orderId, successMessage, responseData }) => {
   const { t, i18n } = useTranslation();
+  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfFileBlob, setPdfFileBlob] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [email, setEmail] = useState("");
   const [orderValueExpanded, setOrderValueExpanded] = useState(false);
+  emailjs.init(process.env.REACT_APP_EMAILJS_PUBLIC_KEY);
+
   const handleShowOrderValue = () => {
     setOrderValueExpanded(!orderValueExpanded);
   };
+
+  const handleDownload = () => {
+    if (pdfFile) {
+      pdfFile.save(responseData.OrderNumber + ".pdf");
+    } else {
+      const pdfInstance = responseToPdf(responseData);
+      pdfInstance.save(responseData.OrderNumber + ".pdf");
+    }
+  };
+
+  const handlePrint = () => {
+    if (pdfFileBlob) {
+      const url = URL.createObjectURL(pdfFileBlob);
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.onload = () => {
+        iframe.contentWindow.print();
+      };
+    } else {
+      const pdfInstance = responseToPdf(responseData);
+      const blob = pdfInstance.output("blob");
+      setPdfFileBlob(blob);
+    }
+  };
+
+  const handleOnEmailClick = () => {
+    setShowPopup(true);
+  };
+
+  const handleSendEmail = () => {
+    if (!email) {
+      setShowPopup(true);
+    } else {
+      const data = {
+        orderNumber: responseData.OrderNumber,
+        email: email,
+        amount: responseData.Amount,
+        Pan: responseData.Pan,
+        expiration: responseData.expiration,
+        cardholderName: responseData.cardholderName,
+      };
+      sendEmail(data);
+    }
+  };
+
+  const handleCancelEmail = () => {
+    setShowPopup(false);
+    setEmail("");
+  };
+
+  const handleConfirmEmail = () => {
+    handleSendEmail();
+    setShowPopup(false);
+  };
+
+  useEffect(() => {
+    console.log("loading ...");
+    console.log(responseData);
+    const pdfInstance = responseToPdf(responseData);
+    if (pdfInstance) {
+      setPdfFile(pdfInstance);
+      const blob = pdfInstance.output("blob");
+      setPdfFileBlob(blob);
+    }
+  }, [responseData]);
   return (
     <Container isArabic={i18n.language === "ar"}>
       <GlassBox>
@@ -205,10 +360,10 @@ const Success = ({ orderId, depositeAmount, successMessage }) => {
         <ContentWrapper>
           <Content>
             <Title>{t("thankYouForPurchase")}</Title>
-            <Description>{t("purchaseSuccess")}</Description>
+            <Description>{successMessage}</Description>
             <PaymentInfo>
               <PaymentInfoWrapper>
-                <Label>{t("order")}</Label>
+                <Label>orderId</Label>
                 <ValueWrapper>
                   <Value expanded={orderValueExpanded}>{orderId}</Value>
                   <ShowValueIcon
@@ -220,21 +375,97 @@ const Success = ({ orderId, depositeAmount, successMessage }) => {
                 </ValueWrapper>
               </PaymentInfoWrapper>
               <PaymentInfoWrapper>
-                <Label>{t("orderStatus")}</Label>
+                <Label>respCode_desc</Label>
                 <ValueWrapper>
                   <Value className="transparentBackground" expanded={true}>
-                    {successMessage}
+                    {responseData.params.respCode_desc}
                   </Value>
                 </ValueWrapper>
               </PaymentInfoWrapper>
+
               <PaymentInfoWrapper>
-                <Label>{t("depositeAmount")}</Label>
+                <Label>orderNumber</Label>
                 <ValueWrapper>
                   <Value className="transparentBackground" expanded={true}>
-                    {depositeAmount} {t("dzd")}
+                    {responseData.OrderNumber}
                   </Value>
                 </ValueWrapper>
               </PaymentInfoWrapper>
+
+              <PaymentInfoWrapper>
+                <Label>approvalCode</Label>
+                <ValueWrapper>
+                  <Value className="transparentBackground" expanded={true}>
+                    {responseData.approvalCode}
+                  </Value>
+                </ValueWrapper>
+              </PaymentInfoWrapper>
+
+              <PaymentInfoWrapper>
+                <Label>montant</Label>
+                <ValueWrapper>
+                  <Value className="transparentBackground" expanded={true}>
+                    {responseData.Amount / 100} dzd
+                  </Value>
+                </ValueWrapper>
+              </PaymentInfoWrapper>
+
+              <PaymentInfoWrapper>
+                <Label className="expanded">
+                  Le mode de paiement : carte CIB/Edhahabia.
+                </Label>
+              </PaymentInfoWrapper>
+
+              <PaymentInfoWrapper>
+                <Label>
+                  En cas de problème de paiement, veuillez contacter le numéro
+                  vert de la SATIM 3020{" "}
+                </Label>
+              </PaymentInfoWrapper>
+              <ButtonsWrapper>
+                <ButtonWithIcon
+                  image={Pdf}
+                  text2="Dowinload"
+                  backgroundColor={light.redColor}
+                  onClick={handleDownload}
+                ></ButtonWithIcon>
+                <ButtonWithIcon
+                  image={Print}
+                  text2="Pring"
+                  onClick={handlePrint}
+                ></ButtonWithIcon>
+                <ButtonWithIcon
+                  image={Send}
+                  text2="Send Email"
+                  onClick={handleOnEmailClick}
+                ></ButtonWithIcon>
+                {showPopup && (
+                  <Popup>
+                    <InputLabel>
+                      Enter your email here to receive your receipt
+                    </InputLabel>
+                    <FormGroup>
+                      {" "}
+                      <InputLabel>Email:</InputLabel>
+                      <Input
+                        type="text"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </FormGroup>
+                    <PopupButtonWrapper>
+                      <TextButton onClick={handleCancelEmail}>
+                        Cancel
+                      </TextButton>
+                      <ButtonWithIcon
+                        image={Send}
+                        text2="Send Email"
+                        onClick={handleConfirmEmail}
+                      ></ButtonWithIcon>
+                    </PopupButtonWrapper>
+                  </Popup>
+                )}
+              </ButtonsWrapper>
               <PaymentInfoWrapper>
                 <Link to="/">
                   <ActionButton> {t("404Button")} </ActionButton>
