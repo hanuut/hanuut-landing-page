@@ -215,7 +215,7 @@ const Failed = ({ orderId, responseData, error }) => {
               <PaymentInfoWrapper>
                 <ValueWrapper>
                   <Value className="transparentBackground" expanded={true}>
-                    {responseData.params.respCode_desc
+                    {responseData.params && responseData.params.respCode_desc
                       ? responseData.params.respCode_desc
                       : ""}
                   </Value>
