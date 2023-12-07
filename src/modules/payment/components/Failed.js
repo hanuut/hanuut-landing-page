@@ -139,7 +139,7 @@ const PaymentInfoWrapper = styled.div`
   gap: 0.5rem;
 `;
 const Label = styled.h3`
-  max-width:${(props) => (props.expanded ? "100%" : "30%")};
+  max-width: ${(props) => (props.expanded ? "100%" : "30%")};
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
@@ -217,17 +217,7 @@ const Failed = ({ orderId, responseData, error }) => {
                   <Value className="transparentBackground" expanded={true}>
                     {responseData.params && responseData.params.respCode_desc
                       ? responseData.params.respCode_desc
-                      : ""}
-                  </Value>
-                </ValueWrapper>
-              </PaymentInfoWrapper>
-
-              <PaymentInfoWrapper>
-                <ValueWrapper>
-                  <Value className="transparentBackground" expanded={true}>
-                    {responseData && responseData.actionCodeDescription
-                      ? responseData.actionCodeDescription
-                      : ""}
+                      : responseData.actionCodeDescription}
                   </Value>
                 </ValueWrapper>
               </PaymentInfoWrapper>
