@@ -321,7 +321,7 @@ const Success = ({ orderId, successMessage, responseData }) => {
       const data = {
         orderNumber: responseData.OrderNumber,
         email: email,
-        amount: responseData.Amount,
+        amount: responseData.Amount / 100,
         Pan: responseData.Pan,
         expiration: responseData.expiration,
         cardholderName: responseData.cardholderName,
@@ -341,8 +341,7 @@ const Success = ({ orderId, successMessage, responseData }) => {
   };
 
   useEffect(() => {
-    console.log("loading ...");
-    console.log(responseData);
+
     const pdfInstance = responseToPdf(responseData);
     if (pdfInstance) {
       setPdfFile(pdfInstance);

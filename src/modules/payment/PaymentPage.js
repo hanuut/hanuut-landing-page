@@ -51,10 +51,10 @@ const PaymentPage = () => {
               successMessage: errorCodeDescription.description[i18n.language],
             });
           } else {
-            console.log("else");
+
             setSuccess(false);
             if (responseData.ErrorCode === "0") {
-              console.log("Order Status 3");
+
               setPaymentStatus({
                 errorCode: responseData.ErrorCode,
                 errorMessage: responseData.ErrorMessage,
@@ -62,7 +62,7 @@ const PaymentPage = () => {
                   "Votre transaction a été rejetée/ Your transaction was rejected/ تم رفض معاملتك",
               });
             } else {
-              console.log("Order else error");
+
               setPaymentStatus({
                 errorCode: responseData.ErrorCode,
                 errorMessage: responseData.ErrorMessage,
@@ -77,7 +77,7 @@ const PaymentPage = () => {
           errorMessage: error,
         });
       }
-      console.log(paymentStatus);
+
     };
 
     if (orderId && !paymentStatus) {

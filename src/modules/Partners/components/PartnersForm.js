@@ -460,7 +460,7 @@ const PartnersForm = ({ setStep }) => {
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log({ domain: domain });
+
     if (
       !fullName ||
       !phone ||
