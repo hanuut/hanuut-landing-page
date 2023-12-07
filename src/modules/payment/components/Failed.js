@@ -220,7 +220,13 @@ const Failed = ({ orderId, responseData, error }) => {
                       : ""}
                   </Value>
                 </ValueWrapper>
-                - En cas de problème de paiement, veuillez contacter le numéro vert de la SATIM 3020.
+                <ValueWrapper>
+                  <Label>
+                    {" "}
+                    - En cas de problème de paiement, veuillez contacter le
+                    numéro vert de la SATIM 3020.
+                  </Label>
+                </ValueWrapper>
               </PaymentInfoWrapper>
               <PaymentInfoWrapper>
                 <Link to="/">
