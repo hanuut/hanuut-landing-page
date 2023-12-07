@@ -13,7 +13,7 @@ export const responseToPdf = (responseData) => {
   doc.text("Order Number: " + OrderNumber, 15, 60);
   doc.text("Order Date: " + new Date().toLocaleDateString(), 15, 70);
   doc.text("Payment Details", 15, 90);
-  doc.text("Amount: " + Amount + " " + currency, 15, 100);
+  doc.text("Amount: " + Amount / 100 + " dzd", 15, 100);
   doc.text("Card Number: " + (Pan ? Pan : "N/A"), 15, 110);
   doc.text("Expiration: " + (expiration ? expiration : "N/A"), 15, 120);
   doc.text(

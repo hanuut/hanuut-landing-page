@@ -184,7 +184,7 @@ const Value = styled.p`
 `;
 const Failed = ({ orderId, responseData, error }) => {
   const { t, i18n } = useTranslation();
-  console.log(error);
+
   return (
     <Container isArabic={i18n.language === "ar"}>
       <GlassBox>
@@ -208,6 +208,16 @@ const Failed = ({ orderId, responseData, error }) => {
                 <ValueWrapper>
                   <Value className="transparentBackground" expanded={true}>
                     {error}
+                  </Value>
+                </ValueWrapper>
+              </PaymentInfoWrapper>
+
+              <PaymentInfoWrapper>
+                <ValueWrapper>
+                  <Value className="transparentBackground" expanded={true}>
+                    {responseData.params.respCode_desc
+                      ? responseData.params.respCode_desc
+                      : ""}
                   </Value>
                 </ValueWrapper>
               </PaymentInfoWrapper>
