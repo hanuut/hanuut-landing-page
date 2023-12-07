@@ -25,6 +25,7 @@ const Section = styled.div`
 const PaymentPage = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [data, setData] = useState(false);
   const { i18n } = useTranslation();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -36,6 +37,7 @@ const PaymentPage = () => {
       try {
         const response = await confirmOrder(orderId);
         const responseData = response.data;
+        setData(responseData);
 
         if (response) {
           const errorCodeDescription = errorCodes[responseData.ErrorCode];
@@ -43,28 +45,39 @@ const PaymentPage = () => {
             errorCodeDescription.code === errorCodes[0].code ||
             errorCodeDescription.code === errorCodes[2].code
           ) {
- 
-        
             setSuccess(true);
             setPaymentStatus({
               ...responseData,
               successMessage: errorCodeDescription.description[i18n.language],
             });
           } else {
+            console.log("else");
             setSuccess(false);
-            setPaymentStatus({
-              errorCode: responseData.ErrorCode,
-              errorMessage: responseData.errorMessage,
-              errorCodeDescription:
-                errorCodeDescription.description[i18n.language],
-            });
+            if (responseData.ErrorCode === "0") {
+              console.log("Order Status 3");
+              setPaymentStatus({
+                errorCode: responseData.ErrorCode,
+                errorMessage: responseData.ErrorMessage,
+                errorCodeDescription:
+                  "Votre transaction a été rejetée/ Your transaction was rejected/ تم رفض معاملتك",
+              });
+            } else {
+              console.log("Order else error");
+              setPaymentStatus({
+                errorCode: responseData.ErrorCode,
+                errorMessage: responseData.ErrorMessage,
+                errorCodeDescription: responseData.ErrorMessage,
+              });
+            }
           }
         }
       } catch (error) {
+        console.log(error);
         setPaymentStatus({
           errorMessage: error,
         });
       }
+      console.log(paymentStatus);
     };
 
     if (orderId && !paymentStatus) {
@@ -84,12 +97,17 @@ const PaymentPage = () => {
   return (
     <Section>
       {!success ? (
-        <Failed orderId={orderId} error={paymentStatus.errorCodeDescription}></Failed>
+        <Failed
+          orderId={orderId}
+          responseData={data}
+          error={paymentStatus.errorCodeDescription}
+        ></Failed>
       ) : (
         <Success
           orderId={orderId}
-          depositeAmount={parseFloat(paymentStatus.depositAmount) / 100}
+          depositeAmount={parseFloat(paymentStatus.Amount) / 100}
           successMessage={paymentStatus.successMessage}
+          responseData={data}
         ></Success>
       )}
     </Section>

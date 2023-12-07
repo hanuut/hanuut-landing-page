@@ -21,7 +21,6 @@
     "somethingWrongHappened": "Sorry! Something went wrong",
     "purchaseSuccess": "Your order has been successfully processed. We appreciate your business and look forward to serving you again.",
     "purchaseFailure": "We apologize for the inconvenience. There was an issue processing your order. We value your business and will make every effort to resolve the issue.",
-    "order": "Order",
     "orderStatus": "Order status",
     "depositeAmount": "Deposite Amount",
     "homeSubHeading": "We bring the Shops you trust to your mobile phone",
@@ -148,5 +147,12 @@
     "testPaymentRegisterOrder": "Test Register Order",
     "testPaymentRefundOrder": "Test Refund Order",
     "testPaymentButton": "proceed payment",
+    "testPaymentCaptchaError": "Please complete the reCAPTCHA verification",
+    "testPaymentCaptcha": "Verify Captcha",
+    "testPaymentTerms": " Terms and Conditions",
+    "testPaymentTermsError": "Please confirm the terms and conditions",
+    "testPaymentAmountShow":"Amount to pay is:",
+    "testPaymentAmountShowRefund":"Amount to refund is:",
     "redirecting": "redirecting ..."
+
 }

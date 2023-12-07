@@ -147,6 +147,13 @@
     "testPaymentParagraph2": "Sur cette page, vous pouvez tester :",
     "testPaymentRegisterOrder": "Test d'Enregistrement de Commande",
     "testPaymentRefundOrder": "Test de Remboursement de Commande",
-    "testPaymentButton": "Poursuivre le Paiement",
+    "testPaymentAmountShow": "Montant à payer :",
+    "testPaymentButton": "poursuivre le payment",
+    "testPaymentCaptchaError": "Veuillez compléter la vérification reCAPTCHA",
+    "testPaymentCaptchaVerify": "Verify",
+    "testPaymentCaptcha": "Confirmer la sécurité",
+    "testPaymentTerms": "Conditions générales",
+    "testPaymentTermsError": "Veuillez confirmer les termes et conditions",
+    "testPaymentAmountShowRefund": "Montant à Rembourser :",
     "redirecting": "Redirection en cours..."
 }

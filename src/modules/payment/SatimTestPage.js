@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import BackgroundImage from "../../assets/background.png";
 import { useTranslation } from "react-i18next";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
 import { light } from "../../config/Themes";
-import creditCard from "../../assets/creaditCard.svg";
+import creditCard from "../../assets/cibLogo.png";
 import { refund, registerOrder } from "./services/paymentServices";
 import Loader from "../../components/Loader";
+import Recaptcha from "react-google-recaptcha";
+import SatimTermsAndConditions from "./components/satimTermsAndConditions";
+import { TextButton, ActionButton } from "../../components/ActionButton";
 
 const Section = styled.div`
   height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -145,12 +148,16 @@ const FormContainer = styled.form`
 `;
 
 const FormGroup = styled.div`
+display: flex;
+flex-direction: row;
+align-items: center;
+justify-content: flex-start;
 width: 75%;
-  display; flex;
-  @media (max-width: 768px) {
-    max-width: 75%;
-    width: 90%;
-  }
+display; flex;
+@media (max-width: 768px) {
+  max-width: 75%;
+  width: 90%;
+}
 `;
 
 const Label = styled.label`
@@ -163,7 +170,7 @@ const Label = styled.label`
   }
 `;
 const Input = styled.input`
-  width: 100%;
+  flex: 1;
   padding: 10px;
   border: 1px solid;
   border-radius: ${(props) => props.theme.smallRadius};
@@ -173,7 +180,6 @@ const Input = styled.input`
     border-color: ${(props) => props.theme.secondaryColor};
   }
   @media (max-width: 768px) {
-    width: 100%;
     position: static;
     font-size: ${(props) => props.theme.fontmd};
   }
@@ -201,7 +207,8 @@ const SuccessMessage = styled.p`
   font-size: ${(props) => props.theme.fontmd};
 `;
 const FormTitle = styled.p`
-  max-width: 100%;
+  width: 100%;
+  text-align: center;
   color: ${(props) => props.theme.text};
   font-size: ${(props) => props.theme.fontxxxl};
   font-weight: 600;
@@ -230,8 +237,41 @@ const Paragraph = styled.p`
     font-size: ${(props) => props.theme.fontmd};
   }
 `;
-
+const TermsPopup = styled.div`
+  width: 60%;
+  height: 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border: 1px solid ${(props) => props.theme.primaryColor};
+  border-radius: 4px;
+  z-index: 999;
+`;
+const TermsPopupConainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+const TermsPopupButtonWrapper = styled.div`
+  gap: 1rem;
+  display: flex;
+  align-self: flex-end;
+  justify-content: flex-end;
+  margin-top: 20px;
+`;
 const SatimTestPage = () => {
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const [captchaResponse, setCaptchaResponse] = useState(null);
+  const [showTermsPopup, setShowTermsPopup] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const [selectedForm, setSelectedForm] = useState("registerOrder");
@@ -239,14 +279,44 @@ const SatimTestPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [orderId, setOrderId] = useState("");
   const [amount, setAmount] = useState(0);
+  const [termsChecked, setTermsChecked] = useState(false);
   const { t, i18n } = useTranslation();
 
   const handleRadioChange = (event) => {
     setSelectedForm(event.target.value);
   };
 
+  const handleCaptchaResponse = (response) => {
+    setCaptchaResponse(response);
+  };
+  const handleTermsCheckboxChange = () => {
+    if (termsChecked) {
+      setTermsChecked(false);
+    } else {
+      setShowTermsPopup(true);
+    }
+  };
+
+  const handleAcceptTerms = () => {
+    setTermsChecked(true);
+    setShowTermsPopup(false);
+  };
+
+  const handleCancelTerms = () => {
+    setShowTermsPopup(false);
+  };
+
+  const handleCaptchaCheckboxChange = (event) => {
+    event.preventDefault();
+    if (!orderId || !amount) {
+      setErrorMessage(t("errorFillAllFields"));
+      return;
+    }
+    setShowCaptcha(true);
+  };
   const handleSubscribe = async (event) => {
     event.preventDefault();
+
     if (!isSubmitting) {
       if (!orderId || !amount) {
         setErrorMessage(t("errorFillAllFields"));
@@ -258,49 +328,63 @@ const SatimTestPage = () => {
         return;
       }
 
-      setErrorMessage("");
-      setIsSubmitting(true);
-
-      const data = {
-        orderId: orderId,
-        amount: amount * 100,
-      };
-
-      try {
-        if (selectedForm === "registerOrder") {
-          const response = await registerOrder(data);
-          const responseData = response.data;
-          if (responseData) {
-            if (responseData.errorCode === "0") {
-              setRedirecting(true);
-              setTimeout(() => {
-                window.location.href = responseData.formUrl;
-              }, 2000);
-              return () => {
-                setRedirecting(false);
-              };
-            } else {
-              setErrorMessage(responseData.errorMessage);
-            }
-          }
-        } else {
-          const response = await refund(data);
-          const responseData = response.data;
-          if (responseData) {
-            if (responseData.errorCode === "0") {
-              setErrorMessage("");
-              setSuccessMessage(responseData.errorMessage);
-            } else {
-              setSuccessMessage("");
-              setErrorMessage(responseData.errorMessage);
-            }
-          }
-        }
-      } catch (error) {
-        console.error(error);
-        setErrorMessage(error.message);
+      if (!termsChecked) {
+        setErrorMessage(t("testPaymentTermsError"));
+        return;
+      }
+      if (!captchaResponse) {
+        setErrorMessage(t("testPaymentCaptchaError"));
+        return;
       }
 
+      if (captchaResponse) {
+        setErrorMessage("");
+        setIsSubmitting(true);
+
+        const data = {
+          orderId: orderId,
+          amount: amount * 100,
+        };
+
+        try {
+          if (selectedForm === "registerOrder") {
+            const response = await registerOrder(data);
+            const responseData = response.data;
+            if (responseData) {
+              if (responseData.errorCode === "0") {
+                setRedirecting(true);
+                setTimeout(() => {
+                  window.location.href = responseData.formUrl;
+                }, 2000);
+                return () => {
+                  setRedirecting(false);
+                };
+              } else {
+                setErrorMessage(responseData.errorMessage);
+              }
+            }
+          } else {
+            const response = await refund(data);
+            const responseData = response.data;
+            if (responseData) {
+              if (responseData.errorCode === "0") {
+                setErrorMessage("");
+                setSuccessMessage(responseData.errorMessage);
+              } else {
+                setSuccessMessage("");
+                setErrorMessage(responseData.errorMessage);
+              }
+            }
+          }
+        } catch (error) {
+          console.error(error);
+          setErrorMessage(error.message);
+        }
+
+        setIsSubmitting(false);
+      }
+    } else {
+      setErrorMessage(t("testPaymentCaptchaError"));
       setIsSubmitting(false);
     }
   };
@@ -376,9 +460,54 @@ const SatimTestPage = () => {
                       onChange={(event) => setAmount(event.target.value)}
                     />
                   </FormGroup>
+                  {amount > 0 && (
+                    <FormGroup>
+                      <FormTitle>
+                        {selectedForm === "registerOrder"
+                          ? `${t("testPaymentAmountShow")} ${amount} ${t(
+                              "dzd"
+                            )}`
+                          : `${t("testPaymentAmountShowRefund")} ${amount} ${t(
+                              "dzd"
+                            )}`}
+                      </FormTitle>
+                    </FormGroup>
+                  )}
+                  <FormGroup>
+                    <input
+                      type="checkbox"
+                      checked={termsChecked}
+                      onChange={handleTermsCheckboxChange}
+                    />
+                    <Label>{t("testPaymentTerms")}</Label>
+                  </FormGroup>
+                  {showTermsPopup && (
+                    <TermsPopup>
+                      {" "}
+                      <TermsPopupConainer>
+                        <SatimTermsAndConditions />
+
+                        <TermsPopupButtonWrapper>
+                          <TextButton onClick={handleCancelTerms}>
+                            Cancel
+                          </TextButton>
+                          <ActionButton onClick={handleAcceptTerms}>
+                            Accept
+                          </ActionButton>
+                        </TermsPopupButtonWrapper>
+                      </TermsPopupConainer>
+                    </TermsPopup>
+                  )}
+                  <FormGroup>
+                    <input
+                      type="checkbox"
+                      checked={showCaptcha}
+                      onChange={handleCaptchaCheckboxChange}
+                    />
+                    <Label>{t("testPaymentCaptcha")}</Label>
+                  </FormGroup>
                   {errorMessage ? (
                     <FormGroup>
-                      {" "}
                       <ErrorMessage>
                         {errorMessage && <p>{errorMessage}</p>}
                       </ErrorMessage>
@@ -396,6 +525,12 @@ const SatimTestPage = () => {
                   ) : (
                     ""
                   )}
+                  {showCaptcha && (
+                    <Recaptcha
+                      sitekey="6LfckCcpAAAAAOcv_SA3mzHW-zRaoDSPlk9p8SbB"
+                      onChange={handleCaptchaResponse}
+                    />
+                  )}
                   <ButtonWithIcon
                     image={creditCard}
                     backgroundColor={light.primaryColor}
@@ -405,6 +540,7 @@ const SatimTestPage = () => {
                         : t("testPaymentButton")
                     }
                     disabled={isSubmitting}
+                    className={"noFlipIcon"}
                   ></ButtonWithIcon>
                 </FormContainer>
               </>
