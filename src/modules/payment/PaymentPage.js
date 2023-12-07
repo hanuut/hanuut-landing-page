@@ -54,7 +54,6 @@ const PaymentPage = () => {
 
             setSuccess(false);
             if (responseData.ErrorCode === "0") {
-
               setPaymentStatus({
                 errorCode: responseData.ErrorCode,
                 errorMessage: responseData.ErrorMessage,
@@ -77,7 +76,6 @@ const PaymentPage = () => {
           errorMessage: error,
         });
       }
-
     };
 
     if (orderId && !paymentStatus) {
