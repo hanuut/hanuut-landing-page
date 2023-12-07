@@ -139,7 +139,7 @@ const PaymentInfoWrapper = styled.div`
   gap: 0.5rem;
 `;
 const Label = styled.h3`
-  max-width: 30%;
+  max-width:${(props) => (props.expanded ? "100%" : "30%")};
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
@@ -184,7 +184,7 @@ const Value = styled.p`
 `;
 const Failed = ({ orderId, responseData, error }) => {
   const { t, i18n } = useTranslation();
-
+  console.log(responseData);
   return (
     <Container isArabic={i18n.language === "ar"}>
       <GlassBox>
@@ -220,8 +220,21 @@ const Failed = ({ orderId, responseData, error }) => {
                       : ""}
                   </Value>
                 </ValueWrapper>
+              </PaymentInfoWrapper>
+
+              <PaymentInfoWrapper>
                 <ValueWrapper>
-                  <Label>
+                  <Value className="transparentBackground" expanded={true}>
+                    {responseData && responseData.actionCodeDescription
+                      ? responseData.actionCodeDescription
+                      : ""}
+                  </Value>
+                </ValueWrapper>
+              </PaymentInfoWrapper>
+
+              <PaymentInfoWrapper>
+                <ValueWrapper>
+                  <Label className="transparentBackground" expanded={true}>
                     {" "}
                     - En cas de problème de paiement, veuillez contacter le
                     numéro vert de la SATIM 3020.
