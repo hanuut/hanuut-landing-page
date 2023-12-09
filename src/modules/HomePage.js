@@ -10,19 +10,24 @@ import { Link } from "react-router-dom";
 import AboutUs from "./Sections/AboutUs";
 import HowItWorks from "./Sections/HowItWorks";
 import ButtonWithIcon from "../components/ButtonWithIcon";
+import BackgroundImage from "../assets/background.png"
 // import Testimonials from "./Sections/Testimonials";
 // import Partners from "./Partners/Partners";
 // import CallToAction from "./Sections/CallToAction";
 
 const Section = styled.div`
-  min-height: ${(props) => `calc(79vh - ${props.theme.navHeight})`};
-  background-color: ${(props) => props.theme.body};
+  min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-image: url(${BackgroundImage});
+  background-size: 100%;
+  gap: 2rem;
+  background-position: center;
   @media (max-width: 768px) {
     justify-content: flex-start;
+    width: 100%;
   }
 `;
 
@@ -100,7 +105,7 @@ const Paragraph = styled.p`
 `;
 
 const SmallParagraph = styled.p`
-margin-top: 0.3rem;
+  margin-top: 0.3rem;
   width: 100%;
   font-size: ${(props) => props.theme.fontmd};
   opacity: 0.75;
@@ -129,7 +134,7 @@ const HomePage = () => {
                 backgroundColor="#000000"
                 text1={t("getItOn")}
                 text2={t("googlePlay")}
-                className= "homeDownloadButton"
+                className="homeDownloadButton"
               ></ButtonWithIcon>
             </Link>
             <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>

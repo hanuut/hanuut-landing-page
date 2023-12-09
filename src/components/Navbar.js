@@ -13,9 +13,9 @@ const Section = styled.section`
   background-color: ${(props) => props.theme.body};
   height: ${(props) => props.theme.navHeight};
   z-index: 1000;
-  display: flex; /* Add display: flex */
-  justify-content: center; /* Add justify-content: center */
-  align-items: center; /* Add align-items: center */
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
   @media (max-width: 768px) {
     position: relative;
     height: ${(props) => props.theme.navHeightMobile};

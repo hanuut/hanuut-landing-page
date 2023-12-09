@@ -60,7 +60,7 @@ const ShopPageContainer = styled.div`
 
   filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#B5E3CA", endColorstr="#E1F4EA", GradientType=1 );
   border-radius: ${(props) => props.theme.defaultRadius};
-  box-shadow: 0 0 2px rgba(${(props) => props.theme.primaryColorRgba}, 0.2);
+  box-shadow: 0 5px 5px rgba(${(props) => props.theme.primaryColorRgba}, 0.2);
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
     padding: ${(props) => props.theme.smallPadding};

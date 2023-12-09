@@ -1,16 +1,22 @@
 import styled from "styled-components";
 import AboutUsIllutstration from "../../assets/aboutUs.svg";
 import MissionIllustration from "../../assets/mission.svg";
-
 import { useTranslation } from "react-i18next";
+import BackgroundImage from "../../assets/background.png"
 const Section = styled.div`
-  min-height: 60vh;
-  background-color: ${(props) => props.theme.body};
+  min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-image: url(${BackgroundImage});
+  background-size: 100%;
   gap: 2rem;
+  background-position: center;
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+    width: 100%;
+  }
 `;
 
 const Container = styled.div`
@@ -94,7 +100,6 @@ const MissionHeaderContainer = styled.div`
   @media (max-width: 768px) {
     gap: 0.5rem;
   }
- 
 `;
 const MissionIllutstrationContainer = styled.img`
   max-width: 15%;
