@@ -3,16 +3,20 @@ import AddToCart from "../../assets/addToCart.svg";
 import CartManagment from "../../assets/cartManagment.svg";
 import Delivery from "../../assets/delivery.svg";
 import { useTranslation } from "react-i18next";
+import BackgroundImage from "../../assets/background.png";
 
 const Section = styled.section`
-  min-height: 60vh;
-  background-color: ${(props) => props.theme.body};
+  min-height: 70vh;
+  background-image: url(${BackgroundImage});
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2rem;
+
   @media (max-width: 768px) {
     justify-content: flex-start;
+    min-height: 100vh;
+    width: 100%;
+    padding: 2rem 0;
   }
 `;
 
@@ -24,10 +28,16 @@ const Container = styled.div`
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+  background: rgba(${(props) => props.theme.primaryColorRgba}, 0.05);
+  backdrop-filter: blur(2px);
+  border-radius: 10px;
+  padding: 2rem;
+
   @media (max-width: 768px) {
     width: 100%;
     align-items: flex-start;
+    padding: 1rem;
+    padding: 5rem 0;
   }
 `;
 
@@ -38,8 +48,8 @@ const HowItWorksTitle = styled.h2`
   @media (max-width: 768px) {
     margin-top: 2rem;
     font-size: ${(props) => props.theme.fontxxxl};
-    margin-left:  ${(props) => (props.isArabic ? "" : "5%")};
-    margin-right:  ${(props) => (props.isArabic ? "5%" : "")};
+    margin-left: ${(props) => (props.isArabic ? "" : "5%")};
+    margin-right: ${(props) => (props.isArabic ? "5%" : "")};
   }
 `;
 

@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import PartnersImg from "../../assets/partnersIllustration.svg";
 import BackgroundImage from "../../assets/background.png";
 import { useTranslation } from "react-i18next";
-import ShopsContainer from "./components/ShopsContainer";
+// import ShopsContainer from "./components/ShopsContainer";
 import { ActionButton } from "../../components/ActionButton";
 import PartnersValues from "./components/PartnersValues";
 import JoinUs from "./components/JoinUs";
 
 const Section = styled.div`
-  min-height: ${(props) => `calc(79vh - ${props.theme.navHeight})`};
+  min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -38,7 +38,6 @@ const PartnersContainer = styled.div`
   }
 `;
 const UpperBox = styled.div`
-
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -172,7 +171,7 @@ const PartnersPage = () => {
         </UpperBox>
         <PartnersValues />
         <LowerBox isArabic={i18n.language === "ar"}>
-          <ShopsContainer />
+          {/* <ShopsContainer /> */}
           <JoinUs />
         </LowerBox>
       </PartnersContainer>

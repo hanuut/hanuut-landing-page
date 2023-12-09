@@ -37,10 +37,9 @@ const StepIcon = styled.img`
 `;
 
 const StepDescription = styled.div`
-  max-width: 70%;
+  width: 70%;
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
-
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -60,8 +59,7 @@ const StepDescription = styled.div`
     }
   }}
   background-size: contain;
-  background-position: ${(props) =>
-    props.isArabic ? "80%, right" : "left, 15%"};
+  background-position: ${(props) => (props.isArabic ? "80%, 100%" : "0, 15%")};
   background-repeat: no-repeat;
   @media (max-width: 768px) {
     background-size: 30%;

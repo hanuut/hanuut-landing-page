@@ -16,6 +16,7 @@ import DomainsDropDown from "../../../components/DomainsDropDown";
 import { TextButton } from "../../../components/ActionButton";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import Send from "../../../assets/send.svg";
+import fireworks from "../../../assets/fireworks.svg";
 const Container = styled.div`
   width: 100%;
   display: flex;
@@ -39,7 +40,6 @@ const PartnerFormStep = styled.form`
 
 const FormStepsIndicator = styled.div`
   position: absolute;
-
   bottom: 0;
   display: flex;
   flex-direction: row;
@@ -49,39 +49,35 @@ const FormStepsIndicator = styled.div`
   max-width: 50%;
   padding: ${(props) => props.theme.smallPadding};
   border-radius: ${(props) => props.theme.bigRadius};
-
-  background: hsla(146, 45%, 80%, 1);
-
   background: linear-gradient(
     -45deg,
-    hsla(146, 45%, 80%, 1) 50%,
-    hsla(26, 80%, 80%, 1) 100%
+    hsla(146, 45%, 10%, 1) ${(props) => (props.formStep - 1) * 25}%,
+    hsla(26, 80%, 10%, 1) 100%
   );
 
   background: -moz-linear-gradient(
     -45deg,
-    hsla(146, 45%, 80%, 1) 50%,
-    hsla(26, 80%, 80%, 1) 100%
+    hsla(146, 45%, 10%, 1) ${(props) => (props.formStep - 1) * 25}%,
+    hsla(26, 80%, 10%, 1) 100%
   );
 
   background: -webkit-linear-gradient(
     -45deg,
-    hsla(146, 45%, 80%, 1) 50%,
-    hsla(26, 80%, 80%, 1) 100%
+    hsla(26, 80%, 90%, 1) ${(props) => (props.formStep - 1) * 25}%,
+    hsla(146, 45%, 90%, 1) ${(props) => (props.formStep + 1) * 50}%
   );
-
-  filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#B5E3C9", endColorstr="#F5C7A3", GradientType=1 );
-
+  box-shadow: 0 5px 5px rgba(${(props) => props.theme.primaryColorRgba}, 0.2);
   @media (max-width: 768px) {
     bottom: 5%;
   }
 `;
 
 const StepIndicator = styled.div`
-  height: 5px;
-  width: 5px;
+  height: 6px;
+  width: 6px;
   border-radius: 50%;
-  background-color: ${(props) => props.theme.primaryColor};
+  background-color: ${(props) =>
+    props.active ? props.theme.primaryColor : "#ccc"};
 `;
 
 const slideAnimation = keyframes`
@@ -187,14 +183,14 @@ const Icon = styled.img`
   width: 2rem;
 `;
 
-const Paragraph = styled.p`
-  text-align: center;
-  width: 100%;
-  font-size: ${(props) => props.theme.fontxl};
-  @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontmd};
-  }
-`;
+// const Paragraph = styled.p`
+//   text-align: center;
+//   width: 100%;
+//   font-size: ${(props) => props.theme.fontxl};
+//   @media (max-width: 768px) {
+//     font-size: ${(props) => props.theme.fontmd};
+//   }
+// `;
 
 const InputWrapper = styled.div`
   width: 100%;
@@ -278,6 +274,9 @@ const EmailButton = styled(Button)`
 const SmallParagraph = styled.p`
   width: 100%;
   font-size: ${(props) => props.theme.fontmd};
+  &.centeredText {
+    text-align: center;
+  }
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontsm};
   }
@@ -327,9 +326,17 @@ const ErrorMessage = styled.div`
     color: #d8000c;
     padding: ${(props) => props.theme.smallPadding};
     border: 1px solid #d8000c;
+
     border-radius: ${(props) => props.theme.defaultRadius};
     font-size: ${(props) => props.theme.fontmd};
   }
+`;
+
+const SuccessMessageContainer = styled.div`
+  background-image: ${(props) =>
+    props.isAccepted ? `url(${fireworks})` : "none"};
+  background-size: cover;
+  background-position: center 30%;
 `;
 const PartnersForm = ({ setStep }) => {
   const myHanuutDownloadLink = process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK;
@@ -348,6 +355,7 @@ const PartnersForm = ({ setStep }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isAccepted, setIsAccepted] = useState(false);
+  const totalSteps = 4;
 
   const resetForm = () => {
     setEmail("");
@@ -538,7 +546,6 @@ const PartnersForm = ({ setStep }) => {
           <FirstStep isArabic={i18n.language === "ar"}>
             <Title>{t("joinOurCommunity")}</Title>
             <SubHeading>{t("partnersFormFirstStepSubHeading")}</SubHeading>
-            <Paragraph>{t("partnersFormFirstStepParagrapho")}</Paragraph>
             <PhoneInputWrapper>
               <PhoneInput
                 type="phone"
@@ -557,6 +564,9 @@ const PartnersForm = ({ setStep }) => {
                   : t("partnerInputButton")}
               </EmailButton>
             </PhoneInputWrapper>
+            <SmallParagraph className="centeredText">
+              {t("partnersFormFirstStepParagraph")}
+            </SmallParagraph>
             <ErrorMessage>{errorMessage && <p>{errorMessage}</p>}</ErrorMessage>
           </FirstStep>
         )}
@@ -663,7 +673,7 @@ const PartnersForm = ({ setStep }) => {
         {formStep === 4 && (
           <FourthStep isArabic={i18n.language === "ar"}>
             {successMessage ? (
-              <>
+              <SuccessMessageContainer isAccepted={isAccepted}>
                 {successMessage && (
                   <MessageWithLink
                     message={successMessage}
@@ -672,7 +682,7 @@ const PartnersForm = ({ setStep }) => {
                     textColor={light.primaryColor}
                   />
                 )}
-              </>
+              </SuccessMessageContainer>
             ) : (
               <>
                 <Heading className="greenSubHeading">
@@ -688,9 +698,9 @@ const PartnersForm = ({ setStep }) => {
           </FourthStep>
         )}
 
-        <FormStepsIndicator>
-          {Array.from({ length: formStep }, (_, index) => (
-            <StepIndicator key={index} active={index === formStep} />
+        <FormStepsIndicator formStep={formStep}>
+          {Array.from({ length: totalSteps }, (_, index) => (
+            <StepIndicator key={index} active={index <= formStep - 1} />
           ))}
         </FormStepsIndicator>
       </PartnerFormStep>
