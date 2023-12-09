@@ -31,7 +31,6 @@ const JoinUsContainer = styled.div`
   }
 `;
 const Title = styled.h2`
-
   align-self: start;
   font-size: ${(props) => props.theme.fontLargest};
   font-weight: bold;
@@ -88,7 +87,7 @@ const JoinUs = () => {
     setFormStep(step);
   };
   return (
-    <Section>
+    <Section id="joinUs">
       <Title>{t("ourPartners")}</Title>
       <JoinUsContainer>
         <StepsContainer isArabic={i18n.language === "ar"}>
