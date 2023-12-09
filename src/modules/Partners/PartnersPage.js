@@ -146,6 +146,12 @@ const Paragraph = styled.p`
 
 const PartnersPage = () => {
   const { t, i18n } = useTranslation();
+  const handleJoinUsOnClick = () => {
+    const element = document.getElementById("joinUs");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <Section>
@@ -159,7 +165,9 @@ const PartnersPage = () => {
             </Heading>
             <SubHeading>{t("partnerSubHeading")}</SubHeading>
             <Paragraph>{t("partnerParagraph")}</Paragraph>
-            <ActionButton>{t("joinOurCommunity")}</ActionButton>
+            <ActionButton onClick={handleJoinUsOnClick}>
+              {t("joinOurCommunity")}
+            </ActionButton>
           </LeftBox>
           <RightBox>
             <PartnersImageContainer
@@ -172,7 +180,7 @@ const PartnersPage = () => {
         <PartnersValues />
         <LowerBox isArabic={i18n.language === "ar"}>
           {/* <ShopsContainer /> */}
-          <JoinUs />
+          <JoinUs/>
         </LowerBox>
       </PartnersContainer>
     </Section>
