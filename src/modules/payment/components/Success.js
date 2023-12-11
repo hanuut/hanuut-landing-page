@@ -2,11 +2,8 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import celebration from "../../../assets/celebration.svg";
 import successful from "../../../assets/successful.svg";
-import right from "../../../assets/right.svg";
-import left from "../../../assets/left.svg";
 import fireworks from "../../../assets/fireworks.svg";
-import { ActionButton } from "../../../components/ActionButton";
-import { Link } from "react-router-dom";
+import SatimLigne from "../../../assets/satimLigne.png";
 import { useTranslation } from "react-i18next";
 import emailjs from "@emailjs/browser";
 import { responseToPdf, sendEmail } from "../services/utils";
@@ -38,6 +35,7 @@ const Container = styled.div`
 
 const GlassBox = styled.div`
   width: 76%;
+  min-height: 70vh;
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(7px);
   border-radius: 10px;
@@ -112,6 +110,7 @@ const Content = styled.div`
   justify-content: center;
 `;
 const Title = styled.h1`
+  margin: 0.5rem 0;
   font-size: ${(props) => props.theme.fontLargest};
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
@@ -120,7 +119,7 @@ const Title = styled.h1`
 `;
 
 const Description = styled.p`
-  margin-top: 1rem;
+  margin: 0.5rem 0;
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
   @media (max-width: 768px) {
@@ -149,6 +148,15 @@ const PaymentInfoWrapper = styled.div`
 const Label = styled.h3`
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
+  &.satimMessage {
+    font-size: ${(props) => props.theme.fontxxl};
+    color: ${(props) => props.theme.primaryColor};
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
   @media (max-width: 768px) {
     max-width: 30%;
     font-size: ${(props) => props.theme.fontsm};
@@ -168,9 +176,9 @@ const ValueWrapper = styled.div`
 
 const Value = styled.p`
   line-height: 1;
-  overflow: ${(props) => (props.expanded ? "" : "hidden")};
+  overflow: ${(props) => (props.expanded ? "" : "")};
   border-radius: ${(props) => props.theme.defaultRadius};
-  width: ${(props) => (props.expanded ? "100%" : "4%")};
+  width: ${(props) => (props.expanded ? "100%" : "100%")};
   color: ${(props) => props.theme.body};
   background-color: ${(props) => props.theme.primaryColor};
   padding: ${(props) => props.theme.actionButtonPaddingMobile};
@@ -200,6 +208,7 @@ const ShowValueIcon = styled.img`
 const ButtonsWrapper = styled.div`
   width: 100%;
   gap: 1rem;
+  margin: 1rem 0;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -278,6 +287,15 @@ const Success = ({ orderId, successMessage, responseData }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [email, setEmail] = useState("");
   const [orderValueExpanded, setOrderValueExpanded] = useState(false);
+  const currentDate = new Date();
+  const day = String(currentDate.getDate()).padStart(2, "0");
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const year = String(currentDate.getFullYear()).slice(-2);
+  const hours = String(currentDate.getHours()).padStart(2, "0");
+  const minutes = String(currentDate.getMinutes()).padStart(2, "0");
+
+  const formattedDateTime = `${day}/${month}/20${year}, ${hours}:${minutes}`;
+
   emailjs.init(process.env.REACT_APP_EMAILJS_PUBLIC_KEY);
 
   const handleShowOrderValue = () => {
@@ -341,7 +359,6 @@ const Success = ({ orderId, successMessage, responseData }) => {
   };
 
   useEffect(() => {
-
     const pdfInstance = responseToPdf(responseData);
     if (pdfInstance) {
       setPdfFile(pdfInstance);
@@ -359,18 +376,46 @@ const Success = ({ orderId, successMessage, responseData }) => {
         <ContentWrapper>
           <Content>
             <Title>{t("thankYouForPurchase")}</Title>
-            <Description>{successMessage}</Description>
+            <PaymentInfoWrapper>
+              <Label className="satimMessage">Recu de Paiment</Label>
+            </PaymentInfoWrapper>
+            <PaymentInfoWrapper>
+              <Label>
+                <Label>Merchant: SARL Hanuut Express</Label>
+              </Label>
+            </PaymentInfoWrapper>
+            <PaymentInfoWrapper>
+              <Label>
+                {" "}
+                <Label>Address: Arris, Batna</Label>
+              </Label>
+            </PaymentInfoWrapper>
+            <PaymentInfoWrapper>
+              <Label>
+                {" "}
+                <Label>email: contact@hanuut.com</Label>
+              </Label>
+            </PaymentInfoWrapper>
+            <PaymentInfoWrapper>
+              <Label>
+                {" "}
+                <Label className="satimMessage">Payment Details</Label>
+              </Label>
+            </PaymentInfoWrapper>
+
             <PaymentInfo>
               <PaymentInfoWrapper>
-                <Label>orderId</Label>
+                <Label>Order ID</Label>
                 <ValueWrapper>
                   <Value expanded={orderValueExpanded}>{orderId}</Value>
-                  <ShowValueIcon
-                    src={orderValueExpanded ? left : right}
-                    alt="img"
-                    onClick={handleShowOrderValue}
-                    isArabic={i18n.language === "ar"}
-                  />
+                </ValueWrapper>
+              </PaymentInfoWrapper>
+              <PaymentInfoWrapper>
+                <Label>Time</Label>
+                <ValueWrapper>
+                  <Value className="transparentBackground" expanded={true}>
+                    {formattedDateTime}
+                  </Value>
                 </ValueWrapper>
               </PaymentInfoWrapper>
               <PaymentInfoWrapper>
@@ -412,13 +457,6 @@ const Success = ({ orderId, successMessage, responseData }) => {
               <PaymentInfoWrapper>
                 <Label className="expanded">
                   Le mode de paiement : carte CIB/Edhahabia.
-                </Label>
-              </PaymentInfoWrapper>
-
-              <PaymentInfoWrapper>
-                <Label>
-                  En cas de problème de paiement, veuillez contacter le numéro
-                  vert de la SATIM 3020{" "}
                 </Label>
               </PaymentInfoWrapper>
               <ButtonsWrapper>
@@ -465,10 +503,12 @@ const Success = ({ orderId, successMessage, responseData }) => {
                   </Popup>
                 )}
               </ButtonsWrapper>
+
               <PaymentInfoWrapper>
-                <Link to="/">
-                  <ActionButton> {t("404Button")} </ActionButton>
-                </Link>
+                <Label className="satimMessage">
+                  En cas de problème de paiement, veuillez contacter le numéro
+                  vert de la SATIM 3020 <img src={SatimLigne}></img>
+                </Label>
               </PaymentInfoWrapper>
             </PaymentInfo>
           </Content>

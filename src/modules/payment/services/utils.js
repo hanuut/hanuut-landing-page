@@ -2,7 +2,7 @@ import { jsPDF } from "jspdf";
 import emailjs from "@emailjs/browser";
 
 export const responseToPdf = (responseData) => {
-  const { OrderNumber, Amount, Pan, expiration, cardholderName, currency } =
+  const { OrderNumber, Amount, Pan, expiration, cardholderName } =
     responseData;
   const doc = new jsPDF();
   doc.setFontSize(12);

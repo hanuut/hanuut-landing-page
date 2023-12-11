@@ -51,7 +51,6 @@ const PaymentPage = () => {
               successMessage: errorCodeDescription.description[i18n.language],
             });
           } else {
-
             setSuccess(false);
             if (responseData.ErrorCode === "0") {
               setPaymentStatus({
@@ -61,7 +60,6 @@ const PaymentPage = () => {
                   "Votre transaction a été rejetée/ Your transaction was rejected/ تم رفض معاملتك",
               });
             } else {
-
               setPaymentStatus({
                 errorCode: responseData.ErrorCode,
                 errorMessage: responseData.ErrorMessage,
