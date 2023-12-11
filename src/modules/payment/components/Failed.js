@@ -5,6 +5,7 @@ import noData from "../../../assets/noData.svg";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ActionButton } from "../../../components/ActionButton";
+import SatimLigne from "../../../assets/satimLigne.png";
 
 const Container = styled.div`
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
@@ -139,9 +140,19 @@ const PaymentInfoWrapper = styled.div`
   gap: 0.5rem;
 `;
 const Label = styled.h3`
-  max-width: ${(props) => (props.expanded ? "100%" : "30%")};
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.text};
+  &.satimMessage {
+    max-width: 100%;
+    font-size: ${(props) => props.theme.fontxxl};
+    color: ${(props) => props.theme.primaryColor};
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontsm};
   }
@@ -184,6 +195,15 @@ const Value = styled.p`
 `;
 const Failed = ({ orderId, responseData, error }) => {
   const { t, i18n } = useTranslation();
+  const [orderValueExpanded, setOrderValueExpanded] = useState(false);
+  const currentDate = new Date();
+  const day = String(currentDate.getDate()).padStart(2, "0");
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const year = String(currentDate.getFullYear()).slice(-2);
+  const hours = String(currentDate.getHours()).padStart(2, "0");
+  const minutes = String(currentDate.getMinutes()).padStart(2, "0");
+
+  const formattedDateTime = `${day}/${month}/20${year}, ${hours}:${minutes}`;
   console.log(responseData);
   return (
     <Container isArabic={i18n.language === "ar"}>
@@ -196,13 +216,50 @@ const Failed = ({ orderId, responseData, error }) => {
           <Content>
             <Title>{t("somethingWrongHappened")}</Title>
             <Description>{t("purchaseFailure")}</Description>
+            <PaymentInfoWrapper>
+              <Label className="satimMessage">Recu de Paiment</Label>
+            </PaymentInfoWrapper>
+            <PaymentInfoWrapper>
+              <Label>
+                <Label>Merchant: SARL Hanuut Express</Label>
+              </Label>
+            </PaymentInfoWrapper>
+            <PaymentInfoWrapper>
+              <Label>
+                {" "}
+                <Label>Address: Arris, Batna</Label>
+              </Label>
+            </PaymentInfoWrapper>
+            <PaymentInfoWrapper>
+              <Label>
+                {" "}
+                <Label>email: contact@hanuut.com</Label>
+              </Label>
+            </PaymentInfoWrapper>
+            <PaymentInfoWrapper>
+              <Label>
+                {" "}
+                <Label className="satimMessage">Payment Details</Label>
+              </Label>
+            </PaymentInfoWrapper>
+
             <PaymentInfo>
               <PaymentInfoWrapper>
-                <Label>{t("order")}</Label>
+                <Label>Order ID</Label>
                 <ValueWrapper>
                   <Value expanded={true}>{orderId}</Value>
                 </ValueWrapper>
               </PaymentInfoWrapper>
+              <PaymentInfoWrapper>
+                <Label>Time</Label>
+                <ValueWrapper>
+                  <Value className="transparentBackground" expanded={true}>
+                    {formattedDateTime}
+                  </Value>
+                </ValueWrapper>
+              </PaymentInfoWrapper>
+            </PaymentInfo>
+            <PaymentInfo>
               <PaymentInfoWrapper>
                 <Label>{t("errorDescription")}</Label>
                 <ValueWrapper>
@@ -223,14 +280,12 @@ const Failed = ({ orderId, responseData, error }) => {
               </PaymentInfoWrapper>
 
               <PaymentInfoWrapper>
-                <ValueWrapper>
-                  <Label className="transparentBackground" expanded={true}>
-                    {" "}
-                    - En cas de problème de paiement, veuillez contacter le
-                    numéro vert de la SATIM 3020.
-                  </Label>
-                </ValueWrapper>
+                <Label className="satimMessage">
+                  En cas de problème de paiement, veuillez contacter le numéro
+                  vert de la SATIM 3020 <img src={SatimLigne}></img>
+                </Label>
               </PaymentInfoWrapper>
+
               <PaymentInfoWrapper>
                 <Link to="/">
                   <ActionButton> {t("404Button")} </ActionButton>

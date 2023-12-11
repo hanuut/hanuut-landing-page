@@ -426,7 +426,7 @@ const SatimTestPage = () => {
       return;
     }
     setShowCaptcha(true);
-  };
+  };  
   const handleSubscribe = async (event) => {
     event.preventDefault();
 
