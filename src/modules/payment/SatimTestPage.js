@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import BackgroundImage from "../../assets/background.png";
 import { useTranslation } from "react-i18next";
@@ -29,13 +29,14 @@ const Section = styled.div`
 
 const ShopPageContainer = styled.div`
   width: 80%;
+  height: 100vh;
   padding: 2rem;
   min-height: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-
+  overflow: auto;
   background: hsla(147, 45%, 80%, 1);
   background: linear-gradient(
     90deg,
@@ -152,6 +153,7 @@ display: flex;
 flex-direction: row;
 align-items: center;
 justify-content: flex-start;
+
 width: 75%;
 display; flex;
 @media (max-width: 768px) {
@@ -212,9 +214,14 @@ const FormTitle = styled.p`
   color: ${(props) => props.theme.text};
   font-size: ${(props) => props.theme.fontxxxl};
   font-weight: 600;
+
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontxl};
+  }
+  &.amountText {
+    color: ${(props) => props.theme.orangeColor};
+    font-weight: 900;
   }
 `;
 
@@ -268,6 +275,39 @@ const TermsPopupButtonWrapper = styled.div`
   justify-content: flex-end;
   margin-top: 20px;
 `;
+
+const ProductsContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  p {
+    width: 100%;
+    font-size: 2rem;
+  }
+`;
+const Products = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+`;
+const Product = styled.div`
+  background-color: white;
+  padding: 1rem;
+  label {
+    margin: 0 0.5rem;
+  }
+  button {
+    margin: 0 0.5rem;
+  }
+`;
+
 const SatimTestPage = () => {
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaResponse, setCaptchaResponse] = useState(null);
@@ -277,12 +317,76 @@ const SatimTestPage = () => {
   const [selectedForm, setSelectedForm] = useState("registerOrder");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [orderId, setOrderId] = useState("");
+  const [orderId, setOrderId] = useState(generateRandomId(5));
   const [amount, setAmount] = useState(0);
   const [termsChecked, setTermsChecked] = useState(false);
   const { t, i18n } = useTranslation();
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  const products = [
+    { id: 1, name: "Lait", price: 140 },
+    { id: 2, name: "Oeuf", price: 25 },
+    { id: 3, name: "Coca Cola ", price: 120 },
+    { id: 4, name: "Farine", price: 90 },
+    { id: 5, name: "Chocolat", price: 220 },
+  ];
+
+  const handleProductSelection = (product) => {
+    const selectedProductIndex = selectedProducts.findIndex(
+      (prod) => prod.id === product.id
+    );
+
+    if (selectedProductIndex !== -1) {
+      // Product is already selected, so remove it
+      const updatedSelectedProducts = [...selectedProducts];
+      updatedSelectedProducts.splice(selectedProductIndex, 1);
+      setSelectedProducts(updatedSelectedProducts);
+    } else {
+      // Product is not selected, so add it
+      setSelectedProducts([...selectedProducts, product]);
+    }
+  };
+
+  const handleRemoveProduct = (productId) => {
+    const updatedProducts = selectedProducts.filter(
+      (product) => product.id !== productId
+    );
+    setSelectedProducts(updatedProducts);
+  };
+
+  const calculateTotalAmount = () => {
+    let total = 0;
+    selectedProducts.forEach((product) => {
+      total += product.price;
+    });
+    setAmount(total);
+  };
+
+  function generateRandomId(length) {
+    let result = "";
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+  }
+
+  useEffect(() => {
+    calculateTotalAmount();
+  }, [selectedProducts]);
 
   const handleRadioChange = (event) => {
+    if (event.target.value === "refund") {
+      setAmount(0);
+      setSelectedProducts([]);
+      setOrderId("");
+    } else {
+      setOrderId(generateRandomId(8));
+    }
     setSelectedForm(event.target.value);
   };
 
@@ -308,8 +412,17 @@ const SatimTestPage = () => {
 
   const handleCaptchaCheckboxChange = (event) => {
     event.preventDefault();
-    if (!orderId || !amount) {
+    if (!orderId) {
       setErrorMessage(t("errorFillAllFields"));
+      return;
+    }
+    if (!amount) {
+      setErrorMessage(t("errorAmountIsZero"));
+      return;
+    }
+
+    if (amount < 50) {
+      setErrorMessage(`${t("errorAmount")} ${t("dzd")}`);
       return;
     }
     setShowCaptcha(true);
@@ -318,8 +431,12 @@ const SatimTestPage = () => {
     event.preventDefault();
 
     if (!isSubmitting) {
-      if (!orderId || !amount) {
+      if (!orderId) {
         setErrorMessage(t("errorFillAllFields"));
+        return;
+      }
+      if (!amount) {
+        setErrorMessage(t("errorAmountIsZero"));
         return;
       }
 
@@ -424,6 +541,53 @@ const SatimTestPage = () => {
               />
               <Label for="testRefund">{t("testPaymentRefundOrder")}</Label>
             </FormGroup>
+
+            {selectedForm === "registerOrder" ? (
+              <>
+                {" "}
+                {/* Product Selection */}
+                <ProductsContainer>
+                  <MenuTitle>Select Products:</MenuTitle>
+                  <Products>
+                    {products.map((product) => (
+                      <Product key={product.id}>
+                        <input
+                          type="checkbox"
+                          id={`product-${product.id}`}
+                          onChange={() => handleProductSelection(product)}
+                          checked={selectedProducts.some(
+                            (selectedProduct) =>
+                              selectedProduct.id === product.id
+                          )}
+                        />
+                        <label htmlFor={`product-${product.id}`}>
+                          {product.name} - {product.price} dzd
+                        </label>
+                      </Product>
+                    ))}
+                  </Products>
+                </ProductsContainer>
+                {/* Selected Products */}
+                <ProductsContainer>
+                  <MenuTitle>Selected Products:</MenuTitle>{" "}
+                  <Products>
+                    {selectedProducts.map((product) => (
+                      <Product key={product.id}>
+                        {product.name} - {product.price} dzd
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveProduct(product.id)}
+                        >
+                          Remove
+                        </button>
+                      </Product>
+                    ))}
+                  </Products>
+                </ProductsContainer>
+              </>
+            ) : (
+              ""
+            )}
           </LeftBox>
 
           <RightBox>
@@ -444,12 +608,18 @@ const SatimTestPage = () => {
                 </FormTitle>
                 <FormContainer onSubmit={handleSubscribe}>
                   {" "}
+                  {selectedForm === "registerOrder" ? (
+                    <Label>{t("testPaymentOrder")}</Label>
+                  ) : (
+                    ""
+                  )}
                   <FormGroup>
                     <Input
                       type="text"
                       placeholder={t("testPaymentOrder")}
                       value={orderId}
                       onChange={(event) => setOrderId(event.target.value)}
+                      disabled={selectedForm === "registerOrder" ? true : false}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -458,11 +628,13 @@ const SatimTestPage = () => {
                       placeholder={t("testPaymentAmount")}
                       value={amount > 0 ? amount : ""}
                       onChange={(event) => setAmount(event.target.value)}
+                      disabled={selectedForm === "registerOrder" ? true : false}
+                      hidden={selectedForm === "registerOrder" ? true : false}
                     />
                   </FormGroup>
                   {amount > 0 && (
                     <FormGroup>
-                      <FormTitle>
+                      <FormTitle className="amountText">
                         {selectedForm === "registerOrder"
                           ? `${t("testPaymentAmountShow")} ${amount} ${t(
                               "dzd"
