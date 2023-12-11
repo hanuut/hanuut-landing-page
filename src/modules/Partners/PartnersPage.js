@@ -180,7 +180,7 @@ const PartnersPage = () => {
         <PartnersValues />
         <LowerBox isArabic={i18n.language === "ar"}>
           {/* <ShopsContainer /> */}
-          <JoinUs/>
+          <JoinUs />
         </LowerBox>
       </PartnersContainer>
     </Section>
