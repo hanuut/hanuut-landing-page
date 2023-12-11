@@ -366,6 +366,7 @@ const Success = ({ orderId, successMessage, responseData }) => {
       setPdfFileBlob(blob);
     }
   }, [responseData]);
+  console.log(responseData);
   return (
     <Container isArabic={i18n.language === "ar"}>
       <GlassBox>
@@ -405,9 +406,15 @@ const Success = ({ orderId, successMessage, responseData }) => {
 
             <PaymentInfo>
               <PaymentInfoWrapper>
-                <Label>Order ID</Label>
+                <Label>Transaction Id</Label>
                 <ValueWrapper>
-                  <Value expanded={orderValueExpanded}>{orderId}</Value>
+                  <Value expanded={true}>{orderId}</Value>
+                </ValueWrapper>
+              </PaymentInfoWrapper>
+              <PaymentInfoWrapper>
+                <Label>Order ID "Order Number"</Label>
+                <ValueWrapper>
+                  <Value >{responseData.OrderNumber}</Value>
                 </ValueWrapper>
               </PaymentInfoWrapper>
               <PaymentInfoWrapper>
