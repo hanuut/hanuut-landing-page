@@ -5,7 +5,6 @@ import LanguagesDropDown from "./LanguagesDropDown";
 import Logo from "./Logo";
 import { useTranslation } from "react-i18next";
 
-
 const Section = styled.section`
   position: sticky;
   top: 0;
@@ -13,15 +12,14 @@ const Section = styled.section`
   background-color: ${(props) => props.theme.body};
   height: ${(props) => props.theme.navHeight};
   z-index: 1000;
-  display: flex; 
-  justify-content: center; 
+  display: flex;
+  justify-content: center;
   align-items: center;
   @media (max-width: 768px) {
     position: relative;
     height: ${(props) => props.theme.navHeightMobile};
   }
 `;
-
 
 const Navigation = styled.nav`
   width: 80%;
@@ -78,7 +76,6 @@ const MenuItem = styled.li`
     margin: 0;
     font-size: ${(props) => props.theme.fontmd};
   }
-
 `;
 
 const LanguageMenuItem = styled.li`
@@ -89,7 +86,6 @@ const LanguageMenuItem = styled.li`
     margin: 0;
     font-size: ${(props) => props.theme.fontmd};
   }
-
 `;
 
 const HamburgerMenuContainer = styled.div`
@@ -108,7 +104,10 @@ const HamburgerMenu = styled.span`
   position: absolute;
   top: 50%; /* Change top: 2.5rem to top: 50% */
   right: ${(props) => (props.isArabic ? "80%" : "0")};
-  transform: translate(-100%, -50%); /* Change transform: translateX(-100%) to transform: translate(-100%, -50%) */
+  transform: translate(
+    -100%,
+    -50%
+  ); /* Change transform: translateX(-100%) to transform: translate(-100%, -50%) */
   display: none;
   align-items: center;
   justify-content: center;
@@ -164,19 +163,22 @@ const Navbar = () => {
   return (
     <Section>
       <Navigation isArabic={i18n.language === "ar"}>
-        <Logo className="partnerLogo"/>
+        <Logo className="partnerLogo" />
         <HamburgerMenuContainer onClick={handleClick}>
-          <HamburgerMenu isArabic={i18n.language === "ar"} className={isActive ? "active" : ""}  />
+          <HamburgerMenu
+            isArabic={i18n.language === "ar"}
+            className={isActive ? "active" : ""}
+          />
         </HamburgerMenuContainer>
-        <Menu show={isActive} isArabic={i18n.language === "ar"} >
+        <Menu show={isActive} isArabic={i18n.language === "ar"}>
           <MenuItem>
             <Link to="/" onClick={handleMenuItemClick}>
-            {t('navHome')}
+              {t("navHome")}
             </Link>
           </MenuItem>
           <MenuItem>
             <Link to="/partners" onClick={handleMenuItemClick}>
-            {t('navPartners')}
+              {t("navPartners")}
             </Link>
           </MenuItem>
           {/* <MenuItem>
@@ -189,13 +191,16 @@ const Navbar = () => {
           {t('navContact')}
             </Link>
           </MenuItem> */}
-          {/* <MenuItem>
-          <Link to="/tawsila" onClick={handleMenuItemClick}>
-          {t('navTawsila')}
+          <MenuItem>
+            <Link to="/tawsila" onClick={handleMenuItemClick}>
+              {t("navTawsila")}
             </Link>
-          </MenuItem> */}
+          </MenuItem>
           <LanguageMenuItem>
-          <LanguagesDropDown className="languageMenuItem" handleChooseLanguage= {handleMenuItemClick}/>
+            <LanguagesDropDown
+              className="languageMenuItem"
+              handleChooseLanguage={handleMenuItemClick}
+            />
           </LanguageMenuItem>
         </Menu>
       </Navigation>

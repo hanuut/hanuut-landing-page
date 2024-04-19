@@ -234,12 +234,12 @@ const Tawsila = () => {
     setPhone("");
     setAddress(null);
     setErrorMessage("");
-    setIsAccepted(false)
+    setIsAccepted(false);
 
-    const element = document.getElementById("stepsSection");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    // const element = document.getElementById("stepsSection");
+    // if (element) {
+    //   element.scrollIntoView({ behavior: "smooth" });
+    // }
   };
 
   const handleSubscribe = async (event) => {
@@ -329,7 +329,7 @@ const Tawsila = () => {
                 />
               )}
               <ButtonWithIcon
-                image={ScrollDownIcon}
+                text1={"Done"}
                 onClick={handleScroll}
                 backgroundColor={light.secondaryColor}
               >
