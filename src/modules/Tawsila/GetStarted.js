@@ -69,7 +69,6 @@ const Title = styled.h1`
   margin-bottom: 0.5rem;
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontxxxl};
-
   }
 `;
 
@@ -81,7 +80,6 @@ const StepTitle = styled.h1`
     margin-bottom: 0.5rem;
   }
 `;
-
 
 const Description = styled.p`
   font-size: ${(props) => props.theme.fontlg};

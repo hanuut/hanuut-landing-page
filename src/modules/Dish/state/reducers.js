@@ -1,18 +1,18 @@
-
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getDishesByShopAndCategory } from "../services/dishServices";
 
 export const fetchDishesByCategory = createAsyncThunk(
   "dishes/fetchDishesByCategory",
   async ({ shopId, categoryId }) => {
-const dishesByCategory= [];
+    const dishesByCategory = [];
     try {
       const response = await getDishesByShopAndCategory(shopId, categoryId);
-      response.forEach(dish => {
+      console.log(response);
+      response.forEach((dish) => {
         dishesByCategory.push({
           shopId: shopId,
           categoryId: categoryId,
-          dish: dish
+          dish: dish,
         });
       });
       return dishesByCategory;

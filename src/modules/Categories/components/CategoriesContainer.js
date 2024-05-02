@@ -40,14 +40,14 @@ const Categories = styled.div`
   }
 
   @media (max-width: 768px) {
-      justify-content: flex-start;
+    justify-content: flex-start;
     gap: 0.5em;
     overflow-x: auto;
   }
 `;
 
 const SelectCategory = styled.div`
-margin-top: 1rem;
+  margin-top: 1rem;
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight} - 11rem)`};
   width: 100%;
   display: flex;
@@ -57,11 +57,11 @@ margin-top: 1rem;
 `;
 
 const Content = styled.p`
-font-size: 2.5rem;
-@media (max-width: 768px) {
-  margin-top: 1rem;
-  font-size: ${(props) => props.theme.fontxxl};
-}
+  font-size: 2.5rem;
+  @media (max-width: 768px) {
+    margin-top: 1rem;
+    font-size: ${(props) => props.theme.fontxxl};
+  }
 `;
 
 const CategoriesContainer = ({ shopData }) => {
@@ -104,14 +104,16 @@ const CategoriesContainer = ({ shopData }) => {
   useEffect(() => {
     const filteredDishes = dishes.filter(
       (dish) =>
-        dish.categoryId === selectedCategory && dish.shopId === shopData.id
+        dish.categoryId === selectedCategory && dish.shopId === shopData._id
     );
     setDishesPerCategory(filteredDishes);
   }, [selectedCategory, dishes]);
 
   const handleCategoryClick = async (categoryId) => {
     if (!loadedCategories.includes(categoryId)) {
-      dispatch(fetchDishesByCategory({ shopId: shopData.id, categoryId }));
+      console.log(categoryId);
+      console.log(shopData._id);
+      dispatch(fetchDishesByCategory({ shopId: shopData._id, categoryId }));
       setLoadedCategories((prevLoadedCategories) => [
         ...prevLoadedCategories,
         categoryId,
@@ -133,7 +135,6 @@ const CategoriesContainer = ({ shopData }) => {
         <Loader />
       </Section>
     );
-  if (categoriesError) return <div>Error: No categories available</div>;
 
   return (
     <Section>

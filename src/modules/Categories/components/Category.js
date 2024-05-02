@@ -49,10 +49,9 @@ const Category = ({ category, onCategoryClick, selectedCategory }) => {
       onClick={handleHeadingClick}
       selected={selectedCategory === category.id}
     >
-        <CategoryName selected={selectedCategory === category.id}>
-          {category.name}
-        </CategoryName>
-  
+      <CategoryName selected={selectedCategory === category.id}>
+        {category.name}
+      </CategoryName>
     </Section>
   );
 };

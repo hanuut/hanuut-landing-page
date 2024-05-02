@@ -13,7 +13,8 @@ import ShopPageWithUsername from "../modules/Partners/components/ShopPageWithUse
 import Tawsila from "../modules/Tawsila/Tawsila";
 // import PaymentPage from "../modules/payment/PaymentPage";
 // import SatimTestPage from "../modules/payment/SatimTestPage";
-// import GetStarted from "../modules/Tawsila/GetStarted";
+import GetStarted from "../modules/Tawsila/GetStarted";
+import GetStartedv2 from "../modules/Tawsila/getStartedv2";
 
 const CustomRouter = () => {
   return (
@@ -31,7 +32,7 @@ const CustomRouter = () => {
       {/* <Route path="/confirmPayment" element={<PaymentPage />} /> */}
       {/* <Route path="/testPayment" element={<SatimTestPage />} /> */}
       <Route path="/tawsila" element={<Tawsila />} />
-      {/* <Route path="/get-started-with-Tawsila" element={<GetStarted />} /> */}
+      <Route path="/get-started-with-Tawsila" element={<GetStartedv2 />} />
     </Routes>
   );
 };
