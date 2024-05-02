@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import AboutUs from "./Sections/AboutUs";
 import HowItWorks from "./Sections/HowItWorks";
 import ButtonWithIcon from "../components/ButtonWithIcon";
-import BackgroundImage from "../assets/background.png"
+import BackgroundImage from "../assets/background.png";
 // import Testimonials from "./Sections/Testimonials";
 // import Partners from "./Partners/Partners";
 // import CallToAction from "./Sections/CallToAction";

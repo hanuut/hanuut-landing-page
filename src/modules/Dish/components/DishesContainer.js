@@ -27,7 +27,7 @@ const NoAvailableDishes = styled.div`
 `;
 
 const Content = styled.p`
-font-size: 2.5rem;
+  font-size: 2.5rem;
   @media (max-width: 768px) {
     margin-top: 1rem;
     font-size: ${(props) => props.theme.fontxxl};

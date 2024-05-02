@@ -1,6 +1,6 @@
 // categoriesSlice.js
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getCategory } from '../services/categoryServices';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getCategory } from "../services/categoryServices";
 
 // export const fetchCategory = createAsyncThunk('categories/fetchCategory', async (categoryId) => {
 //   try {
@@ -16,9 +16,10 @@ export const fetchCategories = createAsyncThunk(
   async (categories) => {
     try {
       const response = [];
+
       for (const category of categories) {
         const categorySnap = await getCategory(category);
-            response.push(categorySnap.data);
+        response.push(categorySnap.data);
       }
       return response;
     } catch (error) {
@@ -30,11 +31,11 @@ export const fetchCategories = createAsyncThunk(
 const initialState = {
   categories: [],
   loading: false,
-  error: null
+  error: null,
 };
 
 const categoriesSlice = createSlice({
-  name: 'categories',
+  name: "categories",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -50,11 +51,9 @@ const categoriesSlice = createSlice({
       .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-      })
+      });
   },
 });
 
 export const { reducer, actions } = categoriesSlice;
 export const selectCategories = (state) => state.categories;
-
-
