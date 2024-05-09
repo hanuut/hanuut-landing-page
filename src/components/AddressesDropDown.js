@@ -33,11 +33,9 @@ const InputWrapper = styled.div`
 const Select = styled.select`
 padding: 10px;
 border-radius: 5px;
-border: 1px solid rgba(${(props) => props.theme.primaryColorRgba}, 0.5);
 font-size: ${(props) => props.theme.fontxl};
-background-color: transparent;
+  background-color: rgba(${(props) => props.theme.bodyRgba}, 0.7);
   font-size: ${(props) => props.theme.fontlg};
-
   &:focus {
     outline: none;
     border-color: ${(props) =>

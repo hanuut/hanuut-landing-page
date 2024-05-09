@@ -118,7 +118,7 @@ const SmallParagraph = styled.p`
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();
-  const link = "https://play.google.com/store/apps/details?id=com.hanuut.shop";
+  const link = process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK;
 
   return (
     <>

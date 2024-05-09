@@ -32,10 +32,14 @@ const SecondaryButton = styled(Button)`
 `;
 
 const TextStyleButton = styled(Button)`
-  background-color: transparent;
-  color: ${(props) => props.theme.primaryColor};
-  border: 1px solid ${(props) => props.theme.primaryColor};
-  padding: ${(props) => props.theme.smallPadding};
+  padding: ${(props) => (props.isSelected ? "" : "0")};
+  background-color: ${(props) =>
+    props.isSelected ? props.theme.primaryColor : "transparent"};
+  color: ${(props) =>
+    props.isSelected ? props.theme.body : props.theme.primaryColor};
+  font-weight: ${(props) => (props.isSelected ? "bold" : "")};
+  transform: ${(props) => (props.isSelected ? "scale(1.1)" : "scale(1)")};
+  font-size: ${(props) => props.theme.fontxxl};
 `;
 
 const BlueSecondaryButtonStyle = styled(Button)`
@@ -46,12 +50,14 @@ const BlueSecondaryButtonStyle = styled(Button)`
 `;
 
 const BlueTextButtonStyle = styled(Button)`
+  padding: ${(props) => (props.isSelected ? "" : "0")};
   background-color: ${(props) =>
     props.isSelected ? props.theme.secondaryColor : "transparent"};
   color: ${(props) =>
     props.isSelected ? props.theme.body : props.theme.secondaryColor};
   font-weight: ${(props) => (props.isSelected ? "bold" : "")};
   transform: ${(props) => (props.isSelected ? "scale(1.1)" : "scale(1)")};
+  font-size: ${(props) => props.theme.fontxl};
 `;
 
 const ActionButton = ({ children, onClick, disabled }) => {
