@@ -18,50 +18,35 @@ import MessageWithLink from "../../components/MessageWithLink";
 // import { Link } from "react-router-dom";
 
 const HeroSection = styled.div`
-  position: relative;
-  min-height: ${(props) => `calc(85vh - ${props.theme.navHeight})`};
+  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
+  width: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(3px);
+  background: rgb(10, 153, 255);
+  background: linear-gradient(
+    0deg,
+    rgba(10, 153, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
   @media (max-width: 768px) {
     position: static;
     flex-direction: column;
   }
 `;
 
-const BackgroundImage = styled.div`
-  height: 70vh;
-  background-image: url(${DeliveryMissions});
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 100%;
-  background-color: ${(props) => props.theme.body};
-  @media (max-width: 768px) {
-    width: 80%;
-    height: 25vh;
-    background-size: cover;
-    background-position: center;
-  }
-`;
-
 const FormContainerOverlay = styled.div`
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  position: absolute;
-  width: 25%;
-  margin: 1rem 0;
-  padding: 2.5rem 0;
-  right: ${(props) => (props.isArabic ? "65%" : "10%")};
+  width: 40%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   color: ${(props) => props.theme.text};
-  border-radius: ${(props) => props.theme.bigRadius};
   transition: all 0.2s ease;
-  background: rgba(${(props) => props.theme.bodyRgba}, 0.5);
-  backdrop-filter: blur(3px);
   @media (max-width: 768px) {
     padding: 2rem 0;
     position: static;
@@ -70,14 +55,13 @@ const FormContainerOverlay = styled.div`
 `;
 
 const ContentOverlay = styled.div`
-  width: 35%;
+  width: 50%;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  position: absolute;
   right: ${(props) => (props.isArabic ? "11%" : "54%")};
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   color: ${(props) => props.theme.text};
   border-radius: ${(props) => props.theme.bigRadius};
   transition: all 0.2s ease;
@@ -88,7 +72,7 @@ const ContentOverlay = styled.div`
 `;
 
 const FormContainer = styled.form`
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -105,6 +89,7 @@ const Input = styled.input`
   border: 1px solid;
   border-radius: ${(props) => props.theme.smallRadius};
   font-size: ${(props) => props.theme.fontxl};
+  background-color: rgba(${(props) => props.theme.bodyRgba}, 0.7);
   &:focus {
     outline: none;
     border-color: ${(props) => props.theme.secondaryColor};
@@ -158,21 +143,17 @@ const Button = styled.button`
 `;
 
 const Heading = styled.h1`
-  width: 80%;
-  margin-bottom: 0.5rem;
   font-size: ${(props) => props.theme.fontLargest};
   color: ${(props) => props.theme.secondaryColor};
   font-weight: 900;
   text-transform: uppercase;
-
   @media (max-width: 768px) {
-    width: 90%;
+    width: 100%;
     font-size: ${(props) => props.theme.fontxxxl};
   }
 `;
 
 const Subheading = styled.h1`
-  max-width: 80%;
   color: ${(props) => props.theme.text};
   font-size: ${(props) => props.theme.fontxxxl};
   margin: 0.5rem 0;
@@ -181,12 +162,11 @@ const Subheading = styled.h1`
     -1px 1px 0 ${(props) => props.theme.body},
     1px 1px 0 ${(props) => props.theme.body};
   @media (max-width: 768px) {
-    width: 90%;
+    width: 100%;
     font-size: ${(props) => props.theme.fontxl};
   }
 `;
 const Text = styled.p`
-  max-width: 100%;
   color: ${(props) => props.theme.text};
   font-size: ${(props) => props.theme.fontxxxl};
   margin: 0.5rem 0;
@@ -195,8 +175,11 @@ const Text = styled.p`
     -1px 1px 0 ${(props) => props.theme.body},
     1px 1px 0 ${(props) => props.theme.body};
   margin-bottom: 1rem;
+  max-width: 80%;
+  text-align: center;
   @media (max-width: 768px) {
-    width: 90%;
+    text-align: ${(props) => (props.isArabic ? "right" : "left")};
+    max-width: 100%;
     font-size: ${(props) => props.theme.fontxl};
   }
 `;
@@ -303,13 +286,11 @@ const Tawsila = () => {
   return (
     <>
       <HeroSection isArabic={i18n.language === "ar"}>
-        <BackgroundImage />
-
         <ContentOverlay isArabic={i18n.language === "ar"}>
           {" "}
-          <Heading>{t("tawsilaHeading")}</Heading>
+          <Heading>{t("signUp")}</Heading>
           <Subheading>{t("tawsilaSubHeading")}</Subheading>
-          <Text>{t("tawsilaText")}</Text>
+          <Text isArabic={i18n.language === "ar"}>{t("tawsilaText")}</Text>
           {/* <Link to="/get-started-with-Tawsila">
             <BlueActionButton onClick={() => {}}>
               {" "}
@@ -338,7 +319,6 @@ const Tawsila = () => {
             </>
           ) : (
             <FormContainer onSubmit={handleSubscribe}>
-              <FormTitle>{t("signUp")}</FormTitle>
               <FormGroup>
                 <Input
                   type="text"
@@ -391,9 +371,6 @@ const Tawsila = () => {
           )}
         </FormContainerOverlay>
       </HeroSection>
-      <div id="stepsSection">
-        <Steps />
-      </div>
     </>
   );
 };

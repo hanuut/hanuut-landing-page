@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { useTranslation } from "react-i18next";
 import AddressesDropDown from "../../../components/AddressesDropDown";
@@ -17,6 +17,13 @@ import { TextButton } from "../../../components/ActionButton";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import Send from "../../../assets/send.svg";
 import fireworks from "../../../assets/fireworks.svg";
+import Playstore from "../../../assets/playstore.png";
+import MyHanuutLogo from "../../../assets/myhanuutlogo.png";
+
+import Windows from "../../../assets/windows.svg";
+
+import { Link } from "react-router-dom";
+
 const Container = styled.div`
   width: 100%;
   display: flex;
@@ -172,15 +179,23 @@ const ThirdStep = styled(Step)`
 const FourthStep = styled(Step)`
   align-items: center;
   justify-content: center;
-  align-self: center;
-  gap: 1em;
   text-align: center;
   animation-name: ${PopUpAnimation};
   animation-duration: 0.75s;
+  background-image: ${(props) =>
+    props.isAccepted ? `url(${fireworks})` : "none"};
+  background-size: cover;
+  background-opacity: 0.5;
+`;
+const MyHanuutIcon = styled.img`
+  height: 8rem;
+  width: 8rem;
+  margin-bottom: 3rem;
 `;
 const Icon = styled.img`
   height: 2rem;
   width: 2rem;
+  margin-top: 1.5rem;
 `;
 
 // const Paragraph = styled.p`
@@ -268,6 +283,16 @@ const Button = styled.button`
     padding: ${(props) => props.theme.actionButtonPaddingMobile};
   }
 `;
+
+const ButtonsRow = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+`;
 const EmailButton = styled(Button)`
   margin: 0.5rem;
 `;
@@ -332,15 +357,7 @@ const ErrorMessage = styled.div`
   }
 `;
 
-const SuccessMessageContainer = styled.div`
-  background-image: ${(props) =>
-    props.isAccepted ? `url(${fireworks})` : "none"};
-  background-size: cover;
-  background-position: center 30%;
-`;
 const PartnersForm = ({ setStep }) => {
-  const myHanuutDownloadLink = process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK;
-
   const { t, i18n } = useTranslation();
   const [formStep, setFormStep] = useState(1);
   const [email, setEmail] = useState("");
@@ -356,6 +373,15 @@ const PartnersForm = ({ setStep }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isAccepted, setIsAccepted] = useState(false);
   const totalSteps = 4;
+
+  const myHanuutDownloadLinkWindows =
+    process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK;
+  const myHanuutDownloadLink =
+    process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
+
+  useEffect(() => {
+    console.log(myHanuutDownloadLinkWindows, myHanuutDownloadLinkWindows);
+  }, [myHanuutDownloadLinkWindows, myHanuutDownloadLinkWindows]);
 
   const resetForm = () => {
     setEmail("");
@@ -539,6 +565,15 @@ const PartnersForm = ({ setStep }) => {
       setIsSubmitting(false);
     }
   };
+
+  const handleDownloadPlay = (e) => {
+    e.preventDefault();
+    window.open(myHanuutDownloadLink);
+  };
+  const handleDownloadWindows = (e) => {
+    e.preventDefault();
+    window.open(myHanuutDownloadLinkWindows);
+  };
   return (
     <Container>
       <PartnerFormStep>
@@ -658,46 +693,63 @@ const PartnersForm = ({ setStep }) => {
               ""
             )}
             <ButtonWithIcon
-              image={Send}
-              text2={
-                isSubmitting
-                  ? t("buttonIsSubmitting")
-                  : t("partnersFormSubmitButton")
-              }
+              image={Playstore}
+              backgroundColor="#000000"
+              text1={t("getItOn")}
+              text2={t("googlePlay")}
               className="homeDownloadButton"
-              disabled={isSubmitting}
-              onClick={(e) => handleSubmit(e)}
             ></ButtonWithIcon>
           </ThirdStep>
         )}
-        {formStep === 4 && (
-          <FourthStep isArabic={i18n.language === "ar"}>
-            {successMessage ? (
-              <SuccessMessageContainer isAccepted={isAccepted}>
-                {successMessage && (
-                  <MessageWithLink
-                    message={successMessage}
-                    link={isAccepted ? myHanuutDownloadLink : ""}
-                    linkText={isAccepted ? t("downloadMyHanuut") : ""}
-                    textColor={light.primaryColor}
-                  />
-                )}
-              </SuccessMessageContainer>
-            ) : (
-              <>
-                <Heading className="greenSubHeading">
-                  {t("partnersFormThankYouTitle")}
-                </Heading>
-                <SubHeading>{t("partnersFormThankYouSubTitle")}</SubHeading>
-              </>
-            )}
-            <Icon
-              src={i18n.language === "ar" ? Right : Left}
-              onClick={() => handleLeftClick()}
-            />
-          </FourthStep>
-        )}
+        {formStep === 4 &&
+          //working here
+          (isAccepted ? (
+            <FourthStep
+              isArabic={i18n.language === "ar"}
+              isAccepted={isAccepted}
+            >
+              <MyHanuutIcon src={MyHanuutLogo} />
+              <Heading className="greenSubHeading">
+                {t("congratulations")}
+              </Heading>
+              <SubHeading>{t("clickToDownloadApp")}</SubHeading>
+              <ButtonsRow>
+                <ButtonWithIcon
+                  image={Playstore}
+                  backgroundColor="#000000"
+                  text1={t("getItOn")}
+                  text2={t("googlePlay")}
+                  className="homeDownloadButton"
+                  onClick={(e) => handleDownloadPlay(e)}
+                ></ButtonWithIcon>
 
+                <ButtonWithIcon
+                  image={Windows}
+                  backgroundColor="#000000"
+                  text1={t("getItOn")}
+                  text2={"Windows"}
+                  className="homeDownloadButton"
+                  onClick={(e) => handleDownloadWindows(e)}
+                ></ButtonWithIcon>
+              </ButtonsRow>
+              <Icon
+                src={i18n.language === "ar" ? Right : Left}
+                onClick={() => handleLeftClick()}
+              />
+            </FourthStep>
+          ) : (
+            <FourthStep isArabic={i18n.language === "ar"}>
+              <MyHanuutIcon src={MyHanuutLogo} />
+              <Heading className="greenSubHeading">
+                {t("partnersFormThankYouTitle")}
+              </Heading>
+              <SubHeading>{t("partnersFormThankYouSubTitle")}</SubHeading>
+              <Icon
+                src={i18n.language === "ar" ? Right : Left}
+                onClick={() => handleLeftClick()}
+              />
+            </FourthStep>
+          ))}
         <FormStepsIndicator formStep={formStep}>
           {Array.from({ length: totalSteps }, (_, index) => (
             <StepIndicator key={index} active={index <= formStep - 1} />

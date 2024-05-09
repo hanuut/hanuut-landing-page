@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Logo from "../components/Logo";
-import { FaFacebook, FaInstagram } from "react-icons/fa";
+import { FaFacebook, FaGooglePlay, FaInstagram } from "react-icons/fa";
 
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -39,7 +39,6 @@ const RightBox = styled.div`
   align-items: center;
   justify-content: center;
   gap: 1rem;
-
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 0.5rem;
@@ -48,9 +47,7 @@ const RightBox = styled.div`
 
 const Title = styled.h1`
   color: white;
-
   line-height: 1;
-
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontxxl};
   }
@@ -106,8 +103,9 @@ const FooterText = styled.p`
 `;
 const Footer = () => {
   const { t, i18n } = useTranslation();
-  const instagramLink = "https://www.instagram.com/hanuut_app/";
-  const facebookLink = "https://web.facebook.com/hanuutapp";
+  const instagramLink = process.env.REACT_APP_INSTAGRAM_SOCIAL_MEDIA;
+  const facebookLink = process.env.REACT_APP_FACBOOK_SOCIAL_MEDIA;
+  const downloadLink = process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK;
   return (
     <Section isArabic={i18n.language === "ar"}>
       <UpperBox>
@@ -125,6 +123,11 @@ const Footer = () => {
             <Link to={instagramLink}>
               <SocialMediaIcon>
                 <FaInstagram />
+              </SocialMediaIcon>
+            </Link>
+            <Link to={downloadLink}>
+              <SocialMediaIcon>
+                <FaGooglePlay />
               </SocialMediaIcon>
             </Link>
           </SotialMediaContainer>

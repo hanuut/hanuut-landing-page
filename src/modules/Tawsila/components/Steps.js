@@ -102,15 +102,18 @@ const Steps = () => {
   const { t, i18n } = useTranslation();
   return (
     <Section isArabic={i18n.language === "ar"}>
-      <Title>{t("stepsTitle")}</Title>
       <StepsContainer isArabic={i18n.language === "ar"}>
         <StepCart>
           <StepCartHeading>
             <HexagoneIcon img={HexagoneIconSvg} content={1} />
           </StepCartHeading>
           <StepingCartBody>
-            <CartBodyTitle isArabic={i18n.language === "ar"}>{t("firstJoinStepTitle")}</CartBodyTitle>
-            <CartBodyContent isArabic={i18n.language === "ar"}>{t("firstJoinStepText")}</CartBodyContent>
+            <CartBodyTitle isArabic={i18n.language === "ar"}>
+              {t("firstJoinStepTitle")}
+            </CartBodyTitle>
+            <CartBodyContent isArabic={i18n.language === "ar"}>
+              {t("firstJoinStepText")}
+            </CartBodyContent>
           </StepingCartBody>
         </StepCart>
         <StepCart>
@@ -118,8 +121,12 @@ const Steps = () => {
             <HexagoneIcon img={HexagoneIconSvg} content={2} />
           </StepCartHeading>
           <StepingCartBody>
-            <CartBodyTitle isArabic={i18n.language === "ar"}>{t("secondJoinStepTitle")}</CartBodyTitle>
-            <CartBodyContent isArabic={i18n.language === "ar"}>{t("secondJoinStepText")}</CartBodyContent>
+            <CartBodyTitle isArabic={i18n.language === "ar"}>
+              {t("secondJoinStepTitle")}
+            </CartBodyTitle>
+            <CartBodyContent isArabic={i18n.language === "ar"}>
+              {t("secondJoinStepText")}
+            </CartBodyContent>
           </StepingCartBody>
         </StepCart>
         <StepCart>
@@ -127,8 +134,12 @@ const Steps = () => {
             <HexagoneIcon img={HexagoneIconSvg} content={3} />
           </StepCartHeading>
           <StepingCartBody>
-            <CartBodyTitle isArabic={i18n.language === "ar"}>{t("thirdJoinStepTitle")}</CartBodyTitle>
-            <CartBodyContent isArabic={i18n.language === "ar"}>{t("thirdJoinStepText")}</CartBodyContent>
+            <CartBodyTitle isArabic={i18n.language === "ar"}>
+              {t("thirdJoinStepTitle")}
+            </CartBodyTitle>
+            <CartBodyContent isArabic={i18n.language === "ar"}>
+              {t("thirdJoinStepText")}
+            </CartBodyContent>
           </StepingCartBody>
         </StepCart>
       </StepsContainer>
