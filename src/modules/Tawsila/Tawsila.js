@@ -1,377 +1,251 @@
-import DeliveryMissions from "../../assets/deliverymissions.svg";
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import AddressesDropDown from "../../components/AddressesDropDown";
-import { useTranslation } from "react-i18next";
-import { isValidEmail, isValidPhone } from "../../components/validators";
+import Background from "../../assets/blueBackground.png";
 import {
-  checkPhoneNumberAvailability,
-  getSubscribeRequest,
-  postSubscribeRequest,
-} from "../SubscribeRequest/services/SubscribeRequest";
-import ButtonWithIcon from "../../components/ButtonWithIcon";
-import { light } from "../../config/Themes";
-import ScrollDownIcon from "../../assets/arrowDownIcon.svg";
+  BlueActionButton,
+  BlueTextButton,
+} from "../../components/ActionButton";
+import Screenshot1 from "../../assets/screen1.jpg";
+import Screenshot2 from "../../assets/screen2.jpg";
+import Screenshot3 from "../../assets/screen3.jpg";
+import Screenshot4 from "../../assets/screen4.jpg";
+import Screenshot5 from "../../assets/screen5.jpg";
+import RegisterTawsilaImage from "../../assets/registerTawsila.svg";
+import Approved from "../../assets/approvedTawsila.svg";
+
 import Steps from "./components/Steps";
-import MessageWithLink from "../../components/MessageWithLink";
-// import { BlueActionButton } from "../../components/ActionButton";
-// import { Link } from "react-router-dom";
+import Accepted from "../../assets/acceptTawsila.svg";
+
+import ScreenshotDisplay from "./components/ScreenshotDisplay";
+import { Link } from "react-router-dom";
+import RegisterTawsila from "./RegisterTawsila";
+import { useTranslation } from "react-i18next";
+
+const Section = styled.section`
+  min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-image: url(${Background});
+  background-size: 100%;
+  background-position: center;
+  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+  width: 100%;
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+    width: 100%;
+  }
+`;
 
 const HeroSection = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
-  width: 100%;
+  width: 80%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(3px);
-  background: rgb(10, 153, 255);
-  background: linear-gradient(
-    0deg,
-    rgba(10, 153, 255, 0.3) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  justify-content: space-between;
   @media (max-width: 768px) {
-    position: static;
+    width: 90%;
     flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
+    margin-bottom: 2rem;
   }
 `;
-
-const FormContainerOverlay = styled.div`
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  width: 40%;
+const BecomeDriverSection = styled.div`
+  position: relative;
+  width: 80%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  color: ${(props) => props.theme.text};
-  transition: all 0.2s ease;
-  @media (max-width: 768px) {
-    padding: 2rem 0;
-    position: static;
-    width: 90%;
-  }
-`;
-
-const ContentOverlay = styled.div`
-  width: 50%;
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  right: ${(props) => (props.isArabic ? "11%" : "54%")};
-  display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: center;
-  color: ${(props) => props.theme.text};
-  border-radius: ${(props) => props.theme.bigRadius};
-  transition: all 0.2s ease;
   @media (max-width: 768px) {
-    position: static;
     width: 90%;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
   }
 `;
 
-const FormContainer = styled.form`
-  width: 100%;
+const HalfBox = styled.div`
+  width: 48%;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  transition: all 0.5s ease;
+  align-items: flex-start;
+  justify-content: center;
   @media (max-width: 768px) {
-    align-self: flex-start;
     width: 100%;
   }
 `;
-
-const Input = styled.input`
+const Box = styled.div`
+  margin-top: 2rem;
   width: 100%;
-  padding: 10px;
-  border: 1px solid;
-  border-radius: ${(props) => props.theme.smallRadius};
-  font-size: ${(props) => props.theme.fontxl};
-  background-color: rgba(${(props) => props.theme.bodyRgba}, 0.7);
-  &:focus {
-    outline: none;
-    border-color: ${(props) => props.theme.secondaryColor};
-  }
-  @media (max-width: 768px) {
-    position: static;
-    font-size: ${(props) => props.theme.fontmd};
-  }
-`;
-
-const FormGroup = styled.div`
   display: flex;
+  flex-direction: row;
   align-items: center;
-`;
-
-const ErrorMessage = styled.div`
-  margin: 0.5rem 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-start;
-
-  p {
-    background-color: #ffbaba;
-    color: #d8000c;
-    padding: 0.5rem 1rem;
-    border: 1px solid #d8000c;
-    border-radius: ${(props) => props.theme.defaultRadius};
-    font-size: ${(props) => props.theme.fontmd};
-  }
-`;
-
-const Button = styled.button`
-  background-color: ${(props) => props.theme.secondaryColor};
-  color: #fff;
-  border: none;
-  border-radius: ${(props) => props.theme.defaultRadius};
-  padding: ${(props) => props.theme.actionButtonPadding};
-  font-size: ${(props) => props.theme.fontxl};
-  cursor: pointer;
-  transition: all 0.5s ease;
-
-  &:hover {
-    transform: scale(1.03);
-  }
+  justify-content: space-between;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
-    padding: ${(props) => props.theme.actionButtonPaddingMobile};
-    margin-top: 10px;
+    flex-direction: column;
+    justify-content: center;
+  }
+`;
+const Content = styled.div`
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1rem;
+  @media (max-width: 768px) {
+    min-height: 40vh;
+    justify-content: center;
+    padding: 1rem;
+    border-radius: ${(props) => props.theme.bigRadius};
+    position: absolute;
+    width: 100%;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(1px);
+    background: rgb(255, 255, 255);
+    background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.9) 50%,
+      rgba(255, 255, 255, 0.2) 100%
+    );
+  }
+`;
+const Iluustration = styled.img`
+  max-height: 60vh;
+  object-fit: fill;
+  @media (max-width: 768px) {
+    max-height: 50vh;
   }
 `;
 
-const Heading = styled.h1`
-  font-size: ${(props) => props.theme.fontLargest};
-  color: ${(props) => props.theme.secondaryColor};
+const BlackHeading = styled.h1`
+  line-height: ${(props) => (props.isArabic ? "1.1" : "1")};
+  max-width: 60%;
+  font-size: 7rem;
+  color: ${(props) => props.theme.textColor};
   font-weight: 900;
   text-transform: uppercase;
   @media (max-width: 768px) {
-    width: 100%;
-    font-size: ${(props) => props.theme.fontxxxl};
+    max-width: 100%;
+    font-size: ${(props) => props.theme.fontLargest};
   }
 `;
 
-const Subheading = styled.h1`
-  color: ${(props) => props.theme.text};
-  font-size: ${(props) => props.theme.fontxxxl};
-  margin: 0.5rem 0;
-  text-shadow: -1px -1px 0 ${(props) => props.theme.body},
-    1px -1px 0 ${(props) => props.theme.body},
-    -1px 1px 0 ${(props) => props.theme.body},
-    1px 1px 0 ${(props) => props.theme.body};
-  @media (max-width: 768px) {
-    width: 100%;
-    font-size: ${(props) => props.theme.fontxl};
-  }
-`;
-const Text = styled.p`
-  color: ${(props) => props.theme.text};
-  font-size: ${(props) => props.theme.fontxxxl};
-  margin: 0.5rem 0;
-  text-shadow: -1px -1px 0 ${(props) => props.theme.body},
-    1px -1px 0 ${(props) => props.theme.body},
-    -1px 1px 0 ${(props) => props.theme.body},
-    1px 1px 0 ${(props) => props.theme.body};
+const Heading = styled(BlackHeading)`
+  color: ${(props) => props.theme.secondaryColor};
   margin-bottom: 1rem;
-  max-width: 80%;
-  text-align: center;
-  @media (max-width: 768px) {
-    text-align: ${(props) => (props.isArabic ? "right" : "left")};
-    max-width: 100%;
-    font-size: ${(props) => props.theme.fontxl};
-  }
 `;
-const FormTitle = styled.p`
+const SectionHeading = styled(BlackHeading)`
+  font-size: ${(props) => props.theme.fontLargest};
+  color: ${(props) => props.theme.secondaryColor};
   max-width: 100%;
-  color: ${(props) => props.theme.text};
+`;
+
+const SubHeading = styled.p`
+  max-width: 90%;
   font-size: ${(props) => props.theme.fontxxxl};
-  font-weight: 600;
+  font-weight: 400;
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontxl};
   }
+`;
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 `;
 
 const Tawsila = () => {
   const { t, i18n } = useTranslation();
-  const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [isAccepted, setIsAccepted] = useState(false);
+  const images = [
+    Screenshot1,
+    Screenshot2,
+    Screenshot3,
+    Screenshot4,
+    Screenshot5,
+  ];
 
-  const TawsilaDownloadLink = process.env.REACT_APP_TAWSILA_DOWNLOAD_LINK + "";
-
-  const handleChooseAddress = (newAddress) => {
-    setAddress(newAddress);
-  };
-
-  const handleScroll = () => {
-    setSuccessMessage("");
-    setFullName("");
-    setPhone("");
-    setAddress(null);
-    setErrorMessage("");
-    setIsAccepted(false);
-
-    // const element = document.getElementById("stepsSection");
-    // if (element) {
-    //   element.scrollIntoView({ behavior: "smooth" });
-    // }
-  };
-
-  const handleSubscribe = async (event) => {
-    event.preventDefault();
-    if (
-      !fullName ||
-      !phone ||
-      !address ||
-      !email ||
-      !address.wilaya ||
-      !address.commune
-    ) {
-      setErrorMessage(t("errorFillAllFields"));
-      return;
-    }
-    if (!isValidPhone(phone)) {
-      setErrorMessage(t("errorPhoneNotValid"));
-      return;
-    }
-    if (!isValidEmail(email)) {
-      setErrorMessage(t("errorEmailNotValid"));
-      return;
-    }
-    setErrorMessage("");
-    setIsSubmitting(true);
-
-    const isPhoneUsed = await checkPhoneNumberAvailability(phone);
-
-    if (isPhoneUsed === true) {
-      const subscribeRequest = await getSubscribeRequest(phone);
-      if (subscribeRequest.isAccepted === true) {
-        setSuccessMessage(t("clickToDownloadApp"));
-        setIsAccepted(true);
-      } else {
-        setSuccessMessage(t("messagePhoneIsUsed"));
-        setIsAccepted(false);
-      }
-      setIsSubmitting(false);
-      return;
-    } else {
-      setIsAccepted(false);
-      const data = {
-        fullName: fullName,
-        phone: phone,
-        email: email,
-        wilaya: address.wilaya,
-        commune: address.commune,
-        type: "driver",
-      };
-
-      const response = postSubscribeRequest(data);
-      if (!response) {
-        setErrorMessage(t("errorCouldNotSubscribe"));
-      } else {
-        setErrorMessage("");
-        setSuccessMessage(t("partnersFormThankYouSubTitle"));
-      }
-      setIsSubmitting(false);
+  const handleBecomeDriver = () => {
+    const element = document.getElementById("registerSubscribeRequest");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
   return (
-    <>
-      <HeroSection isArabic={i18n.language === "ar"}>
-        <ContentOverlay isArabic={i18n.language === "ar"}>
-          {" "}
-          <Heading>{t("signUp")}</Heading>
-          <Subheading>{t("tawsilaSubHeading")}</Subheading>
-          <Text isArabic={i18n.language === "ar"}>{t("tawsilaText")}</Text>
-          {/* <Link to="/get-started-with-Tawsila">
-            <BlueActionButton onClick={() => {}}>
+    <Section isArabic={i18n.language === "ar"}>
+      <HeroSection>
+        <HalfBox>
+          <ScreenshotDisplay images={images} />
+        </HalfBox>
+        <HalfBox>
+          <BlackHeading isArabic={i18n.language === "ar"}>
+            {t("tawsilaHeading2")}
+          </BlackHeading>
+          <Heading isArabic={i18n.language === "ar"}>
+            {" "}
+            {t("tawsilaSubHeading2")}
+          </Heading>
+          <ButtonContainer>
+            {" "}
+            <BlueActionButton onClick={handleBecomeDriver}>
               {" "}
-              {"> "} {t("getStarted")}{" "}
+              {t("becomeDriver")}
             </BlueActionButton>
-          </Link> */}
-        </ContentOverlay>
-        <FormContainerOverlay isArabic={i18n.language === "ar"}>
-          {successMessage ? (
-            <>
-              {successMessage && (
-                <MessageWithLink
-                  message={successMessage}
-                  link={isAccepted ? TawsilaDownloadLink : ""}
-                  linkText={isAccepted ? t("downloadTawsila") : ""}
-                  textColor={light.secondaryColor}
-                />
-              )}
-              <ButtonWithIcon
-                text1={"Done"}
-                onClick={handleScroll}
-                backgroundColor={light.secondaryColor}
-              >
-                {t("scrollDown")}
-              </ButtonWithIcon>
-            </>
-          ) : (
-            <FormContainer onSubmit={handleSubscribe}>
-              <FormGroup>
-                <Input
-                  type="text"
-                  placeholder={t("partnerInputTextFullName")}
-                  value={fullName}
-                  onChange={(event) => setFullName(event.target.value)}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <Input
-                  type="email"
-                  placeholder={t("partnerInputText")}
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <Input
-                  type="phone"
-                  placeholder={t("partnerInputTextPhone")}
-                  value={phone}
-                  onChange={(event) => setPhone(event.target.value)}
-                  required
-                />
-              </FormGroup>
-              <AddressesDropDown
-                target="tawsila"
-                onChooseAddress={handleChooseAddress}
-              />
-              {errorMessage ? (
-                <ErrorMessage>
-                  {errorMessage && <p>{errorMessage}</p>}
-                </ErrorMessage>
-              ) : (
-                ""
-              )}
-
-              <Button
-                onClick={handleSubscribe}
-                className={isSubmitting ? "submitting" : ""}
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? t("buttonIsSubmitting")
-                  : t("partnerInputButton")}
-              </Button>
-            </FormContainer>
-          )}
-        </FormContainerOverlay>
+            <Link to={"/get-started-with-Tawsila"}>
+              {" "}
+              <BlueTextButton> {t("learnMore")}</BlueTextButton>
+            </Link>
+          </ButtonContainer>
+        </HalfBox>
       </HeroSection>
-    </>
+      <Steps />
+      <BecomeDriverSection>
+        <Box>
+          <Content>
+            {" "}
+            <SectionHeading>{t("subscribeRequest")}</SectionHeading>
+            <SubHeading>{t("subscribeRequestText")}</SubHeading>
+            <BlueActionButton onClick={handleBecomeDriver}>
+              {" "}
+              {t("becomeDriver")}
+            </BlueActionButton>
+          </Content>
+          <Iluustration src={RegisterTawsilaImage} />
+        </Box>
+        <Box>
+          <Iluustration src={Accepted} />
+          <Content>
+            {" "}
+            <SectionHeading>{t("confirmation")}</SectionHeading>
+            <SubHeading>{t("confirmationText")}</SubHeading>
+            <Link to={"/get-started-with-Tawsila"}>
+              {" "}
+              <BlueTextButton> {t("learnMore")}</BlueTextButton>
+            </Link>
+          </Content>
+        </Box>
+        <Box>
+          <Content>
+            <SectionHeading>{t("validation")}</SectionHeading>
+            <SubHeading>{t("validationText")}</SubHeading>
+            <ButtonContainer> </ButtonContainer>
+          </Content>
+          <Iluustration src={Approved} />
+        </Box>
+      </BecomeDriverSection>{" "}
+      <Box id="registerSubscribeRequest">
+        <RegisterTawsila />
+      </Box>
+    </Section>
   );
 };
 

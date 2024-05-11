@@ -58,6 +58,11 @@ const BlueTextButtonStyle = styled(Button)`
   font-weight: ${(props) => (props.isSelected ? "bold" : "")};
   transform: ${(props) => (props.isSelected ? "scale(1.1)" : "scale(1)")};
   font-size: ${(props) => props.theme.fontxl};
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontmd};
+    padding: ${(props) => props.theme.smallPadding};
+    transform: scale(1);
+  }
 `;
 
 const ActionButton = ({ children, onClick, disabled }) => {
