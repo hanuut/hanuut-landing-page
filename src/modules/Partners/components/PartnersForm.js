@@ -702,7 +702,6 @@ const PartnersForm = ({ setStep }) => {
           </ThirdStep>
         )}
         {formStep === 4 &&
-          //working here
           (isAccepted ? (
             <FourthStep
               isArabic={i18n.language === "ar"}
