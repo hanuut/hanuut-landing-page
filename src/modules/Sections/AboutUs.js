@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import AboutUsIllutstration from "../../assets/aboutUs.svg";
+import AboutUsIllutstration from "../../assets/aboutUs.png";
 import MissionIllustration from "../../assets/mission.svg";
 import { useTranslation } from "react-i18next";
-import BackgroundImage from "../../assets/background.png"
+import BackgroundImage from "../../assets/background.png";
 const Section = styled.div`
   min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
   display: flex;
@@ -34,7 +34,7 @@ const Container = styled.div`
   }
 `;
 const RightBox = styled.div`
-  width: 45%;
+  width: 50%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -115,15 +115,19 @@ const LeftBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  border-radius: 10px;
+  justify-content: flex-start;
   @media (max-width: 768px) {
+    align-items: center;
     width: 100%;
+    margin-bottom: 1rem;
   }
 `;
 const AboutUsIllutstrationContainer = styled.img`
-  max-width: 95%;
-  object-fit: cover;
+  max-height: 60vh;
+  align-self: ${(props) => (props.isArabic ? "flex-end" : "center")};
   @media (max-width: 768px) {
+    align-self: center;
     width: auto;
   }
 `;
@@ -151,7 +155,10 @@ function AboutUs() {
     <Section>
       <Container isArabic={i18n.language === "ar"}>
         <LeftBox>
-          <AboutUsIllutstrationContainer src={AboutUsIllutstration} />
+          <AboutUsIllutstrationContainer
+            src={AboutUsIllutstration}
+            isArabic={i18n.language === "ar"}
+          />
         </LeftBox>
         <RightBox>
           <AboutTitle>{t("aboutUsHeading")}</AboutTitle>

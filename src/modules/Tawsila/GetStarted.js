@@ -273,7 +273,6 @@ const Heading = styled.h1`
   font-weight: 900;
   text-transform: uppercase;
   @media (max-width: 768px) {
-
     font-size: ${(props) => props.theme.fontxxxl};
   }
 `;
@@ -287,7 +286,6 @@ const SubHeading = styled.h1`
     -1px 1px 0 ${(props) => props.theme.body},
     1px 1px 0 ${(props) => props.theme.body};
   @media (max-width: 768px) {
-
     font-size: ${(props) => props.theme.fontxl};
   }
 `;
