@@ -32,7 +32,6 @@ const SecondaryButton = styled(Button)`
 `;
 
 const TextStyleButton = styled(Button)`
-  padding: ${(props) => (props.isSelected ? "" : "0")};
   background-color: ${(props) =>
     props.isSelected ? props.theme.primaryColor : "transparent"};
   color: ${(props) =>
@@ -40,6 +39,7 @@ const TextStyleButton = styled(Button)`
   font-weight: ${(props) => (props.isSelected ? "bold" : "")};
   transform: ${(props) => (props.isSelected ? "scale(1.1)" : "scale(1)")};
   font-size: ${(props) => props.theme.fontxxl};
+  border: 1px solid ${(props) => props.theme.primaryColor};
 `;
 
 const BlueSecondaryButtonStyle = styled(Button)`

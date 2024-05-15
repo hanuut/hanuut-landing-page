@@ -693,11 +693,15 @@ const PartnersForm = ({ setStep }) => {
               ""
             )}
             <ButtonWithIcon
-              image={Playstore}
-              backgroundColor="#000000"
-              text1={t("getItOn")}
-              text2={t("googlePlay")}
+              image={Send}
+              text2={
+                isSubmitting
+                  ? t("buttonIsSubmitting")
+                  : t("partnersFormSubmitButton")
+              }
               className="homeDownloadButton"
+              disabled={isSubmitting}
+              onClick={(e) => handleSubmit(e)}
             ></ButtonWithIcon>
           </ThirdStep>
         )}
