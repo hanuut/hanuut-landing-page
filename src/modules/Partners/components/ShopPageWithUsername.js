@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../../components/Loader";
 import NotFoundPage from "../../NotFoundPage";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
+// import { fetchDomain, selectDomain } from "../../Domains/state/reducers";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -28,7 +29,7 @@ const Section = styled.div`
   align-items: center;
   justify-content: flex-start;
   background-image: url(${BackgroundImage});
-  background-size: 100%; 
+  background-size: 100%;
   background-position: center;
   padding: 2rem 0;
   @media (max-width: 768px) {
@@ -128,11 +129,18 @@ const ShopPageWithUsername = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector(selectShops);
   const selectedShop = useSelector(selectShop);
+  // const selectedDomain = useSelector(selectDomain);
   const selectedShopImage = useSelector(selectSelectedShopImage);
 
   useEffect(() => {
     dispatch(fetchShopWithUsername(username));
   }, [dispatch, username]);
+
+  // useEffect(() => {
+  //   console.log("fetching domain ...");
+  //   dispatch(fetchDomain(selectedShop.domain));
+  //   console.log("selected Domain:" + selectedDomain);
+  // }, [dispatch, selectedShop]);
 
   useEffect(() => {
     if (selectedShop && selectedShop.imageId) {

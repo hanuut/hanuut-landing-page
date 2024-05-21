@@ -14,6 +14,7 @@ import Tawsila from "../modules/Tawsila/Tawsila";
 // import PaymentPage from "../modules/payment/PaymentPage";
 // import SatimTestPage from "../modules/payment/SatimTestPage";
 import GetStarted from "../modules/Tawsila/GetStarted";
+import LinksPage from "../modules/LinksPage";
 
 const CustomRouter = () => {
   return (
@@ -27,6 +28,7 @@ const CustomRouter = () => {
       <Route path="/terms_and_conditions" element={<TermsAndConditions />} />
       <Route path="/shop/:username" element={<ShopPageWithUsername />} />
       <Route path="/tawsila" element={<Tawsila />} />
+      <Route path="/links" element={<LinksPage />} />
       <Route path="*" element={<NotFoundPage />} />
       {/* <Route path="/shop/:shopName" element={<ShopPage/>} /> */}
       {/* <Route path="/confirmPayment" element={<PaymentPage />} /> */}
