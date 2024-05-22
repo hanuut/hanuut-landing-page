@@ -31,12 +31,10 @@ const Container = styled.div`
   gap: 2rem;
   color: ${(props) => props.theme.text};
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-
   @media (max-width: 768px) {
     width: 90%;
     flex-direction: row;
     align-items: flex-start;
-
     flex-wrap: wrap;
   }
 `;
@@ -55,8 +53,6 @@ const Heading = styled.h1`
 `;
 const ValueCard = styled.div`
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  min-width: 30%;
-  max-width: 40%;
   background-color: rgba(${(props) => props.theme.bodyRgba}, 1);
   border-radius: ${(props) => props.theme.defaultRadius};
   padding: 2rem 3rem;
@@ -66,10 +62,17 @@ const ValueCard = styled.div`
   align-items: center;
   gap: 1rem;
   backdrop-filter: blur(5px);
+  width: 500px;
   @media (max-width: 768px) {
-    max-width: 90%;
-    width: 90%;
+    width: 94%;
     padding: ${(props) => props.theme.actionButtonPadding};
+  }
+
+  transition: transform 0.3s, box-shadow 0.3s;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(${(props) => props.theme.textRgba}, 0.3);
   }
 `;
 
