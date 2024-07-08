@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import LanguagesDropDown from "./LanguagesDropDown";
 import Logo from "./Logo";
 import { useTranslation } from "react-i18next";
+import Cart from "../modules/Cart/components/Cart";
+import { useSelector } from "react-redux";
+import { selectShop, selectedShop } from "../modules/Partners/state/reducers";
 
 const Section = styled.section`
   position: sticky;
@@ -151,6 +154,8 @@ const HamburgerMenu = styled.span`
 const Navbar = () => {
   const { t, i18n } = useTranslation();
   const [isActive, setIsActive] = useState(false);
+  const selectedShop = useSelector(selectShop);
+  const shopId = selectedShop._id;
 
   const handleClick = () => {
     setIsActive(!isActive);
@@ -164,6 +169,7 @@ const Navbar = () => {
     <Section>
       <Navigation isArabic={i18n.language === "ar"}>
         <Logo className="partnerLogo" />
+
         <HamburgerMenuContainer onClick={handleClick}>
           <HamburgerMenu
             isArabic={i18n.language === "ar"}
@@ -196,6 +202,9 @@ const Navbar = () => {
               {t("navTawsila")}
             </Link>
           </MenuItem>
+
+          {/* {shopId && <Cart shopId={shopId} />} */}
+
           <LanguageMenuItem>
             <LanguagesDropDown
               className="languageMenuItem"

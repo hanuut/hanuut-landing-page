@@ -34,7 +34,6 @@ export const checkPhoneNumberAvailability = async (phoneNumber) => {
 
     return response.data;
   } catch (error) {
-    // Handle error if the request fails
     console.error("Error checking phone number availability:", error);
     throw error;
   }

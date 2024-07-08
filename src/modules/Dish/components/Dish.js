@@ -2,108 +2,119 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { t } from "i18next";
+import { light } from "../../../config/Themes";
+import CartIcon from "../../../assets/icons/cart.svg";
+import ButtonWithIcon from "../../../components/ButtonWithIcon";
+import {
+  ActionButton,
+  AddToCartButton,
+} from "../../../components/ActionButton";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../Cart/state/reducers";
+// Updated import
+
 const Card = styled.div`
   width: 30%;
   border: 1px solid rgba(${(props) => props.theme.textRgba}, 0.1);
   border-radius: ${(props) => props.theme.smallRadius};
   padding: 0.9rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
-  justify-content: flex-start;
-
+  justify-content: space-between;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
     width: 100%;
   }
 `;
 
-
+const ContentRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  max-width: 95%;
+`;
 
 const Body = styled.div`
   display: flex;
-  width: 100%;
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
 `;
-const Name = styled.h5`
+
+const Name = styled.h4`
   font-family: "Tajawal", sans-serif;
-  margin-bottom: 0.5rem; 
+  margin-bottom: 0.5rem;
 `;
+
 const Ingredients = styled.div`
+  max-width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
   gap: 5px;
-  max-width: 75%;
-  flex-wrap: wrap;
+  overflow-x: scroll;
 `;
+
 const Ingredient = styled.h6`
   font-family: "Tajawal", sans-serif;
   font-weight: 100;
   min-width: fit-content;
 `;
+
 const PriceContainer = styled.div`
-  height: 100%;
+  width: 20%;
   display: flex;
-  flex-direction: ${(props) => (props.isArabic ? "row-reverse" : "row")};
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
   gap: 5px;
   font-weight: bold;
 `;
-const Price = styled.div`
-  font-weight: bold;
-`;
+
+const Price = styled.h4``;
 
 const Dish = ({ dish }) => {
   const { i18n } = useTranslation();
   const { name, sellingPrice } = dish;
   const { ingredients } = dish;
-  const filteredIngredients = ingredients.filter((item) => item.trim() !== "");
-  // const [imageSrc, setImageSrc] = useState("");
-  // useEffect(() => {
-  //   const bufferData = imageData.buffer.data;
-  //   const uint8Array = new Uint8Array(bufferData);
-  //   const blob = new Blob([uint8Array], { type: "image/jpeg" });
-  //   const imageUrl = URL.createObjectURL(blob);
-  //   setImageSrc(imageUrl);
-  // }, [dish]);
+  const filteredIngredients =
+    ingredients && ingredients.length > 0
+      ? ingredients.filter((item) => item.trim() !== "")
+      : [];
+  const dispatch = useDispatch();
+
+  const onAddToCartClick = () => {
+    dispatch(addToCart(dish));
+  };
 
   return (
-    // <Card>
-    //   {/* <Image src={imageSrc} alt="" /> */}
-    //   <Name>{name}</Name>
-    //   <Ingredients>
-    //     {" "}
-    //     {ingredients.map((ingredient, index) => (
-    //       <Ingredient key={index}> {ingredient} </Ingredient>
-    //     ))}
-    //   </Ingredients>
-
-    //   <Price>Price: DZD {sellingPrice}</Price>
-    // </Card>
     <Card isArabic={i18n.language === "ar"}>
-      <Name>{name}</Name>
-      <Body>
-        {filteredIngredients.length > 0 ? (
-          <Ingredients>
-            {filteredIngredients.map((ingredient, index) => (
-              <Ingredient key={index}>
-                {ingredient}
-                {index !== filteredIngredients.length - 1 ? " - " : ""}
-              </Ingredient>
-            ))}
-          </Ingredients>
-        ) : null}
-
-        <PriceContainer isArabic={i18n.language === "ar"}>
-          {t("dzd")}
-          <Price>{sellingPrice}</Price>
-        </PriceContainer>
-      </Body>
+      <ContentRow>
+        <Name>{name}</Name>
+        <Body>
+          {filteredIngredients.length > 0 && (
+            <Ingredients>
+              {filteredIngredients.map((ingredient, index) => (
+                <Ingredient key={index}>
+                  {ingredient}
+                  {index !== filteredIngredients.length - 1 ? " - " : ""}
+                </Ingredient>
+              ))}
+            </Ingredients>
+          )}
+        </Body>
+      </ContentRow>
+      <PriceContainer isArabic={i18n.language === "ar"}>
+        <Price>
+          {sellingPrice} {t("dzd")}
+        </Price>
+        <AddToCartButton key={dish._id} onClick={onAddToCartClick}>
+          +
+        </AddToCartButton>
+      </PriceContainer>
     </Card>
   );
 };

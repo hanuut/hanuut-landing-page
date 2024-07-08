@@ -111,8 +111,8 @@ const CategoriesContainer = ({ shopData }) => {
 
   const handleCategoryClick = async (categoryId) => {
     if (!loadedCategories.includes(categoryId)) {
-      console.log(categoryId);
-      console.log(shopData._id);
+      // console.log(categoryId);
+      // console.log(shopData._id);
       dispatch(fetchDishesByCategory({ shopId: shopData._id, categoryId }));
       setLoadedCategories((prevLoadedCategories) => [
         ...prevLoadedCategories,

@@ -17,10 +17,9 @@ import { TextButton } from "../../../components/ActionButton";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import Send from "../../../assets/send.svg";
 import fireworks from "../../../assets/fireworks.svg";
+import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.png";
 import MyHanuutLogo from "../../../assets/myhanuutlogo.png";
-
-import Windows from "../../../assets/windows.svg";
 
 import { Link } from "react-router-dom";
 
@@ -37,12 +36,15 @@ const Container = styled.div`
 
 const PartnerFormStep = styled.form`
   width: 100%;
-  height: 60vh;
+  min-height: 70vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
+  @media (max-width: 768px) {
+    min-height: 80vh;
+  }
 `;
 
 const FormStepsIndicator = styled.div`
@@ -380,7 +382,7 @@ const PartnersForm = ({ setStep }) => {
     process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
 
   useEffect(() => {
-    console.log(myHanuutDownloadLinkWindows, myHanuutDownloadLinkWindows);
+    // console.log(myHanuutDownloadLinkWindows, myHanuutDownloadLinkWindows);
   }, [myHanuutDownloadLinkWindows, myHanuutDownloadLinkWindows]);
 
   const resetForm = () => {
