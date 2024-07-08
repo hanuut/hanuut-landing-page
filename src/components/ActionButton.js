@@ -27,6 +27,45 @@ const Button = styled.button`
   }
 `;
 
+const AddToCartButtonStyles = styled(Button)`
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  font-size: ${(props) => props.theme.fontmd};
+  cursor: pointer;
+  transition: all 0.5s ease;
+
+  &:hover {
+    transform: scale(1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: all !important;
+  }
+
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontmd};
+    padding: ${(props) => props.theme.smallPadding};
+  }
+`;
+
+const IncrementQuantityButtonStyles = styled(AddToCartButtonStyles)`
+  background-color: transparent;
+  color: ${(props) => props.theme.primaryColor};
+  font-size: ${(props) => props.theme.fontxxxl};
+`;
+
+const DecrementQuantityButtonStyles = styled(IncrementQuantityButtonStyles)`
+  background-color: transparent;
+  color: ${(props) => props.theme.redColor};
+`;
+
 const SecondaryButton = styled(Button)`
   background-color: ${(props) => props.theme.secondaryColor};
 `;
@@ -73,6 +112,30 @@ const ActionButton = ({ children, onClick, disabled }) => {
   );
 };
 
+const AddToCartButton = ({ children, onClick, disabled }) => {
+  return (
+    <AddToCartButtonStyles disabled={disabled} onClick={onClick}>
+      {children}
+    </AddToCartButtonStyles>
+  );
+};
+
+const IncrementQuantityButton = ({ children, onClick, disabled }) => {
+  return (
+    <IncrementQuantityButtonStyles disabled={disabled} onClick={onClick}>
+      {children}
+    </IncrementQuantityButtonStyles>
+  );
+};
+
+const DecrementQuantityButton = ({ children, onClick, disabled }) => {
+  return (
+    <DecrementQuantityButtonStyles disabled={disabled} onClick={onClick}>
+      {children}
+    </DecrementQuantityButtonStyles>
+  );
+};
+
 const BlueActionButton = ({ children, onClick, disabled }) => {
   return (
     <SecondaryButton disabled={disabled} onClick={onClick}>
@@ -115,4 +178,7 @@ export {
   TextButton,
   BlueSecondaryButton,
   BlueTextButton,
+  AddToCartButton,
+  IncrementQuantityButton,
+  DecrementQuantityButton,
 };

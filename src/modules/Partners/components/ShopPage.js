@@ -50,7 +50,7 @@ const UpperBox = styled.div`
   justify-content: space-between;
   @media (max-width: 768px) {
     width: 96%;
-     flex-direction: column;
+    flex-direction: column;
   }
 `;
 
@@ -104,8 +104,9 @@ const PlayIcon = styled.img`
   }
 `;
 const LowerBox = styled.div`
-  width: 80%;
+  max-width: 20%;
   display: flex;
+  overflow-y: scroll;
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -131,12 +132,12 @@ const ShopPage = () => {
             <OrderAndDownload>
               <Title>{t("toOrder")}</Title>
               <Link to={link}>
-              <ButtonWithIcon
-                image={Playstore}
-                backgroundColor="#000000"
-                text1={t("getItOn")}
-                text2={t("googlePlay")}
-              ></ButtonWithIcon>
+                <ButtonWithIcon
+                  image={Playstore}
+                  backgroundColor="#000000"
+                  text1={t("getItOn")}
+                  text2={t("googlePlay")}
+                ></ButtonWithIcon>
               </Link>
             </OrderAndDownload>
           </UpperBox>

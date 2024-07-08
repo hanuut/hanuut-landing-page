@@ -15,6 +15,7 @@ import Tawsila from "../modules/Tawsila/Tawsila";
 // import SatimTestPage from "../modules/payment/SatimTestPage";
 import GetStarted from "../modules/Tawsila/GetStarted";
 import LinksPage from "../modules/LinksPage";
+import MyHanuutGuide from "../modules/MyHanuutGuide";
 
 const CustomRouter = () => {
   return (
@@ -34,6 +35,7 @@ const CustomRouter = () => {
       {/* <Route path="/confirmPayment" element={<PaymentPage />} /> */}
       {/* <Route path="/testPayment" element={<SatimTestPage />} /> */}
       <Route path="/get-started-with-Tawsila" element={<GetStarted />} />
+      {/* <Route path="/my-hanuut-guide" element={<MyHanuutGuide />} /> */}
     </Routes>
   );
 };

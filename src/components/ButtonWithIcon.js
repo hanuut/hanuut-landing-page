@@ -45,6 +45,9 @@ const Button = styled.button`
       padding: ${(props) => props.theme.smallPadding};
     }
   }
+  &.blackText {
+    color: ${(props) => props.theme.text};
+  }
 `;
 
 const Icon = styled.img`

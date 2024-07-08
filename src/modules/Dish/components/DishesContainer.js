@@ -42,11 +42,14 @@ const DishesContainer = ({ dishes, expanded }) => {
   return (
     <Section expanded={expanded}>
       {dishes.length > 0 ? (
-        dishes.map((dish) => <Dish key={dish.id} dish={dish.dish} />)
+        dishes.map((dish) => {
+          return dish.isHidden !== true ? (
+            <Dish key={dish.id} dish={dish.dish} />
+          ) : null;
+        })
       ) : (
         <NoAvailableDishes>
-          {" "}
-          <Content> {t("noDishesAvailable")}</Content>{" "}
+          <Content>{t("noDishesAvailable")}</Content>
         </NoAvailableDishes>
       )}
     </Section>

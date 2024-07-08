@@ -9,6 +9,7 @@ export const light = {
   secondaryColorDark: "#0066CA", //dark blue
   downloadButtonColor: "#182018", //grey
   orangeColor: "#F0A46A",
+  orangeColorRgba: "240, 164, 106",
   redColor: "#FF725E",
   redColorRgba: "255 ,114 ,94",
   primaryColorRgba: "91 ,194 ,139",

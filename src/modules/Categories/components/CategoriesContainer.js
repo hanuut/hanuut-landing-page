@@ -17,7 +17,7 @@ const Section = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   @media (max-width: 768px) {
     margin-top: 0.5rem;
@@ -25,13 +25,14 @@ const Section = styled.div`
 `;
 
 const Categories = styled.div`
-  width: 100%;
+  max-width: 100%;
+  padding: 5px;
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap; /* Change flex-wrap to nowrap */
+  flex-wrap: no-wrap; /* Change flex-wrap to nowrap */
   gap: 1em;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 
@@ -42,7 +43,6 @@ const Categories = styled.div`
   @media (max-width: 768px) {
     justify-content: flex-start;
     gap: 0.5em;
-    overflow-x: auto;
   }
 `;
 
@@ -111,8 +111,8 @@ const CategoriesContainer = ({ shopData }) => {
 
   const handleCategoryClick = async (categoryId) => {
     if (!loadedCategories.includes(categoryId)) {
-      console.log(categoryId);
-      console.log(shopData._id);
+      // console.log(categoryId);
+      // console.log(shopData._id);
       dispatch(fetchDishesByCategory({ shopId: shopData._id, categoryId }));
       setLoadedCategories((prevLoadedCategories) => [
         ...prevLoadedCategories,
