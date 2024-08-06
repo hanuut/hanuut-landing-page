@@ -6,7 +6,6 @@ import Loader from "../../../components/Loader";
 
 const Container = styled.div`
   width: 100%;
-
   border-radius: ${(props) => props.theme.defaultRadius};
   display: flex;
   align-items: center;
@@ -32,6 +31,15 @@ const Container = styled.div`
 
   box-sizing: border-box; /* Add this line to include padding in the width */
 `;
+
+const VerticalContainer = styled(Container)`
+  flex-direction: column;
+  width: 100%;
+  align-items: flex-start;
+  gap: 1rem;
+
+`;
+
 const ShopImage = styled.img`
   width: 4.3rem;
   height: 4.3rem;
@@ -48,7 +56,6 @@ const ShopInfo = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
 `;
 
 const ShopHeader = styled.div`
@@ -129,4 +136,48 @@ const ShopCart = ({ shop, imageData, className }) => {
   );
 };
 
-export default ShopCart;
+const VerticalShopCart = ({ shop, imageData, className }) => {
+  const { i18n } = useTranslation();
+  const [imageSrc, setImageSrc] = useState("");
+
+  useEffect(() => {
+    const loadImage = async () => {
+      try {
+        const bufferData = imageData.buffer.data;
+        const uint8Array = new Uint8Array(bufferData);
+        const blob = new Blob([uint8Array], { type: "image/jpeg" });
+        const imageUrl = URL.createObjectURL(blob);
+        setImageSrc(imageUrl);
+      } catch (error) {
+        console.error("Error loading image:", error);
+        // Handle the error, e.g., display a placeholder image or show an error message
+      }
+    };
+
+    if (imageData && imageData.buffer) {
+      loadImage();
+    }
+  }, [imageData]);
+
+  return (
+    <VerticalContainer isArabic={i18n.language === "ar"} className={className}>
+      {imageSrc ? (
+        <>
+          <ShopImage src={imageSrc} alt="shop image" loading="lazy" />
+          <ShopInfo>
+            <ShopHeader>
+              <ShopName>{shop.name}</ShopName>
+            </ShopHeader>
+            <ShopBody>
+              <ShopDesc>{shop.description}</ShopDesc>
+            </ShopBody>
+          </ShopInfo>
+        </>
+      ) : (
+        <Loader />
+      )}
+    </VerticalContainer>
+  );
+};
+
+export { ShopCart, VerticalShopCart };
