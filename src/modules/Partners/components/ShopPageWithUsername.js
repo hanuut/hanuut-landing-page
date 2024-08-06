@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import ShopCart from "./ShopCart";
+import { ShopCart, VerticalShopCart } from "./ShopCart";
 import { useParams } from "react-router-dom";
 import BackgroundImage from "../../../assets/background.png";
 import CategoriesContainer from "../../Categories/components/CategoriesContainer";
@@ -20,7 +20,6 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../../components/Loader";
 import NotFoundPage from "../../NotFoundPage";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
-// import { fetchDomain, selectDomain } from "../../Domains/state/reducers";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -38,7 +37,7 @@ const Section = styled.div`
   }
 `;
 
-const ShopPageContainer = styled.div`
+const FoodContainer = styled.div`
   width: 80%;
   padding: 2rem;
   display: flex;
@@ -99,6 +98,14 @@ const OrderAndDownload = styled.div`
     align-items: flex-start;
   }
 `;
+
+const VerticalOrderAndDownload = styled(OrderAndDownload)`
+  align-items: flex-start;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+  }
+`;
 const Title = styled.p`
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontsm};
@@ -122,6 +129,37 @@ const LowerBox = styled.div`
   }
 `;
 
+const GroceriesContainer = styled(FoodContainer)`
+  flex-direction: row;
+  gap: 1rem;
+`;
+
+const LeftBox = styled.div`
+  max-width: 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 70vh;
+  @media (max-width: 768px) {
+  }
+`;
+
+const RightBox = styled(LeftBox)`
+  max-width: 75%;
+  border: none;
+`;
+
+const ShopCartContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  @media (max-width: 768px) {
+  }
+`;
+
 const ShopPageWithUsername = () => {
   const link = "https://play.google.com/store/apps/details?id=com.hanuut.shop";
   const { t, i18n } = useTranslation();
@@ -129,18 +167,22 @@ const ShopPageWithUsername = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector(selectShops);
   const selectedShop = useSelector(selectShop);
-  // const selectedDomain = useSelector(selectDomain);
   const selectedShopImage = useSelector(selectSelectedShopImage);
+  const [domainKeyWord, setDomainKeyWord] = useState(null);
 
   useEffect(() => {
+    console.log("shop with username");
     dispatch(fetchShopWithUsername(username));
+    console.log(selectedShop);
   }, [dispatch, username]);
 
-  // useEffect(() => {
-  //   console.log("fetching domain ...");
-  //   dispatch(fetchDomain(selectedShop.domain));
-  //   console.log("selected Domain:" + selectedDomain);
-  // }, [dispatch, selectedShop]);
+  useEffect(() => {
+    if (selectedShop.domainId) {
+      console.log("fetching domain ...");
+      console.log(domainKeyWord);
+      setDomainKeyWord(selectedShop.domainId.keyword);
+    }
+  }, [dispatch, selectedShop]);
 
   useEffect(() => {
     if (selectedShop && selectedShop.imageId) {
@@ -151,7 +193,7 @@ const ShopPageWithUsername = () => {
   if (error) {
     return <NotFoundPage />;
   }
-  if (!selectedShop || !selectedShopImage || loading) {
+  if (!selectedShop || !selectedShopImage || loading || !domainKeyWord) {
     return (
       <Section>
         <Loader />
@@ -161,39 +203,71 @@ const ShopPageWithUsername = () => {
 
   return (
     <Section>
-      <ShopPageContainer isArabic={i18n.language === "ar"}>
-        <UpperBox>
-          {selectedShop && selectedShopImage ? (
-            <ShopCart
-              className="headingShopCart"
-              key={selectedShop.id}
-              shop={selectedShop}
-              imageData={selectedShopImage}
-            />
-          ) : (
-            <Loader />
-          )}
-          <OrderAndDownload>
-            <Title>{t("toOrder")}</Title>
-            <Link to={link}>
-              <ButtonWithIcon
-                image={Playstore}
-                backgroundColor="#000000"
-                text1={t("getItOn")}
-                text2={t("googlePlay")}
-              ></ButtonWithIcon>
-            </Link>
-          </OrderAndDownload>
-        </UpperBox>
-        <MenuTitle>{t("menuTitle")}</MenuTitle>
-        <LowerBox>
-          {selectedShop ? (
-            <CategoriesContainer shopData={selectedShop} />
-          ) : (
-            <Loader />
-          )}
-        </LowerBox>
-      </ShopPageContainer>
+      {domainKeyWord === "food" ? (
+        <FoodContainer isArabic={i18n.language === "ar"}>
+          <UpperBox>
+            {selectedShop && selectedShopImage ? (
+              <ShopCart
+                className="headingShopCart"
+                key={selectedShop.id}
+                shop={selectedShop}
+                imageData={selectedShopImage}
+              />
+            ) : (
+              <Loader />
+            )}
+            <OrderAndDownload>
+              <Title>{t("toOrder")}</Title>
+              <Link to={link}>
+                <ButtonWithIcon
+                  image={Playstore}
+                  backgroundColor="#000000"
+                  text1={t("getItOn")}
+                  text2={t("googlePlay")}
+                ></ButtonWithIcon>
+              </Link>
+            </OrderAndDownload>
+          </UpperBox>
+          <MenuTitle>{t("menuTitle")}</MenuTitle>
+          <LowerBox>
+            {selectedShop ? (
+              <CategoriesContainer shopData={selectedShop} />
+            ) : (
+              <Loader />
+            )}
+          </LowerBox>
+        </FoodContainer>
+      ) : (
+        <GroceriesContainer isArabic={i18n.language === "ar"}>
+          <LeftBox>
+            {" "}
+            {selectedShop && selectedShopImage ? (
+              <VerticalShopCart
+                key={selectedShop.id}
+                shop={selectedShop}
+                imageData={selectedShopImage}
+              />
+            ) : (
+              <Loader />
+            )}
+            <p>Classes</p>
+            <p>Families</p>
+            <p>Categories</p>
+            <VerticalOrderAndDownload>
+              <Title>{t("toOrder")}</Title>
+              <Link to={link}>
+                <ButtonWithIcon
+                  image={Playstore}
+                  backgroundColor="#000000"
+                  text1={t("getItOn")}
+                  text2={t("googlePlay")}
+                ></ButtonWithIcon>
+              </Link>
+            </VerticalOrderAndDownload>
+          </LeftBox>
+          <RightBox></RightBox>
+        </GroceriesContainer>
+      )}
     </Section>
   );
 };

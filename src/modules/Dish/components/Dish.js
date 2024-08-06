@@ -111,9 +111,9 @@ const Dish = ({ dish }) => {
         <Price>
           {sellingPrice} {t("dzd")}
         </Price>
-        <AddToCartButton key={dish._id} onClick={onAddToCartClick}>
+        {/* <AddToCartButton key={dish._id} onClick={onAddToCartClick}>
           +
-        </AddToCartButton>
+        </AddToCartButton> */}
       </PriceContainer>
     </Card>
   );
