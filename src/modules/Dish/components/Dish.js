@@ -17,12 +17,12 @@ const Card = styled.div`
   width: 30%;
   border: 1px solid rgba(${(props) => props.theme.textRgba}, 0.1);
   border-radius: ${(props) => props.theme.smallRadius};
-  padding: 0.9rem;
+  padding: 1rem;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
   justify-content: space-between;
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+  transition: transform 0.3s ease;
   @media (max-width: 768px) {
     width: 100%;
   }

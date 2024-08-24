@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 
 const Section = styled.button`
@@ -26,8 +26,7 @@ const Section = styled.button`
   }
 `;
 
-const CategoryName = styled.h5`
-  width: 100%;
+const FamilyName = styled.h5`
   text-align: center;
   transition: all 0.3s ease;
   font-family: "Tajawal", sans-serif;
@@ -40,21 +39,21 @@ const CategoryName = styled.h5`
     font-size: ${(props) => props.theme.fontsm};
   }
 `;
-const Category = ({ category, onCategoryClick, selectedCategory }) => {
+const Family = ({ family, onFamilyClick, selectedFamily }) => {
   const handleHeadingClick = () => {
-    onCategoryClick(category.id);
+    onFamilyClick(family.id);
   };
 
   return (
     <Section
       onClick={handleHeadingClick}
-      selected={selectedCategory === category.id}
+      selected={selectedFamily === family.id}
     >
-      <CategoryName selected={selectedCategory === category.id}>
-        {category.name}
-      </CategoryName>
+      <FamilyName selected={selectedFamily === family.id}>
+        {family.name}
+      </FamilyName>
     </Section>
   );
 };
 
-export default Category;
+export default Family;

@@ -1,6 +1,9 @@
 // categoriesSlice.js
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getCategory } from "../services/categoryServices";
+import {
+  getCategoriesByFamilyId,
+  getCategory,
+} from "../services/categoryServices";
 
 // export const fetchCategory = createAsyncThunk('categories/fetchCategory', async (categoryId) => {
 //   try {
@@ -28,6 +31,19 @@ export const fetchCategories = createAsyncThunk(
   }
 );
 
+export const fetchCategoriesByFamilyId = createAsyncThunk(
+  "categories/fetchCategoriesByFamilyId",
+  async (familyId) => {
+    // console.log(familyId);
+    try {
+      const response = await getCategoriesByFamilyId(familyId);
+      return response.data;
+    } catch (error) {
+      throw new Error("Failed to fetch shop categories");
+    }
+  }
+);
+
 const initialState = {
   categories: [],
   loading: false,
@@ -49,6 +65,28 @@ const categoriesSlice = createSlice({
         state.categories = action.payload;
       })
       .addCase(fetchCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(fetchCategoriesByFamilyId.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCategoriesByFamilyId.fulfilled, (state, action) => {
+        state.loading = false;
+
+        // Filter out categories that are already in state.categories
+        const newCategories = action.payload.filter(
+          (newCategory) =>
+            !state.categories.some(
+              (existingCategory) => existingCategory.id === newCategory.id
+            )
+        );
+
+        // Add only the new, non-duplicate categories
+        state.categories = [...state.categories, ...newCategories];
+      })
+      .addCase(fetchCategoriesByFamilyId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });
