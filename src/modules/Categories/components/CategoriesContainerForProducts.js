@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
-import {
-  selectCategories,
-  fetchCategories,
-} from "../../Categories/state/reducers";
-
-import { selectDishes, fetchDishesByCategory } from "../../Dish/state/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import Category from "./Category";
 import Loader from "../../../components/Loader";
-import DishesContainer from "../../Dish/components/DishesContainer";
 import { useTranslation } from "react-i18next";
+import {
+  fetchProductByShopAndCategory,
+  selectProducts,
+} from "../../Product/state/reducers";
+import ProductsContainer from "../../Product/components/ProductsContainer";
+
 const Section = styled.div`
   margin-top: 1rem;
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight} - 11rem)`};
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   @media (max-width: 768px) {
     margin-top: 0.5rem;
@@ -29,7 +28,7 @@ const Categories = styled.div`
   padding: 5px;
   display: flex;
   flex-direction: row;
-  flex-wrap: no-wrap; /* Change flex-wrap to nowrap */
+  flex-wrap: nowrap;
   gap: 1em;
   align-items: center;
   justify-content: flex-start;
@@ -64,60 +63,43 @@ const Content = styled.p`
   }
 `;
 
-const CategoriesContainer = ({ shopData }) => {
+const CategoriesContainerForProducts = ({
+  categories,
+  selectedCategory,
+  setSelectedCategory,
+  shopId,
+}) => {
   const { t } = useTranslation();
+  const [loadedCategories, setLoadedCategories] = useState([]);
+  const [productsPerCategory, setProductsPerCategory] = useState([]);
+  const [expanded, setExpanded] = useState(false);
   const dispatch = useDispatch();
   const {
-    categories,
-    loading: categoriesLoading,
-    error: categoriesError,
-  } = useSelector(selectCategories);
-  const { dishes } = useSelector(selectDishes);
-  const [dishesPerCategory, setDishesPerCategory] = useState([]);
-  const [loadedCategories, setLoadedCategories] = useState([]);
-  const [expanded, setExpanded] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("");
+    products,
+    loading: loadingProducts,
+    error: errorProducts,
+  } = useSelector(selectProducts);
 
-  const filterAvailableCategories = (categories, hiddenCategories) => {
-    if (categories) {
-      const availableCategories = categories.filter(
-        (category) => !hiddenCategories.includes(category)
+  useEffect(() => {
+    if (products.length > 0) {
+      const filteredProducts = products.filter(
+        (product) =>
+          product.categoryId === selectedCategory && product.shopId === shopId
       );
-      return availableCategories;
-    } else {
-      return (
-        <Section>
-          <Loader />
-        </Section>
-      );
+      setProductsPerCategory(filteredProducts);
     }
-  };
-
-  useEffect(() => {
-    const availableCategories = filterAvailableCategories(
-      shopData.categories,
-      shopData.hiddenCategories
-    );
-    dispatch(fetchCategories(availableCategories));
-  }, [dispatch, shopData.categories, shopData.hiddenCategories]);
-
-  useEffect(() => {
-    const filteredDishes = dishes.filter(
-      (dish) =>
-        dish.categoryId === selectedCategory && dish.shopId === shopData._id
-    );
-    setDishesPerCategory(filteredDishes);
-  }, [selectedCategory, dishes]);
+  }, [selectedCategory, products]);
 
   const handleCategoryClick = async (categoryId) => {
+    console.log(loadedCategories);
+    setSelectedCategory(categoryId);
     if (!loadedCategories.includes(categoryId)) {
-      dispatch(fetchDishesByCategory({ shopId: shopData._id, categoryId }));
+      dispatch(fetchProductByShopAndCategory({ shopId: shopId, categoryId }));
       setLoadedCategories((prevLoadedCategories) => [
         ...prevLoadedCategories,
         categoryId,
       ]);
     }
-
     if (selectedCategory === categoryId) {
       setExpanded(false);
       setSelectedCategory("");
@@ -127,33 +109,35 @@ const CategoriesContainer = ({ shopData }) => {
     }
   };
 
-  if (categoriesLoading)
-    return (
-      <Section>
-        <Loader />
-      </Section>
-    );
+  if (loadingProducts) {
+    return <Loader />;
+  }
 
   return (
     <Section>
       <Categories>
-        {categories.map((category) => (
-          <Category
-            key={category.id}
-            category={category}
-            selectedCategory={selectedCategory}
-            onCategoryClick={handleCategoryClick}
-          />
-        ))}
+        {categories.length > 0 ? (
+          categories.map((category) => (
+            <Category
+              key={category.id}
+              category={category}
+              selectedCategory={selectedCategory}
+              onCategoryClick={handleCategoryClick}
+            />
+          ))
+        ) : (
+          <SelectCategory>
+            <Content>{t("noCategories")}</Content>
+          </SelectCategory>
+        )}
       </Categories>
       {expanded ? (
-        <DishesContainer
-          dishes={dishesPerCategory}
+        <ProductsContainer
+          products={productsPerCategory}
           expanded={expanded}
-        ></DishesContainer>
+        ></ProductsContainer>
       ) : (
         <SelectCategory>
-          {" "}
           <Content> {t("selectCategory")} </Content>{" "}
         </SelectCategory>
       )}
@@ -161,4 +145,4 @@ const CategoriesContainer = ({ shopData }) => {
   );
 };
 
-export default CategoriesContainer;
+export default CategoriesContainerForProducts;

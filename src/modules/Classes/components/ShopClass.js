@@ -26,7 +26,7 @@ const Section = styled.button`
   }
 `;
 
-const CategoryName = styled.h5`
+const ClassName = styled.h5`
   width: 100%;
   text-align: center;
   transition: all 0.3s ease;
@@ -40,21 +40,21 @@ const CategoryName = styled.h5`
     font-size: ${(props) => props.theme.fontsm};
   }
 `;
-const Category = ({ category, onCategoryClick, selectedCategory }) => {
+const ShopClass = ({ shopClass, onClassClick, selectedClass }) => {
   const handleHeadingClick = () => {
-    onCategoryClick(category.id);
+    onClassClick(shopClass.id);
   };
 
   return (
     <Section
       onClick={handleHeadingClick}
-      selected={selectedCategory === category.id}
+      selected={selectedClass === shopClass.id}
     >
-      <CategoryName selected={selectedCategory === category.id}>
-        {category.name}
-      </CategoryName>
+      <ClassName selected={selectedClass === shopClass.id}>
+        {shopClass.name}
+      </ClassName>
     </Section>
   );
 };
 
-export default Category;
+export default ShopClass;

@@ -4,6 +4,9 @@ import { reducer as imagesReducer } from "./modules/Images/state/reducers";
 import { reducer as categoriesReducer } from "./modules/Categories/state/reducers";
 import { reducer as dishesReducer } from "./modules/Dish/state/reducers";
 import { reducer as cartReducer } from "./modules/Cart/state/reducers";
+import { reducer as classesReducer } from "./modules/Classes/state/reducers";
+import { reducer as productsReducer } from "./modules/Product/state/reducers";
+import { reducer as familiesReducer } from "./modules/Families/state/reducers";
 
 const rootReducer = combineReducers({
   shops: shopsReducer,
@@ -11,6 +14,9 @@ const rootReducer = combineReducers({
   categories: categoriesReducer,
   dishes: dishesReducer,
   cart: cartReducer,
+  classes: classesReducer,
+  products: productsReducer,
+  families: familiesReducer,
 });
 
 const store = configureStore({

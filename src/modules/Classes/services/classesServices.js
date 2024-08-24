@@ -10,10 +10,6 @@ const headers = {
   Authorization: token,
 };
 
-export const getCategory = (id) => {
-  return axios.get(`${prodUrl}/category/${id}`, { headers });
-};
-
-export const getCategoriesByFamilyId = (id) => {
-  return axios.get(`${prodUrl}/category/findByFamily/${id}`, { headers });
+export const getshopClass = (id) => {
+  return axios.get(`${prodUrl}/productClass/${id}`, { headers });
 };
