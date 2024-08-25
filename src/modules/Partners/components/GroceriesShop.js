@@ -118,8 +118,12 @@ const GroceriesShop = ({ selectedShop, selectedShopImage }) => {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   const filterAvailableClasses = (classes, hiddenClasses) => {
+    // Ensure hiddenClasses is an array before using includes
+    const validHiddenClasses = Array.isArray(hiddenClasses)
+      ? hiddenClasses
+      : [];
     return classes
-      ? classes.filter((shopClass) => !hiddenClasses.includes(shopClass))
+      ? classes.filter((shopClass) => !validHiddenClasses.includes(shopClass))
       : [];
   };
 
