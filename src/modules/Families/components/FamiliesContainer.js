@@ -42,9 +42,14 @@ const Families = styled.div`
   }
 `;
 
-const FamiliesContainer = ({ families, selectedFamily, setSelectedFamily }) => {
+const FamiliesContainer = ({
+  families,
+  selectedFamily,
+  setSelectedFamily,
+  loadedFamilies,
+  setLoadedFamilies,
+}) => {
   const dispatch = useDispatch();
-  const [loadedFamilies, setLoadedFamilies] = useState([]);
 
   const handleFamilyClick = async (familyId) => {
     setSelectedFamily(familyId);

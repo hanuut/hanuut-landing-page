@@ -41,10 +41,11 @@ const ClassesContainer = ({
   availableClasses,
   selectedClass,
   setSelectedClass,
+  loadedClasses,
+  setLoadedClasses,
 }) => {
   const dispatch = useDispatch();
   const { classes, loading: classesLoading } = useSelector(selectClasses);
-  const [loadedClasses, setLoadedClasses] = useState([]);
 
   useEffect(() => {
     dispatch(fetchClasses(availableClasses));

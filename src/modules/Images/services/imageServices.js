@@ -11,5 +11,5 @@ const headers = {
 };
 
 export const getImage = (imageId) => {
-    return axios.get(`${prodUrl}/image/${imageId}`, { headers });
+  return axios.get(`${prodUrl}/image/${imageId}`, { headers });
 };

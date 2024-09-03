@@ -3,8 +3,10 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { t } from "i18next";
 import { light } from "../../../config/Themes";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../Cart/state/reducers";
+import { selectShop } from "../../Partners/state/reducers";
+import ProductDetails from "./ProductDetails";
 
 const Card = styled.div`
   width: 30%;
@@ -66,28 +68,84 @@ const Price = styled.h4`
   font-size: 1.4rem;
 `;
 
-const Product = ({ product }) => {
+const ProductDetailsContainer = styled.div`
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 97%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  top: 3rem;
+  border-radius: ${(props) => props.theme.defaultRadius};
+  box-shadow: 0 5px 5px rgba(${(props) => props.theme.primaryColorRgba}, 0.2);
+  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+  background-color: ${(props) => props.theme.body};
+  @media (max-width: 768px) {
+    padding: ${(props) => props.theme.smallPadding};
+    width: 95%;
+    height: 90%;
+  }
+`;
+const Product = ({
+  product,
+  selectedProduct,
+  setSelectedProduct,
+  selectedCategory,
+}) => {
+  console.log("product is ", product.id);
+  const selectedShop = useSelector(selectShop);
   const { i18n } = useTranslation();
   const { name, sellingPrice } = product;
 
+  const onProductClick = () => {
+    console.log(selectedProduct);
+    if (selectedProduct?.id === product.id) {
+      setSelectedProduct(null);
+    } else {
+      setSelectedProduct(product);
+    }
+  };
+
   return (
-    <Card isArabic={i18n.language === "ar"}>
-      <Body>
-        <ContentRow>
-          <Name>
-            {name} - <Brand>{product.brand}</Brand>
-          </Name>
-        </ContentRow>
-        <ContentRow>
-          <Desc>{product.description}</Desc>
-          <PriceContainer>
-            <Price>
-              {sellingPrice} {t("dzd")}
-            </Price>
-          </PriceContainer>
-        </ContentRow>
-      </Body>
-    </Card>
+    <>
+      <Card
+        isArabic={i18n.language === "ar"}
+        key={product.id}
+        onClick={onProductClick}
+      >
+        <Body>
+          <ContentRow>
+            <Name>
+              {name} - <Brand>{product.brand}</Brand>
+            </Name>
+          </ContentRow>
+          <ContentRow>
+            {selectedShop.domainId.keyword === "global" ? (
+              <Desc>{product.shortDescription}</Desc>
+            ) : (
+              <Desc>{product.description}</Desc>
+            )}
+            <PriceContainer>
+              <Price>
+                {sellingPrice} {t("dzd")}
+              </Price>
+            </PriceContainer>
+          </ContentRow>
+        </Body>
+      </Card>
+      {selectedProduct?.id === product.id && (
+        <ProductDetailsContainer>
+          <ProductDetails
+            selectedCategory={selectedCategory}
+            selectedProduct={product}
+            setSelectedProduct={setSelectedProduct}
+          />
+        </ProductDetailsContainer>
+      )}
+    </>
   );
 };
 

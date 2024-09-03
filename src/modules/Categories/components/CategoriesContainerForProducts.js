@@ -11,6 +11,7 @@ import {
 import ProductsContainer from "../../Product/components/ProductsContainer";
 
 const Section = styled.div`
+  position: relative;
   margin-top: 1rem;
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight} - 11rem)`};
   width: 100%;
@@ -65,12 +66,13 @@ const Content = styled.p`
 
 const CategoriesContainerForProducts = ({
   categories,
-  selectedCategory,
   setSelectedCategory,
+  selectedCategory,
   shopId,
+  loadedCategories,
+  setLoadedCategories,
 }) => {
   const { t } = useTranslation();
-  const [loadedCategories, setLoadedCategories] = useState([]);
   const [productsPerCategory, setProductsPerCategory] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const dispatch = useDispatch();
@@ -91,7 +93,6 @@ const CategoriesContainerForProducts = ({
   }, [selectedCategory, products]);
 
   const handleCategoryClick = async (categoryId) => {
-    console.log(loadedCategories);
     setSelectedCategory(categoryId);
     if (!loadedCategories.includes(categoryId)) {
       dispatch(fetchProductByShopAndCategory({ shopId: shopId, categoryId }));
@@ -135,6 +136,7 @@ const CategoriesContainerForProducts = ({
         <ProductsContainer
           products={productsPerCategory}
           expanded={expanded}
+          selectedCategory={selectedCategory}
         ></ProductsContainer>
       ) : (
         <SelectCategory>

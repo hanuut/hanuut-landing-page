@@ -39,7 +39,16 @@ const familiesSlice = createSlice({
       })
       .addCase(fetchFamilies.fulfilled, (state, action) => {
         state.loading = false;
-        state.families = [...state.families, ...action.payload];
+
+        const newFamilies = action.payload.filter(
+          (newFamily) =>
+            !state.families.some(
+              (existingFamily) => existingFamily.id === newFamily.id
+            )
+        );
+
+        // Add only the new, non-duplicate categories
+        state.families = [...state.families, ...newFamilies];
       })
       .addCase(fetchFamilies.rejected, (state, action) => {
         state.loading = false;

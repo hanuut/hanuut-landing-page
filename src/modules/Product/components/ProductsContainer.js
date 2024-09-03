@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Product from "./Product";
 import Loader from "../../../components/Loader";
 import styled from "styled-components";
@@ -33,7 +33,8 @@ const Content = styled.p`
     font-size: ${(props) => props.theme.fontxxl};
   }
 `;
-const ProductsContainer = ({ products, expanded }) => {
+const ProductsContainer = ({ products, expanded, selectedCategory }) => {
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const { t } = useTranslation();
   const { loading: productsLoading, error: productError } =
     useSelector(selectProducts);
@@ -44,7 +45,13 @@ const ProductsContainer = ({ products, expanded }) => {
       {products.length > 0 ? (
         products.map((product) => {
           return product.isHidden !== true ? (
-            <Product key={product.id} product={product.product} />
+            <Product
+              key={product.product._id}
+              product={product.product}
+              selectedProduct={selectedProduct}
+              setSelectedProduct={setSelectedProduct}
+              selectedCategory={selectedCategory}
+            />
           ) : null;
         })
       ) : (
