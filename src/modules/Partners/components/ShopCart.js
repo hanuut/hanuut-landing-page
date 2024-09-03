@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import Loader from "../../../components/Loader";
+import DefautShopImage from "../../../assets/app-logo-minimal.png";
 
 const Container = styled.div`
   width: 100%;
@@ -37,7 +38,6 @@ const VerticalContainer = styled(Container)`
   width: 100%;
   align-items: flex-start;
   gap: 1rem;
-
 `;
 
 const ShopImage = styled.img`
@@ -94,7 +94,7 @@ const ShopDesc = styled.p`
 
 const ShopCart = ({ shop, imageData, className }) => {
   const { i18n } = useTranslation();
-  const [imageSrc, setImageSrc] = useState("");
+  const [imageSrc, setImageSrc] = useState(DefautShopImage);
 
   useEffect(() => {
     const loadImage = async () => {
@@ -106,7 +106,6 @@ const ShopCart = ({ shop, imageData, className }) => {
         setImageSrc(imageUrl);
       } catch (error) {
         console.error("Error loading image:", error);
-        // Handle the error, e.g., display a placeholder image or show an error message
       }
     };
 

@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { ShopCart, VerticalShopCart } from "./ShopCart";
 import { useParams } from "react-router-dom";
 import BackgroundImage from "../../../assets/background.png";
-import CategoriesContainer from "../../Categories/components/CategoriesContainer";
-import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import Playstore from "../../../assets/playstore.png";
 import {
   fetchShopWithUsername,
   selectShop,
@@ -19,10 +14,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../../components/Loader";
 import NotFoundPage from "../../NotFoundPage";
-import ButtonWithIcon from "../../../components/ButtonWithIcon";
-import ClassesContainer from "../../Classes/components/ClassesContainer";
 import FoodShop from "./FoodShop";
-import GroceriesShop from "./GroceriesShop";
+import Shop from "./Shop";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -86,7 +79,7 @@ const ShopPageWithUsername = () => {
           selectedShopImage={selectedShopImage}
         />
       ) : (
-        <GroceriesShop
+        <Shop
           selectedShop={selectedShop}
           selectedShopImage={selectedShopImage}
         />

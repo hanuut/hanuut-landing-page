@@ -41,7 +41,16 @@ const productSlice = createSlice({
       })
       .addCase(fetchProductByShopAndCategory.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = [...state.products, ...action.payload];
+
+        // Only add unique products to the state
+        const newProducts = action.payload.filter((newProduct) => {
+          return !state.products.some(
+            (existingProduct) =>
+              existingProduct.product._id === newProduct.product._id
+          );
+        });
+
+        state.products = [...state.products, ...newProducts];
       })
       .addCase(fetchProductByShopAndCategory.rejected, (state, action) => {
         state.loading = false;

@@ -14,7 +14,7 @@ import FamiliesContainer from "../../Families/components/FamiliesContainer";
 import { selectCategories } from "../../Categories/state/reducers";
 import CategoriesContainerForProducts from "../../Categories/components/CategoriesContainerForProducts";
 
-const GroceriesContainer = styled.div`
+const ShopContainer = styled.div`
   width: 80%;
   padding: 2rem;
   display: flex;
@@ -102,7 +102,7 @@ const LowerBox = styled.div`
   }
 `;
 
-const GroceriesShop = ({ selectedShop, selectedShopImage }) => {
+const Shop = ({ selectedShop, selectedShopImage }) => {
   const { t, i18n } = useTranslation();
   const link = "https://play.google.com/store/apps/details?id=com.hanuut.shop";
 
@@ -117,8 +117,12 @@ const GroceriesShop = ({ selectedShop, selectedShopImage }) => {
   const [availableCategories, setAvailableCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  // State for tracking loaded items
+  const [loadedCategories, setLoadedCategories] = useState([]);
+  const [loadedFamilies, setLoadedFamilies] = useState([]);
+  const [loadedClasses, setLoadedClasses] = useState([]);
+
   const filterAvailableClasses = (classes, hiddenClasses) => {
-    // Ensure hiddenClasses is an array before using includes
     const validHiddenClasses = Array.isArray(hiddenClasses)
       ? hiddenClasses
       : [];
@@ -170,7 +174,7 @@ const GroceriesShop = ({ selectedShop, selectedShopImage }) => {
   }, [selectedClass]);
 
   return (
-    <GroceriesContainer isArabic={i18n.language === "ar"}>
+    <ShopContainer isArabic={i18n.language === "ar"}>
       <UpperBox>
         {selectedShop && selectedShopImage ? (
           <ShopCart
@@ -203,6 +207,8 @@ const GroceriesShop = ({ selectedShop, selectedShopImage }) => {
                 availableClasses={availableClasses}
                 selectedClass={selectedClass}
                 setSelectedClass={setSelectedClass}
+                loadedClasses={loadedClasses} // Pass loadedClasses state
+                setLoadedClasses={setLoadedClasses} // Pass setter for loadedClasses
               />
             ) : (
               <Loader />
@@ -215,6 +221,8 @@ const GroceriesShop = ({ selectedShop, selectedShopImage }) => {
                 families={availableFamilies}
                 selectedFamily={selectedFamily}
                 setSelectedFamily={setSelectedFamily}
+                loadedFamilies={loadedFamilies} // Pass loadedFamilies state
+                setLoadedFamilies={setLoadedFamilies} // Pass setter for loadedFamilies
               />
             ) : null}
 
@@ -226,6 +234,8 @@ const GroceriesShop = ({ selectedShop, selectedShopImage }) => {
                 setSelectedCategory={setSelectedCategory}
                 selectedCategory={selectedCategory}
                 shopId={selectedShop._id}
+                loadedCategories={loadedCategories} // Pass loadedCategories state
+                setLoadedCategories={setLoadedCategories} // Pass setter for loadedCategories
               />
             ) : null}
           </>
@@ -233,8 +243,8 @@ const GroceriesShop = ({ selectedShop, selectedShopImage }) => {
           <Loader />
         )}
       </LowerBox>
-    </GroceriesContainer>
+    </ShopContainer>
   );
 };
 
-export default GroceriesShop;
+export default Shop;

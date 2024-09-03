@@ -12,7 +12,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Loader from "../../../components/Loader";
 
-
 const Section = styled.div`
   width: 100%;
   display: flex;
@@ -93,28 +92,30 @@ const ShopsContainer = () => {
         <></> // Render the component to inform that there are no valid shops yet
       ) : (
         <>
-        <Title>{t('ourPartners')}</Title>
-        <Container>
-          {shopsWithImages.map((shop) => (
-            (shop.shopData.domainId === "6357da1c6c62b4f58636879a") ? 
-            <Link
-              to={`/shop/${shop.shopData.username}`}
-              state={{
-                shopData: shop.shopData,
-                shopImage: shop.shopImage.image,
-              }}
-              key={shop.shopData.id}
-              className="shopLinkWrapper"
-            >
-              <ShopCart
-                key={shop.shopData.id}
-                shop={shop.shopData}
-                imageData={shop.shopImage.image}
-              />
-            </Link>
-            : <></>
-          ))}
-        </Container>
+          <Title>{t("ourPartners")}</Title>
+          <Container>
+            {shopsWithImages.map((shop) =>
+              shop.shopData.domainId === "6357da1c6c62b4f58636879a" ? (
+                <Link
+                  to={`/shop/${shop.shopData.username}`}
+                  state={{
+                    shopData: shop.shopData,
+                    shopImage: shop.shopImage.image,
+                  }}
+                  key={shop.shopData.id}
+                  className="shopLinkWrapper"
+                >
+                  <ShopCart
+                    key={shop.shopData.id}
+                    shop={shop.shopData}
+                    imageData={shop.shopImage.image}
+                  />
+                </Link>
+              ) : (
+                <></>
+              )
+            )}
+          </Container>
         </>
       )}
     </Section>
