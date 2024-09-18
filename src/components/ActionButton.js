@@ -28,19 +28,17 @@ const Button = styled.button`
 `;
 
 const AddToCartButtonStyles = styled(Button)`
-  width: 1.3rem;
-  height: 1.3rem;
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px;
-  font-size: ${(props) => props.theme.fontmd};
+  background-color: ${(props) => props.theme.primaryColor};
+  color: #fff;
+  border: none;
+  border-radius: ${(props) => props.theme.defaultRadius};
+  padding: ${(props) => props.theme.actionButtonPaddingMobile};
+  font-size: ${(props) => props.theme.fontxl};
   cursor: pointer;
   transition: all 0.5s ease;
 
   &:hover {
-    transform: scale(1);
+    transform: scale(1.03);
   }
 
   &:disabled {

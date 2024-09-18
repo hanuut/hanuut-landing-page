@@ -204,7 +204,7 @@ const Failed = ({ orderId, responseData, error }) => {
   const minutes = String(currentDate.getMinutes()).padStart(2, "0");
 
   const formattedDateTime = `${day}/${month}/20${year}, ${hours}:${minutes}`;
-  console.log(responseData);
+
   return (
     <Container isArabic={i18n.language === "ar"}>
       <GlassBox>

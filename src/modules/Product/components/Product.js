@@ -2,12 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { t } from "i18next";
-import { light } from "../../../config/Themes";
-import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../../Cart/state/reducers";
+import { useSelector } from "react-redux";
 import { selectShop } from "../../Partners/state/reducers";
 import ProductDetails from "./ProductDetails";
-
 const Card = styled.div`
   width: 30%;
   border: 1px solid rgba(${(props) => props.theme.textRgba}, 0.1);
@@ -17,7 +14,14 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
+  }
+
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -25,9 +29,8 @@ const Card = styled.div`
 
 const ContentRow = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const Body = styled.div`
@@ -69,44 +72,37 @@ const Price = styled.h4`
 `;
 
 const ProductDetailsContainer = styled.div`
-  position: sticky;
-  top: 0;
+  position: absolute;
   left: 0;
+  top: 6rem;
   width: 100%;
-  height: 97%;
+  height: 90%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  top: 3rem;
-  border-radius: ${(props) => props.theme.defaultRadius};
-  box-shadow: 0 5px 5px rgba(${(props) => props.theme.primaryColorRgba}, 0.2);
+  justify-content: center;
+
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  background-color: ${(props) => props.theme.body};
+
   @media (max-width: 768px) {
     padding: ${(props) => props.theme.smallPadding};
     width: 95%;
-    height: 90%;
+    height: auto;
   }
 `;
+
 const Product = ({
   product,
   selectedProduct,
   setSelectedProduct,
   selectedCategory,
 }) => {
-  console.log("product is ", product.id);
   const selectedShop = useSelector(selectShop);
   const { i18n } = useTranslation();
-  const { name, sellingPrice } = product;
+  const { name, sellingPrice, brand, shortDescription, description } = product;
 
   const onProductClick = () => {
-    console.log(selectedProduct);
-    if (selectedProduct?.id === product.id) {
-      setSelectedProduct(null);
-    } else {
-      setSelectedProduct(product);
-    }
+    setSelectedProduct(selectedProduct?.id === product.id ? null : product);
   };
 
   return (
@@ -115,19 +111,20 @@ const Product = ({
         isArabic={i18n.language === "ar"}
         key={product.id}
         onClick={onProductClick}
+        aria-label={`View details for ${name}`}
       >
         <Body>
           <ContentRow>
             <Name>
-              {name} - <Brand>{product.brand}</Brand>
+              {name} - <Brand>{brand}</Brand>
             </Name>
           </ContentRow>
           <ContentRow>
-            {selectedShop.domainId.keyword === "global" ? (
-              <Desc>{product.shortDescription}</Desc>
-            ) : (
-              <Desc>{product.description}</Desc>
-            )}
+            <Desc>
+              {selectedShop.domainId.keyword === "global"
+                ? shortDescription
+                : description}
+            </Desc>
             <PriceContainer>
               <Price>
                 {sellingPrice} {t("dzd")}
@@ -137,7 +134,7 @@ const Product = ({
         </Body>
       </Card>
       {selectedProduct?.id === product.id && (
-        <ProductDetailsContainer>
+        <ProductDetailsContainer isArabic={i18n.language === "ar"}>
           <ProductDetails
             selectedCategory={selectedCategory}
             selectedProduct={product}

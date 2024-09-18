@@ -21,28 +21,7 @@ const ShopContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background: linear-gradient(
-    90deg,
-    hsla(147, 45%, 80%, 1) 0%,
-    hsla(148, 46%, 92%, 1) 48%,
-    hsla(0, 0%, 100%, 1) 100%
-  );
 
-  background: -moz-linear-gradient(
-    90deg,
-    hsla(147, 45%, 80%, 1) 0%,
-    hsla(148, 46%, 92%, 1) 48%,
-    hsla(0, 0%, 100%, 1) 100%
-  );
-
-  background: -webkit-linear-gradient(
-    90deg,
-    hsla(147, 45%, 80%, 1) 0%,
-    hsla(148, 46%, 92%, 1) 48%,
-    hsla(0, 0%, 100%, 1) 100%
-  );
-  border-radius: ${(props) => props.theme.defaultRadius};
-  box-shadow: 0 5px 5px rgba(${(props) => props.theme.primaryColorRgba}, 0.2);
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
     padding: ${(props) => props.theme.smallPadding};

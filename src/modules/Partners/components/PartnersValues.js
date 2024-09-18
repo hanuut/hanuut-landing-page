@@ -2,8 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import Projection from "../../../assets/projection.svg";
 import Order from "../../../assets/order.svg";
-import Delivery from "../../../assets/deliveryIcon.svg";
 import { useTranslation } from "react-i18next";
+import IncreasingArrow from "../../../assets/increasingArrow.svg";
+import Megaphone from "../../../assets/megaphone.svg";
+import Organize from "../../../assets/organize.svg";
+
 const ValuesRow = styled.div`
   width: 100%;
   display: flex;
@@ -21,7 +24,7 @@ const ValuesRow = styled.div`
 
 const ValueCard = styled.div`
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  max-width: 25%;
+  flex: 1;
   background-color: rgba(${(props) => props.theme.bodyRgba}, 1);
   border-radius: ${(props) => props.theme.defaultRadius};
   padding: 2rem 3rem;
@@ -32,7 +35,6 @@ const ValueCard = styled.div`
   gap: 1rem;
   backdrop-filter: blur(5px);
   @media (max-width: 768px) {
-    max-width: 90%;
     width: 90%;
     padding: ${(props) => props.theme.actionButtonPadding};
     gap: 0.5rem;
@@ -43,6 +45,7 @@ const CardHeading = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+  width: 100%;
 `;
 
 const Icon = styled.img`
@@ -56,17 +59,16 @@ const Icon = styled.img`
 
 const Title = styled.h2`
   font-size: ${(props) => props.theme.fontxxxl};
-  font-weight: 900;
-  text-transform: uppercase;
+  text-transform: capitalize;
   color: ${(props) => props.theme.primaryColor};
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontxl};
   }
 `;
 
-const CardDescription = styled.h3`
+const CardDescription = styled.p`
   font-size: ${(props) => props.theme.fontxl};
-  font-weight: 400;
+
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontxl};
   }
@@ -77,21 +79,21 @@ const PartnersValues = () => {
     <ValuesRow isArabic={i18n.language === "ar"}>
       <ValueCard isArabic={i18n.language === "ar"}>
         <CardHeading>
-          <Icon src={Order}></Icon>
+          <Icon src={Megaphone}></Icon>
           <Title>{t("partnersValue1")}</Title>
         </CardHeading>
         <CardDescription>{t("partnersValue1Description")}</CardDescription>
       </ValueCard>
       <ValueCard isArabic={i18n.language === "ar"}>
         <CardHeading>
-          <Icon src={Projection}></Icon>
+          <Icon src={Organize}></Icon>
           <Title>{t("partnersValue2")}</Title>
         </CardHeading>
         <CardDescription> {t("partnersValue2Description")} </CardDescription>
       </ValueCard>
       <ValueCard isArabic={i18n.language === "ar"}>
         <CardHeading>
-          <Icon src={Delivery}></Icon>
+          <Icon src={IncreasingArrow}></Icon>
           <Title>{t("partnersValue3")}</Title>
         </CardHeading>
         <CardDescription>{t("partnersValue3Description")} </CardDescription>

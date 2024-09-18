@@ -24,16 +24,17 @@ const CartContent = styled.div`
   right: ${(props) => (props.isopen ? "8%" : "-100%")};
   width: ${(props) => (props.isopen ? "33%" : "0")};
   height: 80vh;
-  border: 1px solid black;
+
   display: flex;
   align-items: center;
   justify-content: flex-start;
   flex-direction: column;
+  border: 1px solid black;
   transition: all 0.2s ease;
   background: transparent;
   backdrop-filter: blur(50px);
   border-radius: 10px;
-  bac
+
   overflow-y: scroll;
   @media (max-width: 768px) {
   }
@@ -237,11 +238,13 @@ const Cart = ({ shopId }) => {
   }, [shopId, cart]);
 
   useEffect(() => {
+    console.log();
     const totalPriceInstance = filteredCartItems.reduce(
       (total, cartItem) => total + cartItem.sellingPrice * cartItem.quantity,
       0
     );
     setTotalPrice(totalPriceInstance);
+    console.log(filteredCartItems);
   }, [filteredCartItems]);
 
   const onProceedClick = (e) => {

@@ -34,7 +34,7 @@ export const fetchCategories = createAsyncThunk(
 export const fetchCategoriesByFamilyId = createAsyncThunk(
   "categories/fetchCategoriesByFamilyId",
   async (familyId) => {
-    // console.log(familyId);
+
     try {
       const response = await getCategoriesByFamilyId(familyId);
       return response.data;

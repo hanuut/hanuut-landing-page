@@ -15,10 +15,9 @@ import { addToCart } from "../../Cart/state/reducers";
 
 const Card = styled.div`
   width: 30%;
-  border: 1px solid rgba(${(props) => props.theme.textRgba}, 0.1);
+  border: 1px solid rgba(${(props) => props.theme.textRgba}, 0.3);
   border-radius: ${(props) => props.theme.smallRadius};
   padding: 1rem;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -43,7 +42,7 @@ const Body = styled.div`
   justify-content: space-between;
 `;
 
-const Name = styled.h4`
+const Name = styled.h3`
   font-family: "Tajawal", sans-serif;
   margin-bottom: 0.5rem;
 `;
@@ -58,7 +57,7 @@ const Ingredients = styled.div`
   overflow-x: scroll;
 `;
 
-const Ingredient = styled.h6`
+const Ingredient = styled.h5`
   font-family: "Tajawal", sans-serif;
   font-weight: 100;
   min-width: fit-content;
@@ -74,7 +73,7 @@ const PriceContainer = styled.div`
   font-weight: bold;
 `;
 
-const Price = styled.h4``;
+const Price = styled.h3``;
 
 const Dish = ({ dish }) => {
   const { i18n } = useTranslation();
@@ -84,11 +83,11 @@ const Dish = ({ dish }) => {
     ingredients && ingredients.length > 0
       ? ingredients.filter((item) => item.trim() !== "")
       : [];
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  const onAddToCartClick = () => {
-    dispatch(addToCart(dish));
-  };
+  // const onAddToCartClick = () => {
+  //   dispatch(addToCart(dish));
+  // };
 
   return (
     <Card isArabic={i18n.language === "ar"}>

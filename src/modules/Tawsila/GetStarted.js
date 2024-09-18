@@ -378,12 +378,11 @@ const GetStarted = () => {
 
   const handleVerify = async (event) => {
     event.preventDefault();
-    // console.log("Verifying phone number...");
+
     const isPhoneUsed = await checkPhoneNumberAvailability(phone);
     if (isPhoneUsed === true) {
-      // console.log("Phone number is used. Checking subscription request...");
       const subscribeRequest = await getSubscribeRequest(phone);
-      // console.log(subscribeRequest);
+
       if (subscribeRequest.isAccepted === true) {
         setSuccessMessage(t("clickToDownloadApp"));
         setIsAccepted(true);
@@ -395,7 +394,6 @@ const GetStarted = () => {
       setIsSubmitting(false);
       return;
     } else {
-      // console.log("Phone number is not used.");
       setIsSubmitting(false);
     }
   };
@@ -405,11 +403,6 @@ const GetStarted = () => {
     window.open(tawsilaDownloadLink);
     setCurrentStep(3);
   };
-
-  useEffect(() => {
-    // console.log(currentStep);
-  }, [currentStep]);
-
   return (
     <Section>
       <Container isArabic={i18n.language === "ar"}>

@@ -12,8 +12,6 @@ const headers = {
 
 export const getProductByShopAndCategory = async (shopId, categoryId) => {
   try {
-    console.log(shopId, categoryId);
-
     // Fetch data from both endpoints concurrently
     const [productShopResponse, globalProductResponse] = await Promise.all([
       axios.get(

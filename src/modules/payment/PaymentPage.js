@@ -69,7 +69,7 @@ const PaymentPage = () => {
           }
         }
       } catch (error) {
-        console.log(error);
+
         setPaymentStatus({
           errorMessage: error,
         });
