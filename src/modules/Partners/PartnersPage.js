@@ -3,10 +3,12 @@ import styled from "styled-components";
 import PartnersImg from "../../assets/partnersIllustration.svg";
 import BackgroundImage from "../../assets/background.png";
 import { useTranslation } from "react-i18next";
-// import ShopsContainer from "./components/ShopsContainer";
-import { ActionButton } from "../../components/ActionButton";
+// import { ActionButton } from "../../components/ActionButton";
+// import JoinUs from "./components/JoinUs";
+import ButtonWithIcon from "../../components/ButtonWithIcon";
 import PartnersValues from "./components/PartnersValues";
-import JoinUs from "./components/JoinUs";
+import Windows from "../../assets/windows.svg";
+import Playstore from "../../assets/playstore.png";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
@@ -52,7 +54,15 @@ const UpperBox = styled.div`
     margin-top: 1rem;
   }
 `;
-
+const ButtonsRow = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 1.5rem;
+`;
 const RightBox = styled.div`
   width: 40%;
   display: flex;
@@ -75,7 +85,6 @@ const LeftBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border-radius: 10px;
   justify-content: flex-start;
   @media (max-width: 768px) {
     width: 100%;
@@ -84,7 +93,6 @@ const LeftBox = styled.div`
 `;
 const LowerBox = styled.div`
   width: 100%;
-
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -125,8 +133,7 @@ const Heading = styled.h1`
 const SubHeading = styled.h2`
   width: 99%;
   font-size: ${(props) => props.theme.fontxxxl};
-  margin-bottom: 2rem;
-
+  margin-bottom: 1rem;
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontxl};
@@ -146,11 +153,17 @@ const Paragraph = styled.p`
 
 const PartnersPage = () => {
   const { t, i18n } = useTranslation();
-  const handleJoinUsOnClick = () => {
-    const element = document.getElementById("joinUs");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+  const myHanuutDownloadLinkWindows =
+    process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK;
+  const myHanuutDownloadLink =
+    process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
+  const handleDownloadPlay = (e) => {
+    e.preventDefault();
+    window.open(myHanuutDownloadLink);
+  };
+  const handleDownloadWindows = (e) => {
+    e.preventDefault();
+    window.open(myHanuutDownloadLinkWindows);
   };
 
   return (
@@ -165,9 +178,25 @@ const PartnersPage = () => {
             </Heading>
             <SubHeading>{t("partnerSubHeading")}</SubHeading>
             <Paragraph>{t("partnerParagraph")}</Paragraph>
-            <ActionButton onClick={handleJoinUsOnClick}>
-              {t("joinOurCommunity")}
-            </ActionButton>
+            <ButtonsRow>
+              <ButtonWithIcon
+                image={Playstore}
+                backgroundColor="#000000"
+                text1={t("getItOn")}
+                text2={t("googlePlay")}
+                className="homeDownloadButton"
+                onClick={(e) => handleDownloadPlay(e)}
+              ></ButtonWithIcon>
+
+              <ButtonWithIcon
+                image={Windows}
+                backgroundColor="#000000"
+                text1={t("getItOn")}
+                text2={"Windows"}
+                className="homeDownloadButton"
+                onClick={(e) => handleDownloadWindows(e)}
+              ></ButtonWithIcon>
+            </ButtonsRow>
           </LeftBox>
           <RightBox>
             <PartnersImageContainer
@@ -178,10 +207,7 @@ const PartnersPage = () => {
           </RightBox>
         </UpperBox>
         <PartnersValues />
-        <LowerBox isArabic={i18n.language === "ar"}>
-          {/* <ShopsContainer /> */}
-          <JoinUs />
-        </LowerBox>
+        {/* <LowerBox isArabic={i18n.language === "ar"}></LowerBox> */}
       </PartnersContainer>
     </Section>
   );

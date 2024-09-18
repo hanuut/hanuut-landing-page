@@ -382,7 +382,7 @@ const PartnersForm = ({ setStep }) => {
     process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
 
   useEffect(() => {
-    // console.log(myHanuutDownloadLinkWindows, myHanuutDownloadLinkWindows);
+
   }, [myHanuutDownloadLinkWindows, myHanuutDownloadLinkWindows]);
 
   const resetForm = () => {

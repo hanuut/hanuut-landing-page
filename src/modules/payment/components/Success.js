@@ -366,7 +366,7 @@ const Success = ({ orderId, successMessage, responseData }) => {
       setPdfFileBlob(blob);
     }
   }, [responseData]);
-  console.log(responseData);
+
   return (
     <Container isArabic={i18n.language === "ar"}>
       <GlassBox>

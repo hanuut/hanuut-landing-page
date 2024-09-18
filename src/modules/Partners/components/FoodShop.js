@@ -15,28 +15,30 @@ const FoodContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background: linear-gradient(
-    90deg,
-    hsla(147, 45%, 80%, 1) 0%,
-    hsla(148, 46%, 92%, 1) 48%,
-    hsla(0, 0%, 100%, 1) 100%
-  );
+  // background: linear-gradient(
+  //   90deg,
+  //   hsla(147, 45%, 80%, 1) 0%,
+  //   hsla(148, 46%, 92%, 1) 48%,
+  //   hsla(0, 0%, 100%, 1) 100%
+  // );
 
-  background: -moz-linear-gradient(
-    90deg,
-    hsla(147, 45%, 80%, 1) 0%,
-    hsla(148, 46%, 92%, 1) 48%,
-    hsla(0, 0%, 100%, 1) 100%
-  );
+  // background: -moz-linear-gradient(
+  //   90deg,
+  //   hsla(147, 45%, 80%, 1) 0%,
+  //   hsla(148, 46%, 92%, 1) 48%,
+  //   hsla(0, 0%, 100%, 1) 100%
+  // );
 
-  background: -webkit-linear-gradient(
-    90deg,
-    hsla(147, 45%, 80%, 1) 0%,
-    hsla(148, 46%, 92%, 1) 48%,
-    hsla(0, 0%, 100%, 1) 100%
-  );
+  // background: -webkit-linear-gradient(
+  //   90deg,
+  //   hsla(147, 45%, 80%, 1) 0%,
+  //   hsla(148, 46%, 92%, 1) 48%,
+  //   hsla(0, 0%, 100%, 1) 100%
+  // );
+  background-color: ${(props) => props.theme.body};
   border-radius: ${(props) => props.theme.defaultRadius};
-  box-shadow: 0 5px 5px rgba(${(props) => props.theme.primaryColorRgba}, 0.2);
+  // box-shadow: 0 5px 5px rgba(${(props) =>
+    props.theme.primaryColorRgba}, 0.2);
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
     padding: ${(props) => props.theme.smallPadding};
@@ -92,8 +94,6 @@ const LowerBox = styled.div`
 `;
 
 const FoodShop = ({ selectedShop, selectedShopImage }) => {
-  // console.log("foodshop selected shop: ", selectedShop);
-  // console.log("foodshop selected image: ", selectedShopImage);
   const { t, i18n } = useTranslation();
   const link = "https://play.google.com/store/apps/details?id=com.hanuut.shop";
 

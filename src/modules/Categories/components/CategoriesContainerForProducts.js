@@ -11,7 +11,6 @@ import {
 import ProductsContainer from "../../Product/components/ProductsContainer";
 
 const Section = styled.div`
-  position: relative;
   margin-top: 1rem;
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight} - 11rem)`};
   width: 100%;

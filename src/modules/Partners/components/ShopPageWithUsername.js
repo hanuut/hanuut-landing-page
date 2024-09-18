@@ -43,13 +43,10 @@ const ShopPageWithUsername = () => {
 
   useEffect(() => {
     dispatch(fetchShopWithUsername(username));
-    // console.log(selectedShop);
   }, [dispatch, username]);
 
   useEffect(() => {
     if (selectedShop.domainId) {
-      // console.log("fetching domain ...");
-      // console.log(domainKeyWord);
       setDomainKeyWord(selectedShop.domainId.keyword);
     }
   }, [dispatch, selectedShop]);

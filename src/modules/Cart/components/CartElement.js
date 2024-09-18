@@ -1,111 +1,144 @@
 import React from "react";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
-import { addToCart, removeFromCart } from "../state/reducers";
 import {
-  DecrementQuantityButton,
-  IncrementQuantityButton,
-} from "../../../components/ActionButton";
+  incrementQuantity,
+  decrementQuantity,
+  removeFromCart,
+} from "../state/reducers";
 import ArrowUp from "../../../assets/icons/arrowUp.svg";
 import ArrowDown from "../../../assets/icons/arrowDown.svg";
+import DeleteIcon from "../../../assets/icons/delete.svg";
 
 const CartItemContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   width: 95%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  background-color: transparent;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
+  border-bottom: 1px solid black;
+  padding-bottom: 1rem;
+  transition: box-shadow 0.3s ease;
 `;
+
 const ContentContainer = styled.div`
+  width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  padding: 0 0.5rem;
+`;
+
+const TitleRow = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
 `;
 
 const ItemDetails = styled.div`
   display: flex;
   flex-direction: column;
+  margin-right: 1rem;
 `;
 
 const ItemTitle = styled.span`
+  width: 100%;
   font-size: ${(props) => props.theme.fontlg};
-`;
-
-const TotalItemPrice = styled.p`
-  margin-left: 1rem;
-  font-size: ${(props) => props.theme.fontxl};
   font-weight: bold;
+  color: ${(props) => props.theme.textColor};
 `;
 
-const ItemPrice = styled.span`
+const ItemBrand = styled.span`
   font-size: ${(props) => props.theme.fontmd};
   color: rgba(${(props) => props.theme.textRgba}, 0.7);
+`;
+
+const ItemColorSize = styled.span`
+  font-size: ${(props) => props.theme.fontsm};
+  color: rgba(${(props) => props.theme.textRgba}, 0.5);
+  margin-top: 0.25rem;
+`;
+
+const TotalItemPrice = styled.div`
+  margin-right: 1rem;
+  font-size: ${(props) => props.theme.fontxl};
+  font-weight: bold;
+  color: ${(props) => props.theme.textColor};
 `;
 
 const QuantityControls = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  font-size: ${(props) => props.theme.fontmd};
-  padding: 0.5rem;
 `;
 
 const Quantity = styled.span`
-  margin: 0 0.5rem;
   font-size: ${(props) => props.theme.fontlg};
   font-weight: bold;
+  margin: 0.5rem 0;
+  color: ${(props) => props.theme.textColor};
 `;
 
 const QuantityControlsButton = styled.img`
   width: 1.5rem;
   height: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const DeleteButton = styled.img`
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 
 const CartElement = ({ cartItem }) => {
   const dispatch = useDispatch();
-  const { productId, title, shopId, sellingPrice } = cartItem;
+  const { productId, title, brand, color, size, sellingPrice, quantity } =
+    cartItem;
 
   const handleIncrement = () => {
-    console.log("increment", cartItem);
-    const dish = {
-      _id: productId,
-      name: title,
-      sellingPrice: sellingPrice,
-      shopId: shopId,
-    };
-    dispatch(addToCart(dish));
+    dispatch(incrementQuantity(productId));
   };
 
   const handleDecrement = () => {
-    dispatch(removeFromCart(cartItem.productId));
+    dispatch(decrementQuantity(productId));
+  };
+
+  const handleRemove = () => {
+    dispatch(removeFromCart(productId));
   };
 
   return (
     <CartItemContainer>
       <ContentContainer>
-        <Quantity>{cartItem.quantity}</Quantity>
         <ItemDetails>
-          <ItemTitle>{cartItem.title}</ItemTitle>
-          <ItemPrice>{cartItem.sellingPrice} DZD</ItemPrice>
+          <TitleRow>
+            <ItemTitle>
+              {title} - {brand}
+            </ItemTitle>
+            <DeleteButton src={DeleteIcon} onClick={handleRemove} />
+          </TitleRow>
+          <ItemColorSize>Color: {color}</ItemColorSize>
+          <ItemColorSize>Size: {size}</ItemColorSize>
         </ItemDetails>
+        <TotalItemPrice>{sellingPrice * quantity} DZD</TotalItemPrice>
       </ContentContainer>
       <QuantityControls>
-        <TotalItemPrice>
-          {cartItem.quantity * cartItem.sellingPrice}
-        </TotalItemPrice>{" "}
-        <QuantityControlsButton
-          src={ArrowUp}
-          onClick={handleIncrement}
-        ></QuantityControlsButton>
-        <QuantityControlsButton
-          src={ArrowDown}
-          onClick={handleDecrement}
-        ></QuantityControlsButton>
+        <QuantityControlsButton src={ArrowUp} onClick={handleIncrement} />
+        <Quantity>{quantity}</Quantity>
+        <QuantityControlsButton src={ArrowDown} onClick={handleDecrement} />
       </QuantityControls>
     </CartItemContainer>
   );
