@@ -31,6 +31,7 @@ const CustomRouter = () => {
       <Route path="/tawsila" element={<Tawsila />} />
       <Route path="/links" element={<LinksPage />} />
       <Route path="*" element={<NotFoundPage />} />
+  <Route path="/shop/:username" element={<ShopPageWithUsername />} />
       {/* <Route path="/shop/:shopName" element={<ShopPage/>} /> */}
       {/* <Route path="/confirmPayment" element={<PaymentPage />} /> */}
       {/* <Route path="/testPayment" element={<SatimTestPage />} /> */}
