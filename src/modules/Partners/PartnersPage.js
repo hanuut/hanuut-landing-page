@@ -64,7 +64,8 @@ const ButtonsRow = styled.div`
   margin-top: 1.5rem;
 `;
 const RightBox = styled.div`
-  width: 40%;
+  width: 55%;
+  border: 1px solid red;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -74,8 +75,8 @@ const RightBox = styled.div`
   }
 `;
 const PartnersImageContainer = styled.img`
-  max-width: 100%;
-  object-fit: cover;
+  width: 90%;
+  max-height: 50vh;
   @media (max-width: 768px) {
     width: ${(props) => (props.hide ? "0" : "100%")};
   }
@@ -207,7 +208,7 @@ const PartnersPage = () => {
           </RightBox>
         </UpperBox>
         <PartnersValues />
-        {/* <LowerBox isArabic={i18n.language === "ar"}></LowerBox> */}
+        
       </PartnersContainer>
     </Section>
   );

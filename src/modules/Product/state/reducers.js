@@ -1,5 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getProductByShopAndCategory } from "../services/productsService";
+import {
+  getProductById,
+  getProductByShopAndCategory,
+} from "../services/productsService";
 
 export const fetchProductByShopAndCategory = createAsyncThunk(
   "products/fetchProductByShopAndCategory",
@@ -7,7 +10,7 @@ export const fetchProductByShopAndCategory = createAsyncThunk(
     const productByCategory = [];
     try {
       const response = await getProductByShopAndCategory(shopId, categoryId);
-
+      console.log(response);
       response.forEach((product) => {
         productByCategory.push({
           shopId: shopId,
@@ -23,8 +26,22 @@ export const fetchProductByShopAndCategory = createAsyncThunk(
   }
 );
 
+export const fetchProductById = createAsyncThunk(
+  "products/fetchProductById",
+  async (productId) => {
+    try {
+      const response = await getProductById(productId);
+      return response;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+);
+
 const initialState = {
   products: [],
+  selectedProduct: null,
   loading: false,
   error: null,
 };
@@ -55,9 +72,23 @@ const productSlice = createSlice({
       .addCase(fetchProductByShopAndCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      })
+
+      .addCase(fetchProductById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProductById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedProduct = action.payload;
+      })
+      .addCase(fetchProductById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });
 
 export const { reducer, actions } = productSlice;
 export const selectProducts = (state) => state.products;
+export const selectSelectedProduct = (state) => state.products.selectedProduct;
