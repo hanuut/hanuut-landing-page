@@ -19,7 +19,8 @@ const Card = styled.div`
   border-radius: ${(props) => props.theme.smallRadius};
   padding: 1rem;
   display: flex;
-  flex-direction: row;
+  gap: 0.5rem;
+  flex-direction: column;
   justify-content: space-between;
   transition: transform 0.3s ease;
   @media (max-width: 768px) {
@@ -27,25 +28,24 @@ const Card = styled.div`
   }
 `;
 
-const ContentRow = styled.div`
+const CardHeader = styled.div`
+  width: 100;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const CardBody = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  flex: 5;
 `;
 
-const Body = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-`;
+const Name = styled.h3``;
 
-const Name = styled.h3`
-  font-family: "Tajawal", sans-serif;
-  margin-bottom: 0.5rem;
-`;
+const Price = styled.h3``;
 
 const Ingredients = styled.div`
   max-width: 100%;
@@ -63,18 +63,6 @@ const Ingredient = styled.h5`
   min-width: fit-content;
 `;
 
-const PriceContainer = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 5px;
-  font-weight: bold;
-`;
-
-const Price = styled.h3``;
-
 const Dish = ({ dish }) => {
   const { i18n } = useTranslation();
   const { name, sellingPrice } = dish;
@@ -91,29 +79,24 @@ const Dish = ({ dish }) => {
 
   return (
     <Card isArabic={i18n.language === "ar"}>
-      <ContentRow>
+      <CardHeader>
         <Name>{name}</Name>
-        <Body>
-          {filteredIngredients.length > 0 && (
-            <Ingredients>
-              {filteredIngredients.map((ingredient, index) => (
-                <Ingredient key={index}>
-                  {ingredient}
-                  {index !== filteredIngredients.length - 1 ? "  " : ""}
-                </Ingredient>
-              ))}
-            </Ingredients>
-          )}
-        </Body>
-      </ContentRow>
-      <PriceContainer isArabic={i18n.language === "ar"}>
         <Price>
           {sellingPrice} {t("dzd")}
         </Price>
-        {/* <AddToCartButton key={dish._id} onClick={onAddToCartClick}>
-          +
-        </AddToCartButton> */}
-      </PriceContainer>
+      </CardHeader>
+      <CardBody>
+        {filteredIngredients.length > 0 && (
+          <Ingredients>
+            {filteredIngredients.map((ingredient, index) => (
+              <Ingredient key={index}>
+                {ingredient}
+                {index !== filteredIngredients.length - 1 ? "  " : ""}
+              </Ingredient>
+            ))}
+          </Ingredients>
+        )}
+      </CardBody>
     </Card>
   );
 };
