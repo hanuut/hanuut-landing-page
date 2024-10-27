@@ -208,7 +208,6 @@ const PartnersPage = () => {
           </RightBox>
         </UpperBox>
         <PartnersValues />
-        
       </PartnersContainer>
     </Section>
   );
