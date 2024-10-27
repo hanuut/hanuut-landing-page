@@ -94,6 +94,7 @@ const CategoriesContainerForProducts = ({
   const handleCategoryClick = async (categoryId) => {
     setSelectedCategory(categoryId);
     if (!loadedCategories.includes(categoryId)) {
+      console.log(shopId, categoryId);
       dispatch(fetchProductByShopAndCategory({ shopId: shopId, categoryId }));
       setLoadedCategories((prevLoadedCategories) => [
         ...prevLoadedCategories,

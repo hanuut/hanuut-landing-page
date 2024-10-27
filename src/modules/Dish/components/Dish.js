@@ -32,7 +32,7 @@ const ContentRow = styled.div`
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  max-width: 95%;
+  flex: 5;
 `;
 
 const Body = styled.div`
@@ -51,10 +51,10 @@ const Ingredients = styled.div`
   max-width: 100%;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
   gap: 5px;
-  overflow-x: scroll;
 `;
 
 const Ingredient = styled.h5`
@@ -64,7 +64,7 @@ const Ingredient = styled.h5`
 `;
 
 const PriceContainer = styled.div`
-  width: 20%;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -99,7 +99,7 @@ const Dish = ({ dish }) => {
               {filteredIngredients.map((ingredient, index) => (
                 <Ingredient key={index}>
                   {ingredient}
-                  {index !== filteredIngredients.length - 1 ? " - " : ""}
+                  {index !== filteredIngredients.length - 1 ? "  " : ""}
                 </Ingredient>
               ))}
             </Ingredients>

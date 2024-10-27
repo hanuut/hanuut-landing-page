@@ -12,7 +12,6 @@ const headers = {
 
 export const getProductByShopAndCategory = async (shopId, categoryId) => {
   try {
-    // Fetch data from both endpoints concurrently
     const [productShopResponse, globalProductResponse] = await Promise.all([
       axios.get(
         `${prodUrl}/product-shop/findAvailableByShopAndCategory/${shopId}/${categoryId}`,
@@ -24,14 +23,27 @@ export const getProductByShopAndCategory = async (shopId, categoryId) => {
       ),
     ]);
 
-    // Combine the results from both responses into an array
     const combinedData = [
       ...productShopResponse.data,
       ...globalProductResponse.data,
     ];
-
+    console.log(combinedData);
     return combinedData;
   } catch (error) {
     throw new Error("Failed to fetch category products");
+  }
+};
+
+export const getProductById = async (productId) => {
+  try {
+    const response = await axios.get(
+      `${prodUrl}/global-product/findById/${productId}`,
+      {
+        headers,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to fetch product");
   }
 };

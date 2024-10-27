@@ -5,6 +5,7 @@ import {
   getShopById,
   getShopByUsername,
 } from "../services/shopServices";
+import { fetchShopImage } from "../../Images/state/reducers";
 
 export const fetchShops = createAsyncThunk("shops/fetchShops", async () => {
   try {
@@ -56,6 +57,18 @@ const shopSlice = createSlice({
       .addCase(fetchShops.fulfilled, (state, action) => {
         state.loading = false;
         state.shops = action.payload;
+      })
+      .addCase(fetchShops.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(fetchShop.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchShop.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedShop = action.payload;
       })
       .addCase(fetchShop.rejected, (state, action) => {
         state.loading = false;
