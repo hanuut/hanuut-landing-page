@@ -514,7 +514,7 @@ const Success = ({ orderId, successMessage, responseData }) => {
               <PaymentInfoWrapper>
                 <Label className="satimMessage">
                   En cas de problème de paiement, veuillez contacter le numéro
-                  vert de la SATIM 3020 <img src={SatimLigne}></img>
+                  vert de la SATIM 3020 <img src={SatimLigne} alt="satim-logo"></img>
                 </Label>
               </PaymentInfoWrapper>
             </PaymentInfo>

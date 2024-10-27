@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import BackgroundImage from "../../assets/background.png";
-import TawsilaIllustration from "../../assets/tawsilaIllustration.png";
+import BackgroundImage from "../../assets/background.webp";
+import TawsilaIllustration from "../../assets/tawsilaIllustration.webp";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
@@ -23,8 +23,8 @@ import {
   postSubscribeRequest,
 } from "../SubscribeRequest/services/SubscribeRequest";
 import { isValidEmail, isValidPhone } from "../../components/validators";
-import TawsilaLogo from "../../assets/tawsilaLogo.png";
-import Playstore from "../../assets/playstore.png";
+import TawsilaLogo from "../../assets/tawsilaLogo.webp";
+import Playstore from "../../assets/playstore.webp";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};

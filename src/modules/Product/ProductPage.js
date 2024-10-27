@@ -19,7 +19,7 @@ import Loader from "../../components/Loader";
 import { ShopCart } from "../Partners/components/ShopCart";
 import { useTranslation } from "react-i18next";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
-import Playstore from "../../assets/playstore.png";
+import Playstore from "../../assets/playstore.webp";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};

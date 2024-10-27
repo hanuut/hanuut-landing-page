@@ -86,7 +86,7 @@ const Steps = () => {
   return (
     <StepsContainer isArabic={i18n.language === "ar"}>
       <StepRow>
-        <StepIcon src={SubscribeRequest} />
+        <StepIcon src={SubscribeRequest} alt="step-icon" loading="lazy" />
         <StepDescription className="step-one" isArabic={i18n.language === "ar"}>
           <StepTitle>{t("partnersFirstStepTitle")}</StepTitle>
           <StepText>
@@ -96,7 +96,7 @@ const Steps = () => {
         </StepDescription>
       </StepRow>
       <StepRow>
-        <StepIcon src={Approved} />
+        <StepIcon src={Approved} alt="step-icon" loading="lazy" />
         <StepDescription className="step-two" isArabic={i18n.language === "ar"}>
           <StepTitle>{t("partnersSecondStepTitle")}</StepTitle>
           <StepText>
@@ -106,7 +106,7 @@ const Steps = () => {
         </StepDescription>
       </StepRow>{" "}
       <StepRow>
-        <StepIcon src={IncreasingArrow} />
+        <StepIcon src={IncreasingArrow} alt="step-icon" loading="lazy" />
         <StepDescription
           className="step-three"
           isArabic={i18n.language === "ar"}

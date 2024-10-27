@@ -18,8 +18,8 @@ import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import Send from "../../../assets/send.svg";
 import fireworks from "../../../assets/fireworks.svg";
 import Windows from "../../../assets/windows.svg";
-import Playstore from "../../../assets/playstore.png";
-import MyHanuutLogo from "../../../assets/myhanuutlogo.png";
+import Playstore from "../../../assets/playstore.webp";
+import MyHanuutLogo from "../../../assets/myhanuutlogo.webp";
 
 import { Link } from "react-router-dom";
 
@@ -381,9 +381,10 @@ const PartnersForm = ({ setStep }) => {
   const myHanuutDownloadLink =
     process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
 
-  useEffect(() => {
-
-  }, [myHanuutDownloadLinkWindows, myHanuutDownloadLinkWindows]);
+  useEffect(() => {}, [
+    myHanuutDownloadLinkWindows,
+    myHanuutDownloadLinkWindows,
+  ]);
 
   const resetForm = () => {
     setEmail("");
@@ -713,7 +714,7 @@ const PartnersForm = ({ setStep }) => {
               isArabic={i18n.language === "ar"}
               isAccepted={isAccepted}
             >
-              <MyHanuutIcon src={MyHanuutLogo} />
+              <MyHanuutIcon src={MyHanuutLogo} alt="app-logo" />
               <Heading className="greenSubHeading">
                 {t("congratulations")}
               </Heading>
@@ -740,11 +741,12 @@ const PartnersForm = ({ setStep }) => {
               <Icon
                 src={i18n.language === "ar" ? Right : Left}
                 onClick={() => handleLeftClick()}
+                alt="navigate"
               />
             </FourthStep>
           ) : (
             <FourthStep isArabic={i18n.language === "ar"}>
-              <MyHanuutIcon src={MyHanuutLogo} />
+              <MyHanuutIcon src={MyHanuutLogo} alt="app-logo" />
               <Heading className="greenSubHeading">
                 {t("partnersFormThankYouTitle")}
               </Heading>
@@ -752,6 +754,7 @@ const PartnersForm = ({ setStep }) => {
               <Icon
                 src={i18n.language === "ar" ? Right : Left}
                 onClick={() => handleLeftClick()}
+                alt="navigate"
               />
             </FourthStep>
           ))}

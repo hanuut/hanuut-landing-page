@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import AboutUsIllutstration from "../../assets/aboutUs.png";
+import AboutUsIllutstration from "../../assets/aboutUs.webp";
 import MissionIllustration from "../../assets/mission.svg";
 import { useTranslation } from "react-i18next";
-import BackgroundImage from "../../assets/background.png";
+import BackgroundImage from "../../assets/background.webp";
 const Section = styled.div`
   min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
   display: flex;
@@ -158,6 +158,8 @@ function AboutUs() {
           <AboutUsIllutstrationContainer
             src={AboutUsIllutstration}
             isArabic={i18n.language === "ar"}
+            alt="hanuut"
+            loading="lazy"
           />
         </LeftBox>
         <RightBox>
@@ -165,7 +167,11 @@ function AboutUs() {
           <AboutText>{t("aboutUsText")}</AboutText>
           <MissionContainer isArabic={i18n.language === "ar"}>
             <MissionHeaderContainer>
-              <MissionIllutstrationContainer src={MissionIllustration} />
+              <MissionIllutstrationContainer
+                src={MissionIllustration}
+                alt="mission"
+                loading="lazy"
+              />
               <AboutTitle className="mission">
                 {t("aboutUsMissionTitle")}
               </AboutTitle>

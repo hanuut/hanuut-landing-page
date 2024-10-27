@@ -3,18 +3,18 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 
 const Section = styled.section`
-min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
-background-color: ${(props) => props.theme.body};
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-@media (max-width: 768px) {
-  min-height: 100vh;
-}
+  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
+  background-color: ${(props) => props.theme.body};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  @media (max-width: 768px) {
+    min-height: 100vh;
+  }
 `;
 const Container = styled.div`
-direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -109,26 +109,26 @@ const TextArea = styled.textarea`
 `;
 
 const Button = styled.button`
-margin-top: 10px;
-background-color: ${(props) => props.theme.primaryColor};
-color: #fff;
-border: none;
-border-radius: 5px;
-padding: ${(props) => props.theme.actionButtonPadding};
-font-size: ${(props) => props.theme.fontxl};
-cursor: pointer;
-transition: all 0.5s ease;
-&.submitting{
-  background-color: #eee;
-}
-&:hover {
-  transform: scale(1.03);
-}
+  margin-top: 10px;
+  background-color: ${(props) => props.theme.primaryColor};
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: ${(props) => props.theme.actionButtonPadding};
+  font-size: ${(props) => props.theme.fontxl};
+  cursor: pointer;
+  transition: all 0.5s ease;
+  &.submitting {
+    background-color: #eee;
+  }
+  &:hover {
+    transform: scale(1.03);
+  }
 
-@media (max-width: 768px) {
-  font-size: ${(props) => props.theme.fontlg};
-  padding: ${(props) => props.theme.actionButtonPaddingMobile};
-}
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontlg};
+    padding: ${(props) => props.theme.actionButtonPaddingMobile};
+  }
 `;
 
 const Message = styled.p`
@@ -143,7 +143,6 @@ const Message = styled.p`
 const Checkbox = styled.input`
   margin: 0 10px;
 `;
-
 
 const DeleteAccountPage = () => {
   const { t, i18n } = useTranslation();
@@ -175,118 +174,118 @@ const DeleteAccountPage = () => {
       reason,
       reasonDescription,
       deleteDataOnly,
-      deleteAccountWithData
+      deleteAccountWithData,
     };
-  //const testUrl = process.env.REACT_APP_API_TEST_URL;
-   const prodUrl = process.env.REACT_APP_API_PROD_URL;
+    //const testUrl = process.env.REACT_APP_API_TEST_URL;
+    const prodUrl = process.env.REACT_APP_API_PROD_URL;
     try {
-      const response = await fetch(prodUrl+'/deleteRequest', {
-        method: 'POST',
+      const response = await fetch(prodUrl + "/deleteRequest", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
       setIsSubmitting(false);
     } catch (error) {
-
-      console.error('Error sending request:', error);
+      console.error("Error sending request:", error);
       setIsSubmitting(false);
     }
   };
 
-
   return (
     <Section>
-    <Container isArabic={i18n.language === "ar"}>
-      <Title>{t('detleteAccountTitle')}</Title>
-      <Form onSubmit={handleSubmit}>
-        <InputWrapper>
-          <Label htmlFor="fullName">{t('deleteAccountFullName')}</Label>
-          <Input
-            type="text"
-            id="fullName"
-            value={fullName}
-            onChange={(event) => setFullName(event.target.value)}
-            required
-          />
-        </InputWrapper>
-        <InputWrapper>
-          <Label htmlFor="phoneNumber">{t('deleteAccountPhone')}</Label>
-          <Input
-            type="tel"
-            id="phoneNumber"
-            value={phoneNumber}
-            onChange={(event) => setPhoneNumber(event.target.value)}
-            required
-          />
-        </InputWrapper>
-        <InputWrapper>
-          <Label htmlFor="password">{t('deleteAccountPassword')}</Label>
-          <Input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </InputWrapper>
-        <InputWrapper>
-          <Label htmlFor="reason">{t('deleteAccountReason')}</Label>
-          <Select
-            id="reason"
-            value={reason}
-            onChange={handleReasonChange}
-          >
-            <Option value="" disabled>
-            {t('deleteAccountReasonHeader')}
-            </Option>
-            <Option value="No longer need the account">
-            {t('reasonNoLongerNeedAccount')}
-            </Option>
-            <Option value="Privacy concerns">{t('reasonPrivacy')}</Option>
-            <Option value="Not satisfied with the service">
-            {t('deleteAccountNotSatisfied')}
-            </Option>{" "}
-            <Option value="Other">{t('deleteAccountreasonOther')}</Option>
-          </Select>
-        </InputWrapper>
-        {reason === "Other" && (
+      <Container isArabic={i18n.language === "ar"}>
+        <Title>{t("detleteAccountTitle")}</Title>
+        <Form onSubmit={handleSubmit}>
           <InputWrapper>
-            <Label htmlFor="reasonDescription">{t('deleteAccountOtherReasonsDescription')}</Label>
-            <TextArea
-              id="reasonDescription"
-              value={reasonDescription}
-              onChange={handleReasonDescriptionChange}
+            <Label htmlFor="fullName">{t("deleteAccountFullName")}</Label>
+            <Input
+              type="text"
+              id="fullName"
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+              required
             />
           </InputWrapper>
-        )}
-        <Label>
-        <Checkbox
-          type="checkbox"
-          checked={deleteDataOnly}
-          onChange={(event) => setDeleteDataOnly(event.target.checked)}
-        />
-       {t('deleteDataOnly')}
-      </Label>
-      <Label>
-        <Checkbox
-          type="checkbox"
-          checked={deleteAccountWithData}
-          onChange={(event) => setDeleteAccountWithData(event.target.checked)}
-        />
-       {t('deleteAccountWithData')}
-      </Label>
-        <Button type="submit" className={isSubmitting ? 'submitting' : ''} disabled={isSubmitting}>
-        {isSubmitting ? t('buttonIsSubmitting') : t('buttonSubmit')}
-      </Button>
-      </Form>
-      <Message>
-      {t('deleteAccountMessage')}
-      </Message>
-    </Container>
+          <InputWrapper>
+            <Label htmlFor="phoneNumber">{t("deleteAccountPhone")}</Label>
+            <Input
+              type="tel"
+              id="phoneNumber"
+              value={phoneNumber}
+              onChange={(event) => setPhoneNumber(event.target.value)}
+              required
+            />
+          </InputWrapper>
+          <InputWrapper>
+            <Label htmlFor="password">{t("deleteAccountPassword")}</Label>
+            <Input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </InputWrapper>
+          <InputWrapper>
+            <Label htmlFor="reason">{t("deleteAccountReason")}</Label>
+            <Select id="reason" value={reason} onChange={handleReasonChange}>
+              <Option value="" disabled>
+                {t("deleteAccountReasonHeader")}
+              </Option>
+              <Option value="No longer need the account">
+                {t("reasonNoLongerNeedAccount")}
+              </Option>
+              <Option value="Privacy concerns">{t("reasonPrivacy")}</Option>
+              <Option value="Not satisfied with the service">
+                {t("deleteAccountNotSatisfied")}
+              </Option>{" "}
+              <Option value="Other">{t("deleteAccountreasonOther")}</Option>
+            </Select>
+          </InputWrapper>
+          {reason === "Other" && (
+            <InputWrapper>
+              <Label htmlFor="reasonDescription">
+                {t("deleteAccountOtherReasonsDescription")}
+              </Label>
+              <TextArea
+                id="reasonDescription"
+                value={reasonDescription}
+                onChange={handleReasonDescriptionChange}
+              />
+            </InputWrapper>
+          )}
+          <Label>
+            <Checkbox
+              type="checkbox"
+              checked={deleteDataOnly}
+              onChange={(event) => setDeleteDataOnly(event.target.checked)}
+            />
+            {t("deleteDataOnly")}
+          </Label>
+          <Label>
+            <Checkbox
+              type="checkbox"
+              checked={deleteAccountWithData}
+              onChange={(event) =>
+                setDeleteAccountWithData(event.target.checked)
+              }
+            />
+            {t("deleteAccountWithData")}
+          </Label>
+          <Button
+            type="submit"
+            className={isSubmitting ? "submitting" : ""}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? t("buttonIsSubmitting") : t("buttonSubmit")}
+          </Button>
+        </Form>
+        <Message>{t("deleteAccountMessage")}</Message>
+      </Container>
     </Section>
   );
 };

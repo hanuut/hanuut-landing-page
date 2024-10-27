@@ -79,21 +79,21 @@ const PartnersValues = () => {
     <ValuesRow isArabic={i18n.language === "ar"}>
       <ValueCard isArabic={i18n.language === "ar"}>
         <CardHeading>
-          <Icon src={Megaphone}></Icon>
+          <Icon src={Megaphone} alt="value"></Icon>
           <Title>{t("partnersValue1")}</Title>
         </CardHeading>
         <CardDescription>{t("partnersValue1Description")}</CardDescription>
       </ValueCard>
       <ValueCard isArabic={i18n.language === "ar"}>
         <CardHeading>
-          <Icon src={Organize}></Icon>
+          <Icon src={Organize} alt="value"></Icon>
           <Title>{t("partnersValue2")}</Title>
         </CardHeading>
         <CardDescription> {t("partnersValue2Description")} </CardDescription>
       </ValueCard>
       <ValueCard isArabic={i18n.language === "ar"}>
         <CardHeading>
-          <Icon src={IncreasingArrow}></Icon>
+          <Icon src={IncreasingArrow} alt="value"></Icon>
           <Title>{t("partnersValue3")}</Title>
         </CardHeading>
         <CardDescription>{t("partnersValue3Description")} </CardDescription>

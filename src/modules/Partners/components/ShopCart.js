@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import Loader from "../../../components/Loader";
-import DefautShopImage from "../../../assets/app-logo-minimal.png";
+import DefautShopImage from "../../../assets/app-logo-minimal.webp";
 
 const Container = styled.div`
   width: 100%;

@@ -1,14 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 import PartnersImg from "../../assets/partnersIllustration.svg";
-import BackgroundImage from "../../assets/background.png";
+import BackgroundImage from "../../assets/background.webp";
 import { useTranslation } from "react-i18next";
 // import { ActionButton } from "../../components/ActionButton";
 // import JoinUs from "./components/JoinUs";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
 import PartnersValues from "./components/PartnersValues";
 import Windows from "../../assets/windows.svg";
-import Playstore from "../../assets/playstore.png";
+import Playstore from "../../assets/playstore.webp";
+import { Helmet } from "react-helmet";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
@@ -65,7 +66,6 @@ const ButtonsRow = styled.div`
 `;
 const RightBox = styled.div`
   width: 55%;
-  border: 1px solid red;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -168,48 +168,78 @@ const PartnersPage = () => {
   };
 
   return (
-    <Section>
-      <PartnersContainer>
-        <UpperBox isArabic={i18n.language === "ar"}>
-          <LeftBox>
-            <Heading> {t("partnerHeadingBoost")}</Heading>
-            <Heading>
-              {" "}
-              <span>{t("partnerHeading")}</span>
-            </Heading>
-            <SubHeading>{t("partnerSubHeading")}</SubHeading>
-            <Paragraph>{t("partnerParagraph")}</Paragraph>
-            <ButtonsRow>
-              <ButtonWithIcon
-                image={Playstore}
-                backgroundColor="#000000"
-                text1={t("getItOn")}
-                text2={t("googlePlay")}
-                className="homeDownloadButton"
-                onClick={(e) => handleDownloadPlay(e)}
-              ></ButtonWithIcon>
+    <>
+      <Helmet>
+        <html lang={i18n.language} />
+        <title>{t("myHanuutTitle")}</title>{" "}
+        <meta
+          name="description"
+          content={`${t("appTitle")}, ${t("myHanuutTitle")}, ${t(
+            "partnersBoostYourProfits"
+          )} , ${t("partnerSubHeading")}`}
+        />
+        <meta
+          name="keywords"
+          content={`${t("myHanuutTitle")}, ${t("myHanuutTitle")}, ${t(
+            "partnersBoostYourProfits"
+          )}, e-commerce, online shop`}
+        />
+        <link rel="canonical" href="https://www.hanuut.com/partners" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: t("myHanuutTitle"),
+            description: `${t("appTitle")}, ${t("myHanuutTitle")}, ${t(
+              "partnersBoostYourProfits"
+            )} , ${t("partnerSubHeading")}`,
+            url: "https://www.hanuut.com/partners",
+          })}
+        </script>
+      </Helmet>
+      <Section>
+        <PartnersContainer>
+          <UpperBox isArabic={i18n.language === "ar"}>
+            <LeftBox>
+              <Heading> {t("partnerHeadingBoost")}</Heading>
+              <Heading>
+                {" "}
+                <span>{t("partnerHeading")}</span>
+              </Heading>
+              <SubHeading>{t("partnerSubHeading")}</SubHeading>
+              <Paragraph>{t("partnerParagraph")}</Paragraph>
+              <ButtonsRow>
+                <ButtonWithIcon
+                  image={Playstore}
+                  backgroundColor="#000000"
+                  text1={t("getItOn")}
+                  text2={t("googlePlay")}
+                  className="homeDownloadButton"
+                  onClick={(e) => handleDownloadPlay(e)}
+                ></ButtonWithIcon>
 
-              <ButtonWithIcon
-                image={Windows}
-                backgroundColor="#000000"
-                text1={t("getItOn")}
-                text2={"Windows"}
-                className="homeDownloadButton"
-                onClick={(e) => handleDownloadWindows(e)}
-              ></ButtonWithIcon>
-            </ButtonsRow>
-          </LeftBox>
-          <RightBox>
-            <PartnersImageContainer
-              src={PartnersImg}
-              isArabic={i18n.language === "ar"}
-              alt="Partners"
-            />
-          </RightBox>
-        </UpperBox>
-        <PartnersValues />
-      </PartnersContainer>
-    </Section>
+                <ButtonWithIcon
+                  image={Windows}
+                  backgroundColor="#000000"
+                  text1={t("getItOn")}
+                  text2={"Windows"}
+                  className="homeDownloadButton"
+                  onClick={(e) => handleDownloadWindows(e)}
+                ></ButtonWithIcon>
+              </ButtonsRow>
+            </LeftBox>
+            <RightBox>
+              <PartnersImageContainer
+                src={PartnersImg}
+                isArabic={i18n.language === "ar"}
+                alt="Partners"
+              />
+            </RightBox>
+          </UpperBox>
+          <PartnersValues />
+        </PartnersContainer>
+      </Section>
+    </>
   );
 };
 

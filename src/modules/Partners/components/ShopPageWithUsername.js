@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
-import BackgroundImage from "../../../assets/background.png";
+import BackgroundImage from "../../../assets/background.webp";
 import {
   fetchShopWithUsername,
   selectShop,
@@ -69,19 +69,22 @@ const ShopPageWithUsername = () => {
   }
 
   return (
-    <Section>
-      {domainKeyWord === "food" ? (
-        <FoodShop
-          selectedShop={selectedShop}
-          selectedShopImage={selectedShopImage}
-        />
-      ) : (
-        <Shop
-          selectedShop={selectedShop}
-          selectedShopImage={selectedShopImage}
-        />
-      )}
-    </Section>
+    <>
+      {" "}
+      <Section>
+        {domainKeyWord === "food" ? (
+          <FoodShop
+            selectedShop={selectedShop}
+            selectedShopImage={selectedShopImage}
+          />
+        ) : (
+          <Shop
+            selectedShop={selectedShop}
+            selectedShopImage={selectedShopImage}
+          />
+        )}
+      </Section>
+    </>
   );
 };
 

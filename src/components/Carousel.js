@@ -9,19 +9,18 @@ const CarouselContainer = styled.div`
   align-items: center;
   position: relative;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-
 `;
 
 const CarouselImage = styled.img`
   max-width: 35%;
-  border-radius: ${(props) => (props.theme.defaultRadius)};
+  border-radius: ${(props) => props.theme.defaultRadius};
   object-fit: cover;
   position: absolute;
-  
+
   @media (max-width: 768px) {
     max-width: 30%;
   }
-  `;
+`;
 
 const slide = keyframes`
   0% {
@@ -42,14 +41,13 @@ const CenterImage = styled(CarouselImage)`
   animation: ${slide} 0.5s ease;
   @media (max-width: 768px) {
     max-width: 34%;
-    
   }
 `;
 
 const BackImage = styled(CarouselImage)`
   z-index: 0;
   opacity: 0.75;
-  filter:  blur(1px) grayscale(15%) saturate(90%);
+  filter: blur(1px) grayscale(15%) saturate(90%);
   animation: ${slide} 0.5s ease;
 `;
 
@@ -61,27 +59,24 @@ const LeftImage = styled(BackImage)`
   @media (max-width: 768px) {
     transform: translate(-4rem, 0) rotate(0deg);
   }
- 
 `;
 
 const RightImage = styled(BackImage)`
   transform: translate(12rem, 1.25rem) rotate(10deg);
- 
+
   @media (max-width: 1366px) {
     transform: translate(6rem, 0) rotate(5deg);
   }
   @media (max-width: 768px) {
     transform: translate(4rem, 0) rotate(0deg);
   }
-
 `;
 
 const Carousel = ({ images }) => {
-
   const [centerIndex, setCenterIndex] = useState(0);
   const [leftIndex, setLeftIndex] = useState(images.length - 1);
   const [rightIndex, setRightIndex] = useState(1);
-  const [animationTrigger, setAnimationTrigger] = useState(0); 
+  const [animationTrigger, setAnimationTrigger] = useState(0);
 
   useEffect(() => {
     const intervalID = setInterval(() => {
@@ -95,9 +90,19 @@ const Carousel = ({ images }) => {
 
   return (
     <CarouselContainer>
-      <LeftImage src={images[leftIndex]} />
-      <CenterImage key={centerIndex} src={images[centerIndex]} /> {/* Add the key prop */}
-      <RightImage src={images[rightIndex]} />
+      <LeftImage src={images[leftIndex]} alt="carousel-image" loading="lazy" />
+      <CenterImage
+        key={centerIndex}
+        src={images[centerIndex]}
+        alt="carousel-image"
+        loading="lazy"
+      />{" "}
+      {/* Add the key prop */}
+      <RightImage
+        src={images[rightIndex]}
+        alt="carousel-image"
+        loading="lazy"
+      />
     </CarouselContainer>
   );
 };

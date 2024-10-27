@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import styled from "styled-components";
 
 const Section = styled.section`
@@ -11,9 +11,7 @@ const Section = styled.section`
 `;
 
 const ContactPage = () => {
-  return (
-    <Section>ContactPage</Section>
-  )
-}
+  return <Section>ContactPage</Section>;
+};
 
-export default ContactPage
+export default ContactPage;

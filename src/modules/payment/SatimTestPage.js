@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import BackgroundImage from "../../assets/background.png";
+import BackgroundImage from "../../assets/background.webp";
 import { useTranslation } from "react-i18next";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
 import { light } from "../../config/Themes";
-import creditCard from "../../assets/cibLogo.png";
+import creditCard from "../../assets/cibLogo.webp";
 import { refund, registerOrder } from "./services/paymentServices";
 import Loader from "../../components/Loader";
 import Recaptcha from "react-google-recaptcha";
