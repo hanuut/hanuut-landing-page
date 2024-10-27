@@ -103,6 +103,7 @@ const ButtonWithIcon = ({
         src={image}
         isArabic={i18n.language === "ar"}
         className={className}
+        alt="Button Icon"
       />{" "}
       <TextContainer>
         <Title isArabic={i18n.language === "ar"}>{text1}</Title>

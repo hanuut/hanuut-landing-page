@@ -4,7 +4,7 @@ import Loader from "../../../components/Loader";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
-import Playstore from "../../../assets/playstore.png";
+import Playstore from "../../../assets/playstore.webp";
 import { useTranslation } from "react-i18next";
 
 import ClassesContainer from "../../Classes/components/ClassesContainer";

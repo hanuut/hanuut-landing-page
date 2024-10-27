@@ -36,7 +36,7 @@ const CartElementsGrid = ({ filteredCartItems }) => {
           return <CartElement key={cartItem.productId} cartItem={cartItem} />;
         })
       ) : (
-        <MissionIllutstrationContainer src={EmptyCartIllustration} />
+        <MissionIllutstrationContainer src={EmptyCartIllustration} alt="empty-cart"/>
       )}
     </CartElementContainer>
   );

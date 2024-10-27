@@ -5,11 +5,11 @@ import {
   BlueActionButton,
   BlueTextButton,
 } from "../../components/ActionButton";
-import Screenshot1 from "../../assets/screen1.jpg";
-import Screenshot2 from "../../assets/screen2.jpg";
-import Screenshot3 from "../../assets/screen3.jpg";
-import Screenshot4 from "../../assets/screen4.jpg";
-import Screenshot5 from "../../assets/screen5.jpg";
+import Screenshot1 from "../../assets/screen1.webp";
+import Screenshot2 from "../../assets/screen2.webp";
+import Screenshot3 from "../../assets/screen3.webp";
+import Screenshot4 from "../../assets/screen4.webp";
+import Screenshot5 from "../../assets/screen5.webp";
 import RegisterTawsilaImage from "../../assets/registerTawsila.svg";
 import Approved from "../../assets/approvedTawsila.svg";
 

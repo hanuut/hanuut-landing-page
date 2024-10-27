@@ -2,11 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import ShopCart from "./ShopCart";
 import { useLocation } from "react-router-dom";
-import BackgroundImage from "../../../assets/background.png";
+import BackgroundImage from "../../../assets/background.webp";
 import CategoriesContainer from "../../Categories/components/CategoriesContainer";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import Playstore from "../../../assets/playstore.png";
+import Playstore from "../../../assets/playstore.webp";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 
 const Section = styled.div`

@@ -23,8 +23,6 @@ const CustomRouter = () => {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/partners" element={<PartnersPage />} />
-      <Route path="/solutions" element={<SolutionsPage />} />
-      <Route path="/contact" element={<ContactPage />} />
       <Route path="/delete_account" element={<DeleteAccountPage />} />
       <Route path="/privacy_policy" element={<PrivacyPolicy />} />
       <Route path="/terms_and_conditions" element={<TermsAndConditions />} />
@@ -32,14 +30,14 @@ const CustomRouter = () => {
       <Route path="/tawsila" element={<Tawsila />} />
       <Route path="/links" element={<LinksPage />} />
       <Route path="*" element={<NotFoundPage />} />
-
       <Route path="/product/:productId" element={<ProductPage />} />
       <Route path="/shop/:username" element={<ShopPageWithUsername />} />
-
+      <Route path="/get-started-with-Tawsila" element={<GetStarted />} />
+      {/* <Route path="/solutions" element={<SolutionsPage />} /> */}
+      {/* <Route path="/contact" element={<ContactPage />} /> */}
       {/* <Route path="/shop/:shopName" element={<ShopPage/>} /> */}
       {/* <Route path="/confirmPayment" element={<PaymentPage />} /> */}
       {/* <Route path="/testPayment" element={<SatimTestPage />} /> */}
-      <Route path="/get-started-with-Tawsila" element={<GetStarted />} />
       {/* <Route path="/my-hanuut-guide" element={<MyHanuutGuide />} /> */}
     </Routes>
   );

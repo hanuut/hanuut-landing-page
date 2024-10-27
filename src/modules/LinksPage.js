@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import BackgroundImage from "../assets/background.png";
-import MyHanuutLogo from "../assets/myHanuutLogo2.png";
-import HanuutCustomerLogo from "../assets/hanuutLogo.png";
+import BackgroundImage from "../assets/background.webp";
+import MyHanuutLogo from "../assets/myHanuutLogo2.webp";
+import HanuutCustomerLogo from "../assets/hanuutLogo.webp";
 import { Link } from "react-router-dom";
 
 const Section = styled.div`
@@ -116,7 +116,7 @@ const LinksPage = () => {
         <Link to="/">
           {" "}
           <ValueCard isArabic={i18n.language === "ar"}>
-            <Icon src={HanuutCustomerLogo}></Icon>
+            <Icon src={HanuutCustomerLogo} alt="app-logo"></Icon>
             <CardHeading>
               <Title>{t("linksPageHanuutTitle")}</Title>
               <CardDescription>{t("linksPageHanuutText")}</CardDescription>
@@ -126,7 +126,7 @@ const LinksPage = () => {
         <Link to="/partners">
           {" "}
           <ValueCard isArabic={i18n.language === "ar"}>
-            <Icon src={MyHanuutLogo}></Icon>
+            <Icon src={MyHanuutLogo} alt="app-logo"></Icon>
             <CardHeading>
               <Title>{t("linksPageMyHanuutTitle")}</Title>
               <CardDescription>{t("linksPageMyHanuutText")}</CardDescription>

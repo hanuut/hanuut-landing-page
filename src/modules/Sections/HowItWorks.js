@@ -3,7 +3,7 @@ import AddToCart from "../../assets/addToCart.svg";
 import CartManagment from "../../assets/cartManagment.svg";
 import Delivery from "../../assets/delivery.svg";
 import { useTranslation } from "react-i18next";
-import BackgroundImage from "../../assets/background.png";
+import BackgroundImage from "../../assets/background.webp";
 
 const Section = styled.section`
   min-height: 70vh;

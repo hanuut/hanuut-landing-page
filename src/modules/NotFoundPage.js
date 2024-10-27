@@ -111,7 +111,7 @@ const NotFoundPage = () => {
       </Link>
       </LeftBox>
       <RightBox>
-      <PartnersImageContainer src={Oops} isArabic={i18n.language === "ar"} alt=""/>
+      <PartnersImageContainer src={Oops} isArabic={i18n.language === "ar"} alt="oops"/>
       </RightBox>
     </Container>
   </Section>

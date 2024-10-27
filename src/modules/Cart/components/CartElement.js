@@ -128,7 +128,7 @@ const CartElement = ({ cartItem }) => {
             <ItemTitle>
               {title} - {brand}
             </ItemTitle>
-            <DeleteButton src={DeleteIcon} onClick={handleRemove} />
+            <DeleteButton src={DeleteIcon} onClick={handleRemove} alt="delete"/>
           </TitleRow>
           <ItemColorSize>Color: {color}</ItemColorSize>
           <ItemColorSize>Size: {size}</ItemColorSize>
@@ -136,9 +136,9 @@ const CartElement = ({ cartItem }) => {
         <TotalItemPrice>{sellingPrice * quantity} DZD</TotalItemPrice>
       </ContentContainer>
       <QuantityControls>
-        <QuantityControlsButton src={ArrowUp} onClick={handleIncrement} />
+        <QuantityControlsButton src={ArrowUp} onClick={handleIncrement} alt="-"/>
         <Quantity>{quantity}</Quantity>
-        <QuantityControlsButton src={ArrowDown} onClick={handleDecrement} />
+        <QuantityControlsButton src={ArrowDown} onClick={handleDecrement} alt="+"/>
       </QuantityControls>
     </CartItemContainer>
   );

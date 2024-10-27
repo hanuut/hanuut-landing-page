@@ -72,6 +72,7 @@ const ScreenshotDisplay = ({ images }) => {
             key={index}
             src={screenshot}
             alt={`Screenshot ${index + 1}`}
+            loading="lazy"
           />
         ))}
       </Column>
@@ -82,6 +83,7 @@ const ScreenshotDisplay = ({ images }) => {
             key={index}
             src={screenshot}
             alt={`Screenshot ${index + 1}`}
+            loading="lazy"
           />
         ))}
       </ReversedColumn>

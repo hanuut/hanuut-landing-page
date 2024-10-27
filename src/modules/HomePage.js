@@ -2,15 +2,16 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import HomeCarousel from "../components/Carousel";
-import HomeIllustration1 from "../assets/screenshot1.png";
-import HomeIllustration2 from "../assets/screenshot2.png";
-import HomeIllustration3 from "../assets/screenshot3.png";
-import Playstore from "../assets/playstore.png";
+import HomeIllustration1 from "../assets/screenshot1.webp";
+import HomeIllustration2 from "../assets/screenshot2.webp";
+import HomeIllustration3 from "../assets/screenshot3.webp";
+import Playstore from "../assets/playstore.webp";
 import { Link } from "react-router-dom";
 import AboutUs from "./Sections/AboutUs";
 import HowItWorks from "./Sections/HowItWorks";
 import ButtonWithIcon from "../components/ButtonWithIcon";
-import BackgroundImage from "../assets/background.png";
+import BackgroundImage from "../assets/background.webp";
+import { Helmet } from "react-helmet";
 // import Testimonials from "./Sections/Testimonials";
 // import Partners from "./Partners/Partners";
 // import CallToAction from "./Sections/CallToAction";
@@ -122,13 +123,34 @@ const HomePage = () => {
 
   return (
     <>
+      <Helmet>
+        <html />
+        <title>{t("appTitle")}</title>
+        <meta name="description" content={t("homeHeading")} />
+        <meta
+          name="keywords"
+          content={`${t("appTitle")}, ${t("myHanuutTitle")}, ${t(
+            "homeHeading"
+          )}, e-commerce, online shop, marketplace`}
+        />
+        <link rel="canonical" href="https://www.hanuut.com" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: t("appTitle"),
+            description: t("homeHeading"),
+            url: "https://www.hanuut.com",
+          })}
+        </script>
+      </Helmet>
       <Section>
         <Container isArabic={i18n.language === "ar"}>
           <LeftBox>
             <Heading>{t("homeHeading")}</Heading>
             <SubHeading>{t("homeSubHeading")}</SubHeading>
             <Paragraph>{t("homeParagraph")}</Paragraph>
-            <Link to={link}>
+            <Link to={link} name="playsore">
               <ButtonWithIcon
                 image={Playstore}
                 backgroundColor="#000000"

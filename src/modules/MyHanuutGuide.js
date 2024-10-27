@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import AppLogo from "../assets/myHanuutLogo2.png";
-import BackgroundImage from "../assets/background.png";
+import AppLogo from "../assets/myHanuutLogo2.webp";
+import BackgroundImage from "../assets/background.webp";
 import Windows from "../assets/windows.svg";
-import Playstore from "../assets/playstore.png";
+import Playstore from "../assets/playstore.webp";
 import ButtonWithIcon from "../components/ButtonWithIcon";
 import { Link } from "react-router-dom";
 import Shop from "../assets/icons/shop.svg";
@@ -240,7 +240,7 @@ const MyHanuutGuide = () => {
       <Container isArabic={i18n.language === "ar"}>
         <ContainerTitle>دليل برنامج ماي حـــــانووت</ContainerTitle>
         <AppCart>
-          <AppLogoImage src={AppLogo} />
+          <AppLogoImage src={AppLogo}  alt="guide-illustration"/>
           <AppInfo>
             <AppName>MY Hanuut</AppName>
             <ButtonsRow>
@@ -290,7 +290,7 @@ const MyHanuutGuide = () => {
         </ContainerTitleWithElements>
         <Heading className="black start medium">إدارة المتجر</Heading>
         <GuideRow>
-          <GuideIllustration src={Illustration} />
+          <GuideIllustration src={Illustration} alt="guide-illustration" />
           <GuideContentColumn>
             <GuideElement>
               {" "}
@@ -346,7 +346,7 @@ const MyHanuutGuide = () => {
       </Container>
       <Container isArabic={i18n.language === "ar"}>
         <GuideRow>
-          <GuideIllustration src={Illustration} /> {/* changeIllustratio */}
+          <GuideIllustration src={Illustration} alt="guide-illustration" /> {/* changeIllustratio */}
           <GuideContentColumn>
             <GuideElement>
               {" "}
@@ -369,7 +369,7 @@ const MyHanuutGuide = () => {
                 احصل على تقارير مفصلة عن أداء محلك
               </Paragraph>
             </GuideElement>
-            <GuideIllustration src={Illustration} /> {/* changeIllustratio */}
+            <GuideIllustration src={Illustration}  alt="guide-illustration"/> {/* changeIllustratio */}
             <GuideElement>
               {" "}
               <Heading className="black start medium">إدارة حسابك</Heading>
@@ -399,7 +399,7 @@ const MyHanuutGuide = () => {
             المحلية في النظام للحصول على سجلات دقيقة
           </Paragraph>
         </GuideElement>
-        <GuideIllustration className="fullWidth" src={DesktopIllustration} />{" "}
+        <GuideIllustration className="fullWidth" src={DesktopIllustration}  alt="guide-illustration"/>{" "}
         <GuideRow>
           {/* changeIllustratio */}
           <GuideContentColumn>
@@ -441,7 +441,7 @@ const MyHanuutGuide = () => {
         </ContainerTitleWithElements>
         <Heading className="black start medium">إدارة المنتجات</Heading>
         <GuideRow>
-          <GuideIllustration src={Illustration} />
+          <GuideIllustration src={Illustration} alt="guide-illustration" />
           <GuideContentColumn>
             <GuideElement>
               {" "}
@@ -468,13 +468,13 @@ const MyHanuutGuide = () => {
                 تحديد وإدارة العناصر المنتهية الصلاحية
               </Paragraph>
             </GuideElement>
-            <GuideIllustration src={Illustration} /> {/* changeIllustratio */}
+            <GuideIllustration src={Illustration}  alt="guide-illustration"/> {/* changeIllustratio */}
           </GuideContentColumn>
         </GuideRow>
       </Container>
       <Container isArabic={i18n.language === "ar"}>
         <GuideRow>
-          <GuideIllustration src={Illustration} />
+          <GuideIllustration src={Illustration}  alt="guide-illustration"/>
           <GuideContentColumn>
             <GuideElement>
               {" "}
@@ -507,7 +507,7 @@ const MyHanuutGuide = () => {
                 تعديل تفاصيل المنتجات عند الحاجة
               </Paragraph>
             </GuideElement>
-            <GuideIllustration src={Illustration} /> {/* changeIllustratio */}
+            <GuideIllustration src={Illustration}  alt="guide-illustration"/> {/* changeIllustratio */}
           </GuideContentColumn>
         </GuideRow>
       </Container>
@@ -532,7 +532,7 @@ const MyHanuutGuide = () => {
             المحلية بسهولة وكفاءة. إليك كيف يمكن أن يساعدك
           </Paragraph>
         </GuideElement>
-        <GuideIllustration className="fullWidth" src={DesktopIllustration2} />{" "}
+        <GuideIllustration className="fullWidth" src={DesktopIllustration2}  alt="guide-illustration"/>{" "}
         <GuideRow>
           {/* changeIllustratio */}
           <GuideContentColumn>
@@ -578,7 +578,7 @@ const MyHanuutGuide = () => {
         </ContainerTitleWithElements>
         <Heading className="black start medium">إدارة الطلبات</Heading>
         <GuideRow>
-          <GuideIllustration src={Illustration} />
+          <GuideIllustration src={Illustration} alt="guide-illustration" />
           <GuideContentColumn>
             <GuideElement>
               {" "}
@@ -617,7 +617,7 @@ const MyHanuutGuide = () => {
                 جمع العناصر وتجهيزها للتوصيل أو الاستلام
               </Paragraph>
             </GuideElement>
-            <GuideIllustration src={Illustration} /> {/* changeIllustratio */}
+            <GuideIllustration src={Illustration}  alt="guide-illustration"/> {/* changeIllustratio */}
           </GuideContentColumn>
         </GuideRow>
       </Container>
