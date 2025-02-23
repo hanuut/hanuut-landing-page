@@ -4,10 +4,7 @@ import { fetchShops, selectShops } from "../state/reducers";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import ShopCart from "./ShopCart";
-import {
-  fetchShopsImages,
-  selectShopsImages,
-} from "../../Images/state/reducers";
+import { fetchImages, selectImages } from "../../Images/state/reducers";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Loader from "../../../components/Loader";
@@ -55,7 +52,7 @@ const ShopsContainer = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const { shops, loading, error } = useSelector(selectShops);
-  const { images, imagesLoading } = useSelector(selectShopsImages);
+  const { images, imagesLoading } = useSelector(selectImages);
   const [shopsWithImages, setShopsWithImages] = useState([]);
 
   useEffect(() => {
@@ -63,7 +60,7 @@ const ShopsContainer = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(fetchShopsImages(shops));
+    dispatch(fetchImages(shops));
   }, [dispatch, shops]);
 
   useEffect(() => {

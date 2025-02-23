@@ -3,13 +3,13 @@ import styled from "styled-components";
 import PartnersImg from "../../assets/partnersIllustration.svg";
 import BackgroundImage from "../../assets/background.webp";
 import { useTranslation } from "react-i18next";
-// import { ActionButton } from "../../components/ActionButton";
-// import JoinUs from "./components/JoinUs";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
 import PartnersValues from "./components/PartnersValues";
 import Windows from "../../assets/windows.svg";
 import Playstore from "../../assets/playstore.webp";
 import { Helmet } from "react-helmet";
+import FeaturesHighlight from "./components/FeaturesHighlight";
+import DownloadCTA from "./components/DownloadCta";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
@@ -19,7 +19,6 @@ const Section = styled.div`
   justify-content: center;
   background-image: url(${BackgroundImage});
   background-size: 100%;
-  gap: 2rem;
   background-position: center;
   @media (max-width: 768px) {
     justify-content: flex-start;
@@ -238,6 +237,16 @@ const PartnersPage = () => {
           </UpperBox>
           <PartnersValues />
         </PartnersContainer>
+        <FeaturesHighlight />
+        <DownloadCTA
+          groceryGuideLink="/path-to-grocery-guide.pdf"
+          foodShopGuideLink="/path-to-food-shop-guide.pdf"
+          Playstore={Playstore}
+          Windows={Windows}
+          ButtonWithIcon={ButtonWithIcon}
+          handleDownloadPlay={handleDownloadPlay}
+          handleDownloadWindows={handleDownloadWindows}
+        />
       </Section>
     </>
   );

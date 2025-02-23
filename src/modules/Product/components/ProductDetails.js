@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Loader from "../../../components/Loader";
 import { AddToCartButton } from "../../../components/ActionButton";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../Cart/state/reducers";
+import { fetchImages, selectImages } from "../../Images/state/reducers";
+import { useTranslation } from "react-i18next";
 
 const ProductPageContainer = styled.div`
+  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -17,18 +20,8 @@ const ProductPageContainer = styled.div`
   gap: 1rem;
   @media (max-width: 768px) {
     flex-direction: column;
-    border: 1px solid red;
     align-items: center;
   }
-`;
-
-const CloseButton = styled.p`
-  font-size: 1.5rem;
-  font-weight: 900;
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  cursor: pointer;
 `;
 
 const LeftSection = styled.div`
@@ -60,7 +53,7 @@ const MainImage = styled.div`
 
 const ThumbnailContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 0.5rem;
 `;
 
@@ -159,11 +152,8 @@ const SpecificationItem = styled.li`
   }
 `;
 
-const ProductDetails = ({
-  selectedCategory,
-  selectedProduct,
-  setSelectedProduct,
-}) => {
+const ProductDetails = ({ selectedCategory, selectedProduct }) => {
+  const { i18n } = useTranslation();
   const { name, brand, rating, specifications, numReviews, availabilities } =
     selectedProduct;
 
@@ -173,6 +163,8 @@ const ProductDetails = ({
   );
   const [selectedSizeValue, setSelectedSizeValue] = useState("");
   const [sizes, setSizes] = useState([]);
+  const [productImages, setProductImages] = useState([]);
+  const { images } = useSelector(selectImages);
 
   useEffect(() => {
     const selectedAvailability = availabilities.find(
@@ -184,73 +176,57 @@ const ProductDetails = ({
         )
       : [];
     setSizes(sizePriceOptions);
-    setSelectedSizeValue(sizePriceOptions[0]?.split(" - ")[0] || ""); // Select the first size by default
+    setSelectedSizeValue(sizePriceOptions[0]?.split(" - ")[0] || "");
+    setProductImages(availabilities.map((item) => item.imageId));
   }, [selectedColor, availabilities]);
 
-  const onAddToCartClick = () => {
-    const selectedAvailability = selectedProduct.availabilities.find(
-      (availability) => availability.color === selectedColor
-    );
-
-    if (!selectedAvailability) {
-      console.error("Selected color is not available.");
-      return;
-    }
-
-    const selectedSize = selectedAvailability.sizes.find(
-      (size) => size.size === selectedSizeValue
-    );
-
-    if (!selectedSize) {
-      console.error("Selected size is not available.");
-      return;
-    }
-
-    // Constructing the cart item
-
-    const cartItem = {
-      _id: selectedProduct._id,
-      name: selectedProduct.name,
-      sellingPrice: selectedSize.sellingPrice,
-      shopId: selectedProduct.shopId,
-      type: "product", // Assuming this is a product
-      brand: selectedProduct.brand,
-      unit: selectedProduct.unit,
-      color: selectedAvailability.color, // Moved from extraData
-      size: selectedSize.size, // Moved from extraData
-      imageId: selectedAvailability.imageId, // Moved from extraData
+  useEffect(() => {
+    const loadImages = async () => {
+      const newImagesToFetch = productImages.filter(
+        (imageId) => !images.some((img) => img.imageId === imageId)
+      );
+      dispatch(fetchImages(newImagesToFetch));
     };
-    console.log(cartItem);
-    dispatch(addToCart(cartItem));
+
+    if (productImages.length > 0) {
+      loadImages();
+    }
+  }, [productImages]);
+
+  const getImageUrl = (imageId) => {
+    const image = images.find((img) => img.imageId === imageId);
+    if (image) {
+      const bufferData = image.imageData.buffer.data;
+      const uint8Array = new Uint8Array(bufferData);
+      const blob = new Blob([uint8Array], { type: "image/jpeg" });
+      return URL.createObjectURL(blob);
+    }
+    return "";
   };
 
   return (
-    <ProductPageContainer>
-      <CloseButton onClick={() => setSelectedProduct(null)}>X</CloseButton>
+    <ProductPageContainer isArabic={i18n.language === "ar"}>
       <LeftSection>
         <ImageContainer>
           <MainImage
-            imageSrc={`path/to/your/image/${
+            imageSrc={getImageUrl(
               availabilities.find((item) => item.color === selectedColor)
                 ?.imageId
-            }.jpg`}
+            )}
           />
           <ThumbnailContainer>
-            {availabilities.map((item, index) =>
-              item.sizes.map((size, index) => (
-                <Thumbnail
-                  key={`${item.imageId}-${size.size}-${index}`}
-                  imageSrc={`path/to/your/image/${item.imageId}.jpg`}
-                  onClick={() => setSelectedColor(item.color)}
-                />
-              ))
-            )}
+            {availabilities.map((item) => (
+              <Thumbnail
+                key={item.imageId}
+                imageSrc={getImageUrl(item.imageId)}
+                onClick={() => setSelectedColor(item.color)}
+              />
+            ))}
           </ThumbnailContainer>
         </ImageContainer>
       </LeftSection>
       <RightSection>
         <ProductInfo>
-          <Category>{selectedCategory}</Category>
           <ProductName>{name}</ProductName>
           <Brand>{brand}</Brand>
           <Rating>
@@ -292,9 +268,9 @@ const ProductDetails = ({
             ))}
           </Specifications>
         </ProductInfo>
-        <AddToCartButton key={selectedProduct._id} onClick={onAddToCartClick}>
+        {/* <AddToCartButton key={selectedProduct._id} onClick={onAddToCartClick}>
           Add to Cart
-        </AddToCartButton>
+        </AddToCartButton> */}
       </RightSection>
     </ProductPageContainer>
   );

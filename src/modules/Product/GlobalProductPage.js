@@ -4,12 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { selectSelectedProduct } from "./state/reducers";
 import { fetchProductById } from "./state/reducers";
 import styled from "styled-components";
-import {
-  fetchShop,
-  fetchShopWithUsername,
-  selectShop,
-  selectShops,
-} from "../Partners/state/reducers";
+import { fetchShop, selectShop, selectShops } from "../Partners/state/reducers";
 import { fetchImage, selectSelectedShopImage } from "../Images/state/reducers";
 import NotFoundPage from "../NotFoundPage";
 import Loader from "../../components/Loader";
@@ -17,7 +12,6 @@ import { ShopCart } from "../Partners/components/ShopCart";
 import { useTranslation } from "react-i18next";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
 import Playstore from "../../assets/playstore.webp";
-import ProductDetails from "./components/ProductDetails";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -33,6 +27,7 @@ const Section = styled.div`
     width: 100%;
   }
 `;
+
 const Container = styled.div`
   width: 80%;
   padding: 2rem;
@@ -47,7 +42,10 @@ const Container = styled.div`
     width: 85%;
   }
 `;
+
 const UpperBox = styled.div`
+  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -60,14 +58,6 @@ const UpperBox = styled.div`
   }
 `;
 
-const LowerBox = styled.div`
-  margin-top: 1rem;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-`;
 const OrderAndDownload = styled.div`
   display: flex;
   flex-direction: column;
@@ -191,7 +181,7 @@ const ProductPage = () => {
     }
   }, [dispatch, selectedShop]);
 
-  if (error || (!selectedProduct && !loading)) {
+  if (error) {
     return <NotFoundPage />;
   }
   if (!selectedShop || !selectedShopImage || loading) {
@@ -205,7 +195,7 @@ const ProductPage = () => {
     <Section>
       <Container>
         {" "}
-        <UpperBox>
+        <UpperBox isArabic={i18n.language === "ar"}>
           {selectedShop && selectedShopImage ? (
             <ShopCart
               className="headingShopCart"
@@ -228,12 +218,6 @@ const ProductPage = () => {
             </Link>
           </OrderAndDownload>
         </UpperBox>
-        <LowerBox>
-          <ProductDetails
-            selectedProduct={selectedProduct}
-            selectedCategory={selectedProduct.categoryId}
-          />
-        </LowerBox>
       </Container>
     </Section>
   );
