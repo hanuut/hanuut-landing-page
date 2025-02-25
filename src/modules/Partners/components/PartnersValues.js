@@ -13,7 +13,7 @@ const ValuesRow = styled.div`
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 3rem;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
     width: 90%;
@@ -25,10 +25,10 @@ const ValuesRow = styled.div`
 const ValueCard = styled.div`
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   flex: 1;
-  background-color: rgba(${(props) => props.theme.bodyRgba}, 1);
+  background-color: rgba(${(props) => props.theme.bodyRgba}, 0.3);
   border-radius: ${(props) => props.theme.defaultRadius};
-  padding: 2rem 3rem;
-  box-shadow: 0 2px 4px rgba(${(props) => props.theme.textRgba}, 0.2);
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(${(props) => props.theme.bodyRgba}, 0.2);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -44,16 +44,14 @@ const ValueCard = styled.div`
 const CardHeading = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.7rem;
   width: 100%;
 `;
 
 const Icon = styled.img`
-  width: 4rem;
-  height: 4rem;
+  width: 3rem;
   @media (max-width: 768px) {
-    width: 3rem;
-    height: 3rem;
+    width: 2.5rem;
   }
 `;
 

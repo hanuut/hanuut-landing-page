@@ -71,8 +71,8 @@ const LeftBox = styled.div`
 
 const Heading = styled.h1`
   width: 100%;
-  margin-bottom: 0.5rem;
-  font-size: 4rem;
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
   color: ${(props) => props.theme.primaryColor};
   font-weight: 900;
   text-transform: uppercase;
@@ -86,7 +86,7 @@ const Heading = styled.h1`
 const SubHeading = styled.h2`
   width: 100%;
   font-size: ${(props) => props.theme.fontxxxl};
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
 
   @media (max-width: 768px) {
     width: 90%;
@@ -124,26 +124,23 @@ const HomePage = () => {
   return (
     <>
       <Helmet>
-        <html />
-        <title>{t("appTitle")}</title>
-        <meta name="description" content={t("homeHeading")} />
-        <meta
-          name="keywords"
-          content={`${t("appTitle")}, ${t("myHanuutTitle")}, ${t(
-            "homeHeading"
-          )}, e-commerce, online shop, marketplace`}
-        />
-        <link rel="canonical" href="https://www.hanuut.com" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            name: t("appTitle"),
-            description: t("homeHeading"),
-            url: "https://www.hanuut.com",
-          })}
-        </script>
-      </Helmet>
+  {/* Change based on language */}
+  <html lang="ar" /> 
+  <title>حانووت - سوقك المحلي الآمن</title>
+  <meta name="description" content="تسوق من متاجر محلية موثوقة مع تتبع للطلبات وعروض حصرية. تجنب عمليات النصب الإلكتروني عبر منصة آمنة تجمع كل احتياجاتك اليومية." />
+  <meta name="keywords" content="تسوق آمن, حانوت ,hanuut, hanout, hanot , متاجر محلية, منصة موثوقة, توصيل طلبات, عروض حصرية, سوق إلكتروني, حانووت" />
+  <link rel="canonical" href="https://www.hanuut.com" />
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "حانووت - سوقك المحلي الآمن",
+      "description": "منصة تسوق آمنة تربطك بمتاجر محلية موثوقة مع تتبع حي للطلبات وعروض حصرية.",
+      "url": "https://www.hanuut.com",
+      "inLanguage": "ar"
+    })}
+  </script>
+</Helmet>
       <Section>
         <Container isArabic={i18n.language === "ar"}>
           <LeftBox>

@@ -25,7 +25,7 @@ const ContentWrapper = styled.div`
 `;
 
 const LeftBox = styled.div`
-  padding: 4rem 0;
+  padding: 1rem 3rem;
   z-index: 2;
   @media (max-width: 768px) {
     padding: 6rem 1rem 2rem;
@@ -35,6 +35,7 @@ const LeftBox = styled.div`
 const RightBox = styled.div`
   position: sticky;
   top: 0;
+   padding: 10rem 0;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -48,11 +49,12 @@ const RightBox = styled.div`
     width: 100%;
     height: 60vh;
     position: relative;
+     padding: 0 0;
   }
 `;
 
 const Feature = styled(motion.div)`
-  min-height: 70vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -87,6 +89,7 @@ const FeatureDescription = styled(motion.p)`
 const FeatureImage = styled(motion.img)`
   margin-top: 2rem;
   width: 100%;
+  max-height: 70vh;
   object-fit: cover;
 `;
 

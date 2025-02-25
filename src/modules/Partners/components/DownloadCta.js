@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 // Styled Components with minimalistic design
 const Section = styled(motion.section)`
-  min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
+  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
   width: 100%;
   padding: 6rem 2rem;
   position: relative;
@@ -50,10 +50,10 @@ const ContentWrapper = styled.div`
 `;
 
 const Title = styled(motion.h2)`
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: clamp(1.2rem, 5vw, 2.5rem);
   font-weight: 700;
   color: ${({ theme }) => theme.primaryColor};
-  line-height: 1.2;
+  line-height: 1;
   letter-spacing: -0.02em;
 
   span {
@@ -62,8 +62,8 @@ const Title = styled(motion.h2)`
 `;
 
 const Description = styled(motion.p)`
-  font-size: clamp(1.125rem, 2vw, 1.25rem);
-  color: ${({ theme }) => theme.text}cc;
+  font-size: clamp(1.3rem, 2vw, 1.25rem);
+  color: ${({ theme }) => theme.body}cc;
   line-height: 1.6;
   max-width: 600px;
   margin: 0 auto;

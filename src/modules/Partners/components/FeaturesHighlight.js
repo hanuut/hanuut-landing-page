@@ -2,51 +2,66 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import FeatureScroll from "./FeatureList";
-import Smartphone from "../../../assets/smartphone.png";
+import Food1 from "../../../assets/my_hanuut_features/food_1.png";
+import Food2 from "../../../assets/my_hanuut_features/food_2.png";
+import Food3 from "../../../assets/my_hanuut_features/food_3.png";
+import Grocery1 from "../../../assets/my_hanuut_features/grocery_1.png";
+import Grocery2 from "../../../assets/my_hanuut_features/grocery_2.png";
+import Grocery3 from "../../../assets/my_hanuut_features/grocery_3.png";
+
+
+
 
 const featuresData = (t) => ({
   foodShops: [
     {
-      title: t("digitalMenuTitle"),
-      description: t("digitalMenuDescription"),
-      image: Smartphone,
+      title: t("foodShopsTitle"),
+      description: t("foodShopsDescription"),
+      image: Food1,
     },
     {
       title: t("socialMediaTitle"),
       description: t("socialMediaDescription"),
-      image: Smartphone,
+      image: Food2,
     },
     {
       title: t("orderControlTitle"),
       description: t("orderControlDescription"),
-      image: Smartphone,
-    },
-    {
-      title: t("paymentsTitle"),
-      description: t("paymentsDescription"),
-      image: Smartphone,
+      image: Food3,
     },
   ],
   supermarkets: [
     {
       title: t("inventoryControlTitle"),
       description: t("inventoryControlDescription"),
-      image: Smartphone,
+      image: Grocery1,
     },
     {
       title: t("financialMasteryTitle"),
       description: t("financialMasteryDescription"),
-      image: Smartphone,
+      image: Grocery2,
     },
+    {
+      title: t("seamlessPaymentsTitle"),
+      description: t("seamlessPaymentsDescription"),
+      image: Grocery3,
+    },
+  ],
+  globalShops: [
     {
       title: t("onlineOfflineTitle"),
       description: t("onlineOfflineDescription"),
-      image: Smartphone,
+      image: Grocery1,
+    },
+    {
+      title: t("smartOrderTitle"),
+      description: t("smartOrderDescription"),
+      image: Grocery2,
     },
     {
       title: t("orderManagementTitle"),
       description: t("orderManagementDescription"),
-      image: Smartphone,
+      image: Grocery3,
     },
   ],
 });
@@ -79,16 +94,17 @@ const ButtonGroup = styled.div`
 const Button = styled.button`
   padding: ${(props) => props.theme.actionButtonPadding};
   background-color: ${(props) =>
-    props.isSelected ? props.theme.primaryColor : props.theme.body};
+    props.isSelected ? props.theme.darkGreen : props.theme.body};
   color: ${(props) =>
-    props.isSelected ? props.theme.body : props.theme.primaryColor};
-  font-size: ${(props) => props.theme.fontsm};
+    props.isSelected ? props.theme.orangeColor : props.theme.darkGreen};
+  font-size: ${(props) => props.theme.fontxl};
   border: 1px solid;
   border-radius: ${(props) => props.theme.smallRadius};
   border-color: ${(props) => props.theme.primaryColor};
   cursor: pointer;
   transition: all 0.3s ease;
-
+  font-weight : ${(props) =>
+    props.isSelected ? 900 : 400};
   &:hover {
     background-color: ${(props) =>
       props.isSelected
@@ -107,11 +123,11 @@ const Button = styled.button`
 const Paragraph = styled.p`
   font-size: ${(props) => props.theme.fontxxl};
   margin-bottom: 2rem;
+  padding: 0rem 6rem;
   text-align: center;
   align-self: center;
-
   @media (max-width: 768px) {
-    width: 90%;
+      padding: 0rem 2rem;
     font-size: ${(props) => props.theme.fontlg};
   }
 `;
@@ -162,6 +178,12 @@ const FeaturesHighlight = () => {
             isSelected={selectedCategory === "foodShops"}
           >
             {t("foodShops")}
+          </Button>
+          <Button
+            onClick={() => setSelectedCategory("globalShops")}
+            isSelected={selectedCategory === "globalShops"}
+          >
+            {t("globalShops")}
           </Button>
         </ButtonGroup>
       </FeaturesHighlightContainer>

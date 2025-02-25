@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import PartnersImg from "../../assets/partnersIllustration.svg";
-import BackgroundImage from "../../assets/background.webp";
+import MyHanuutAppCarousel from "./components/myHanuutAppCarousel";
 import { useTranslation } from "react-i18next";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
 import PartnersValues from "./components/PartnersValues";
@@ -10,6 +9,21 @@ import Playstore from "../../assets/playstore.webp";
 import { Helmet } from "react-helmet";
 import FeaturesHighlight from "./components/FeaturesHighlight";
 import DownloadCTA from "./components/DownloadCta";
+import image1 from "../../assets/my_hanuut_carousel/myhanuut-play-store-app-preview-assets_01.jpg";
+import image2 from "../../assets/my_hanuut_carousel/myhanuut-play-store-app-preview-assets_02.jpg";
+import image3 from "../../assets/my_hanuut_carousel/myhanuut-play-store-app-preview-assets_03.jpg";
+import image4 from "../../assets/my_hanuut_carousel/myhanuut-play-store-app-preview-assets_04.jpg";
+import image5 from "../../assets/my_hanuut_carousel/myhanuut-play-store-app-preview-assets_05.jpg";
+
+
+const images = [
+  image1,
+  image2,
+  image3,
+  image4,
+  image5
+];
+
 
 const Section = styled.div`
   min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
@@ -17,9 +31,7 @@ const Section = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-image: url(${BackgroundImage});
-  background-size: 100%;
-  background-position: center;
+    background-color: ${(props) => props.theme.darkGreen};
   @media (max-width: 768px) {
     justify-content: flex-start;
     width: 100%;
@@ -73,13 +85,7 @@ const RightBox = styled.div`
     margin-bottom: 1rem;
   }
 `;
-const PartnersImageContainer = styled.img`
-  width: 90%;
-  max-height: 50vh;
-  @media (max-width: 768px) {
-    width: ${(props) => (props.hide ? "0" : "100%")};
-  }
-`;
+
 const LeftBox = styled.div`
   width: 40%;
   display: flex;
@@ -116,24 +122,28 @@ const LowerBox = styled.div`
 
 const Heading = styled.h1`
   width: 100%;
-  margin-bottom: 0.5rem;
-  font-size: 4rem;
-  font-weight: 900;
+  margin-bottom: 0.1rem;
+  font-size: 1.2rem;
+  font-weight: 500;
   text-transform: uppercase;
-  color: ${(props) => props.theme.orangeColor};
+  color: ${(props) => props.theme.primaryColor};
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontxxxl};
   }
   span {
-    color: ${(props) => props.theme.primaryColor};
+    color: ${(props) => props.theme.orangeColor};
+    font-size: 2rem;
+    font-weight: 900;
   }
 `;
 
 const SubHeading = styled.h2`
   width: 99%;
   font-size: ${(props) => props.theme.fontxxxl};
-  margin-bottom: 1rem;
+  color: ${(props) => props.theme.body};
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontxl};
@@ -144,7 +154,7 @@ const Paragraph = styled.p`
   width: 100%;
   font-size: ${(props) => props.theme.fontxxxl};
   margin-bottom: 1rem;
-
+ color: ${(props) => props.theme.body};
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontmd};
@@ -228,11 +238,7 @@ const PartnersPage = () => {
               </ButtonsRow>
             </LeftBox>
             <RightBox>
-              <PartnersImageContainer
-                src={PartnersImg}
-                isArabic={i18n.language === "ar"}
-                alt="Partners"
-              />
+            <MyHanuutAppCarousel images={images} />
             </RightBox>
           </UpperBox>
           <PartnersValues />

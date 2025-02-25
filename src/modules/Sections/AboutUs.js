@@ -13,6 +13,7 @@ const Section = styled.div`
   background-size: 100%;
   gap: 2rem;
   background-position: center;
+  overflow-x: hidden;
   @media (max-width: 768px) {
     justify-content: flex-start;
     width: 100%;
@@ -46,8 +47,8 @@ const RightBox = styled.div`
 `;
 
 const MissionContainer = styled.div`
-  margin-top: 2rem;
-  align-self: end;
+  margin-top: 0.5rem;
+  align-self: start;
   max-width: 90%;
   flex-direction: column;
   align-items: flex-start;
@@ -59,11 +60,11 @@ const MissionContainer = styled.div`
   border: 1px solid rgba(${(props) => props.theme.primaryColorRgba}, 0.75);
   box-shadow: ${(props) =>
     props.isArabic
-      ? `-15px 15px rgba(${props.theme.primaryColorRgba}, 0.75)`
-      : `15px 15px rgba(${props.theme.primaryColorRgba}, 0.75)`};
+      ? `-15px 15px rgba(${props.theme.primaryColorRgba}, 0.5)`
+      : `15px 15px rgba(${props.theme.primaryColorRgba}, 0.5)`};
   transition: all 0.5s ease;
   .missionText {
-    font-size: ${(props) => props.theme.fontxl};
+    font-size: ${(props) => props.theme.fontxxxl};
     padding-left: ${(props) => (props.isArabic ? "0" : "2rem")};
     padding-right: ${(props) => (props.isArabic ? "2rem" : "0")};
   }
@@ -135,8 +136,9 @@ const AboutUsIllutstrationContainer = styled.img`
 const AboutTitle = styled.h1`
   color: ${(props) => props.theme.primaryColor};
   font-weight: bold;
+      font-size: 5rem;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontxxxl};
+    font-size: 3rem;
   }
 `;
 
@@ -163,8 +165,7 @@ function AboutUs() {
           />
         </LeftBox>
         <RightBox>
-          <AboutTitle>{t("aboutUsHeading")}</AboutTitle>
-          <AboutText>{t("aboutUsText")}</AboutText>
+          <AboutTitle>{t("appTitle")}</AboutTitle>
           <MissionContainer isArabic={i18n.language === "ar"}>
             <MissionHeaderContainer>
               <MissionIllutstrationContainer
@@ -172,13 +173,10 @@ function AboutUs() {
                 alt="mission"
                 loading="lazy"
               />
-              <AboutTitle className="mission">
-                {t("aboutUsMissionTitle")}
-              </AboutTitle>
-            </MissionHeaderContainer>
-            <AboutText className="missionText">
+               <AboutText className="missionText">
               {t("aboutUsMissionText")}
-            </AboutText>
+               </AboutText>
+            </MissionHeaderContainer>
           </MissionContainer>
         </RightBox>
       </Container>
