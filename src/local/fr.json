@@ -242,6 +242,166 @@
     "digitalMenuTitle": "Magie du Menu Digital",
     "digitalMenuDescription": "Démarquez-vous avec un menu digital époustouflant qui se met à jour en temps réel ! Partagez-le via des QR codes ou des liens, et faites briller votre marque en ligne. Votre menu n’a jamais été aussi beau ! ✨",
     "paymentsTitle": "Paiements",
-    "paymentsDescription": "Acceptez les paiements en ligne en toute sécurité et gérez vos transactions en toute simplicité."
+    "paymentsDescription": "Acceptez les paiements en ligne en toute sécurité et gérez vos transactions en toute simplicité.",
+
+    "food_domain_examples": "Restauration 🍔 [Restaurants, fast-food, cuisines fantômes, boulangeries...etc]",
+    "grocery_domain_examples": "Épicerie 🛒 [Épiceries, marchands de fruits et légumes, boucheries...etc]",
+    "ecom_domain_examples": "E-commerce Général 👗 [Vêtements, meubles, livres, outils, et plus]"
+  ,
+  
+    "myHanuutFeatures": {
+        "grocerySections": [
+            {
+              "title": "Commencez en quelques minutes",
+              "paragraphs": [
+                "Créez un profil personnel : Présentez-vous comme première étape pour établir une présence en ligne fiable.",
+                "Construisez l'identité de votre boutique : Téléchargez votre logo, choisissez un nom et rédigez une description qui raconte votre histoire."
+              ]
+            },
+            {
+              "title": "Gestion intelligente des stocks, sans tracas ✅",
+              "paragraphs": [
+                "Ajoutez des produits en quelques secondes, scannez les codes-barres pour remplir automatiquement les détails à partir de notre base de données de plus de 4 000 produits (en constante augmentation !).",
+                "Pas de code-barres ? Ajoutez des articles personnalisés manuellement."
+              ]
+            },
+            {
+              "title": "Suivez les expéditions comme un pro 👨‍🏫",
+              "paragraphs": [
+                "Suivez votre entrepôt avec les dates d'expiration, les prix d'achat/vente et les quantités.",
+                "Recevez des alertes de faible stock et des avertissements d'expiration pour réduire le gaspillage.",
+                "Listes d'achats et reçus 🚚 : Planifiez les réapprovisionnements à l'avance, puis convertissez les listes en expéditions dès l'arrivée des fournitures, et votre entrepôt se met à jour automatiquement."
+              ]
+            },
+            {
+              "title": "Votre vitrine numérique ✨",
+              "paragraphs": [
+                "Réclamez un nom d'utilisateur unique (par exemple, hanuut.com/@votreboutique) pour obtenir : Un magasin d'alimentation en direct.",
+                "Fonction POS : gérez les ventes en personne sans effort."
+              ]
+            },
+            {
+              "title": "Outils de commandes et de croissance 🧾",
+              "paragraphs": [
+                "Recevez les commandes à votre convenance et vérifiez-les.",
+                "Mettez à jour les statuts (en préparation, en livraison, livré) et informez automatiquement vos clients.",
+                "Analysez les meilleures ventes, vos statistiques d'activité et les tendances de vos clients."
+              ]
+            },
+            {
+              "title": "Contrôlez votre portée 📍",
+              "paragraphs": [
+                "Définissez votre adresse, vos jours d'ouverture et vos horaires."
+              ]
+            },
+            {
+              "title": "Options de livraison et de retrait 🚚",
+              "paragraphs": [
+                "Livraison autonome : définissez votre rayon de livraison et vos frais.",
+                "Retrait activé : permettez aux clients de récupérer leurs commandes à leur convenance."
+              ]
+            },
+            {
+              "title": "Prêt à rejoindre ?",
+              "paragraphs": [
+                "My Hanuut est votre partenaire de croissance. Des stands alimentaires de proximité au commerce électronique à l'échelle nationale, nous nous adaptons à vos besoins.",
+                "Commencez dès aujourd'hui. Faites briller votre boutique.",
+                "👉 Réclamez votre place :"
+              ]
+            }
+          ],
+          "foodSections": [
+            {
+              "title": "Commencez en quelques minutes",
+              "paragraphs": [
+                "Créez un profil personnel : Présentez-vous comme première étape pour établir une présence en ligne fiable.",
+                "Construisez l'identité de votre boutique : Téléchargez votre logo, choisissez un nom et rédigez une description qui raconte votre histoire."
+              ]
+            },
+            {
+              "title": "Créez des plats comme un pro 🍴",
+              "paragraphs": [
+                "Ajoutez des photos, des ingrédients et des prix. Organisez les articles par catégories.",
+                "Mise à jour instantanée : Masquez les plats en rupture de stock ou mettez en avant les offres du jour d'un simple clic.",
+                "Fonction exclusive : devient un lien actif (par exemple, hanuut.com/@votrecafe) — sans frais d'impression, toujours à jour."
+              ]
+            },
+            {
+              "title": "Votre vitrine numérique ✨",
+              "paragraphs": [
+                "Réclamez un nom d'utilisateur unique (par exemple, hanuut.com/@votreboutique)✨ et transformez votre menu en une expérience numérique dynamique.",
+                "Fonction POS : gérez les ventes en personne sans effort."
+              ]
+            },
+            {
+              "title": "Contrôlez votre portée 📍",
+              "paragraphs": [
+                "Définissez votre adresse, vos jours d'ouverture et vos horaires."
+              ]
+            },
+            {
+              "title": "Options de livraison et de retrait 🚚",
+              "paragraphs": [
+                "Livraison autonome : définissez votre rayon de livraison et vos frais.",
+                "Retrait activé : permettez aux clients de récupérer leurs commandes à leur convenance."
+              ]
+            },
+            {
+              "title": "Outils de commandes et de croissance 🧾",
+              "paragraphs": [
+                "Recevez les commandes à votre rythme et vérifiez-les.",
+                "Mettez à jour les statuts (en préparation, en livraison, livré) et informez automatiquement vos clients.",
+                "Analysez les meilleures ventes, vos statistiques d'activité et les tendances de vos clients."
+              ]
+            },
+            {
+              "title": "Prêt à rejoindre ?",
+              "paragraphs": [
+                "My Hanuut est votre partenaire de croissance. Des stands alimentaires de proximité au commerce électronique à l'échelle nationale, nous nous adaptons à vos besoins.",
+                "Commencez dès aujourd'hui. Faites briller votre boutique.",
+                "👉 Réclamez votre place :"
+              ]
+            }
+          ],
+          "ecomSections": [
+            {
+              "title": "Commencez en quelques minutes",
+              "paragraphs": [
+                "Créez un profil personnel : Présentez-vous comme première étape pour établir une présence en ligne fiable.",
+                "Construisez l'identité de votre boutique : Téléchargez votre logo, choisissez un nom et rédigez une description qui raconte votre histoire."
+              ]
+            },
+            {
+              "title": "Mettez en valeur chaque détail 🎯",
+              "paragraphs": [
+                "Incluez plusieurs couleurs, tailles et spécifications personnalisées (par exemple, Matériau : Coton ou Dimensions : 30x40 cm).",
+                "Disponibilité flexible : fixez des prix par variante et gérez le stock sans effort."
+              ]
+            },
+            {
+              "title": "Votre vitrine numérique ✨",
+              "paragraphs": [
+                "Réclamez un nom d'utilisateur unique (par exemple, hanuut.com/@votreboutique) pour obtenir une page de destination professionnelle avec tous vos produits.",
+                "Livrez dans des wilayas spécifiques ou dans toute l'Algérie."
+              ]
+            },
+            {
+              "title": "Outils de commandes et de croissance 🧾",
+              "paragraphs": [
+                "Recevez les commandes à tout moment et vérifiez-les.",
+                "Mettez à jour les statuts (en préparation, en livraison, livré) et informez automatiquement vos clients.",
+                "Analysez les meilleures ventes, vos statistiques d'activité et les tendances de vos clients."
+              ]
+            },
+            {
+              "title": "Prêt à rejoindre ?",
+              "paragraphs": [
+                "My Hanuut est votre partenaire de croissance. Des stands alimentaires de proximité au commerce électronique à l'échelle nationale, nous nous adaptons à vos besoins.",
+                "Commencez dès aujourd'hui. Faites briller votre boutique.",
+                "👉 Réclamez votre place :"
+              ]
+            }
+          ]
+        }
 
 }

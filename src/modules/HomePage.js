@@ -120,29 +120,65 @@ const SmallParagraph = styled.p`
 const HomePage = () => {
   const { t, i18n } = useTranslation();
   const link = process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK;
+  const currentLanguage = i18n.language;
+  const isArabic = currentLanguage === "ar";
+
+  // SEO content based on language
+  const seoContent = {
+    ar: {
+      title: "حانووت - سوقك المحلي الآمن",
+      description: "تسوق من متاجر محلية موثوقة مع تتبع للطلبات وعروض حصرية. تجنب عمليات النصب الإلكتروني عبر منصة آمنة تجمع كل احتياجاتك اليومية.",
+      keywords: "تسوق آمن, حانوت ,hanuut, hanout, hanot , متاجر محلية, منصة موثوقة, توصيل طلبات, عروض حصرية, سوق إلكتروني, حانووت",
+      schema: {
+        name: "حانووت - سوقك المحلي الآمن",
+        description: "منصة تسوق آمنة تربطك بمتاجر محلية موثوقة مع تتبع حي للطلبات وعروض حصرية."
+      }
+    },
+    en: {
+      title: "Hanuut - Your Safe Local Marketplace",
+      description: "Shop from trusted local stores with order tracking and exclusive offers. Avoid online scams through a secure platform that brings together all your daily needs.",
+      keywords: "safe shopping, hanuut, hanout, hanot, local stores, trusted platform, order delivery, exclusive offers, e-marketplace",
+      schema: {
+        name: "Hanuut - Your Safe Local Marketplace",
+        description: "A secure shopping platform connecting you with trusted local stores with live order tracking and exclusive offers."
+      }
+    },
+    fr: {
+      title: "Hanuut - Votre Marché Local Sécurisé",
+      description: "Achetez auprès de magasins locaux de confiance avec suivi des commandes et offres exclusives. Évitez les arnaques en ligne grâce à une plateforme sécurisée qui rassemble tous vos besoins quotidiens.",
+      keywords: "achats sécurisés, hanuut, hanout, hanot, magasins locaux, plateforme fiable, livraison de commandes, offres exclusives, marché électronique",
+      schema: {
+        name: "Hanuut - Votre Marché Local Sécurisé",
+        description: "Une plateforme d'achat sécurisée vous connectant à des magasins locaux de confiance avec suivi des commandes en direct et offres exclusives."
+      }
+    }
+  };
+
+  // Default to Arabic if the language is not supported
+  const activeSeoContent = seoContent[currentLanguage] || seoContent.ar;
 
   return (
     <>
       <Helmet>
-  {/* Change based on language */}
-  <html lang="ar" /> 
-  <title>حانووت - سوقك المحلي الآمن</title>
-  <meta name="description" content="تسوق من متاجر محلية موثوقة مع تتبع للطلبات وعروض حصرية. تجنب عمليات النصب الإلكتروني عبر منصة آمنة تجمع كل احتياجاتك اليومية." />
-  <meta name="keywords" content="تسوق آمن, حانوت ,hanuut, hanout, hanot , متاجر محلية, منصة موثوقة, توصيل طلبات, عروض حصرية, سوق إلكتروني, حانووت" />
-  <link rel="canonical" href="https://www.hanuut.com" />
-  <script type="application/ld+json">
-    {JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "حانووت - سوقك المحلي الآمن",
-      "description": "منصة تسوق آمنة تربطك بمتاجر محلية موثوقة مع تتبع حي للطلبات وعروض حصرية.",
-      "url": "https://www.hanuut.com",
-      "inLanguage": "ar"
-    })}
-  </script>
-</Helmet>
+        <html lang={currentLanguage} />
+        <title>{activeSeoContent.title}</title>
+        <meta name="description" content={activeSeoContent.description} />
+        <meta name="keywords" content={activeSeoContent.keywords} />
+        <link rel="canonical" href="https://www.hanuut.com" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": activeSeoContent.schema.name,
+            "description": activeSeoContent.schema.description,
+            "url": "https://www.hanuut.com",
+            "inLanguage": currentLanguage
+          })}
+        </script>
+      </Helmet>
+      
       <Section>
-        <Container isArabic={i18n.language === "ar"}>
+        <Container isArabic={isArabic}>
           <LeftBox>
             <Heading>{t("homeHeading")}</Heading>
             <SubHeading>{t("homeSubHeading")}</SubHeading>
@@ -154,7 +190,7 @@ const HomePage = () => {
                 text1={t("getItOn")}
                 text2={t("googlePlay")}
                 className="homeDownloadButton"
-              ></ButtonWithIcon>
+              />
             </Link>
             <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>
           </LeftBox>
@@ -168,9 +204,10 @@ const HomePage = () => {
       <AboutUs />
       <HowItWorks />
       {/* 
-    <Testimonials />
-    <Partners /> 
-    <CallToAction /> */}
+      <Testimonials />
+      <Partners /> 
+      <CallToAction /> 
+      */}
     </>
   );
 };

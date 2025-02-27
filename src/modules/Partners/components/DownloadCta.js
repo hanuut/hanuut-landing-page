@@ -61,10 +61,35 @@ const Title = styled(motion.h2)`
   }
 `;
 
+const FeatureSection = styled.div`
+  padding: 0;
+`;
+
+const FeatureStepTitle = styled.h3`
+  font-size: ${(props) => props.theme.fontxl};
+  color: ${(props) => props.theme.primaryColor};
+  margin-bottom: 1rem;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontlg};
+  }
+`;
+
+const FeatureParagraph = styled.p`
+  font-size: ${(props) => props.theme.fontlg};
+  color: ${(props) => props.theme.body};
+  margin-bottom: 0.2rem;
+  position: relative;
+  padding-left: 1.5rem;
+    max-width: 600px;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontmd};
+  }
+`;
+
 const Description = styled(motion.p)`
   font-size: clamp(1.3rem, 2vw, 1.25rem);
   color: ${({ theme }) => theme.body}cc;
-  line-height: 1.6;
+  line-height: 1.2;
   max-width: 600px;
   margin: 0 auto;
 `;
@@ -72,8 +97,6 @@ const Description = styled(motion.p)`
 const GuideSection = styled(motion.div)`
   display: flex;
   gap: 2rem;
-  margin-top: 2rem;
-
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: stretch;
@@ -128,6 +151,8 @@ const DownloadCTA = ({
   Playstore,
   handleDownloadPlay,
   handleDownloadWindows,
+  currentFeatures,
+  selectedCategory,
 }) => {
   const handleDownloadPlayClick = (e) => {
     handleDownloadPlay(e);
@@ -136,6 +161,21 @@ const DownloadCTA = ({
     handleDownloadWindows(e);
   };
   const { t } = useTranslation();
+  // Domain content from l18n
+  const domainContent = {
+    features: {
+      supermarkets: t("myHanuutFeatures.grocerySections", { returnObjects: true }),
+      foodShops: t("myHanuutFeatures.foodSections", { returnObjects: true }),
+      globalShops: t("myHanuutFeatures.ecomSections", { returnObjects: true })
+    }
+  };
+  
+// Get the appropriate sections for the selected category
+const currentFeaturesSteps = domainContent.features[selectedCategory] || [];
+const generateTitle = () => {
+  return  currentFeaturesSteps.slice(currentFeaturesSteps.length-1,currentFeaturesSteps.length);
+};
+
   return (
     <Section
       initial={{ opacity: 0 }}
@@ -173,6 +213,18 @@ const DownloadCTA = ({
             {t("PartnerCtaDescription")}
           </Description>
 
+          {
+            generateTitle().map((section, indexS) => (
+              <FeatureSection key={indexS}>
+                <FeatureStepTitle>{section.title}</FeatureStepTitle>
+                {section.paragraphs.map((paragraph, pIndex) => (
+                  <FeatureParagraph key={pIndex}>{paragraph}</FeatureParagraph>
+                ))}
+              </FeatureSection>
+            ))
+            
+         }
+
           <ButtonsContainer
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -197,7 +249,7 @@ const DownloadCTA = ({
             />
           </ButtonsContainer>
 
-          <GuideSection
+          {/*<GuideSection
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -222,7 +274,7 @@ const DownloadCTA = ({
               <h3>{t("PartnerCtaGuideFood")}</h3>
               <p>{t("PartnerCtaGuideDownload")}</p>
             </GuideButton>
-          </GuideSection>
+          </GuideSection>*/}
         </ContentWrapper>
       </Container>
     </Section>

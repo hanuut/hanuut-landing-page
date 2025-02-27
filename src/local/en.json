@@ -238,5 +238,163 @@
     "smartOrderTitle": "Multiple Variant Options",
     "smartOrderDescription": "Offer diverse options like color and size variants. Give your customers a personalized shopping experience with easy selection. 🌟",
     "orderManagementTitle": "Seamless Online Orders",
-    "orderManagementDescription": "Effortlessly manage orders and track sales. Enjoy a user-friendly dashboard with real-time analytics to boost your performance. 💰"
+    "orderManagementDescription": "Effortlessly manage orders and track sales. Enjoy a user-friendly dashboard with real-time analytics to boost your performance. 💰",
+    "food_domain_examples" : "Food 🍔 [Restaurants, fast food, cloud kitchens, bakeries...etc]",
+    "grocery_domain_examples" : "Grocery 🛒 [Grocery stores, fruit/vegetable vendors, butchers...etc]",
+    "ecom_domain_examples" : " General Ecommerce 👗[Clothing, furniture, books, tools, and more]",
+        "myHanuutFeatures": {
+          "grocerySections": [
+            {
+              "title": "Get Started in Minutes",
+              "paragraphs": [
+                "Create a Personal Profile: Introduce yourself as a first step to create a reliable online presence.",
+                "Build Your Shop’s Identity: Upload your logo, pick a name, and craft a description that tells your story."
+              ]
+            },
+            {
+              "title": "Smart Inventory, Zero Headaches ✅",
+              "paragraphs": [
+                "Add Products in Seconds, Scan barcodes to auto-fill details from our 4,000+ product database (growing daily!).",
+                "No barcode? Add custom items manually."
+              ]
+            },
+            {
+              "title": "Track Shipments Like a Pro 👨‍🏫",
+              "paragraphs": [
+                "Track warehouse with expiry dates, buying/selling prices, and quantities.",
+                "Get low-stock alerts and expiry warnings to reduce waste.",
+                "Buying Lists & Receipts 🚚: Plan restocks in advance, then convert lists into shipments when supplies arrive, and your warehouse is updated automatically."
+              ]
+            },
+            {
+              "title": "Your Digital Storefront ✨",
+              "paragraphs": [
+                "Claim a unique username (e.g., hanuut.com/@yourshop) to get: A live grocery store.",
+                "POS Feature: manage in-person sales seamlessly."
+              ]
+            },
+            {
+              "title": "Orders & Growth Tools 🧾",
+              "paragraphs": [
+                "Receive orders at your service time and verify them.",
+                "Update statuses (preparing, on delivery, delivered) and notify customers automatically.",
+                "Analyze bestsellers, your activity statistics, and customer trends."
+              ]
+            },
+            {
+              "title": "Control Your Reach 📍",
+              "paragraphs": [
+                "Set your address, operating days, and opening/closing times."
+              ]
+            },
+            {
+              "title": "Delivery & Pickup Options 🚚",
+              "paragraphs": [
+                "Self-Delivery: Define your delivery radius and fees.",
+                "Enable Pickup: Let customers grab orders at their convenience."
+              ]
+            },
+            {
+              "title": "Ready to Join?",
+              "paragraphs": [
+                "My Hanuut is your partner in growth. For grocery shops, we adapt to your needs.",
+                "Start today. Let your shop shine.",
+                "👉 Claim Your Spot:"
+              ]
+            }
+          ],
+          "foodSections": [
+            {
+              "title": "Get Started in Minutes",
+              "paragraphs": [
+                "Create a Personal Profile: Introduce yourself as a first step to create a reliable online presence.",
+                "Build Your Shop’s Identity: Upload your logo, pick a name, and craft a description that tells your story."
+              ]
+            },
+            {
+              "title": "Create Dishes Like a Pro 🍴",
+              "paragraphs": [
+                "Add photos, ingredients, and prices. Organize items into categories.",
+                "Instantly Update: Hide sold-out dishes or highlight daily specials with one click.",
+                "Exclusive Feature: becomes a live link (e.g., hanuut.com/@yourcafe)—no printing costs, always up-to-date."
+              ]
+            },
+            {
+              "title": "Your Digital Storefront ✨",
+              "paragraphs": [
+                "Claim a unique username (e.g., hanuut.com/@yourshop)✨ and turn your menu into a dynamic digital experience.",
+                "POS Feature: manage in-person sales seamlessly."
+              ]
+            },
+            {
+              "title": "Control Your Reach 📍",
+              "paragraphs": [
+                "Set your address, operating days, and opening/closing times."
+              ]
+            },
+            {
+              "title": "Delivery & Pickup Options 🚚",
+              "paragraphs": [
+                "Self-Delivery: Define your delivery radius and fees.",
+                "Enable Pickup: Let customers grab orders at their convenience."
+              ]
+            },
+            {
+              "title": "Orders & Growth Tools 🧾",
+              "paragraphs": [
+                "Receive orders at your service time and verify them.",
+                "Update statuses (preparing, on delivery, delivered) and notify customers automatically.",
+                "Analyze bestsellers, your activity statistics, and customer trends."
+              ]
+            },
+            {
+              "title": "Ready to Join?",
+              "paragraphs": [
+                "My Hanuut is your partner in growth. for local food shops, we adapt to your needs.",
+                "Start today. Let your shop shine.",
+                "👉 Claim Your Spot:"
+              ]
+            }
+          ],
+          "ecomSections": [
+            {
+              "title": "Get Started in Minutes",
+              "paragraphs": [
+                "Create a Personal Profile: Introduce yourself as a first step to create a reliable online presence.",
+                "Build Your Shop’s Identity: Upload your logo, pick a name, and craft a description that tells your story."
+              ]
+            },
+            {
+              "title": "Showcase Every Detail 🎯",
+              "paragraphs": [
+                "Include multiple colors, sizes, and custom specs (e.g., Material: Cotton or Dimensions: 30x40cm).",
+                "Flexible Availability: Set prices per variant and manage stock effortlessly."
+              ]
+            },
+            {
+              "title": "Your Digital Storefront ✨",
+              "paragraphs": [
+                "Claim a unique username (e.g., hanuut.com/@yourshop) to get a professional landing page with all your products.",
+                "Deliver to specific Wilayas or all of Algeria."
+              ]
+            },
+            {
+              "title": "Orders & Growth Tools 🧾",
+              "paragraphs": [
+                "Receive orders at any time and verify them.",
+                "Update statuses (preparing, on delivery, delivered) and notify customers automatically.",
+                "Analyze bestsellers, your activity statistics, and customer trends."
+              ]
+            },
+            {
+              "title": "Ready to Join?",
+              "paragraphs": [
+                "My Hanuut is your partner in growth. For nationwide ecommerce shops, we adapt to your needs.",
+                "Start today. Let your shop shine.",
+                "👉 Claim Your Spot:"
+              ]
+            }
+          ]
+        }
+      
 }

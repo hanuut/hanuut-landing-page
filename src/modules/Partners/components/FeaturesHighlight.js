@@ -159,12 +159,31 @@ const FeaturesHighlight = () => {
     return () => scrollContainer?.removeEventListener("scroll", handleScroll);
   }, []);
 
+   // Domain content from l18n
+   const domainContent = {
+    features: {
+      supermarkets: t("myHanuutFeatures.grocerySections", { returnObjects: true }),
+      foodShops: t("myHanuutFeatures.foodSections", { returnObjects: true }),
+      globalShops: t("myHanuutFeatures.ecomSections", { returnObjects: true })
+    }
+  };
+  
+// Get the appropriate sections for the selected category
+const currentFeaturesSteps = domainContent.features[selectedCategory] || [];
+const generateTitle = () => {
+  return  currentFeaturesSteps.slice(0, 1);
+};
+
   return (
     <Container isArabic={i18n.language === "ar"}>
       <FeaturesHighlightContainer
         style={{ position: isSticky ? "sticky" : "relative" }}
       >
-        <Title>{t("discoverFeaturesTitle")}</Title>
+  
+        { generateTitle().map((section, indexS) => (
+              <Title>{section.title}</Title>
+            ))
+          }
         <Paragraph>{t("discoverFeaturesParagraph")}</Paragraph>
         <ButtonGroup>
           <Button
@@ -190,6 +209,7 @@ const FeaturesHighlight = () => {
       <FeatureScroll
         ref={featureScrollRef}
         features={featuresData(t)[selectedCategory]}
+        selectedFeature = {selectedCategory}
       />
     </Container>
   );

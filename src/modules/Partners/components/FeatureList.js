@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
+
 
 const Container = styled.div`
   position: relative;
@@ -93,31 +95,46 @@ const FeatureImage = styled(motion.img)`
   object-fit: cover;
 `;
 
-const ProgressContainer = styled(motion.div)`
-  position: fixed;
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 300px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  backdrop-filter: blur(8px);
-  z-index: 1000;
+const FeaturesContainer = styled.div`
+  width: 100%;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 `;
 
-const ProgressBar = styled(motion.div)`
-  height: 100%;
-  background: linear-gradient(90deg, #ff6b6b, #ff8e53);
-  border-radius: 4px;
-  box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+const FeatureSection = styled.div`
+  padding: 0.5rem;
 `;
 
-const FeatureScroll = React.forwardRef(({ features }, ref) => {
+const FeatureStepTitle = styled.h3`
+  font-size: ${(props) => props.theme.fontxl};
+  color: ${(props) => props.theme.primaryColor};
+  margin-bottom: 1rem;
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontlg};
+  }
+`;
+
+const FeatureParagraph = styled.p`
+  font-size: ${(props) => props.theme.fontlg};
+  color: ${(props) => props.theme.text};
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-left: 1.5rem;
+  
+  @media (max-width: 768px) {
+    font-size: ${(props) => props.theme.fontmd};
+  }
+`;
+
+const FeatureScroll = React.forwardRef(({ features, selectedFeature }, ref) => {
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const featureRefs = useRef([]);
   const containerRef = useRef();
+
+
 
   // Reset refs when features change
   useEffect(() => {
@@ -171,19 +188,26 @@ const FeatureScroll = React.forwardRef(({ features }, ref) => {
       featureRefs.current = [];
     };
   }, []);
+
+  const { t, i18n } = useTranslation();
+
+    // Domain content from l18n
+    const domainContent = {
+      features: {
+        supermarkets: t("myHanuutFeatures.grocerySections", { returnObjects: true }),
+        foodShops: t("myHanuutFeatures.foodSections", { returnObjects: true }),
+        globalShops: t("myHanuutFeatures.ecomSections", { returnObjects: true })
+      }
+    };
+    
+  // Get the appropriate sections for the selected category
+  const currentFeaturesSteps = domainContent.features[selectedFeature] || [];
+  const generateSteps = (indx) => {
+    return selectedFeature === "supermarkets" ? indx === 0 ? currentFeaturesSteps.slice(1, 3) :  indx === 1 ? currentFeaturesSteps.slice(3, 5) : currentFeaturesSteps.slice(5, 7) : selectedFeature === "foodShops" ?  indx === 0 ? currentFeaturesSteps.slice(1, 3) :  indx === 1 ? currentFeaturesSteps.slice(3, 5) : currentFeaturesSteps.slice(5, 6) : indx === 0 ? currentFeaturesSteps.slice(1, 2) :  indx === 1 ? currentFeaturesSteps.slice(2, 3) : currentFeaturesSteps.slice(3, 4);
+  };
+
   return (
     <Container>
-      <ProgressContainer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <ProgressBar
-          style={{ width: `${scrollProgress}%` }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        />
-      </ProgressContainer>
-
       <ContentWrapper ref={containerRef}>
         <LeftBox ref={ref}>
           {features.map((feature, index) => (
@@ -208,6 +232,21 @@ const FeatureScroll = React.forwardRef(({ features }, ref) => {
               >
                 {feature.description}
               </FeatureDescription>
+
+              <FeaturesContainer>
+            {
+            generateSteps(index).map((section, indexS) => (
+              <FeatureSection key={indexS}>
+                <FeatureStepTitle>{section.title}</FeatureStepTitle>
+                {section.paragraphs.map((paragraph, pIndex) => (
+                  <FeatureParagraph key={pIndex}>{paragraph}</FeatureParagraph>
+                ))}
+              </FeatureSection>
+            ))
+            
+            }
+          </FeaturesContainer>
+
             </Feature>
           ))}
         </LeftBox>
