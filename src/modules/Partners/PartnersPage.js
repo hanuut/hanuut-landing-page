@@ -83,12 +83,11 @@ const Section = styled.div`
 `;
 
 const PartnersContainer = styled.div`
-  padding: 3rem 0;
-  width: 80%;
+  margin: 2rem 0 ;
+  width: 90%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5rem;
   justify-content: flex-start;
   @media (max-width: 768px) {
     width: 100%;
@@ -102,6 +101,7 @@ const UpperBox = styled.div`
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
+  margin-bottom: 2rem;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
     width: 90%;
@@ -119,15 +119,13 @@ const ButtonsRow = styled.div`
   align-items: flex-start;
   justify-content: flex-start;
   gap: 1rem;
-  margin-top: 1.5rem;
 `;
 
 const RightBox = styled.div`
   width: 55%;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: flex-end;
-  
   @media (max-width: 768px) {
     width: 100%;
     margin-bottom: 1rem;
@@ -135,7 +133,7 @@ const RightBox = styled.div`
 `;
 
 const LeftBox = styled.div`
-  width: 40%;
+  width: 85%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -143,29 +141,6 @@ const LeftBox = styled.div`
   @media (max-width: 768px) {
     width: 100%;
     margin-bottom: 1rem;
-  }
-`;
-
-const LowerBox = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-  @media (max-width: 768px) {
-    width: 100%;
-    margin-bottom: 1rem;
-    align-items: center;
-    justify-content: center;
-  }
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  .shopLinkWrapper {
-    width: 30%;
-    @media (max-width: 768px) {
-      width: 100%;
-    }
   }
 `;
 
@@ -189,7 +164,7 @@ const Heading = styled.h1`
 
 const SubHeading = styled.h2`
   width: 99%;
-  font-size: ${(props) => props.theme.fontxxxl};
+  font-size: ${(props) => props.theme.fontxxl};
   color: ${(props) => props.theme.body};
   margin-bottom: 0.5rem;
   margin-top: 1rem;
@@ -201,7 +176,7 @@ const SubHeading = styled.h2`
 
 const Paragraph = styled.p`
   width: 100%;
-  font-size: ${(props) => props.theme.fontxxxl};
+  font-size: ${(props) => props.theme.fontxxl};
   margin-bottom: 1rem;
   color: ${(props) => props.theme.body};
   @media (max-width: 768px) {
@@ -232,7 +207,7 @@ const FeatureSection = styled.div`
 `;
 
 const FeatureTitle = styled.h3`
-  font-size: ${(props) => props.theme.fontxl};
+  font-size: ${(props) => props.theme.fontmd};
   color: ${(props) => props.theme.body};
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontlg};

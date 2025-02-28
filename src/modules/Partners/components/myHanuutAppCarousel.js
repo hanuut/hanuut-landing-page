@@ -6,9 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 // Styled Components
 const CarouselContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  margin: auto;
+  width: 75%;
   overflow: hidden;
   position: relative;
 `;
@@ -41,14 +39,6 @@ const SlideImage = styled.img`
   width: 100%;
   height: auto;
   object-fit: cover;
-`;
-
-const PartnersImageContainer = styled.img`
-  width: 90%;
-  max-height: 50vh;
-  @media (max-width: 768px) {
-    width: ${(props) => (props.hide ? "0" : "100%")};
-  }
 `;
 
 const MyHanuutAppCarousel = ({ images }) => {
