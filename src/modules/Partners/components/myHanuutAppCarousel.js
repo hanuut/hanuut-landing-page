@@ -6,9 +6,12 @@ import "slick-carousel/slick/slick-theme.css";
 
 // Styled Components
 const CarouselContainer = styled.div`
-  width: 100%;
+  width: 80%;
   overflow: hidden;
   position: relative;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const GradientOverlay = styled.div`
@@ -19,18 +22,25 @@ const GradientOverlay = styled.div`
   bottom: 0;
   pointer-events: none;
   z-index: 1;
-  
+
   /* Left gradient (darkGreen to transparent) */
-  background-image: 
-    linear-gradient(to right, ${props => props.theme.darkGreen} 0%, transparent 100%),
+  background-image: linear-gradient(
+      to right,
+      ${(props) => props.theme.darkGreen} 0%,
+      transparent 100%
+    ),
     /* Right gradient (darkGreen to transparent) */
-    linear-gradient(to left, ${props => props.theme.darkGreen} 0%, transparent 100%);
-  
+      linear-gradient(
+        to left,
+        ${(props) => props.theme.darkGreen} 0%,
+        transparent 100%
+      );
+
   background-size: 6% 100%, 2% 100%;
-  
+
   /* Position at left and right edges */
   background-position: left center, right center;
-  
+
   /* Prevent repeating */
   background-repeat: no-repeat;
 `;
@@ -50,7 +60,7 @@ const MyHanuutAppCarousel = ({ images }) => {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 2600,
-    arrows: false
+    arrows: false,
   };
 
   return (

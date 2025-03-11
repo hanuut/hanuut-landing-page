@@ -44,7 +44,7 @@ const ButtonGroup = styled.div`
 `;
 
 const Button = styled.button`
-  padding:  0.5rem;
+  padding: 0.5rem;
   background-color: ${(props) =>
     props.isSelected ? props.theme.body : props.theme.darkGreen};
   color: ${(props) =>
@@ -58,7 +58,9 @@ const Button = styled.button`
   font-weight: ${(props) => (props.isSelected ? 900 : 400)};
   &:hover {
     background-color: ${(props) =>
-      props.isSelected ? props.theme.primaryColorDark : props.theme.primaryColor};
+      props.isSelected
+        ? props.theme.primaryColorDark
+        : props.theme.primaryColor};
     color: ${(props) => props.theme.body};
     border-color: ${(props) => props.theme.body};
   }
@@ -83,7 +85,7 @@ const Section = styled.div`
 `;
 
 const PartnersContainer = styled.div`
-  margin: 2rem 0 ;
+  margin: 2rem 0;
   width: 90%;
   display: flex;
   flex-direction: column;
@@ -221,64 +223,47 @@ const PartnersPage = () => {
     process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK;
   const myHanuutDownloadLink =
     process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
-    
+
   // Domain content from JSON
   const domainContent = {
     domainExamples: {
       supermarkets: t("grocery_domain_examples"),
       foodShops: t("food_domain_examples"),
-      globalShops: t("ecom_domain_examples")
+      globalShops: t("ecom_domain_examples"),
     },
     features: {
-      supermarkets: t("myHanuutFeatures.grocerySections", { returnObjects: true }),
+      supermarkets: t("myHanuutFeatures.grocerySections", {
+        returnObjects: true,
+      }),
       foodShops: t("myHanuutFeatures.foodSections", { returnObjects: true }),
-      globalShops: t("myHanuutFeatures.ecomSections", { returnObjects: true })
-    }
+      globalShops: t("myHanuutFeatures.ecomSections", { returnObjects: true }),
+    },
   };
-  
+
   const handleDownloadPlay = (e) => {
     e.preventDefault();
     window.open(myHanuutDownloadLink);
   };
-  
+
   const handleDownloadWindows = (e) => {
     e.preventDefault();
     window.open(myHanuutDownloadLinkWindows);
   };
-  
-  const images = i18n.language === "ar" ? [
-    image1Ar,
-    image4Ar,
-    image3Ar,
-    image2Ar,
-    image5Ar,
-    image6Ar,
-    image7Ar,
-  ] : i18n.language === "en" ? [
-    image1En,
-    image3En,
-    image2En,
-    image4En,
-    image7En,
-    image5En,
-    image6En,
-  ] : [
-    image1En,
-    image2Fr,
-    image4Fr,
-    image3Fr,
-    image7Fr,
-    image5Fr,
-    image6Fr,
-  ];
+
+  const images =
+    i18n.language === "ar"
+      ? [image1Ar, image4Ar, image3Ar, image2Ar, image5Ar, image6Ar, image7Ar]
+      : i18n.language === "en"
+      ? [image1En, image3En, image2En, image4En, image7En, image5En, image6En]
+      : [image1En, image2Fr, image4Fr, image3Fr, image7Fr, image5Fr, image6Fr];
 
   // Get the appropriate sections for the selected category
   const currentFeatures = domainContent.features[selectedCategory] || [];
-  
+
   // Get SEO meta data based on language and selected domain
   const getSeoContent = () => {
     let domainType = "";
-    switch(selectedCategory) {
+    switch (selectedCategory) {
       case "supermarkets":
         domainType = t("supermarkets");
         break;
@@ -291,14 +276,18 @@ const PartnersPage = () => {
       default:
         domainType = t("supermarkets");
     }
-    
+
     return {
       title: `${t("myHanuutTitle")} - ${domainType}`,
-      description: `${t("appTitle")}, ${t("myHanuutTitle")}, ${t("partnersBoostYourProfits")} ${domainType}, ${t("partnerSubHeading")}`,
-      keywords: `${t("myHanuutTitle")}, ${domainType}, ${t("partnersBoostYourProfits")}, e-commerce, online shop, hanuut`
+      description: `${t("appTitle")}, ${t("myHanuutTitle")}, ${t(
+        "partnersBoostYourProfits"
+      )} ${domainType}, ${t("partnerSubHeading")}`,
+      keywords: `${t("myHanuutTitle")}, ${domainType}, ${t(
+        "partnersBoostYourProfits"
+      )}, e-commerce, online shop, hanuut`,
     };
   };
-  
+
   const seoContent = getSeoContent();
 
   return (
@@ -316,7 +305,7 @@ const PartnersPage = () => {
             name: seoContent.title,
             description: seoContent.description,
             url: "https://www.hanuut.com/partners",
-            inLanguage: i18n.language
+            inLanguage: i18n.language,
           })}
         </script>
       </Helmet>
@@ -354,13 +343,15 @@ const PartnersPage = () => {
                 {t(domainContent.domainExamples[selectedCategory])}
               </DomainExampleText>
               {/* Domain-specific features */}
-          <FeaturesContainer>
-            {currentFeatures.slice(1,currentFeatures.length-1 ).map((section, index) => (
-              <FeatureSection key={index}>
-                <FeatureTitle>{section.title}</FeatureTitle>
-              </FeatureSection>
-            ))}
-          </FeaturesContainer>
+              <FeaturesContainer>
+                {currentFeatures
+                  .slice(1, currentFeatures.length - 1)
+                  .map((section, index) => (
+                    <FeatureSection key={index}>
+                      <FeatureTitle>{section.title}</FeatureTitle>
+                    </FeatureSection>
+                  ))}
+              </FeaturesContainer>
               <Paragraph>{t("partnerParagraph")}</Paragraph>
               <ButtonsRow>
                 <ButtonWithIcon
@@ -385,10 +376,10 @@ const PartnersPage = () => {
             <RightBox>
               <MyHanuutAppCarousel images={images} />
             </RightBox>
-          </UpperBox>          
+          </UpperBox>
           <PartnersValues />
         </PartnersContainer>
-        <FeaturesHighlight selectedCategory = {selectedCategory} />
+        <FeaturesHighlight selectedCategory={selectedCategory} />
         <DownloadCTA
           groceryGuideLink="/path-to-grocery-guide.pdf"
           foodShopGuideLink="/path-to-food-shop-guide.pdf"
@@ -398,7 +389,7 @@ const PartnersPage = () => {
           handleDownloadPlay={handleDownloadPlay}
           handleDownloadWindows={handleDownloadWindows}
           selectedCategory={selectedCategory}
-          currentFeatures = {currentFeatures}
+          currentFeatures={currentFeatures}
         />
       </Section>
     </>
