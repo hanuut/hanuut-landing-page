@@ -27,6 +27,7 @@ const Section = styled(motion.section)`
 
   @media (max-width: 768px) {
     padding: 4rem 1.5rem;
+    width: 90%;
   }
 `;
 
@@ -80,7 +81,7 @@ const FeatureParagraph = styled.p`
   margin-bottom: 0.2rem;
   position: relative;
   padding-left: 1.5rem;
-    max-width: 600px;
+  max-width: 600px;
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontmd};
   }
@@ -164,17 +165,22 @@ const DownloadCTA = ({
   // Domain content from l18n
   const domainContent = {
     features: {
-      supermarkets: t("myHanuutFeatures.grocerySections", { returnObjects: true }),
+      supermarkets: t("myHanuutFeatures.grocerySections", {
+        returnObjects: true,
+      }),
       foodShops: t("myHanuutFeatures.foodSections", { returnObjects: true }),
-      globalShops: t("myHanuutFeatures.ecomSections", { returnObjects: true })
-    }
+      globalShops: t("myHanuutFeatures.ecomSections", { returnObjects: true }),
+    },
   };
-  
-// Get the appropriate sections for the selected category
-const currentFeaturesSteps = domainContent.features[selectedCategory] || [];
-const generateTitle = () => {
-  return  currentFeaturesSteps.slice(currentFeaturesSteps.length-1,currentFeaturesSteps.length);
-};
+
+  // Get the appropriate sections for the selected category
+  const currentFeaturesSteps = domainContent.features[selectedCategory] || [];
+  const generateTitle = () => {
+    return currentFeaturesSteps.slice(
+      currentFeaturesSteps.length - 1,
+      currentFeaturesSteps.length
+    );
+  };
 
   return (
     <Section
@@ -213,17 +219,14 @@ const generateTitle = () => {
             {t("PartnerCtaDescription")}
           </Description>
 
-          {
-            generateTitle().map((section, indexS) => (
-              <FeatureSection key={indexS}>
-                <FeatureStepTitle>{section.title}</FeatureStepTitle>
-                {section.paragraphs.map((paragraph, pIndex) => (
-                  <FeatureParagraph key={pIndex}>{paragraph}</FeatureParagraph>
-                ))}
-              </FeatureSection>
-            ))
-            
-         }
+          {generateTitle().map((section, indexS) => (
+            <FeatureSection key={indexS}>
+              <FeatureStepTitle>{section.title}</FeatureStepTitle>
+              {section.paragraphs.map((paragraph, pIndex) => (
+                <FeatureParagraph key={pIndex}>{paragraph}</FeatureParagraph>
+              ))}
+            </FeatureSection>
+          ))}
 
           <ButtonsContainer
             initial={{ opacity: 0, y: 20 }}

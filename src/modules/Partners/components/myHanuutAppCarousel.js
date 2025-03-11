@@ -6,7 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 // Styled Components
 const CarouselContainer = styled.div`
-  width: 75%;
+  width: 100%;
   overflow: hidden;
   position: relative;
 `;

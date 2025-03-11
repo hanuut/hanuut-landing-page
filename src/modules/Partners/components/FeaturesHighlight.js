@@ -9,9 +9,6 @@ import Grocery1 from "../../../assets/my_hanuut_features/grocery_1.png";
 import Grocery2 from "../../../assets/my_hanuut_features/grocery_2.png";
 import Grocery3 from "../../../assets/my_hanuut_features/grocery_3.png";
 
-
-
-
 const featuresData = (t) => ({
   foodShops: [
     {
@@ -103,14 +100,10 @@ const Button = styled.button`
   border-color: ${(props) => props.theme.primaryColor};
   cursor: pointer;
   transition: all 0.3s ease;
-  font-weight : ${(props) =>
-    props.isSelected ? 900 : 400};
+  font-weight: ${(props) => (props.isSelected ? 900 : 400)};
   &:hover {
-    background-color: ${(props) =>
-      props.isSelected
-        ? props.theme.primaryColorDark
-        : props.theme.primaryColor};
-    color: ${(props) => props.theme.body};
+    background-color: ${(props) => props.theme.darkGreen};
+    color: ${(props) => props.theme.orangeColor};
     border-color: ${(props) => props.theme.body};
   }
 
@@ -127,7 +120,7 @@ const Paragraph = styled.p`
   text-align: center;
   align-self: center;
   @media (max-width: 768px) {
-      padding: 0rem 2rem;
+    padding: 0rem 2rem;
     font-size: ${(props) => props.theme.fontlg};
   }
 `;
@@ -159,31 +152,31 @@ const FeaturesHighlight = () => {
     return () => scrollContainer?.removeEventListener("scroll", handleScroll);
   }, []);
 
-   // Domain content from l18n
-   const domainContent = {
+  // Domain content from l18n
+  const domainContent = {
     features: {
-      supermarkets: t("myHanuutFeatures.grocerySections", { returnObjects: true }),
+      supermarkets: t("myHanuutFeatures.grocerySections", {
+        returnObjects: true,
+      }),
       foodShops: t("myHanuutFeatures.foodSections", { returnObjects: true }),
-      globalShops: t("myHanuutFeatures.ecomSections", { returnObjects: true })
-    }
+      globalShops: t("myHanuutFeatures.ecomSections", { returnObjects: true }),
+    },
   };
-  
-// Get the appropriate sections for the selected category
-const currentFeaturesSteps = domainContent.features[selectedCategory] || [];
-const generateTitle = () => {
-  return  currentFeaturesSteps.slice(0, 1);
-};
+
+  // Get the appropriate sections for the selected category
+  const currentFeaturesSteps = domainContent.features[selectedCategory] || [];
+  const generateTitle = () => {
+    return currentFeaturesSteps.slice(0, 1);
+  };
 
   return (
     <Container isArabic={i18n.language === "ar"}>
       <FeaturesHighlightContainer
         style={{ position: isSticky ? "sticky" : "relative" }}
       >
-  
-        { generateTitle().map((section, indexS) => (
-              <Title>{section.title}</Title>
-            ))
-          }
+        {generateTitle().map((section, indexS) => (
+          <Title>{section.title}</Title>
+        ))}
         <Paragraph>{t("discoverFeaturesParagraph")}</Paragraph>
         <ButtonGroup>
           <Button
@@ -209,7 +202,7 @@ const generateTitle = () => {
       <FeatureScroll
         ref={featureScrollRef}
         features={featuresData(t)[selectedCategory]}
-        selectedFeature = {selectedCategory}
+        selectedFeature={selectedCategory}
       />
     </Container>
   );
