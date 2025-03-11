@@ -38,7 +38,7 @@ const CustomRouter = () => {
       {/* <Route path="/shop/:shopName" element={<ShopPage/>} /> */}
       {/* <Route path="/confirmPayment" element={<PaymentPage />} /> */}
       {/* <Route path="/testPayment" element={<SatimTestPage />} /> */}
-      {/* <Route path="/my-hanuut-guide" element={<MyHanuutGuide />} /> */}
+      <Route path="/my-hanuut-guide" element={<MyHanuutGuide />} />
     </Routes>
   );
 };

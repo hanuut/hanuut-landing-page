@@ -34,10 +34,14 @@ const Categories = styled.div`
   justify-content: center;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-
+  /* Hide scrollbar for Chrome, Safari and Opera */
   &::-webkit-scrollbar {
     display: none;
   }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: 0px; /* Firefox */
 
   @media (max-width: 768px) {
     justify-content: flex-start;
@@ -111,7 +115,6 @@ const CategoriesContainer = ({ shopData }) => {
 
   const handleCategoryClick = async (categoryId) => {
     if (!loadedCategories.includes(categoryId)) {
-
       dispatch(fetchDishesByCategory({ shopId: shopData._id, categoryId }));
       setLoadedCategories((prevLoadedCategories) => [
         ...prevLoadedCategories,

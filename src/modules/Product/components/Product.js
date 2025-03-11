@@ -5,6 +5,7 @@ import { t } from "i18next";
 import { useSelector } from "react-redux";
 import { selectShop } from "../../Partners/state/reducers";
 import ProductDetails from "./ProductDetails";
+import { useNavigate } from "react-router-dom";
 const Card = styled.div`
   width: 30%;
   border: 1px solid rgba(${(props) => props.theme.textRgba}, 0.1);
@@ -101,48 +102,40 @@ const Product = ({
   const { i18n } = useTranslation();
   const { name, sellingPrice, brand, shortDescription, description } = product;
 
+  const navigate = useNavigate();
   const onProductClick = () => {
-    setSelectedProduct(selectedProduct?.id === product.id ? null : product);
+    if (selectedShop.domainId.keyword === "global") {
+      navigate(`/product/${product.id}`);
+    }
   };
 
   return (
-    <>
-      <Card
-        isArabic={i18n.language === "ar"}
-        key={product.id}
-        onClick={onProductClick}
-        aria-label={`View details for ${name}`}
-      >
-        <Body>
-          <ContentRow>
-            <Name>
-              {name} - <Brand>{brand}</Brand>
-            </Name>
-          </ContentRow>
-          <ContentRow>
-            <Desc>
-              {selectedShop.domainId.keyword === "global"
-                ? shortDescription
-                : description}
-            </Desc>
-            <PriceContainer>
-              <Price>
-                {sellingPrice} {t("dzd")}
-              </Price>
-            </PriceContainer>
-          </ContentRow>
-        </Body>
-      </Card>
-      {selectedProduct?.id === product.id && (
-        <ProductDetailsContainer isArabic={i18n.language === "ar"}>
-          <ProductDetails
-            selectedCategory={selectedCategory}
-            selectedProduct={product}
-            setSelectedProduct={setSelectedProduct}
-          />
-        </ProductDetailsContainer>
-      )}
-    </>
+    <Card
+      isArabic={i18n.language === "ar"}
+      key={product.id}
+      onClick={onProductClick}
+      aria-label={`View details for ${name}`}
+    >
+      <Body>
+        <ContentRow>
+          <Name>
+            {name} - <Brand>{brand}</Brand>
+          </Name>
+        </ContentRow>
+        <ContentRow>
+          <Desc>
+            {selectedShop.domainId.keyword === "global"
+              ? shortDescription
+              : description}
+          </Desc>
+          <PriceContainer>
+            <Price>
+              {sellingPrice} {t("dzd")}
+            </Price>
+          </PriceContainer>
+        </ContentRow>
+      </Body>
+    </Card>
   );
 };
 

@@ -5,7 +5,7 @@ import {
   getShopById,
   getShopByUsername,
 } from "../services/shopServices";
-import { fetchShopImage } from "../../Images/state/reducers";
+import { fetchImage } from "../../Images/state/reducers";
 
 export const fetchShops = createAsyncThunk("shops/fetchShops", async () => {
   try {
