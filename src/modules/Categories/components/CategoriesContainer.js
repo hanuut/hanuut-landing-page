@@ -35,10 +35,14 @@ const Categories = styled.div`
   justify-content: flex-start;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-
+  /* Hide scrollbar for Chrome, Safari and Opera */
   &::-webkit-scrollbar {
     display: none;
   }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 
   @media (max-width: 768px) {
     justify-content: flex-start;

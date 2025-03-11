@@ -45,35 +45,25 @@ const ProductsContainer = ({ products, selectedCategory }) => {
   if (productError) return <div>Error: {productError}</div>;
 
   return (
-    <>
-      {selectedProduct ? (
-        <ProductDetails
-          selectedCategory={selectedCategory}
-          selectedProduct={selectedProduct}
-          setSelectedProduct={setSelectedProduct}
-        />
+    <Section>
+      {products.length > 0 ? (
+        products.map((product) =>
+          product.isHidden !== true ? (
+            <Product
+              key={product.product._id}
+              product={product.product}
+              selectedProduct={selectedProduct}
+              setSelectedProduct={setSelectedProduct}
+              selectedCategory={selectedCategory}
+            />
+          ) : null
+        )
       ) : (
-        <Section>
-          {products.length > 0 ? (
-            products.map((product) =>
-              product.isHidden !== true ? (
-                <Product
-                  key={product.product._id}
-                  product={product.product}
-                  selectedProduct={selectedProduct}
-                  setSelectedProduct={setSelectedProduct}
-                  selectedCategory={selectedCategory}
-                />
-              ) : null
-            )
-          ) : (
-            <NoAvailableProducts>
-              <Content>{t("noProductsAvailable")}</Content>
-            </NoAvailableProducts>
-          )}
-        </Section>
+        <NoAvailableProducts>
+          <Content>{t("noProductsAvailable")}</Content>
+        </NoAvailableProducts>
       )}
-    </>
+    </Section>
   );
 };
 

@@ -7,11 +7,9 @@ import BackgroundImage from "../../assets/background.webp";
 
 const Section = styled.section`
   min-height: 70vh;
-  background-image: url(${BackgroundImage});
   display: flex;
   align-items: center;
   justify-content: center;
-
   @media (max-width: 768px) {
     justify-content: flex-start;
     min-height: 100vh;
@@ -28,11 +26,9 @@ const Container = styled.div`
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  background: rgba(${(props) => props.theme.primaryColorRgba}, 0.05);
+
   backdrop-filter: blur(2px);
   border-radius: 10px;
-  padding: 2rem;
-
   @media (max-width: 768px) {
     width: 100%;
     align-items: flex-start;

@@ -2,24 +2,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getImage } from "../services/imageServices";
 
-export const fetchShopsImages = createAsyncThunk(
-  "images/fetchShopsImages",
-  async (shops) => {
+export const fetchImages = createAsyncThunk(
+  "images/fetchImages",
+  async (imageIds) => {
     try {
-      const filteredShops = shops.filter((shop) => shop.imageId); // Filter out shops with empty or null imageId
-      const imageIds = filteredShops.map((shop) => shop.imageId);
       const response = [];
-
       for (const imageId of imageIds) {
         const imageSnap = await getImage(imageId);
-        filteredShops.forEach((shop) => {
-          if (shop.imageId === imageId) {
-            response.push({ shopId: shop.id, image: imageSnap.data });
-          }
-        });
+        response.push({ imageId: imageId, imageData: imageSnap.data });
       }
 
-      return response; // Return the response to update the state
+      return response;
     } catch (error) {
       throw new Error("Failed to fetch shop images");
     }
@@ -49,8 +42,8 @@ export const fetchDishesImages = createAsyncThunk(
   }
 );
 
-export const fetchShopImage = createAsyncThunk(
-  "images/fetchShopImage",
+export const fetchImage = createAsyncThunk(
+  "images/fetchImage",
   async (imageId) => {
     try {
       const response = await getImage(imageId);
@@ -69,20 +62,20 @@ const imageSlice = createSlice({
     dishesImages: [],
     imagesLoading: false,
     selectedImageLoading: false,
-    error: '',
+    error: "",
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchShopsImages.pending, (state) => {
+      .addCase(fetchImages.pending, (state) => {
         state.imagesLoading = true;
         state.error = null;
       })
-      .addCase(fetchShopsImages.fulfilled, (state, action) => {
+      .addCase(fetchImages.fulfilled, (state, action) => {
         state.imagesLoading = false;
         state.images = [...state.images, ...action.payload];
       })
-      .addCase(fetchShopsImages.rejected, (state, action) => {
+      .addCase(fetchImages.rejected, (state, action) => {
         state.imagesLoading = false;
         state.error = action.error.message;
       })
@@ -98,15 +91,15 @@ const imageSlice = createSlice({
         state.imagesLoading = false;
         state.error = action.error.message;
       })
-      .addCase(fetchShopImage.pending, (state) => {
+      .addCase(fetchImage.pending, (state) => {
         state.selectedImageLoading = true;
         state.error = null;
       })
-      .addCase(fetchShopImage.fulfilled, (state, action) => {
+      .addCase(fetchImage.fulfilled, (state, action) => {
         state.selectedImageLoading = false;
         state.selectedShopImage = action.payload;
       })
-      .addCase(fetchShopImage.rejected, (state, action) => {
+      .addCase(fetchImage.rejected, (state, action) => {
         state.selectedImageLoading = false;
         state.error = action.error.message;
       });
@@ -114,7 +107,7 @@ const imageSlice = createSlice({
 });
 
 export const { reducer, actions } = imageSlice;
-export const selectShopsImages = (state) => state.images;
+export const selectImages = (state) => state.images;
 export const selectDishesImages = (state) => state.images.dishesImages;
 export const selectSelectedShopImage = (state) =>
   state.images.selectedShopImage;

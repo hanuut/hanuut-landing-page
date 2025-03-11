@@ -10,16 +10,14 @@ import {
   selectShop,
   selectShops,
 } from "../Partners/state/reducers";
-import {
-  fetchShopImage,
-  selectSelectedShopImage,
-} from "../Images/state/reducers";
+import { fetchImage, selectSelectedShopImage } from "../Images/state/reducers";
 import NotFoundPage from "../NotFoundPage";
 import Loader from "../../components/Loader";
 import { ShopCart } from "../Partners/components/ShopCart";
 import { useTranslation } from "react-i18next";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
 import Playstore from "../../assets/playstore.webp";
+import ProductDetails from "./components/ProductDetails";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -60,6 +58,15 @@ const UpperBox = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
   }
+`;
+
+const LowerBox = styled.div`
+  margin-top: 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 `;
 const OrderAndDownload = styled.div`
   display: flex;
@@ -180,11 +187,11 @@ const ProductPage = () => {
 
   useEffect(() => {
     if (selectedShop && selectedShop.imageId) {
-      dispatch(fetchShopImage(selectedShop.imageId));
+      dispatch(fetchImage(selectedShop.imageId));
     }
   }, [dispatch, selectedShop]);
 
-  if (error) {
+  if (error || (!selectedProduct && !loading)) {
     return <NotFoundPage />;
   }
   if (!selectedShop || !selectedShopImage || loading) {
@@ -221,6 +228,12 @@ const ProductPage = () => {
             </Link>
           </OrderAndDownload>
         </UpperBox>
+        <LowerBox>
+          <ProductDetails
+            selectedProduct={selectedProduct}
+            selectedCategory={selectedProduct.categoryId}
+          />
+        </LowerBox>
       </Container>
     </Section>
   );

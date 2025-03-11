@@ -149,7 +149,6 @@ const VerticalShopCart = ({ shop, imageData, className }) => {
         setImageSrc(imageUrl);
       } catch (error) {
         console.error("Error loading image:", error);
-        // Handle the error, e.g., display a placeholder image or show an error message
       }
     };
 

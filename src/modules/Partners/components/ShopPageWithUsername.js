@@ -8,7 +8,7 @@ import {
   selectShops,
 } from "../state/reducers";
 import {
-  fetchShopImage,
+  fetchImage,
   selectSelectedShopImage,
 } from "../../Images/state/reducers";
 import { useDispatch, useSelector } from "react-redux";
@@ -53,7 +53,7 @@ const ShopPageWithUsername = () => {
 
   useEffect(() => {
     if (selectedShop && selectedShop.imageId) {
-      dispatch(fetchShopImage(selectedShop.imageId));
+      dispatch(fetchImage(selectedShop.imageId));
     }
   }, [dispatch, selectedShop]);
 
