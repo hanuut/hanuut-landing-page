@@ -1,1 +1,11 @@
-/*    /index.html    200
+# Serve assetlinks.json from the .well-known path (for Android App Links)
+/.well-known/assetlinks.json /assetlinks.json 200
+
+# Handle all deep link routes
+/deeplink/* /index.html 200
+
+# Handle app link page
+/applink/* /applink.html 200
+
+# SPA fallback - redirect all other requests to index.html
+/* /index.html 200
