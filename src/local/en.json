@@ -1,400 +1,399 @@
 {
-    "dzd": "da",
-    "getItOn": "GET IT ON",
-    "googlePlay": "Google Play",
-    "show": "Show",
-    "hide": "Hide",
-    "joinOurCommunity": "Join Our Community",
-    "appTitle": "hanuut",
-    "myHanuutTitle": "My hanuut",
-    "linksPageTitle": "Hanuut Links",
-    "linksPageHanuutTitle": "Shop Your Favorites Safely Online",
-    "linksPageHanuutText": "Discover a seamless shopping experience with our app. Download Hanuut now and start shopping!",
-    "linksPageMyHanuutTitle": "Transform Your Shop Today!",
-    "linksPageMyHanuutText": "Simplify your operations, boost efficiency, and grow your business. Download My Hanuut and take your grocery shop to the next level!",
-    "navHome": "Home",
-    "congratulations": "Congratulations",
-    "navPartners": "My Hanuut",
-    "navSolution": "Solutions",
-    "navContact": "Contact",
-    "navTawsila": "Tawsila",
-    "footerFindUs": "Find us ",
-    "innovative": "An innovative mobile app for delivery",
-    "welcomeToTawsila": "  Welcome to our platform! We're excited to have you join our community of drivers. To get started, please follow the steps",
-    "pleaseTakeAMoment": "Please take a moment to review our",
-    "submitToRules": ". By submitting your subscription request, you agree to abide by these terms and conditions.",
-    "subscribeYourTawsila": "Subscription Request",
-    "fillTheSubscription": " Fill out the subscription request form below with your contact information and relevant details.",
-    "reviewConditions": "Review the terms and conditions carefully before submitting your request.",
-    "clickToSubmit": "Click the Submit button to send your subscription request  to our team for review.",
-    "enterPhoneToSubOrCheck": "Enter your phone number to check your subscribe request",
-    "clickToDownload": "Click the link to download the app",
-    "acceptance": "Acceptance",
-    "acceptanceAfterSubmittingRequest": "After submitting your subscribe request, our team will diligently review the information you provided.",
-    "onceRequestAccepted": "Once your request is accepted, we will notify you of your acceptance. Congratulations! You're now officially a part of our driver community.",
-    "getStartedWithTawsila": "Get start with tawsila",
-    "toGetStartedWithTawsila": "To get started, simply provide your phone number and find the download link for the app. Click on it to visite the download page. Our user-friendly app is designed to provide you with a seamless experience and access to the tools you need. ",
-    "approval": "Approval",
-    "openYourAccount": "Open your account on our platform by providing the required information. ",
-    "fillInformation": " Fill in your personal details and vehicle information accurately.",
-    "submitDocs": "  Submit the necessary documents for verification and validation.",
-    "ourTeamWillReviewAndVerify": "  Our team will carefully review the information provided and verify your submitted documents. Once your data and documents have been successfully validated, you will receive approval.",
-    "earnForMission": "Earn For Your Delivery Missions",
-    "congratulationsAccepted": " Congratulations! You are now eligible to go online as an active driver.",
-    "loginAndOnline": "Log in to our driver app and set your availability status to 'online.'",
-    "startReceivingMission": "You'll start receiving mission requests from our system,  matching you with suitable tasks.",
-    "AcceptMissionToWork": "Accept missions and provide excellent service to our customers.",
-    "footerAllRightsReserved": "© 2023 hanuut Express. All rights reserved | ",
-    "footerPrivacyAndPolicy": "Privacy Policy | ",
-    "footerTermsOfUse": "Terms of Use  ",
-    "thankYouForPurchase": "Thank you for your purchase!",
-    "somethingWrongHappened": "Sorry! Something went wrong",
-    "purchaseSuccess": "Your order has been successfully processed. We appreciate your business and look forward to serving you again.",
-    "purchaseFailure": "We apologize for the inconvenience. There was an issue processing your order. We value your business and will make every effort to resolve the issue.",
-    "orderStatus": "Order status",
-    "depositeAmount": "Deposite Amount",
-    "homeHeading": "Hanuut: Your Neighborhood's Digital Main Street",
-    "homeSubHeading": "Shop verified local businesses - From grocery staples to hidden gems, all with the trust of a face-to-face transaction",
-    "homeParagraph": "Why gamble with random online sellers? Hanuut recreates the reliability of your favorite local shops in a modern app. Watch live updates as trusted merchants handle your order - from 'confirmed' to 'at your door' or ready for pickup. Get members-only deals from neighborhood businesses and tap into our community marketplace: a safe space to buy/sell within your area.",
-    "homeInputButton": "Download",
-    "toOrder": "Order from Hanuut App",
-    "homeSmallerParagraph": "Download From Play Store.",
-    "aboutUsHeading": "About Us",
-    "aboutUsText": "At hanuut, we make it easy for you to find everything you need in one place. We partner with a variety of local shops that you trust in your area to offer you a wide range of products right at your fingertips. Whether you're looking for food, household essentials or groceries, we've got you covered.",
-    "aboutUsMissionTitle": "Our Mission",
-    "aboutUsMissionText": "Local shops that you trust offering a wide range of products right at your fingertips.",
-    "aboutUsValues": "What Sets Us Apart",
-    "howItWorksTitle": "Mechanisms",
-    "howItWorksShoping": "Choose the store that suits you, explore a well-organized list of products, and add the items you want to purchase to your virtual shopping cart.",
-    "howItWorkCartManagment": "provide your delivery address and select your preferred method of receiving the order. This will allow us to ensure that your items are delivered to the correct location and in the way that is most convenient for you.",
-    "howItWorksDelivery": "Simply wait at your doorstep, as our driver will be arriving shortly to deliver your order. You can track the status of your delivery using our app.",
-    "valuesConvenienceTitle": "Convenience and Accessibility",
-    "valuesConvenienceText": "We provide a convenient shopping experience by allowing customers to shop online, access a wider range of products in many domains, and receive delivery services directly to their doorstep.",
-    "valuesTrustTitle": "Trust and Security",
-    "valuesTrustText": "We prioritize trust and security by protecting customer information and offering excellent customer support. Transparent pricing, clear return policies, and a loyalty program for customer.",
-    "valuesPricingTitle": "Competitive Pricing and Quality",
-    "valuesPricingText": "We promote competitive pricing and quality by encouraging healthy competition among sellers, leading to lower prices and higher quality products. Access to reviews, ratings, and comparisons helps customers make confident purchases.",
-    "404Title": "404 - Page Not Found",
-    "404Text": "We couldn't find the page you were looking for.",
-    "404Button": "Go Back To Home",
-    "partnerHeadingBoost": "Go digital with",
-    "partnerHeading": "My Hanuut",
-    "partnersBoostYourProfits": "Boost your profit",
-    "partnerSubHeading": "Manage your inventory, track sales, and launch promotions to attract more customers.",
-    "partnerParagraph": "Create your online shop, receive orders online, and manage your inventory seamlessly , My Hanuut helps you to grow your business. Download the app now!",
-    "partnerInputText": "Enter your email address",
-    "partnerInputButton": "Subscribe",
-    "partnerSmallerParagraph": "By entering your email, you agree to receive emails from hanuut.",
-    "secondStepTitle": "Tell us about you",
-    "partnersFormFullName": "Full name",
-    "partnerInputTextFullName": "Enter you full name",
-    "partnersFormPhone": "Phone",
-    "partnersFormEmail": "Email",
-    "partnerInputTextPhone": "Enter your phone number",
-    "partnersFormAddress": "Address",
-    "partnersFormAddressState": "State",
-    "partnersFormAddressCity": "City",
-    "partnersFormNextButton": "Next",
-    "thirdStepTitle": "Tell us about your business",
-    "partnersFormBusinessName": "Business name",
-    "partnerInputTextBusinessName": "Enter your business name",
-    "partnersFormDomain": "Domain",
-    "partnerInputTextForm": "Choose the domain of your business",
-    "partnerInputTextFormOther": "Enter the domain of your business",
-    "partnersFormOther": "Other domain",
-    "partnersFormSource": "How did you find hanuut",
-    "partnersFormSubmitButton": "send",
-    "partnersFormThankYouTitle": "Thank you for subscribing",
-    "partnersFormThankYouSubTitle": "you have been successfully joined our waiting list. Our team will reach you soon",
-    "ourPartners": "Create your online shop now",
-    "partnersValue1": "Expand Your Reach",
-    "partnersValue1Description": "Today, every customer has a smartphone with internet access. So why not put your store in their pockets? With My Hanuut, open your online shop and attract more customers effortlessly.",
-    "partnersValue2": "Streamline Your Operations",
-    "partnersValue2Description": "Keep all your products in one place, categorized and easy to update anytime. My Hanuut makes store management seamless and more professional.",
-    "partnersValue3": "Grow Your Business",
-    "partnersValue3Description": "Receive online orders, track sales, and analyze your business with precise data to make better decisions and boost your profits.",
-    "partnersFormFirstStepHeading": "join our community",
-    "partnersFormFirstStepSubHeading": "and easily bring your business online",
-    "partnersFormFirstStepParagraph": "Enter your phone number to subscribe or check the progess of your subscribtion",
-    "partnersFirstStepTitle": "Subscription",
-    "partnersFirstStepDescription1": "Fill your subscribtion request",
-    "partnersFirstStepDescription2": "Stay in touch. You can check your subscription in the same form",
-    "partnersSecondStepTitle": "Approval",
-    "partnersSecondStepDescriptions1": " After accepting your request, we will give you access to our app",
-    "partnersSecondStepDescriptions2": " Install the up, and setup your Online Shop",
-    "partnersThirdStepTitle": "Receive Online Orders",
-    "partnerThirdStepDescription1": "Recieve online orders from our customers and don't bother yourself with delivery",
-    "partnerThirdStepDescription2": "Keep your inverentory updated in real-time",
-    "noShopAvailable": "No valid shops available",
-    "sorryNoShopAvailable": "Sorry, there are currently no shops available",
-    "errorDescription": "Error description",
-    "errorAmountIsZero": "please select at least 1 product",
-    "errorFillAllFields": "please fill all fields",
-    "errorEmailNotValid": "please enter a valid email",
-    "errorPhoneNotValid": "please enter a valid phone number",
-    "messagePhoneIsUsed": "Your request is still being treated by Hanuut team. Stay in touch, we will reach you soon",
-    "errorCouldNotSubscribe": "Couldn't subscribe, please try later",
-    "detleteAccountTitle": "Request Account Deletion",
-    "deleteAccountFullName": "Full Name",
-    "deleteAccountPhone": "Used Phone Number",
-    "deleteAccountPassword": "Used Password",
-    "deleteAccountReason": "Reason for Account Deletion",
-    "deleteAccountReasonHeader": "Select a reason",
-    "reasonNoLongerNeedAccount": " No longer need the account",
-    "reasonPrivacy": "Privacy concerns",
-    "deleteAccountNotSatisfied": "Not satisfied with the service",
-    "deleteAccountreasonOther": "Other",
-    "deleteAccountOtherReasonsDescription": " Reason Description",
-    "deleteDataOnly": "Delete data only",
-    "deleteAccountWithData": "Delete account and data",
-    "buttonSubmit": "Submit",
-    "buttonIsSubmitting": "Submitting ...",
-    "deleteAccountMessage": "Your account deletion request will be processed within 48 hours. You will receive an email confirmation once it's completed.",
-    "tawsilaHeading": "Tawsila",
-    "tawsilaSubHeading": "Deliver missions and get paid for them!",
-    "tawsilaText": "Earn money delivering missions with TAWSILA! complete missions and get paid. Join our driver community now and start earning today!",
-    "tawsilaHeading2": "Earn Your Freedom",
-    "tawsilaSubHeading2": "Drive Your Way",
-    "becomeDriver": "Become a driver",
-    "learnMore": "Learn More >",
-    "subscribeRequest": "subscribe Request",
-    "confirmation": "Confirmation",
-    "validation": "Validation",
-    "subscribeRequestText": "Welcome to our platform! We're thrilled to have you join our community of drivers. Get ready for an exciting experience!    ",
-    "confirmationText": "After registering your subscription, our dedicated team will swiftly validate your request. Keep track of your subscription's status by simply clicking the link below. Stay informed!",
-    "validationText": "You'll have the opportunity to create a new account, provide your information, and submit the necessary documents. Once completed, you can easily enable your account and start enjoying the benefits.",
-    "signUp": "Sign Up your request",
-    "scrollDown": "Scroll",
-    "stepsTitle": "Joining steps",
-    "firstJoinStepTitle": "Join request",
-    "firstJoinStepText": "Sign up a join request. You must be over 19 and have access to a vehicle",
-    "secondJoinStepTitle": "Account creation",
-    "secondJoinStepText": "After Hannut validation, you'll receive an email containing TAWSILA app and the instruction to install it",
-    "thirdJoinStepTitle": "Deliver",
-    "thirdJoinStepText": "Go online, receive delivery mission and get paid for each one seperately",
-    "clickToDownloadApp": "Your demand has been accepted",
-    "downloadTawsila": "Download Tawsila",
-    "downloadMyHanuut": "Download My hanuut",
-    "selectCategory": "Please select a category",
-    "noDishesAvailable": "No dishes available for this category",
-    "noProductsAvailable": "No products are available in this category",
-    "menuTitle": "Menu",
-    "productsListTitle": "Products",
-    "testPayment": "Online Payment Test!",
-    "testPaymentOrder": "OrderId",
-    "testPaymentAmount": "Enter Amount!",
-    "errorCouldNotPay": "Couldn't process payment, please try later",
-    "errorAmount": "amount must be at least 50",
-    "testPaymentTitle": "Test Register Order",
-    "testPaymentSubHeading": "Please Note that this page is only for testing the integrity of online payment functions through SATIM",
-    "testPaymentParagraph": "I hope you understand that SATIM payment gateway will be used in our Mobile Apps, and this is just a test page to give you a glance on our API functions",
-    "testPaymentParagraph2": "In this page, you can test :",
-    "testPaymentRegisterOrder": "Test Register Order",
-    "testPaymentRefundOrder": "Test Refund Order",
-    "testPaymentButton": "proceed payment",
-    "testPaymentCaptchaError": "Please complete the reCAPTCHA verification",
-    "verify": "Verify",
-    "subscribe": "Subscribe",
-    "previous": "Previous",
-    "testPaymentTerms": " Terms and Conditions",
-    "testPaymentTermsError": "Please confirm the terms and conditions",
-    "testPaymentAmountShow": "Amount to pay is:",
-    "testPaymentAmountShowRefund": "Amount to refund is:",
-    "redirecting": "redirecting ...",
-    "partnersCtaTitle": "Ready to Scale",
-    "discoverFeaturesTitle": "Features",
-    "discoverFeaturesParagraph": "My Hanuut offers three tailored versions: restaurants get an interactive digital menu, grocery stores enable live shopping by scanning products, and e-commerce shops have a dedicated page showcasing all their products. Each version comes with customized features and a fully functional online store ready for customer orders.✨",
-    
-    "supermarkets": "Grocery Shops",
-    "globalShops": "General E-Commerce",
-    "foodShops": "Food Shops",
-    "partnersCtaBusiness": "Your Success?",
-    "PartnerCtaDescription": "Join the merchants who trust My Hanuut to grow their business. Get instant access to guides designed for your growth. 📈",
-    "PartnerCtaGuideGroceried": "Supermateks Guide",
-    "PartnerCtaGuideFood": "Restaurant Guide",
-    "PartnerCtaGuideDownload": "Download Free Guide",
-    "digitalMenuTitle": "Smart Digital Menu Platform",
-    "digitalMenuDescription": "Transform your menu into an interactive digital experience. Real-time updates, QR code integration, and multi-language support help your vendors showcase their offerings. Perfect for restaurants, cafes, and food markets! 🎯",
-    "paymentsTitle": "Payments",
-    "paymentsDescription": "Securely accept online payments and manage transactions with ease.",
-
-
-    "foodShopsTitle": "Digital Menu Creation",
-    "foodShopsDescription": "Easily build a digital menu by adding dishes with ingredients, images, and prices. Update your menu anytime to impress your customers. ✨",
-    "socialMediaTitle": "Easy Product Management",
-    "socialMediaDescription": "Manage your dishes effortlessly. Add, edit, or remove items with a few clicks and keep your menu always up-to-date. 🔥",
-    "orderControlTitle": "Seamless Order Processing",
-    "orderControlDescription": "Integrate orders with our built-in POS system. Receive real-time updates and ensure fast, efficient service for every order. 📱",
-    
-    "seamlessPaymentsTitle": "Barcode & Manual Entry",
-    "seamlessPaymentsDescription": "Add products swiftly by scanning barcodes or entering details manually. Save time and keep your inventory updated effortlessly. 📦",
-    "inventoryControlTitle": "Efficient Inventory Management",
-    "inventoryControlDescription": "Manage shipments with ease. Track quantities, prices, and expiration dates to ensure your stock is always optimized. 🚀",
-    "financialMasteryTitle": "Smart Warehouse Alerts",
-    "financialMasteryDescription": "Receive alerts for low, near-expiry, and expired items. Stay on top of inventory and make timely restocking decisions. 📈",
-
-    "onlineOfflineTitle": "Customizable Product Listings",
-    "onlineOfflineDescription": "Design rich product pages with custom specs, detailed descriptions, and images that captivate and inform your customers. 💪",
-    "smartOrderTitle": "Multiple Variant Options",
-    "smartOrderDescription": "Offer diverse options like color and size variants. Give your customers a personalized shopping experience with easy selection. 🌟",
-    "orderManagementTitle": "Seamless Online Orders",
-    "orderManagementDescription": "Effortlessly manage orders and track sales. Enjoy a user-friendly dashboard with real-time analytics to boost your performance. 💰",
-    "food_domain_examples" : "Food 🍔 [Restaurants, fast food, cloud kitchens, bakeries...etc]",
-    "grocery_domain_examples" : "Grocery 🛒 [Grocery stores, fruit/vegetable vendors, butchers...etc]",
-    "ecom_domain_examples" : " General Ecommerce 👗[Clothing, furniture, books, tools, and more]",
-        "myHanuutFeatures": {
-          "grocerySections": [
-            {
-              "title": "Get Started in Minutes",
-              "paragraphs": [
-                "Create a Personal Profile: Introduce yourself as a first step to create a reliable online presence.",
-                "Build Your Shop’s Identity: Upload your logo, pick a name, and craft a description that tells your story."
-              ]
-            },
-            {
-              "title": "Smart Inventory, Zero Headaches ✅",
-              "paragraphs": [
-                "Add Products in Seconds, Scan barcodes to auto-fill details from our 4,000+ product database (growing daily!).",
-                "No barcode? Add custom items manually."
-              ]
-            },
-            {
-              "title": "Track Shipments Like a Pro 👨‍🏫",
-              "paragraphs": [
-                "Track warehouse with expiry dates, buying/selling prices, and quantities.",
-                "Get low-stock alerts and expiry warnings to reduce waste.",
-                "Buying Lists & Receipts 🚚: Plan restocks in advance, then convert lists into shipments when supplies arrive, and your warehouse is updated automatically."
-              ]
-            },
-            {
-              "title": "Your Digital Storefront ✨",
-              "paragraphs": [
-                "Claim a unique username (e.g., hanuut.com/@yourshop) to get: A live grocery store.",
-                "POS Feature: manage in-person sales seamlessly."
-              ]
-            },
-            {
-              "title": "Orders & Growth Tools 🧾",
-              "paragraphs": [
-                "Receive orders at your service time and verify them.",
-                "Update statuses (preparing, on delivery, delivered) and notify customers automatically.",
-                "Analyze bestsellers, your activity statistics, and customer trends."
-              ]
-            },
-            {
-              "title": "Control Your Reach 📍",
-              "paragraphs": [
-                "Set your address, operating days, and opening/closing times."
-              ]
-            },
-            {
-              "title": "Delivery & Pickup Options 🚚",
-              "paragraphs": [
-                "Self-Delivery: Define your delivery radius and fees.",
-                "Enable Pickup: Let customers grab orders at their convenience."
-              ]
-            },
-            {
-              "title": "Ready to Join?",
-              "paragraphs": [
-                "My Hanuut is your partner in growth. For grocery shops, we adapt to your needs.",
-                "Start today. Let your shop shine.",
-                "👉 Claim Your Spot:"
-              ]
-            }
-          ],
-          "foodSections": [
-            {
-              "title": "Get Started in Minutes",
-              "paragraphs": [
-                "Create a Personal Profile: Introduce yourself as a first step to create a reliable online presence.",
-                "Build Your Shop’s Identity: Upload your logo, pick a name, and craft a description that tells your story."
-              ]
-            },
-            {
-              "title": "Create Dishes Like a Pro 🍴",
-              "paragraphs": [
-                "Add photos, ingredients, and prices. Organize items into categories.",
-                "Instantly Update: Hide sold-out dishes or highlight daily specials with one click.",
-                "Exclusive Feature: becomes a live link (e.g., hanuut.com/@yourcafe)—no printing costs, always up-to-date."
-              ]
-            },
-            {
-              "title": "Your Digital Storefront ✨",
-              "paragraphs": [
-                "Claim a unique username (e.g., hanuut.com/@yourshop)✨ and turn your menu into a dynamic digital experience.",
-                "POS Feature: manage in-person sales seamlessly."
-              ]
-            },
-            {
-              "title": "Control Your Reach 📍",
-              "paragraphs": [
-                "Set your address, operating days, and opening/closing times."
-              ]
-            },
-            {
-              "title": "Delivery & Pickup Options 🚚",
-              "paragraphs": [
-                "Self-Delivery: Define your delivery radius and fees.",
-                "Enable Pickup: Let customers grab orders at their convenience."
-              ]
-            },
-            {
-              "title": "Orders & Growth Tools 🧾",
-              "paragraphs": [
-                "Receive orders at your service time and verify them.",
-                "Update statuses (preparing, on delivery, delivered) and notify customers automatically.",
-                "Analyze bestsellers, your activity statistics, and customer trends."
-              ]
-            },
-            {
-              "title": "Ready to Join?",
-              "paragraphs": [
-                "My Hanuut is your partner in growth. for local food shops, we adapt to your needs.",
-                "Start today. Let your shop shine.",
-                "👉 Claim Your Spot:"
-              ]
-            }
-          ],
-          "ecomSections": [
-            {
-              "title": "Get Started in Minutes",
-              "paragraphs": [
-                "Create a Personal Profile: Introduce yourself as a first step to create a reliable online presence.",
-                "Build Your Shop’s Identity: Upload your logo, pick a name, and craft a description that tells your story."
-              ]
-            },
-            {
-              "title": "Showcase Every Detail 🎯",
-              "paragraphs": [
-                "Include multiple colors, sizes, and custom specs (e.g., Material: Cotton or Dimensions: 30x40cm).",
-                "Flexible Availability: Set prices per variant and manage stock effortlessly."
-              ]
-            },
-            {
-              "title": "Your Digital Storefront ✨",
-              "paragraphs": [
-                "Claim a unique username (e.g., hanuut.com/@yourshop) to get a professional landing page with all your products.",
-                "Deliver to specific Wilayas or all of Algeria."
-              ]
-            },
-            {
-              "title": "Orders & Growth Tools 🧾",
-              "paragraphs": [
-                "Receive orders at any time and verify them.",
-                "Update statuses (preparing, on delivery, delivered) and notify customers automatically.",
-                "Analyze bestsellers, your activity statistics, and customer trends."
-              ]
-            },
-            {
-              "title": "Ready to Join?",
-              "paragraphs": [
-                "My Hanuut is your partner in growth. For nationwide ecommerce shops, we adapt to your needs.",
-                "Start today. Let your shop shine.",
-                "👉 Claim Your Spot:"
-              ]
-            }
-          ]
-        }
-      
+  "dzd": "da",
+  "getItOn": "GET IT ON",
+  "googlePlay": "Google Play",
+  "show": "Show",
+  "hide": "Hide",
+  "joinOurCommunity": "Join Our Community",
+  "appTitle": "hanuut",
+  "myHanuutTitle": "My hanuut",
+  "linksPageTitle": "Hanuut Links",
+  "linksPageHanuutTitle": "Shop Your Favorites Safely Online",
+  "linksPageHanuutText": "Discover a seamless shopping experience with our app. Download Hanuut now and start shopping!",
+  "linksPageMyHanuutTitle": "Transform Your Shop Today!",
+  "linksPageMyHanuutText": "Simplify your operations, boost efficiency, and grow your business. Download My Hanuut and take your grocery shop to the next level!",
+  "navHome": "Home",
+  "congratulations": "Congratulations",
+  "navPartners": "My Hanuut",
+  "navSolution": "Solutions",
+  "navContact": "Contact",
+  "navTawsila": "Tawsila",
+  "footerFindUs": "Find us ",
+  "innovative": "An innovative mobile app for delivery",
+  "welcomeToTawsila": "  Welcome to our platform! We're excited to have you join our community of drivers. To get started, please follow the steps",
+  "pleaseTakeAMoment": "Please take a moment to review our",
+  "submitToRules": ". By submitting your subscription request, you agree to abide by these terms and conditions.",
+  "subscribeYourTawsila": "Subscription Request",
+  "fillTheSubscription": " Fill out the subscription request form below with your contact information and relevant details.",
+  "reviewConditions": "Review the terms and conditions carefully before submitting your request.",
+  "clickToSubmit": "Click the Submit button to send your subscription request  to our team for review.",
+  "enterPhoneToSubOrCheck": "Enter your phone number to check your subscribe request",
+  "clickToDownload": "Click the link to download the app",
+  "acceptance": "Acceptance",
+  "acceptanceAfterSubmittingRequest": "After submitting your subscribe request, our team will diligently review the information you provided.",
+  "onceRequestAccepted": "Once your request is accepted, we will notify you of your acceptance. Congratulations! You're now officially a part of our driver community.",
+  "getStartedWithTawsila": "Get start with tawsila",
+  "toGetStartedWithTawsila": "To get started, simply provide your phone number and find the download link for the app. Click on it to visite the download page. Our user-friendly app is designed to provide you with a seamless experience and access to the tools you need. ",
+  "approval": "Approval",
+  "openYourAccount": "Open your account on our platform by providing the required information. ",
+  "fillInformation": " Fill in your personal details and vehicle information accurately.",
+  "submitDocs": "  Submit the necessary documents for verification and validation.",
+  "ourTeamWillReviewAndVerify": "  Our team will carefully review the information provided and verify your submitted documents. Once your data and documents have been successfully validated, you will receive approval.",
+  "earnForMission": "Earn For Your Delivery Missions",
+  "congratulationsAccepted": " Congratulations! You are now eligible to go online as an active driver.",
+  "loginAndOnline": "Log in to our driver app and set your availability status to 'online.'",
+  "startReceivingMission": "You'll start receiving mission requests from our system,  matching you with suitable tasks.",
+  "AcceptMissionToWork": "Accept missions and provide excellent service to our customers.",
+  "footerAllRightsReserved": "© 2023 hanuut Express. All rights reserved | ",
+  "footerPrivacyAndPolicy": "Privacy Policy | ",
+  "footerTermsOfUse": "Terms of Use  ",
+  "thankYouForPurchase": "Thank you for your purchase!",
+  "somethingWrongHappened": "Sorry! Something went wrong",
+  "purchaseSuccess": "Your order has been successfully processed. We appreciate your business and look forward to serving you again.",
+  "purchaseFailure": "We apologize for the inconvenience. There was an issue processing your order. We value your business and will make every effort to resolve the issue.",
+  "orderStatus": "Order status",
+  "depositeAmount": "Deposite Amount",
+  "homeHeading": "Hanuut: Your Neighborhood's Digital Main Street",
+  "homeSubHeading": "Shop verified local businesses - From grocery staples to hidden gems, all with the trust of a face-to-face transaction",
+  "homeParagraph": "Why gamble with random online sellers? Hanuut recreates the reliability of your favorite local shops in a modern app. Watch live updates as trusted merchants handle your order - from 'confirmed' to 'at your door' or ready for pickup. Get members-only deals from neighborhood businesses and tap into our community marketplace: a safe space to buy/sell within your area.",
+  "homeInputButton": "Download",
+  "toOrder": "Order from Hanuut App",
+  "homeSmallerParagraph": "Download From Play Store.",
+  "aboutUsHeading": "About Us",
+  "aboutUsText": "At hanuut, we make it easy for you to find everything you need in one place. We partner with a variety of local shops that you trust in your area to offer you a wide range of products right at your fingertips. Whether you're looking for food, household essentials or groceries, we've got you covered.",
+  "aboutUsMissionTitle": "Our Mission",
+  "aboutUsMissionText": "Local shops that you trust offering a wide range of products right at your fingertips.",
+  "aboutUsValues": "What Sets Us Apart",
+  "howItWorksTitle": "Mechanisms",
+  "howItWorksShoping": "Choose the store that suits you, explore a well-organized list of products, and add the items you want to purchase to your virtual shopping cart.",
+  "howItWorkCartManagment": "provide your delivery address and select your preferred method of receiving the order. This will allow us to ensure that your items are delivered to the correct location and in the way that is most convenient for you.",
+  "howItWorksDelivery": "Simply wait at your doorstep, as our driver will be arriving shortly to deliver your order. You can track the status of your delivery using our app.",
+  "valuesConvenienceTitle": "Convenience and Accessibility",
+  "valuesConvenienceText": "We provide a convenient shopping experience by allowing customers to shop online, access a wider range of products in many domains, and receive delivery services directly to their doorstep.",
+  "valuesTrustTitle": "Trust and Security",
+  "valuesTrustText": "We prioritize trust and security by protecting customer information and offering excellent customer support. Transparent pricing, clear return policies, and a loyalty program for customer.",
+  "valuesPricingTitle": "Competitive Pricing and Quality",
+  "valuesPricingText": "We promote competitive pricing and quality by encouraging healthy competition among sellers, leading to lower prices and higher quality products. Access to reviews, ratings, and comparisons helps customers make confident purchases.",
+  "404Title": "404 - Page Not Found",
+  "404Text": "We couldn't find the page you were looking for.",
+  "404Button": "Go Back To Home",
+  "partnerHeadingBoost": "Go digital with",
+  "partnerHeading": "My Hanuut",
+  "partnersBoostYourProfits": "Boost your profit",
+  "partnerSubHeading": "Manage your inventory, track sales, and launch promotions to attract more customers.",
+  "partnerParagraph": "Create your online shop, receive orders online, and manage your inventory seamlessly , My Hanuut helps you to grow your business. Download the app now!",
+  "partnerInputText": "Enter your email address",
+  "partnerInputButton": "Subscribe",
+  "partnerSmallerParagraph": "By entering your email, you agree to receive emails from hanuut.",
+  "secondStepTitle": "Tell us about you",
+  "partnersFormFullName": "Full name",
+  "partnerInputTextFullName": "Enter you full name",
+  "partnersFormPhone": "Phone",
+  "partnersFormEmail": "Email",
+  "partnerInputTextPhone": "Enter your phone number",
+  "partnersFormAddress": "Address",
+  "partnersFormAddressState": "State",
+  "partnersFormAddressCity": "City",
+  "partnersFormNextButton": "Next",
+  "thirdStepTitle": "Tell us about your business",
+  "partnersFormBusinessName": "Business name",
+  "partnerInputTextBusinessName": "Enter your business name",
+  "partnersFormDomain": "Domain",
+  "partnerInputTextForm": "Choose the domain of your business",
+  "partnerInputTextFormOther": "Enter the domain of your business",
+  "partnersFormOther": "Other domain",
+  "partnersFormSource": "How did you find hanuut",
+  "partnersFormSubmitButton": "send",
+  "partnersFormThankYouTitle": "Thank you for subscribing",
+  "partnersFormThankYouSubTitle": "you have been successfully joined our waiting list. Our team will reach you soon",
+  "ourPartners": "Create your online shop now",
+  "partnersValue1": "Expand Your Reach",
+  "partnersValue1Description": "Today, every customer has a smartphone with internet access. So why not put your store in their pockets? With My Hanuut, open your online shop and attract more customers effortlessly.",
+  "partnersValue2": "Streamline Your Operations",
+  "partnersValue2Description": "Keep all your products in one place, categorized and easy to update anytime. My Hanuut makes store management seamless and more professional.",
+  "partnersValue3": "Grow Your Business",
+  "partnersValue3Description": "Receive online orders, track sales, and analyze your business with precise data to make better decisions and boost your profits.",
+  "partnersFormFirstStepHeading": "join our community",
+  "partnersFormFirstStepSubHeading": "and easily bring your business online",
+  "partnersFormFirstStepParagraph": "Enter your phone number to subscribe or check the progess of your subscribtion",
+  "partnersFirstStepTitle": "Subscription",
+  "partnersFirstStepDescription1": "Fill your subscribtion request",
+  "partnersFirstStepDescription2": "Stay in touch. You can check your subscription in the same form",
+  "partnersSecondStepTitle": "Approval",
+  "partnersSecondStepDescriptions1": " After accepting your request, we will give you access to our app",
+  "partnersSecondStepDescriptions2": " Install the up, and setup your Online Shop",
+  "partnersThirdStepTitle": "Receive Online Orders",
+  "partnerThirdStepDescription1": "Recieve online orders from our customers and don't bother yourself with delivery",
+  "partnerThirdStepDescription2": "Keep your inverentory updated in real-time",
+  "noShopAvailable": "No valid shops available",
+  "sorryNoShopAvailable": "Sorry, there are currently no shops available",
+  "errorDescription": "Error description",
+  "errorAmountIsZero": "please select at least 1 product",
+  "errorFillAllFields": "please fill all fields",
+  "errorEmailNotValid": "please enter a valid email",
+  "errorPhoneNotValid": "please enter a valid phone number",
+  "messagePhoneIsUsed": "Your request is still being treated by Hanuut team. Stay in touch, we will reach you soon",
+  "errorCouldNotSubscribe": "Couldn't subscribe, please try later",
+  "detleteAccountTitle": "Request Account Deletion",
+  "deleteAccountFullName": "Full Name",
+  "deleteAccountPhone": "Used Phone Number",
+  "deleteAccountPassword": "Used Password",
+  "deleteAccountReason": "Reason for Account Deletion",
+  "deleteAccountReasonHeader": "Select a reason",
+  "reasonNoLongerNeedAccount": " No longer need the account",
+  "reasonPrivacy": "Privacy concerns",
+  "deleteAccountNotSatisfied": "Not satisfied with the service",
+  "deleteAccountreasonOther": "Other",
+  "deleteAccountOtherReasonsDescription": " Reason Description",
+  "deleteDataOnly": "Delete data only",
+  "deleteAccountWithData": "Delete account and data",
+  "buttonSubmit": "Submit",
+  "buttonIsSubmitting": "Submitting ...",
+  "deleteAccountMessage": "Your account deletion request will be processed within 48 hours. You will receive an email confirmation once it's completed.",
+  "tawsilaHeading": "Tawsila",
+  "tawsilaSubHeading": "Deliver missions and get paid for them!",
+  "tawsilaText": "Earn money delivering missions with TAWSILA! complete missions and get paid. Join our driver community now and start earning today!",
+  "tawsilaHeading2": "Earn Your Freedom",
+  "tawsilaSubHeading2": "Drive Your Way",
+  "becomeDriver": "Become a driver",
+  "learnMore": "Learn More >",
+  "subscribeRequest": "subscribe Request",
+  "confirmation": "Confirmation",
+  "validation": "Validation",
+  "subscribeRequestText": "Welcome to our platform! We're thrilled to have you join our community of drivers. Get ready for an exciting experience!    ",
+  "confirmationText": "After registering your subscription, our dedicated team will swiftly validate your request. Keep track of your subscription's status by simply clicking the link below. Stay informed!",
+  "validationText": "You'll have the opportunity to create a new account, provide your information, and submit the necessary documents. Once completed, you can easily enable your account and start enjoying the benefits.",
+  "signUp": "Sign Up your request",
+  "scrollDown": "Scroll",
+  "stepsTitle": "Joining steps",
+  "firstJoinStepTitle": "Join request",
+  "firstJoinStepText": "Sign up a join request. You must be over 19 and have access to a vehicle",
+  "secondJoinStepTitle": "Account creation",
+  "secondJoinStepText": "After Hannut validation, you'll receive an email containing TAWSILA app and the instruction to install it",
+  "thirdJoinStepTitle": "Deliver",
+  "thirdJoinStepText": "Go online, receive delivery mission and get paid for each one seperately",
+  "clickToDownloadApp": "Your demand has been accepted",
+  "downloadTawsila": "Download Tawsila",
+  "downloadMyHanuut": "Download My hanuut",
+  "selectCategory": "Please select a category",
+  "noDishesAvailable": "No dishes available for this category",
+  "noProductsAvailable": "No products are available in this category",
+  "menuTitle": "Menu",
+  "productsListTitle": "Products",
+  "testPayment": "Online Payment Test!",
+  "testPaymentOrder": "OrderId",
+  "testPaymentAmount": "Enter Amount!",
+  "errorCouldNotPay": "Couldn't process payment, please try later",
+  "errorAmount": "amount must be at least 50",
+  "testPaymentTitle": "Test Register Order",
+  "testPaymentSubHeading": "Please Note that this page is only for testing the integrity of online payment functions through SATIM",
+  "testPaymentParagraph": "I hope you understand that SATIM payment gateway will be used in our Mobile Apps, and this is just a test page to give you a glance on our API functions",
+  "testPaymentParagraph2": "In this page, you can test :",
+  "testPaymentRegisterOrder": "Test Register Order",
+  "testPaymentRefundOrder": "Test Refund Order",
+  "testPaymentButton": "proceed payment",
+  "testPaymentCaptchaError": "Please complete the reCAPTCHA verification",
+  "verify": "Verify",
+  "subscribe": "Subscribe",
+  "previous": "Previous",
+  "testPaymentTerms": " Terms and Conditions",
+  "testPaymentTermsError": "Please confirm the terms and conditions",
+  "testPaymentAmountShow": "Amount to pay is:",
+  "testPaymentAmountShowRefund": "Amount to refund is:",
+  "redirecting": "redirecting ...",
+  "partnersCtaTitle": "Ready to Scale",
+  "discoverFeaturesTitle": "Features",
+  "discoverFeaturesParagraph": "My Hanuut offers three tailored versions: restaurants get an interactive digital menu, grocery stores enable live shopping by scanning products, and e-commerce shops have a dedicated page showcasing all their products. Each version comes with customized features and a fully functional online store ready for customer orders.✨",
+  "supermarkets": "Grocery Shops",
+  "globalShops": "General E-Commerce",
+  "foodShops": "Food Shops",
+  "partnersCtaBusiness": "Your Success?",
+  "PartnerCtaDescription": "Join the merchants who trust My Hanuut to grow their business. Get instant access to guides designed for your growth. 📈",
+  "PartnerCtaGuideGroceried": "Supermateks Guide",
+  "PartnerCtaGuideFood": "Restaurant Guide",
+  "PartnerCtaGuideDownload": "Download Free Guide",
+  "digitalMenuTitle": "Smart Digital Menu Platform",
+  "digitalMenuDescription": "Transform your menu into an interactive digital experience. Real-time updates, QR code integration, and multi-language support help your vendors showcase their offerings. Perfect for restaurants, cafes, and food markets! 🎯",
+  "paymentsTitle": "Payments",
+  "paymentsDescription": "Securely accept online payments and manage transactions with ease.",
+  "foodShopsTitle": "Digital Menu Creation",
+  "foodShopsDescription": "Easily build a digital menu by adding dishes with ingredients, images, and prices. Update your menu anytime to impress your customers. ✨",
+  "socialMediaTitle": "Easy Product Management",
+  "socialMediaDescription": "Manage your dishes effortlessly. Add, edit, or remove items with a few clicks and keep your menu always up-to-date. 🔥",
+  "orderControlTitle": "Seamless Order Processing",
+  "orderControlDescription": "Integrate orders with our built-in POS system. Receive real-time updates and ensure fast, efficient service for every order. 📱",
+  "seamlessPaymentsTitle": "Barcode & Manual Entry",
+  "seamlessPaymentsDescription": "Add products swiftly by scanning barcodes or entering details manually. Save time and keep your inventory updated effortlessly. 📦",
+  "inventoryControlTitle": "Efficient Inventory Management",
+  "inventoryControlDescription": "Manage shipments with ease. Track quantities, prices, and expiration dates to ensure your stock is always optimized. 🚀",
+  "financialMasteryTitle": "Smart Warehouse Alerts",
+  "financialMasteryDescription": "Receive alerts for low, near-expiry, and expired items. Stay on top of inventory and make timely restocking decisions. 📈",
+  "onlineOfflineTitle": "Customizable Product Listings",
+  "onlineOfflineDescription": "Design rich product pages with custom specs, detailed descriptions, and images that captivate and inform your customers. 💪",
+  "smartOrderTitle": "Multiple Variant Options",
+  "smartOrderDescription": "Offer diverse options like color and size variants. Give your customers a personalized shopping experience with easy selection. 🌟",
+  "orderManagementTitle": "Seamless Online Orders",
+  "orderManagementDescription": "Effortlessly manage orders and track sales. Enjoy a user-friendly dashboard with real-time analytics to boost your performance. 💰",
+  "food_domain_examples": "Food 🍔 [Restaurants, fast food, cloud kitchens, bakeries...etc]",
+  "grocery_domain_examples": "Grocery 🛒 [Grocery stores, fruit/vegetable vendors, butchers...etc]",
+  "ecom_domain_examples": " General Ecommerce 👗[Clothing, furniture, books, tools, and more]",
+  "myHanuutFeatures": {
+    "grocerySections": [
+      {
+        "title": "Get Started in Minutes",
+        "paragraphs": [
+          "Create a Personal Profile: Introduce yourself as a first step to create a reliable online presence.",
+          "Build Your Shop’s Identity: Upload your logo, pick a name, and craft a description that tells your story."
+        ]
+      },
+      {
+        "title": "Smart Inventory, Zero Headaches ✅",
+        "paragraphs": [
+          "Add Products in Seconds, Scan barcodes to auto-fill details from our 4,000+ product database (growing daily!).",
+          "No barcode? Add custom items manually."
+        ]
+      },
+      {
+        "title": "Track Shipments Like a Pro 👨‍🏫",
+        "paragraphs": [
+          "Track warehouse with expiry dates, buying/selling prices, and quantities.",
+          "Get low-stock alerts and expiry warnings to reduce waste.",
+          "Buying Lists & Receipts 🚚: Plan restocks in advance, then convert lists into shipments when supplies arrive, and your warehouse is updated automatically."
+        ]
+      },
+      {
+        "title": "Your Digital Storefront ✨",
+        "paragraphs": [
+          "Claim a unique username (e.g., hanuut.com/@yourshop) to get: A live grocery store.",
+          "POS Feature: manage in-person sales seamlessly."
+        ]
+      },
+      {
+        "title": "Orders & Growth Tools 🧾",
+        "paragraphs": [
+          "Receive orders at your service time and verify them.",
+          "Update statuses (preparing, on delivery, delivered) and notify customers automatically.",
+          "Analyze bestsellers, your activity statistics, and customer trends."
+        ]
+      },
+      {
+        "title": "Control Your Reach 📍",
+        "paragraphs": [
+          "Set your address, operating days, and opening/closing times."
+        ]
+      },
+      {
+        "title": "Delivery & Pickup Options 🚚",
+        "paragraphs": [
+          "Self-Delivery: Define your delivery radius and fees.",
+          "Enable Pickup: Let customers grab orders at their convenience."
+        ]
+      },
+      {
+        "title": "Ready to Join?",
+        "paragraphs": [
+          "My Hanuut is your partner in growth. For grocery shops, we adapt to your needs.",
+          "Start today. Let your shop shine.",
+          "👉 Claim Your Spot:"
+        ]
+      }
+    ],
+    "foodSections": [
+      {
+        "title": "Get Started in Minutes",
+        "paragraphs": [
+          "Create a Personal Profile: Introduce yourself as a first step to create a reliable online presence.",
+          "Build Your Shop’s Identity: Upload your logo, pick a name, and craft a description that tells your story."
+        ]
+      },
+      {
+        "title": "Create Dishes Like a Pro 🍴",
+        "paragraphs": [
+          "Add photos, ingredients, and prices. Organize items into categories.",
+          "Instantly Update: Hide sold-out dishes or highlight daily specials with one click.",
+          "Exclusive Feature: becomes a live link (e.g., hanuut.com/@yourcafe)—no printing costs, always up-to-date."
+        ]
+      },
+      {
+        "title": "Your Digital Storefront ✨",
+        "paragraphs": [
+          "Claim a unique username (e.g., hanuut.com/@yourshop)✨ and turn your menu into a dynamic digital experience.",
+          "POS Feature: manage in-person sales seamlessly."
+        ]
+      },
+      {
+        "title": "Control Your Reach 📍",
+        "paragraphs": [
+          "Set your address, operating days, and opening/closing times."
+        ]
+      },
+      {
+        "title": "Delivery & Pickup Options 🚚",
+        "paragraphs": [
+          "Self-Delivery: Define your delivery radius and fees.",
+          "Enable Pickup: Let customers grab orders at their convenience."
+        ]
+      },
+      {
+        "title": "Orders & Growth Tools 🧾",
+        "paragraphs": [
+          "Receive orders at your service time and verify them.",
+          "Update statuses (preparing, on delivery, delivered) and notify customers automatically.",
+          "Analyze bestsellers, your activity statistics, and customer trends."
+        ]
+      },
+      {
+        "title": "Ready to Join?",
+        "paragraphs": [
+          "My Hanuut is your partner in growth. for local food shops, we adapt to your needs.",
+          "Start today. Let your shop shine.",
+          "👉 Claim Your Spot:"
+        ]
+      }
+    ],
+    "ecomSections": [
+      {
+        "title": "Get Started in Minutes",
+        "paragraphs": [
+          "Create a Personal Profile: Introduce yourself as a first step to create a reliable online presence.",
+          "Build Your Shop’s Identity: Upload your logo, pick a name, and craft a description that tells your story."
+        ]
+      },
+      {
+        "title": "Showcase Every Detail 🎯",
+        "paragraphs": [
+          "Include multiple colors, sizes, and custom specs (e.g., Material: Cotton or Dimensions: 30x40cm).",
+          "Flexible Availability: Set prices per variant and manage stock effortlessly."
+        ]
+      },
+      {
+        "title": "Your Digital Storefront ✨",
+        "paragraphs": [
+          "Claim a unique username (e.g., hanuut.com/@yourshop) to get a professional landing page with all your products.",
+          "Deliver to specific Wilayas or all of Algeria."
+        ]
+      },
+      {
+        "title": "Orders & Growth Tools 🧾",
+        "paragraphs": [
+          "Receive orders at any time and verify them.",
+          "Update statuses (preparing, on delivery, delivered) and notify customers automatically.",
+          "Analyze bestsellers, your activity statistics, and customer trends."
+        ]
+      },
+      {
+        "title": "Ready to Join?",
+        "paragraphs": [
+          "My Hanuut is your partner in growth. For nationwide ecommerce shops, we adapt to your needs.",
+          "Start today. Let your shop shine.",
+          "👉 Claim Your Spot:"
+        ]
+      }
+    ]
+  },
+  "deepLinkOpeningApp": "Opening",
+  "deepLinkRedirectingMessage": "We're redirecting you to the {{appName}} app. If the app doesn't open automatically, you'll be taken to the app store in",
+  "deepLinkSecond": "second",
+  "deepLinkSeconds": "seconds",
+  "deepLinkOpenStore": "Get it on Google Play"
 }
