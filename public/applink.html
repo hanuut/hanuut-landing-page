@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hanuut App</title>
+
+    <!-- App Links meta tags for Android -->
+    <meta property="al:android:url" content="hanuut://" />
+    <meta property="al:android:package" content="com.hanuut.shop" />
+    <meta property="al:android:app_name" content="Hanuut" />
+    <meta property="al:web:url" content="https://hanuut.com" />
+
+    <!-- iOS Universal Links -->
+    <meta property="al:ios:url" content="hanuut://" />
+    <meta property="al:ios:app_name" content="Hanuut" />
+
+    <style>
+      :root {
+        --primary-color: #4f46e5;
+        --primary-dark: #4338ca;
+        --text-color: #1f2937;
+        --text-secondary: #4b5563;
+        --background-color: #f9fafb;
+        --card-background: #ffffff;
+        --border-radius: 12px;
+        --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        --spacing: 24px;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        text-align: center;
+      }
+
+      .container {
+        max-width: 480px;
+        width: 90%;
+        background-color: var(--card-background);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: var(--spacing);
+        margin: var(--spacing);
+      }
+
+      .logo {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto var(--spacing);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--primary-color);
+        border-radius: 20%;
+        color: white;
+        font-weight: 700;
+        font-size: 24px;
+      }
+
+      h1 {
+        margin: 0 0 calc(var(--spacing) / 2);
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      p {
+        margin: 0 0 var(--spacing);
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        margin: calc(var(--spacing) / 2) auto var(--spacing);
+        border: 3px solid rgba(79, 70, 229, 0.2);
+        border-top-color: var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--spacing) / 2);
+      }
+
+      .button {
+        display: block;
+        padding: 16px;
+        border-radius: calc(var(--border-radius) / 2);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        cursor: pointer;
+      }
+
+      .primary {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .primary:hover,
+      .primary:focus {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+      }
+
+      .secondary {
+        background-color: #f3f4f6;
+        color: var(--text-color);
+        border: 1px solid #e5e7eb;
+      }
+
+      .secondary:hover,
+      .secondary:focus {
+        background-color: #e5e7eb;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">H</div>
+      <h1>Opening Hanuut App</h1>
+      <div class="spinner" id="spinner"></div>
+      <p>We're attempting to open this content in the Hanuut app.</p>
+      <p id="countdown">
+        Redirecting to store in <span id="timer">3</span> seconds...
+      </p>
+      <div class="buttons">
+        <a href="hanuut://" class="button primary" id="openApp">Open in App</a>
+        <a
+          href="https://play.google.com/store/apps/details?id=com.hanuut.shop"
+          class="button secondary"
+          id="android-store"
+          >Get it on Google Play</a
+        >
+        <a
+          href="#"
+          class="button secondary"
+          id="ios-store"
+          style="display: none"
+          >Get it on App Store</a
+        >
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Detect platform
+        const isIOS =
+          /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
+
+        // Get the path from URL if any
+        const urlPath = window.location.pathname.replace("/applink/", "");
+        const urlSearch = window.location.search;
+
+        // Construct deep link URL
+        const deepLink = urlPath
+          ? `hanuut://${urlPath}${urlSearch}`
+          : "hanuut://";
+
+        // Set appropriate store URL based on device
+        const storeUrl = isIOS
+          ? "#" // Replace with your iOS App Store URL when available
+          : "https://play.google.com/store/apps/details?id=com.hanuut.shop";
+
+        // Update button URLs
+        document.getElementById("openApp").href = deepLink;
+
+        // Show/hide appropriate store buttons
+        if (isIOS) {
+          document.getElementById("android-store").style.display = "none";
+          document.getElementById("ios-store").style.display = "block";
+        } else {
+          document.getElementById("ios-store").style.display = "none";
+        }
+
+        // Try to open the app automatically
+        window.location.href = deepLink;
+
+        // Countdown timer for store redirect
+        let secondsLeft = 3;
+        const timerElement = document.getElementById("timer");
+        const countdownInterval = setInterval(() => {
+          secondsLeft--;
+          if (secondsLeft <= 0) {
+            clearInterval(countdownInterval);
+            window.location.href = storeUrl;
+          } else {
+            timerElement.textContent = secondsLeft;
+          }
+        }, 1000);
+
+        // Cancel automatic redirect if user interacts with buttons
+        document.querySelectorAll(".button").forEach((button) => {
+          button.addEventListener("click", () => {
+            clearInterval(countdownInterval);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

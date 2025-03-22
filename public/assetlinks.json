@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.hanuut.shop",
+            "sha256_cert_fingerprints": [
+                "76:F2:05:46:22:58:62:73:15:ED:E4:EE:CC:61:11:84:C5:A7:75:CC:41:0F:F4:10:4A:89:0F:CF:A1:E5:7B:05"
+            ]
+        }
+    }
+]
