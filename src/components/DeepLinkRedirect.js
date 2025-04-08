@@ -26,154 +26,74 @@ const DeepLinkRedirect = ({
 }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
-
-  // Local state
   const location = useLocation();
   const [countdown, setCountdown] = useState(Math.ceil(redirectDelay / 1000));
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
 
-  /**
-   * Detects the user's platform
-   * @returns {Object} Platform information with isIOS and isAndroid flags
-   */
   const detectPlatform = useCallback(() => {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
     const isAndroid = /Android/.test(userAgent);
-
     return { isIOS, isAndroid };
   }, []);
 
-  /**
-   * Processes the current path and constructs the deep link URL
-   * @returns {string} The formatted deep link URL
-   */
   const processPath = useCallback(() => {
-    // Extract path and search params from current location
     const { pathname, search } = location;
-
-    // Remove the /deeplink prefix if present
-    const normalizedPath = pathname.startsWith("/deeplink")
-      ? pathname.replace(/^\/deeplink\/?/, "")
-      : pathname;
-
-    // Apply any custom path transformations
-    const transformedPath = transformPath(normalizedPath);
-
-    // Construct the final deep link URL
+    // Pass the full pathname to transformPath
+    const transformedPath = transformPath(pathname);
     return `${appScheme}${transformedPath}${search}`;
   }, [location, appScheme, transformPath]);
 
-  /**
-   * Handles the redirection process to the app or store
-   */
   useEffect(() => {
-    // Generate the deep link URL
     const deepLinkUrl = processPath();
     const { isIOS } = detectPlatform();
+    const platformSpecificStoreUrl = isIOS ? storeUrl : storeUrl;
 
-    // Select the appropriate store URL based on platform
-    const platformSpecificStoreUrl = isIOS
-      ? storeUrl // Replace with iOS store URL when available
-      : storeUrl;
-
-    // Start redirection process
     setIsRedirecting(true);
-
-    // Log attempt (helpful for debugging)
     console.log(`Attempting to open deep link: ${deepLinkUrl}`);
-
-    // Attempt to open the app via deep link
     window.location.href = deepLinkUrl;
 
-    // Set up countdown timer
     const timer = setInterval(() => {
       setCountdown((prev) => {
         const newCount = prev - 1;
-
-        // When we reach 0, begin animating out
         if (newCount <= 0) {
           setIsAnimatingOut(true);
           clearInterval(timer);
         }
-
         return Math.max(0, newCount);
       });
     }, 1000);
 
-    // Set up fallback to store redirect
     const fallbackTimer = setTimeout(() => {
       console.log(`Redirecting to app store: ${platformSpecificStoreUrl}`);
       window.location.href = platformSpecificStoreUrl;
     }, redirectDelay);
 
-    // Clean up timers
     return () => {
       clearInterval(timer);
       clearTimeout(fallbackTimer);
     };
   }, [processPath, redirectDelay, storeUrl, detectPlatform]);
 
-  // If UI is disabled or redirection happens very quickly, don't render anything
   if (!showUI || !isRedirecting) return null;
 
-  // Animation variants for smooth transitions
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        when: "beforeChildren",
-        staggerChildren: 0.1,
-      },
-    },
-    exit: {
-      opacity: 0,
-      transition: {
-        when: "afterChildren",
-        staggerChildren: 0.05,
-        staggerDirection: -1,
-      },
-    },
+    visible: { opacity: 1, transition: { when: "beforeChildren", staggerChildren: 0.1 } },
+    exit: { opacity: 0, transition: { when: "afterChildren", staggerChildren: 0.05, staggerDirection: -1 } },
   };
 
   const cardVariants = {
-    hidden: {
-      y: 50,
-      opacity: 0,
-      scale: 0.9,
-    },
-    visible: {
-      y: 0,
-      opacity: 1,
-      scale: 1,
-      transition: {
-        type: "spring",
-        damping: 25,
-        stiffness: 500,
-      },
-    },
-    exit: {
-      y: -30,
-      opacity: 0,
-      scale: 0.95,
-      transition: { duration: 0.2 },
-    },
+    hidden: { y: 50, opacity: 0, scale: 0.9 },
+    visible: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", damping: 25, stiffness: 500 } },
+    exit: { y: -30, opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
   };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "spring", damping: 30, stiffness: 300 },
-    },
-    exit: {
-      y: -10,
-      opacity: 0,
-      transition: { duration: 0.2 },
-    },
+    visible: { y: 0, opacity: 1, transition: { type: "spring", damping: 30, stiffness: 300 } },
+    exit: { y: -10, opacity: 0, transition: { duration: 0.2 } },
   };
 
   return (
@@ -194,11 +114,9 @@ const DeepLinkRedirect = ({
                 <LogoText>{appName.charAt(0)}</LogoText>
               )}
             </Logo>
-
             <Heading variants={itemVariants}>
               {t("deepLinkOpeningApp", { appName }) || `Opening ${appName}`}
             </Heading>
-
             <Paragraph variants={itemVariants}>
               {t("deepLinkRedirectingMessage", { appName }) ||
                 `We're redirecting you to the ${appName} app. If the app doesn't open automatically, you'll be taken to the app store in`}{" "}
@@ -208,11 +126,9 @@ const DeepLinkRedirect = ({
                 : t("deepLinkSeconds") || "seconds"}
               .
             </Paragraph>
-
             <SpinnerContainer variants={itemVariants}>
               <Spinner />
             </SpinnerContainer>
-
             <ButtonContainer variants={itemVariants}>
               <StoreButton
                 href={storeUrl}
@@ -230,6 +146,7 @@ const DeepLinkRedirect = ({
     </AnimatePresence>
   );
 };
+
 
 DeepLinkRedirect.propTypes = {
   /** The URI scheme for your app (e.g., 'hanuut://') */
