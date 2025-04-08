@@ -73,8 +73,8 @@ const CustomRouter = ({ appConfig, location }) => {
       "/deeplink/cart": {
         path: () => "cart",
       },
-      "/deeplink/profile": {
-        path: () => "profile",
+      "/deeplink/marketplace/:marketplaceRef/:adRef": {
+    path: (params) => `marketplace/${params.marketplaceRef}/${params.adRef}`,
       },
     };
 
