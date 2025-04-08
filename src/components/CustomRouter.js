@@ -96,6 +96,9 @@ const CustomRouter = ({ appConfig, location }) => {
                 if (segment.startsWith(":")) {
                   const paramName = segment.substring(1);
                   params[paramName] = pathParts[index];
+                }else if (segment !== pathParts[index]) {
+                  const paramName = segment;
+                  params[paramName] = pathParts[index];
                 }
               });
 
