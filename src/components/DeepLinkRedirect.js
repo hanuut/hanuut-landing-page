@@ -51,7 +51,7 @@ const DeepLinkRedirect = ({
     const platformSpecificStoreUrl = isIOS ? storeUrl : storeUrl;
 
     setIsRedirecting(true);
-    console.log(`Attempting to open deep link: ${deepLinkUrl}`);
+    // console.log(`Attempting to open deep link: ${deepLinkUrl}`);
     window.location.href = deepLinkUrl;
 
     const timer = setInterval(() => {
@@ -66,7 +66,7 @@ const DeepLinkRedirect = ({
     }, 1000);
 
     const fallbackTimer = setTimeout(() => {
-      console.log(`Redirecting to app store: ${platformSpecificStoreUrl}`);
+      // console.log(`Redirecting to app store: ${platformSpecificStoreUrl}`);
       window.location.href = platformSpecificStoreUrl;
     }, redirectDelay);
 
@@ -80,19 +80,38 @@ const DeepLinkRedirect = ({
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { when: "beforeChildren", staggerChildren: 0.1 } },
-    exit: { opacity: 0, transition: { when: "afterChildren", staggerChildren: 0.05, staggerDirection: -1 } },
+    visible: {
+      opacity: 1,
+      transition: { when: "beforeChildren", staggerChildren: 0.1 },
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        when: "afterChildren",
+        staggerChildren: 0.05,
+        staggerDirection: -1,
+      },
+    },
   };
 
   const cardVariants = {
     hidden: { y: 50, opacity: 0, scale: 0.9 },
-    visible: { y: 0, opacity: 1, scale: 1, transition: { type: "spring", damping: 25, stiffness: 500 } },
+    visible: {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: { type: "spring", damping: 25, stiffness: 500 },
+    },
     exit: { y: -30, opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
   };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { type: "spring", damping: 30, stiffness: 300 } },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", damping: 30, stiffness: 300 },
+    },
     exit: { y: -10, opacity: 0, transition: { duration: 0.2 } },
   };
 
@@ -146,7 +165,6 @@ const DeepLinkRedirect = ({
     </AnimatePresence>
   );
 };
-
 
 DeepLinkRedirect.propTypes = {
   /** The URI scheme for your app (e.g., 'hanuut://') */
