@@ -10,7 +10,6 @@ export const fetchProductByShopAndCategory = createAsyncThunk(
     const productByCategory = [];
     try {
       const response = await getProductByShopAndCategory(shopId, categoryId);
-      console.log(response);
       response.forEach((product) => {
         productByCategory.push({
           shopId: shopId,

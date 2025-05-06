@@ -44,7 +44,6 @@ const DeepLinkRedirect = lazy(() => import("./DeepLinkRedirect"));
  * @param {Object} props.location - Current location object (from useLocation())
  */
 const CustomRouter = ({ appConfig, location }) => {
-  // Configure deep link routes based on app configuration
   const deepLinkRoutes = useMemo(() => {
     const deepLinkConfig = {
       appScheme: appConfig?.appScheme || "hanuut://",
@@ -55,30 +54,18 @@ const CustomRouter = ({ appConfig, location }) => {
       logoSrc: appConfig?.logoSrc,
     };
 
-    // Create a map of path patterns to their transform functions
     const deepLinkPatterns = {
       "/deeplink": { path: () => "" },
-      "/deeplink/product/:id": {
-        path: (params) => `product/${params.id}`,
-      },
-      "/deeplink/shop/:username": {
-        path: (params) => `shop/${params.username}`,
-      },
-      "/deeplink/category/:id": {
-        path: (params) => `category/${params.id}`,
-      },
-      "/deeplink/search": {
-        path: () => "search",
-      },
-      "/deeplink/cart": {
-        path: () => "cart",
-      },
-      "/deeplink/profile": {
-        path: () => "profile",
+      "/deeplink/product/:id": { path: (params) => `product/${params.id}` },
+      "/deeplink/shop/:username": { path: (params) => `shop/${params.username}` },
+      "/deeplink/category/:id": { path: (params) => `category/${params.id}` },
+      "/deeplink/search": { path: () => "search" },
+      "/deeplink/cart": { path: () => "cart" },
+      "/deeplink/marketplace/:marketplaceRef/:adRef": {
+        path: (params) => `marketplace/${params.marketplaceRef}/${params.adRef}`,
       },
     };
 
-    // Generate deep link routes from the patterns
     return Object.entries(deepLinkPatterns).map(([path, config]) => (
       <Route
         key={`deeplink-${path}`}
@@ -87,18 +74,20 @@ const CustomRouter = ({ appConfig, location }) => {
           <DeepLinkRedirect
             {...deepLinkConfig}
             transformPath={(normalizedPath) => {
-              // Extract route params if present
+              console.log("Normalized Path:", normalizedPath);
               const pathParts = normalizedPath.split("/");
+              console.log("Path Parts:", pathParts);
               const params = {};
-
-              // Create params object by matching route pattern segments
               path.split("/").forEach((segment, index) => {
                 if (segment.startsWith(":")) {
                   const paramName = segment.substring(1);
                   params[paramName] = pathParts[index];
+                }else if (segment !== pathParts[index]) {
+                  const paramName = segment;
+                  params[paramName] = pathParts[index];
                 }
               });
-
+              console.log("Params in transformPath:", params);
               return config.path(params);
             }}
           />
@@ -115,6 +104,9 @@ const CustomRouter = ({ appConfig, location }) => {
         }
       >
         <Routes location={location}>
+          {/* Deep link routes - more specific, so place them first */}
+          {deepLinkRoutes}
+
           {/* Main routes */}
           <Route path="/" element={<HomePage />} />
 
@@ -133,28 +125,18 @@ const CustomRouter = ({ appConfig, location }) => {
 
           {/* Product and shop routes */}
           <Route path="/product/:productId" element={<ProductPage />} />
-          <Route path="/:username" element={<ShopPageWithUsername />} />
           <Route path="/shop/:username" element={<ShopPageWithUsername />} />
+          <Route path="/:username" element={<ShopPageWithUsername />} />
 
           {/* Tawsila related routes */}
           <Route path="/tawsila" element={<Tawsila />} />
           <Route path="/get-started-with-Tawsila" element={<GetStarted />} />
-
-          {/* Deep link routes - generated dynamically */}
-          {deepLinkRoutes}
 
           {/* Legacy redirects */}
           <Route
             path="/app/*"
             element={<Navigate to="/deeplink/*" replace />}
           />
-
-          {/* Disabled/commented routes - uncomment if needed */}
-          {/* <Route path="/solutions" element={<SolutionsPage />} /> */}
-          {/* <Route path="/contact" element={<ContactPage />} /> */}
-          {/* <Route path="/shop/:shopName" element={<ShopPage/>} /> */}
-          {/* <Route path="/confirmPayment" element={<PaymentPage />} /> */}
-          {/* <Route path="/testPayment" element={<SatimTestPage />} /> */}
 
           {/* Catch all route - must be last */}
           <Route path="*" element={<NotFoundPage />} />
