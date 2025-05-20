@@ -1,150 +1,96 @@
 import React from "react";
 import styled from "styled-components";
-import HexagoneIcon from "./HexagoneIcon";
-import HexagoneIconSvg from "../../../assets/hexagone.svg";
 import { useTranslation } from "react-i18next";
-const Section = styled.div`
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  background-color: ${(props) => props.theme.secondaryColor};
-  padding: 2rem 0;
+
+const Section = styled.section`
+      direction: ${props => (props.isArabic ? "rtl" : "ltr")};
+      text-direction: ${props => (props.isArabic ? "rtl" : "ltr")};
+      width: 80%;
+    `;
+
+    const StepsContainer = styled.div`
+      display: grid;
+      grid-template-columns: repeat(${props => (props.nbSteps !=null ? props.nbSteps : 3)}, 1fr);
+      gap: 20px;
+      @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+    `;
+
+    const StepCart = styled.div`
+  position: relative;
+  background-color: ${props => props.backGroundColor != null ? props.backGroundColor : 'white'};
+  border-radius: 20px;
+  overflow: hidden;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-  justify-content: flex-start;
-`;
 
-const Title = styled.h2`
-  font-size: ${(props) => props.theme.fontLargest};
-  font-weight: bold;
-  color: ${(props) => props.theme.body};
-  @media (max-width: 768px) {
-    width: 90%;
-    font-size: ${(props) => props.theme.fontxxxl};
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: ${props => props.backgroundImage ? `url(${props.backgroundImage})` : 'none'};
+      width: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 0;
   }
 `;
 
-const StepsContainer = styled.div`
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  min-height: 20vh;
-  width: 80%;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
-  @media (max-width: 768px) {
-    flex-direction: column;
-    width: 90%;
-    gap: 3rem;
-  }
+const ContentWrapper = styled.div`
+position: relative;
+z-index: 1;
+padding: 20px;
+border-radius: 20px;
+text-align: center;
+color: ${props => props.textColor !=null ? props.textColor : 'black'};
 `;
 
-const StepCart = styled.div`
-  width: 30%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  @media (max-width: 768px) {
-    flex-direction: row;
-    width: 100%;
-    gap: 1rem;
-  }
-`;
+    const StepImage = styled.img`
+      width: 100%;
+      border-radius: 20px;
+      height: auto;
+    `;
 
-const StepCartHeading = styled.div`
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+    const StepText = styled.p`
+      margin-top: 10px;
+      font-size: ${props => props.subtext !=null ? '1.6rem' : '1.4rem'};
+      font-weight: bold;
+      text-align: center;
+    `;
 
-const StepingCartBody = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
+    const StepSubText = styled.p`
+      margin-top: 10px;
+      font-size: 1.8rem;
+      font-weight: normal;
+      text-align: center;
+      color: ${props => props.textColor !=null ? props.textColor : 'black'};
+    `;
 
-  @media (max-width: 768px) {
-    align-items: flex-start;
-    justify-content: flex-start;
-  }
-`;
+    const Steps = ({ title, steps, isArabic }) => {
+      return (
+        <Section isArabic={isArabic}>
+          <StepsContainer nbSteps={steps.length}>
+            {steps.map((step, index) => (
+              <StepCart key={index} backgroundImage={step.backgroundImage} backGroundColor={step.backGroundColor}>
+                {step.image && <StepImage src={step.image} alt={`Step ${index + 1}`} />}
+                <ContentWrapper hasBackgroundImage={!!step.backgroundImage} textColor={step.textColor}>
+                
+                  {/* <StepNumber>{index + 1}</StepNumber> */}
 
-const CartBodyTitle = styled.h3`
-  margin-top: 5px;
-  color: ${(props) => props.theme.body};
-  width: 75%;
-  text-align: center;
-  font-size: ${(props) => props.theme.fontxxxl};
-
-  @media (max-width: 768px) {
-    text-align: ${(props) => (props.isArabic ? "right" : "left")};
-    font-size: ${(props) => props.theme.fontxl};
-  }
-`;
-const CartBodyContent = styled.p`
-  color: ${(props) => props.theme.body};
-  width: 75%;
-  text-align: center;
-  font-size: ${(props) => props.theme.fontxxl};
-  @media (max-width: 768px) {
-    width: 100%;
-    text-align: ${(props) => (props.isArabic ? "right" : "left")};
-    font-size: ${(props) => props.theme.fontlg};
-  }
-`;
-
-const Steps = () => {
-  const { t, i18n } = useTranslation();
-  return (
-    <Section isArabic={i18n.language === "ar"}>
-      <StepsContainer isArabic={i18n.language === "ar"}>
-        <StepCart>
-          <StepCartHeading>
-            <HexagoneIcon img={HexagoneIconSvg} content={1} />
-          </StepCartHeading>
-          <StepingCartBody>
-            <CartBodyTitle isArabic={i18n.language === "ar"}>
-              {t("firstJoinStepTitle")}
-            </CartBodyTitle>
-            <CartBodyContent isArabic={i18n.language === "ar"}>
-              {t("firstJoinStepText")}
-            </CartBodyContent>
-          </StepingCartBody>
-        </StepCart>
-        <StepCart>
-          <StepCartHeading>
-            <HexagoneIcon img={HexagoneIconSvg} content={2} />
-          </StepCartHeading>
-          <StepingCartBody>
-            <CartBodyTitle isArabic={i18n.language === "ar"}>
-              {t("secondJoinStepTitle")}
-            </CartBodyTitle>
-            <CartBodyContent isArabic={i18n.language === "ar"}>
-              {t("secondJoinStepText")}
-            </CartBodyContent>
-          </StepingCartBody>
-        </StepCart>
-        <StepCart>
-          <StepCartHeading>
-            <HexagoneIcon img={HexagoneIconSvg} content={3} />
-          </StepCartHeading>
-          <StepingCartBody>
-            <CartBodyTitle isArabic={i18n.language === "ar"}>
-              {t("thirdJoinStepTitle")}
-            </CartBodyTitle>
-            <CartBodyContent isArabic={i18n.language === "ar"}>
-              {t("thirdJoinStepText")}
-            </CartBodyContent>
-          </StepingCartBody>
-        </StepCart>
-      </StepsContainer>
-    </Section>
-  );
-};
+                  <StepText subtext = {step.subtext}>{step.text}</StepText>
+                  <StepSubText textColor={step.textColor}>{step.subtext}</StepSubText>
+                </ContentWrapper>
+              </StepCart>
+            ))}
+          </StepsContainer>
+        </Section>
+      );
+    };
 
 export default Steps;
