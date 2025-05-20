@@ -5,8 +5,8 @@ export const light = {
   bodyRgba: "255, 252, 248",
   textRgba: "32, 32, 32",
   primaryColor: "#57B17F", //green
-  secondaryColor: "#0A99FF", //blue
-  secondaryColorDark: "#0066CA", //dark blue
+  secondaryColor: "#5F96CF", //blue
+  secondaryColorDark: "#1e3cbe", //dark blue
   downloadButtonColor: "#182018", //grey 
   darkGreen: "#043424", // 
   orangeColor: "#f0a46a",
