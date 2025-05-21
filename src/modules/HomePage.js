@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import HomeCarousel from "../components/Carousel";
 import HomeIllustration1 from "../assets/screenshot1.webp";
 import HomeIllustration2 from "../assets/screenshot2.webp";
 import HomeIllustration3 from "../assets/screenshot3.webp";
@@ -16,16 +15,15 @@ import { Helmet } from "react-helmet";
 // import Partners from "./Partners/Partners";
 // import CallToAction from "./Sections/CallToAction";
 
+import HanuutIllustration from "../assets/illustrations/HanuutAnimation.gif";
+
 const Section = styled.div`
-  min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
+   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-image: url(${BackgroundImage});
-  background-size: 100%;
   gap: 2rem;
-  background-position: center;
   @media (max-width: 768px) {
     justify-content: flex-start;
     width: 100%;
@@ -117,6 +115,10 @@ const SmallParagraph = styled.p`
   }
 `;
 
+const IllustrationContainer = styled.img`
+  height: 70vh;
+`;
+
 const HomePage = () => {
   const { t, i18n } = useTranslation();
   const link = process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK;
@@ -179,6 +181,10 @@ const HomePage = () => {
       
       <Section>
         <Container isArabic={isArabic}>
+       
+          <RightBox>
+           <IllustrationContainer src={HanuutIllustration} alt="Hanuut" />
+          </RightBox>
           <LeftBox>
             <Heading>{t("homeHeading")}</Heading>
             <SubHeading>{t("homeSubHeading")}</SubHeading>
@@ -194,11 +200,6 @@ const HomePage = () => {
             </Link>
             <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>
           </LeftBox>
-          <RightBox>
-            <HomeCarousel
-              images={[HomeIllustration1, HomeIllustration2, HomeIllustration3]}
-            />
-          </RightBox>
         </Container>
       </Section>
       <AboutUs />

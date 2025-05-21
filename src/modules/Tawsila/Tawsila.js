@@ -106,13 +106,6 @@ const Content = styled.div`
     );
   }
 `;
-const Iluustration = styled.img`
-  max-height: 60vh;
-  object-fit: fill;
-  @media (max-width: 768px) {
-    max-height: 50vh;
-  }
-`;
 
 const BlackHeading = styled.h1`
   line-height: ${(props) => (props.isArabic ? "1.1" : "1")};
@@ -131,11 +124,6 @@ const Heading = styled(BlackHeading)`
   color: ${(props) => props.theme.secondaryColor};
   margin-bottom: 1rem;
 `;
-const SectionHeading = styled(BlackHeading)`
-  font-size: ${(props) => props.theme.fontLargest};
-  color: ${(props) => props.theme.secondaryColor};
-  max-width: 100%;
-`;
 
 const SubHeading = styled.h1`
   max-width: 90%;
@@ -143,8 +131,9 @@ const SubHeading = styled.h1`
   font-weight: bold;
   margin-bottom : 10px;
   @media (max-width: 768px) {
-    width: 90%;
+    width: 100%;
     font-size: ${(props) => props.theme.fontxl};
+    text-align: center;
   }
 `;
 const ButtonContainer = styled.div`
@@ -177,12 +166,6 @@ const BenefitCard = styled.div`
   }
 `;
 
-const BenefitTitle = styled.h3`
-  margin: 10px 0;
-`;
-
-const BenefitDescription = styled.p``;
-
 const CTAContainer = styled.div`
   text-align: center;
   padding: 50px 0;
@@ -208,22 +191,6 @@ const StepImage = styled.img`
 
 const Tawsila = () => {
   const { t, i18n } = useTranslation();
-  const images = [
-    Screenshot1,
-    Screenshot2,
-    Screenshot3,
-    Screenshot4,
-    Screenshot5,
-    Screenshot6,
-    Screenshot7,
-  ];
-
-  const handleBecomeDriver = () => {
-    const element = document.getElementById("registerSubscribeRequest");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
   const link = "https://play.google.com/store/apps/details?id=com.hanuut.tawsila";
 
   return (
