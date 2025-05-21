@@ -4,7 +4,7 @@ import MissionIllustration from "../../assets/mission.svg";
 import { useTranslation } from "react-i18next";
 import BackgroundImage from "../../assets/background.webp";
 const Section = styled.div`
-  min-height: ${(props) => `calc(80vh - ${props.theme.navHeight})`};
+  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -156,14 +156,6 @@ function AboutUs() {
   return (
     <Section>
       <Container isArabic={i18n.language === "ar"}>
-        <LeftBox>
-          <AboutUsIllutstrationContainer
-            src={AboutUsIllutstration}
-            isArabic={i18n.language === "ar"}
-            alt="hanuut"
-            loading="lazy"
-          />
-        </LeftBox>
         <RightBox>
           <AboutTitle>{t("appTitle")}</AboutTitle>
           <MissionContainer isArabic={i18n.language === "ar"}>
@@ -179,6 +171,14 @@ function AboutUs() {
             </MissionHeaderContainer>
           </MissionContainer>
         </RightBox>
+        <LeftBox>
+          <AboutUsIllutstrationContainer
+            src={AboutUsIllutstration}
+            isArabic={i18n.language === "ar"}
+            alt="hanuut"
+            loading="lazy"
+          />
+        </LeftBox>
       </Container>
       {/* <AboutTitle>{t("aboutUsValues")}</AboutTitle>
       <Values /> */}
