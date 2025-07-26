@@ -22,18 +22,12 @@ const CategoryButton = styled.button`
 
   // --- Conditional Styling (This is the key part) ---
   
-  // 1. Set background color: Hanuut Green if selected, otherwise the subtle surface color.
   background-color: ${(props) =>
-    props.isSelected ? props.theme.primary : props.theme.surface};
-  
-  // 2. Set text color: The light background color if selected, otherwise the main dark text color.
+    props.$isSelected ? props.theme.primary : props.theme.surface};
   color: ${(props) =>
-    props.isSelected ? props.theme.body : props.theme.text};
-  
-  // 3. Set border color: The same as the background if selected, otherwise the subtle border color.
-  border: 1px solid ${(props) => 
-    props.isSelected ? props.theme.primary : props.theme.surfaceBorder};
-
+    props.$isSelected ? props.theme.body : props.theme.text};
+  border: 1px solid ${(props) =>
+    props.$isSelected ? props.theme.primary : props.theme.surfaceBorder};
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -49,7 +43,7 @@ const Category = ({ category, selectedCategory, onCategoryClick }) => {
 
   return (
     <CategoryButton
-      isSelected={categoryIsSelected}
+      $isSelected={categoryIsSelected}
       onClick={() => onCategoryClick(category.id)}
     >
       {categoryName}

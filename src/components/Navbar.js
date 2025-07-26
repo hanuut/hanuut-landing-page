@@ -1,23 +1,35 @@
-import React, { useEffect, useState } from "react";
+// src/components/Navbar.js
+
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import LanguagesDropDown from "./LanguagesDropDown";
 import Logo from "./Logo";
 import { useTranslation } from "react-i18next";
-import Cart from "../modules/Cart/components/Cart";
 import { useSelector } from "react-redux";
-import { selectShop, selectedShop } from "../modules/Partners/state/reducers";
+// --- FIX: This selector seems to be the correct one from your file ---
+import { selectShop } from "../modules/Partners/state/reducers";
+
+// --- FIX: Import both of your logo images ---
+import logoAr from "../assets/logo-ar.png";
+import logoEn from "../assets/logo-en.png";
+
 
 const Section = styled.section`
   position: sticky;
   top: 0;
   width: 100vw;
-  background-color: ${(props) => props.theme.body};
+  // --- THE FIX: Dynamic Background ---
+  background: ${({ theme, $brandColor }) =>
+    $brandColor
+      ? `linear-gradient(90deg, ${theme.body} 70%, ${$brandColor}40 100%)`
+      : theme.body};
   height: ${(props) => props.theme.navHeight};
   z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: background 0.5s ease-in-out;
   @media (max-width: 768px) {
     position: relative;
     height: ${(props) => props.theme.navHeightMobile};
@@ -31,7 +43,8 @@ const Navigation = styled.nav`
   justify-content: space-between;
   align-items: center;
   margin: 0 auto;
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+  // --- THE FIX: Pass direction with '$' prefix ---
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
     width: 90%;
   }
@@ -52,8 +65,9 @@ const Menu = styled.ul`
     justify-content: center;
     gap: 1.5rem;
     background-color: ${(props) => props.theme.body};
+    // --- THE FIX: Use '$' prefix for 'show' prop ---
     transform: ${(props) =>
-      props.show ? "translateY(0px)" : "translateY(-150%)"};
+      props.$show ? "translateY(0px)" : "translateY(-150%)"};
     transition: transform 0.5s ease-in-out;
     z-index: 2;
   }
@@ -95,9 +109,9 @@ const HamburgerMenuContainer = styled.div`
   height: 1.5rem;
   width: 1.5rem;
   padding: 2px;
-  display: flex; /* Add display: flex */
-  align-items: center; /* Add align-items: center */
-  justify-content: center; /* Add justify-content: center */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const HamburgerMenu = styled.span`
@@ -105,12 +119,9 @@ const HamburgerMenu = styled.span`
   height: 2px;
   background-color: ${(props) => props.theme.text};
   position: absolute;
-  top: 50%; /* Change top: 2.5rem to top: 50% */
-  right: ${(props) => (props.isArabic ? "85%" : "0")};
-  transform: translate(
-    -100%,
-    -50%
-  ); /* Change transform: translateX(-100%) to transform: translate(-100%, -50%) */
+  top: 50%;
+  right: ${(props) => (props.$isArabic ? "85%" : "0")};
+  transform: translate(-100%, -50%);
   display: none;
   align-items: center;
   justify-content: center;
@@ -118,7 +129,7 @@ const HamburgerMenu = styled.span`
   cursor: pointer;
 
   @media (max-width: 768px) {
-    top: 50%; /* Change top: 2.4rem to top: 50% */
+    top: 50%;
     display: flex;
   }
 
@@ -132,31 +143,31 @@ const HamburgerMenu = styled.span`
     transition: transform 0.5s ease;
   }
 
-  &::after {
-    top: 0.5rem;
-  }
-
-  &::before {
-    bottom: 0.5rem;
-  }
+  &::after { top: 0.5rem; }
+  &::before { bottom: 0.5rem; }
 
   &.active {
     transform: translateX(-100%) rotate(180deg);
     height: 0px;
-    &::after {
-      transform: translateY(-0.65rem) rotate(-45deg);
-    }
-    &::before {
-      transform: translateY(0.5rem) rotate(45deg);
-    }
+    &::after { transform: translateY(-0.65rem) rotate(-45deg); }
+    &::before { transform: translateY(0.5rem) rotate(45deg); }
   }
 `;
+
 const Navbar = () => {
   const { t, i18n } = useTranslation();
   const [isActive, setIsActive] = useState(false);
+  
+  // Use the correct selector and check for the shop object
   const selectedShop = useSelector(selectShop);
-  const shopId = selectedShop._id;
+  
+  const isSubscribed = selectedShop && selectedShop.subscriptionPlanId !== null;
+  let brandColor = null;
 
+  if (isSubscribed && selectedShop.styles && selectedShop.styles.mainColor) {
+    brandColor = selectedShop.styles.mainColor;
+  }
+  
   const handleClick = () => {
     setIsActive(!isActive);
   };
@@ -165,18 +176,24 @@ const Navbar = () => {
     setIsActive(false);
   };
 
+  // --- THE FIX: Determine which logo to use ---
+  const currentLogo = i18n.language === "ar" ? logoAr : logoEn;
+  const isArabic = i18n.language === "ar";
+
   return (
-    <Section>
-      <Navigation isArabic={i18n.language === "ar"}>
-        <Logo className="partnerLogo" />
+    <Section $brandColor={brandColor}>
+      <Navigation $isArabic={isArabic}>
+        {/* --- THE FIX: Pass the correct logo image --- */}
+        <Logo image={currentLogo} />
 
         <HamburgerMenuContainer onClick={handleClick}>
           <HamburgerMenu
-            isArabic={i18n.language === "ar"}
+            $isArabic={isArabic}
             className={isActive ? "active" : ""}
           />
         </HamburgerMenuContainer>
-        <Menu show={isActive} isArabic={i18n.language === "ar"}>
+        
+        <Menu $show={isActive}>
           <MenuItem>
             <Link to="/" onClick={handleMenuItemClick}>
               {t("navHome")}
@@ -187,29 +204,13 @@ const Navbar = () => {
               {t("navPartners")}
             </Link>
           </MenuItem>
-          {/* <MenuItem>
-             <Link to="/solutions" onClick={handleMenuItemClick}>
-             {t('navSolution')}
-            </Link>
-          </MenuItem> */}
-          {/* <MenuItem>
-          <Link to="/contact" onClick={handleMenuItemClick}>
-          {t('navContact')}
-            </Link>
-          </MenuItem> */}
           <MenuItem>
             <Link to="/tawsila" onClick={handleMenuItemClick}>
               {t("navTawsila")}
             </Link>
           </MenuItem>
-
-          {/* {shopId && <Cart shopId={shopId} />} */}
-
           <LanguageMenuItem>
-            <LanguagesDropDown
-              className="languageMenuItem"
-              handleChooseLanguage={handleMenuItemClick}
-            />
+            <LanguagesDropDown handleChooseLanguage={handleMenuItemClick} />
           </LanguageMenuItem>
         </Menu>
       </Navigation>

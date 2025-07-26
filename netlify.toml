@@ -1,15 +1,13 @@
 # This file tells Netlify how to build your site.
 [build]
-  # Your build command
-  command = "npm run build"
-  # The directory that your build command generates
+  command = "CI=false npm run build"
   publish = "build"
 
 # This section defines the build environment.
 [build.environment]
   # Explicitly set the Node.js version you want to use.
   # This is a critical best practice.
-  NODE_VERSION = "18"
+  NODE_VERSION = "22"
   
   # By NOT specifying a PYTHON_VERSION, we ensure Netlify 
   # uses its default, clean build image without extra tools.

@@ -418,5 +418,8 @@
   "benefits_drivers_description": "Restez en route avec des alertes de trajets et livraisons en temps réel.",
   "benefits_title": "Local et réactif",
   "benefits_description": "Connectez-vous instantanément avec votre quartier.",
-  "ctaReinforcement": "Prêt à bouger efficacement ? Téléchargez maintenant."
+  "ctaReinforcement": "Prêt à bouger efficacement ? Téléchargez maintenant.",
+  "loading": {
+    "message": "Chargement en cours..."
+  }
 }

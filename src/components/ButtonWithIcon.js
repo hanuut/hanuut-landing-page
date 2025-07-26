@@ -11,8 +11,7 @@ const Button = styled.button`
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem;
-  background-color: ${(props) =>
-    props.backgroundColor || props.theme.primaryColor};
+  background-color: ${(props) => props.$backgroundColor};
   color: #fff;
   border: none;
   border-radius: ${(props) => props.theme.defaultRadius};
@@ -96,7 +95,7 @@ const ButtonWithIcon = ({
   return (
     <Button
       onClick={onClick}
-      backgroundColor={backgroundColor}
+      $backgroundColor={backgroundColor}
       className={className}
       disabled={disabled}
     >

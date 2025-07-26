@@ -418,5 +418,8 @@
   "benefits_drivers_description": "ابق على الطريق مع تنبيهات فورية للطلبات.",
   "benefits_title": "محلي وسريع الاستجابة",
   "benefits_description": "اتصل فوراً مع أشخاص في منطقتك.",
-  "ctaReinforcement": "جاهز للتحرك بكفاءة؟ حمّل الآن."
+  "ctaReinforcement": "جاهز للتحرك بكفاءة؟ حمّل الآن.",
+  "loading": {
+    "message": "جاري التحميل..."
+  }
 }

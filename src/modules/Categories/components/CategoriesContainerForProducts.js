@@ -1,3 +1,5 @@
+// src/modules/Categories/components/CategoriesContainerForProducts.js
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
@@ -75,13 +77,15 @@ const CategoriesContainerForProducts = ({
   const [productsPerCategory, setProductsPerCategory] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const dispatch = useDispatch();
+
+  // --- FIX #1: REMOVED unused 'errorProducts' variable ---
   const {
     products,
     loading: loadingProducts,
-    error: errorProducts,
   } = useSelector(selectProducts);
 
   useEffect(() => {
+    // This effect is fine as it is, but for consistency we add shopId.
     if (products.length > 0) {
       const filteredProducts = products.filter(
         (product) =>
@@ -89,12 +93,12 @@ const CategoriesContainerForProducts = ({
       );
       setProductsPerCategory(filteredProducts);
     }
-  }, [selectedCategory, products]);
+    // --- FIX #2: ADDED 'shopId' to the dependency array ---
+  }, [selectedCategory, products, shopId]);
 
   const handleCategoryClick = async (categoryId) => {
     setSelectedCategory(categoryId);
     if (!loadedCategories.includes(categoryId)) {
-      console.log(shopId, categoryId);
       dispatch(fetchProductByShopAndCategory({ shopId: shopId, categoryId }));
       setLoadedCategories((prevLoadedCategories) => [
         ...prevLoadedCategories,

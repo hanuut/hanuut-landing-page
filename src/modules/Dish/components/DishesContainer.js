@@ -1,99 +1,79 @@
 // src/pages/Dish/components/DishesContainer.js
 
-import React, { useMemo } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import Dish from "./Dish.js"; // This should match your dish component file name
+import Dish from "./Dish.js";
 import Loader from "../../../components/Loader";
+import NothingFoundImage from "../../../assets/nothing.png";
 
-// This helper function converts the image buffer into a usable Data URL
-const bufferToUrl = (imageObject) => {
-  if (!imageObject || !imageObject.buffer || !imageObject.buffer.data) {
-    return null;
-  }
-  const imageData = imageObject.buffer.data;
-  const base64String = btoa(
-    new Uint8Array(imageData).reduce(
-      (data, byte) => data + String.fromCharCode(byte),
-      ''
-    )
-  );
-  const format = imageObject.originalname.split('.').pop().toLowerCase();
-  const mimeType = format === 'jpg' ? 'jpeg' : format;
-  return `data:image/${mimeType};base64,${base64String}`;
-};
-
+// This layout is ONLY for when there are dishes to display.
 const MasonryLayout = styled.div`
   width: 100%;
   box-sizing: border-box;
   padding-top: 2rem;
   column-width: 320px;
   column-gap: 1.5rem;
-  opacity: ${(props) => (props.expanded ? 1 : 0)};
-  transform: ${(props) => (props.expanded ? "translateY(0)" : "translateY(20px)")};
+   opacity: ${(props) => (props.$expanded ? 1 : 0)};
+  transform: ${(props) => (props.$expanded ? "translateY(0)" : "translateY(20px)")};
   transition: opacity 0.5s ease, transform 0.5s ease;
 `;
 
+// This is a separate layout for the empty state.
 const NoAvailableDishes = styled.div`
-  padding: 4rem 0;
+  padding: 4rem 1rem;
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2rem;
+`;
+
+const EmptyStateImage = styled.img`
+  width: 500px;
+  max-width: 40%;
+  opacity: 0.7;
 `;
 
 const Content = styled.p`
   font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.secondaryText};
+  text-align: center;
 `;
 
-const DishesContainer = ({ dishes, expanded, isSubscribed }) => {
+const DishesContainer = ({ dishes, expanded, isSubscribed, isLoading }) => {
   const { t } = useTranslation();
 
-  // useMemo will re-calculate this list ONLY when the 'dishes' prop changes.
-  const dishesWithImageUrls = useMemo(() => {
-    if (!dishes) {
-      return [];
-    }
-    // Map over the dishes to process their images
-    return dishes.map(dishWrapper => {
-      const dish = dishWrapper.dish;
-      // Your 'dish' object likely has an 'image' property with the buffer
-      const imageUrl = dish && dish.image ? bufferToUrl(dish.image) : null;
-      
-      // Return a new object with the processed imageUrl
-      return {
-        ...dishWrapper,
-        dish: {
-          ...dish,
-          imageUrl: imageUrl,
-        },
-      };
-    });
-  }, [dishes]);
+  // --- THE FIX: We structure the entire return ---
 
-  if (!dishes) {
-    return <Loader />;
+  // Case 1: We are currently loading.
+  if (isLoading) {
+    return <Loader fullscreen={false} />;
   }
 
+  // Case 2: We are done loading, and there are no dishes.
+  if (dishes.length === 0) {
+    return (
+      <NoAvailableDishes>
+        <EmptyStateImage src={NothingFoundImage} alt="No items found" />
+        <Content>{t("noDishesAvailable")}</Content>
+      </NoAvailableDishes>
+    );
+  }
+
+  // Case 3: We are done loading, and there ARE dishes.
   return (
-    <MasonryLayout expanded={expanded}>
-      {/* We now map over the processed list */}
-      {dishesWithImageUrls.length > 0 ? (
-        dishesWithImageUrls.map((dishWrapper) => (
-          dishWrapper.isHidden !== true ? (
-            <Dish
-              key={dishWrapper.id}
-              dish={dishWrapper.dish}
-              isSubscribed={isSubscribed}
-            />
-          ) : null
-        ))
-      ) : (
-        <NoAvailableDishes>
-          <Content>{t("noDishesAvailable")}</Content>
-        </NoAvailableDishes>
-      )}
+    <MasonryLayout $expanded={expanded}>
+      {dishes.map((dishWrapper) => (
+        dishWrapper.isHidden !== true ? (
+          <Dish
+            key={dishWrapper.id}
+            dish={dishWrapper.dish}
+            isSubscribed={isSubscribed}
+          />
+        ) : null
+      ))}
     </MasonryLayout>
   );
 };
