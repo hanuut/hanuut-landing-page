@@ -147,7 +147,7 @@ const Button = styled.button`
 `;
 
 const Cart = ({ shopId }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { cart } = useSelector(selectCart);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [filteredCartItems, setFilteredCartItems] = useState([]);
@@ -159,8 +159,8 @@ const Cart = ({ shopId }) => {
   const [address, setAddress] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [isAccepted, setIsAccepted] = useState(false);
+  // const [successMessage, setSuccessMessage] = useState("");
+  // const [isAccepted, setIsAccepted] = useState(false);
 
   const handleChooseAddress = (newAddress) => {
     setAddress(newAddress);

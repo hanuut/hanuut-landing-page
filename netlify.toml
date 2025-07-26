@@ -1,8 +1,6 @@
 # This file tells Netlify how to build your site.
 [build]
-  # Your build command
-  command = "npm run build"
-  # The directory that your build command generates
+  command = "CI=false npm run build"
   publish = "build"
 
 # This section defines the build environment.

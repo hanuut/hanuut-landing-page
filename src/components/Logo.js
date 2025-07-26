@@ -1,27 +1,32 @@
+// src/components/Logo.js
+
 import React from "react";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-const Section = styled.h1`
-  font-size: ${(props) => props.theme.fontLargest};
-  font-weight: 900;
-  letter-spacing: 1px;
-  color: ${(props) => props.theme.primaryColor};
-  cursor: default;
+
+// We are replacing the styled h1 with a styled img for the logo.
+const LogoImg = styled.img`
+  height: 45px;
+  width: auto; // 'auto' maintains the aspect ratio.
+  
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontxxxl};
+    height: 40px; // A slightly smaller logo for mobile screens.
   }
 `;
 
-const Logo = () => {
-  const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === "ar";
-
+// The Logo component no longer needs useTranslation, as it just displays an image.
+// It now accepts an 'image' prop, which will be passed down from the Navbar.
+const Logo = ({ image }) => {
   return (
     <Link to="/">
-      <Section isArabic={isArabic} href="/">
-        {t("appTitle")}
-      </Section>
+      <LogoImg src={image} alt="Hanuut App Logo" />
     </Link>
   );
 };

@@ -414,5 +414,8 @@
   "benefits_drivers_description": "Stay on the road with real-time ride and delivery alerts.",
   "benefits_title": "Local & Responsive",
   "benefits_description": "Connect instantly with people in your neighborhood.",
-  "ctaReinforcement": "Ready to move efficiently? Download now."
+  "ctaReinforcement": "Ready to move efficiently? Download now.",
+  "loading": {
+    "message": "Loading, please wait..."
+  }
 }
