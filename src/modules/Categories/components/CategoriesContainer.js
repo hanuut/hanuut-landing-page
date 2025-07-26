@@ -1,19 +1,20 @@
+// src/modules/Categories/components/CategoriesContainer.js
+
 import React, { useEffect, useState } from "react";
 import {
   selectCategories,
   fetchCategories,
 } from "../../Categories/state/reducers";
-
 import { selectDishes, fetchDishesByCategory } from "../../Dish/state/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
-import Category from "./Category";
+import Category from "./Category.js"; // Use .js for consistency
 import Loader from "../../../components/Loader";
-import DishesContainer from "../../Dish/components/DishesContainer";
+import DishesContainer from "../../Dish/components/DishesContainer.js"; // Use .js for consistency
 import { useTranslation } from "react-i18next";
+
 const Section = styled.div`
   margin-top: 1rem;
-  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight} - 11rem)`};
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -29,30 +30,27 @@ const Categories = styled.div`
   padding: 5px;
   display: flex;
   flex-direction: row;
-  flex-wrap: no-wrap; /* Change flex-wrap to nowrap */
+  flex-wrap: nowrap;
   gap: 1em;
   align-items: center;
   justify-content: flex-start;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  /* Hide scrollbar for Chrome, Safari and Opera */
+  
   &::-webkit-scrollbar {
     display: none;
   }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 
   @media (max-width: 768px) {
-    justify-content: flex-start;
     gap: 0.5em;
   }
 `;
 
 const SelectCategory = styled.div`
   margin-top: 1rem;
-  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight} - 11rem)`};
+  padding: 4rem 0;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -61,59 +59,59 @@ const SelectCategory = styled.div`
 `;
 
 const Content = styled.p`
-  font-size: 2.5rem;
-  @media (max-width: 768px) {
-    margin-top: 1rem;
-    font-size: ${(props) => props.theme.fontxxl};
-  }
+  font-size: ${(props) => props.theme.fontxxl};
+  color: ${(props) => props.theme.secondaryText};
+  text-align: center;
 `;
 
-const CategoriesContainer = ({ shopData }) => {
+// THE FIX: Accept isSubscribed as a prop
+const CategoriesContainer = ({ shopData, isSubscribed }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const {
-    categories,
-    loading: categoriesLoading,
-    error: categoriesError,
-  } = useSelector(selectCategories);
+
+  // Cleaned up selector to remove unused error variable
+  const { categories, loading: categoriesLoading } = useSelector(selectCategories);
   const { dishes } = useSelector(selectDishes);
+
   const [dishesPerCategory, setDishesPerCategory] = useState([]);
   const [loadedCategories, setLoadedCategories] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  const filterAvailableCategories = (categories, hiddenCategories) => {
-    if (categories) {
-      const availableCategories = categories.filter(
-        (category) => !hiddenCategories.includes(category)
-      );
-      return availableCategories;
-    } else {
-      return (
-        <Section>
-          <Loader />
-        </Section>
-      );
+  const filterAvailableCategories = (allCategories, hiddenCategories) => {
+    if (!allCategories) {
+      return [];
     }
+    return allCategories.filter((category) => !hiddenCategories?.includes(category));
   };
 
   useEffect(() => {
+    // Add a guard clause for safety
+    if (!shopData) return;
+
     const availableCategories = filterAvailableCategories(
       shopData.categories,
       shopData.hiddenCategories
     );
     dispatch(fetchCategories(availableCategories));
-  }, [dispatch, shopData.categories, shopData.hiddenCategories]);
+    
+    // THE FIX: Added dependencies to the array
+  }, [dispatch, shopData]);
 
   useEffect(() => {
+    // Add a guard clause for safety
+    if (!shopData) return;
+
     const filteredDishes = dishes.filter(
       (dish) =>
         dish.categoryId === selectedCategory && dish.shopId === shopData._id
     );
     setDishesPerCategory(filteredDishes);
-  }, [selectedCategory, dishes]);
 
-  const handleCategoryClick = async (categoryId) => {
+    // THE FIX: Added 'shopData' to the dependency array
+  }, [selectedCategory, dishes, shopData]);
+
+  const handleCategoryClick = (categoryId) => {
     if (!loadedCategories.includes(categoryId)) {
       dispatch(fetchDishesByCategory({ shopId: shopData._id, categoryId }));
       setLoadedCategories((prevLoadedCategories) => [
@@ -131,12 +129,9 @@ const CategoriesContainer = ({ shopData }) => {
     }
   };
 
-  if (categoriesLoading)
-    return (
-      <Section>
-        <Loader />
-      </Section>
-    );
+  if (categoriesLoading) {
+    return <Loader />;
+  }
 
   return (
     <Section>
@@ -150,15 +145,17 @@ const CategoriesContainer = ({ shopData }) => {
           />
         ))}
       </Categories>
+      
       {expanded ? (
         <DishesContainer
           dishes={dishesPerCategory}
           expanded={expanded}
-        ></DishesContainer>
+          // THE FIX: Pass the isSubscribed prop down to the next component
+          isSubscribed={isSubscribed}
+        />
       ) : (
         <SelectCategory>
-          {" "}
-          <Content> {t("selectCategory")} </Content>{" "}
+          <Content>{t("selectCategory")}</Content>
         </SelectCategory>
       )}
     </Section>

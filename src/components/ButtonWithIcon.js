@@ -10,6 +10,7 @@ const Button = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  padding: 0.5rem;
   background-color: ${(props) =>
     props.backgroundColor || props.theme.primaryColor};
   color: #fff;

@@ -1,38 +1,42 @@
 export const light = {
-  //colors
-  body: "#fffcf8",
-  text: "#202020",
-  bodyRgba: "255, 252, 248",
-  textRgba: "32, 32, 32",
-  primaryColor: "#57B17F", //green
-  secondaryColor: "#5F96CF", //blue
-  secondaryColorDark: "#1e3cbe", //dark blue
-  downloadButtonColor: "#182018", //grey 
-  darkGreen: "#043424", // 
-  orangeColor: "#f0a46a",
-  orangeColorRgba: "240, 164, 106",
-  redColor: "#FF725E",
-  redColorRgba: "255 ,114 ,94",
-  primaryColorRgba: "87, 177, 127",
-  white: "#fff",
+  // ----------------- COLORS -----------------
+  // Based on your new brand palette
 
-  //fonts
-  fontxs: "0.625em", // 10px: This is a small font size, often used for fine print or disclaimers.
-  fontsm: "0.75em", // 12px: This is a common font size for body text on desktop screens, but may be toosmall for mobile screens.
-  fontmd: "0.875em", // 14px: This is a good font size for body text on mobile screens, and can also be used for subheadings or captions.
-  fontlg: "1em", // 16px: This is a common font size for body text on desktop screens, and can also be used for subheadings or navigation labels.
-  fontxl: "1.125em", // 18px: This is a slightly larger font size that can be used for subheadings or emphasized text.
-  fontxxl: "1.25em", // 20px: This is a larger font size that can be used for headings or featured content.
-  fontxxxl: "1.5em", // 24px: This is a bold font size that can be used for headings or call-to-action buttons.
-  fontLargest: "2.25em", // 36px: This is a very large font size that can be used for headlines.
+  // Neutral Tones
+  body: "#FDF4E3",              // Soft Ivory - Main page background
+  text: "#111217",              // Deep Charcoal - Primary text for high contrast
+  textRgba: "17, 18, 23",       // RGB for Deep Charcoal
+  
+  // Primary & Secondary
+  primary: "#39A170",           // Hanuut Green - For key actions and branding
+  primaryRgba: "57, 161, 112",  // RGB for Hanuut Green
+  primaryLight: "#6ED3A3",      // Mint Breeze - Lighter shade for hover or active states
+  secondary: "#397FF9",         //Electric Blue - For secondary actions or highlights
+  
+  // System Tones
+  accent: "#F07A48",            // // Sunset Coral - For Call-to-action or special highlights
+  accentRgba: "57, 127, 249",   // RGB for Electric Blue
+  error: "#D9404D",             // Bold Red - For error messages or destructive actions
+  
+  // Surface Tones for UI Elements
+  surface: "rgba(255, 255, 255, 0.45)", // A clean white with transparency for the glass effect
+  surfaceBorder: "rgba(0, 0, 0, 0.1)", // A subtle, semi-transparent black for card borders
 
-  //mesures
-  navHeight: "5rem",
-  navHeightMobile: "4rem",
-  actionButtonPadding: "0.5rem 1rem",
-  actionButtonPaddingMobile: "0.5rem 0.9rem",
-  smallPadding: "0.4rem 0.7rem",
-  defaultRadius: "10px",
-  smallRadius: "5px",
-  bigRadius: "20px",
+  // ----------------- TYPOGRAPHY -----------------
+  // Hierarchical and responsive font scale
+  fontxxxl: "clamp(2rem, 5vw, 3rem)",    // Page titles
+  fontxxl: "clamp(1.5rem, 4vw, 2rem)",   // Section titles
+  fontxl: "1.25rem",                      // Card titles
+  fontlg: "1rem",                         // Body text, descriptions
+  fontmd: "1rem",                         // Default body text
+  fontsm: "0.875rem",                     // Captions, ingredients
+  fontxs: "0.75rem",                      // Fine print
+
+  // ----------------- LAYOUT & EFFECTS -----------------
+  // Consistent spacing, sizing, and effects
+  navHeight: "5rem",                      // Standard navigation bar height
+  defaultRadius: "12px",                  // Modern, larger radius for containers
+  smallRadius: "8px",                     // Radius for smaller elements like buttons/tags
+  cardHoverEffect: "transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.07);",
+  glassmorphism: "background-color: rgba(255, 255, 255, 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);",
 };
