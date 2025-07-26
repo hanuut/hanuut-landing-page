@@ -9,7 +9,7 @@
 [build.environment]
   # Explicitly set the Node.js version you want to use.
   # This is a critical best practice.
-  NODE_VERSION = "18"
+  NODE_VERSION = "22"
   
   # By NOT specifying a PYTHON_VERSION, we ensure Netlify 
   # uses its default, clean build image without extra tools.
