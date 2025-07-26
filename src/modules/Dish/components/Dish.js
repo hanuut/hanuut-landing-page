@@ -1,104 +1,158 @@
-import React from "react";
+// src/modules/Dish/components/Dish.js
+
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { t } from "i18next";
-import { light } from "../../../config/Themes";
-import CartIcon from "../../../assets/icons/cart.svg";
-import ButtonWithIcon from "../../../components/ButtonWithIcon";
-import {
-  ActionButton,
-  AddToCartButton,
-} from "../../../components/ActionButton";
-import { useDispatch } from "react-redux";
-import { addToCart } from "../../Cart/state/reducers";
-// Updated import
+// THE FIX: Use a correct relative path to find the service.
+import { getImage } from "../../Images/services/imageServices.js";
+
+const bufferToUrl = (imageObject) => {
+  if (!imageObject || !imageObject.buffer || !imageObject.buffer.data) {
+    return null;
+  }
+  const imageData = imageObject.buffer.data;
+  const base64String = btoa(
+    new Uint8Array(imageData).reduce(
+      (data, byte) => data + String.fromCharCode(byte),
+      ''
+    )
+  );
+  const format = imageObject.originalname.split('.').pop().toLowerCase();
+  const mimeType = format === 'jpg' ? 'jpeg' : format;
+  return `data:image/${mimeType};base64,${base64String}`;
+};
+
+const DishImage = styled.img`
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: ${(props) => props.theme.smallRadius};
+  background-color: #eee;
+  margin-bottom: 0.5rem;
+`;
 
 const Card = styled.div`
-  width: 30%;
-  border: 1px solid rgba(${(props) => props.theme.textRgba}, 0.3);
-  border-radius: ${(props) => props.theme.smallRadius};
-  padding: 1rem;
+  background-color: ${(props) => props.theme.surface};
+  border: 1px solid ${(props) => props.theme.surfaceBorder};
+  border-radius: ${(props) => props.theme.defaultRadius};
+  padding: 1.5rem;
   display: flex;
-  gap: 0.5rem;
   flex-direction: column;
-  justify-content: space-between;
-  transition: transform 0.3s ease;
-  @media (max-width: 768px) {
-    width: 100%;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  break-inside: avoid;
+  &:hover {
+    ${(props) => props.theme.cardHoverEffect};
   }
 `;
 
 const CardHeader = styled.div`
-  width: 100;
   display: flex;
-  flex-direction: row;
-  align-items: center;
   justify-content: space-between;
-`;
-
-const CardBody = styled.div`
-  display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
+  gap: 1rem;
 `;
 
-const Name = styled.h3``;
-
-const Price = styled.h3``;
-
-const Ingredients = styled.div`
-  max-width: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
+const Name = styled.h3`
+  font-size: ${(props) => props.theme.fontxl};
+  color: ${(props) => props.theme.text};
+  font-weight: 600;
+  line-height: 1.3;
 `;
 
-const Ingredient = styled.h5`
-  font-family: "Tajawal", sans-serif;
-  font-weight: 100;
-  min-width: fit-content;
+const Price = styled.h3`
+  font-size: ${(props) => props.theme.fontxl};
+  color: ${(props) => props.theme.primary};
+  font-weight: 600;
+  white-space: nowrap;
 `;
 
-const Dish = ({ dish }) => {
-  const { i18n } = useTranslation();
-  const { name, sellingPrice } = dish;
-  const { ingredients } = dish;
-  const filteredIngredients =
-    ingredients && ingredients.length > 0
-      ? ingredients.filter((item) => item.trim() !== "")
-      : [];
-  // const dispatch = useDispatch();
+const Ingredients = styled.p`
+  font-size: ${(props) => props.theme.fontsm};
+  color: ${(props) => props.theme.secondaryText};
+  line-height: 1.5;
+  flex-grow: 1; 
+`;
 
-  // const onAddToCartClick = () => {
-  //   dispatch(addToCart(dish));
-  // };
+// const ActionRow = styled.div`
+//   display: flex;
+//   justify-content: flex-end;
+//   margin-top: 1rem;
+// `;
+
+// const AddToCartButton = styled.button`
+//   background-color: ${(props) => props.theme.primary};
+//   color: ${(props) => props.theme.body};
+//   font-size: ${(props) => props.theme.fontlg};
+//   font-weight: 500;
+//   padding: 0.5rem 1rem;
+//   border: none;
+//   border-radius: ${(props) => props.theme.smallRadius};
+//   cursor: pointer;
+//   transition: all 0.2s ease-in-out;
+//   &:hover {
+//     opacity: 0.9;
+//     transform: scale(1.05);
+//   }
+// `;
+
+const DishCard = ({ dish, isSubscribed }) => {
+  const { i18n, t } = useTranslation();
+  const [imageUrl, setImageUrl] = useState(null);
+
+  // THE FIX: The useEffect hook is now called *after* the main hooks,
+  // but *before* any early returns.
+  useEffect(() => {
+    if (isSubscribed && dish && dish.imageId) {
+      const fetchImageData = async () => {
+        try {
+          const response = await getImage(dish.imageId);
+          const url = bufferToUrl(response.data);
+          setImageUrl(url);
+        } catch (error) {
+          console.error("Failed to fetch dish image:", error);
+          setImageUrl(null);
+        }
+      };
+      fetchImageData();
+    }
+  }, [dish, isSubscribed]); // Simplified dependency array
+
+  // THE FIX: The early return is now AFTER the hooks.
+  if (!dish) {
+    return null;
+  }
+  
+  const { name, nameFr, sellingPrice, ingredients, } = dish;
+  const isArabic = i18n.language === "ar";
+  const dishName = (!isArabic && nameFr && nameFr.length > 0) ? nameFr : name;
+  const ingredientString = ingredients?.filter(item => item.trim() !== "").join(' · ');
 
   return (
-    <Card isArabic={i18n.language === "ar"}>
+    <Card>
+      {isSubscribed && imageUrl && (
+        <DishImage src={imageUrl} alt={dishName} />
+      )}
       <CardHeader>
-        <Name>{name}</Name>
+        <Name>{dishName}</Name>
         <Price>
-          {sellingPrice} {t("dzd")}
+          {parseInt(sellingPrice)} {t("dzd")}
         </Price>
       </CardHeader>
-      <CardBody>
-        {filteredIngredients.length > 0 && (
-          <Ingredients>
-            {filteredIngredients.map((ingredient, index) => (
-              <Ingredient key={index}>
-                {ingredient}
-                {index !== filteredIngredients.length - 1 ? "  " : ""}
-              </Ingredient>
-            ))}
-          </Ingredients>
-        )}
-      </CardBody>
+      {ingredientString && (
+        <Ingredients>{ingredientString}</Ingredients>
+      )}
+      {/* {isSubscribed && (
+        <ActionRow>
+          <AddToCartButton>{t("addToCart")}</AddToCartButton>
+        </ActionRow>
+      )} */}
     </Card>
   );
 };
 
-export default Dish;
+// Renamed component back to Dish to match your file structure.
+export default DishCard;

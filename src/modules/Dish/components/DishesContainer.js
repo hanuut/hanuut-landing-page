@@ -1,58 +1,100 @@
-import React from "react";
-import Dish from "./Dish";
-import Loader from "../../../components/Loader";
+// src/pages/Dish/components/DishesContainer.js
+
+import React, { useMemo } from "react";
 import styled from "styled-components";
-import { selectDishes } from "../../Dish/state/reducers";
-import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-const Section = styled.div`
-  margin-top: 1rem;
+import Dish from "./Dish.js"; // This should match your dish component file name
+import Loader from "../../../components/Loader";
+
+// This helper function converts the image buffer into a usable Data URL
+const bufferToUrl = (imageObject) => {
+  if (!imageObject || !imageObject.buffer || !imageObject.buffer.data) {
+    return null;
+  }
+  const imageData = imageObject.buffer.data;
+  const base64String = btoa(
+    new Uint8Array(imageData).reduce(
+      (data, byte) => data + String.fromCharCode(byte),
+      ''
+    )
+  );
+  const format = imageObject.originalname.split('.').pop().toLowerCase();
+  const mimeType = format === 'jpg' ? 'jpeg' : format;
+  return `data:image/${mimeType};base64,${base64String}`;
+};
+
+const MasonryLayout = styled.div`
   width: 100%;
-  overflow-y: scroll;
-  max-height: ${(props) => (props.expanded ? "100%" : "0")};
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  box-sizing: border-box;
+  padding-top: 2rem;
+  column-width: 320px;
+  column-gap: 1.5rem;
+  opacity: ${(props) => (props.expanded ? 1 : 0)};
+  transform: ${(props) => (props.expanded ? "translateY(0)" : "translateY(20px)")};
+  transition: opacity 0.5s ease, transform 0.5s ease;
 `;
+
 const NoAvailableDishes = styled.div`
-  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight} - 11rem)`};
+  padding: 4rem 0;
   width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
 `;
 
 const Content = styled.p`
-  font-size: 2.5rem;
-  @media (max-width: 768px) {
-    margin-top: 1rem;
-    font-size: ${(props) => props.theme.fontxxl};
-  }
+  font-size: ${(props) => props.theme.fontxl};
+  color: ${(props) => props.theme.secondaryText};
 `;
-const DishesContainer = ({ dishes, expanded }) => {
+
+const DishesContainer = ({ dishes, expanded, isSubscribed }) => {
   const { t } = useTranslation();
-  const { loading: dishesLoading, error: dishesError } =
-    useSelector(selectDishes);
-  if (dishesLoading) return <Loader />;
-  if (dishesError) return <div>Error: {dishesError}</div>;
+
+  // useMemo will re-calculate this list ONLY when the 'dishes' prop changes.
+  const dishesWithImageUrls = useMemo(() => {
+    if (!dishes) {
+      return [];
+    }
+    // Map over the dishes to process their images
+    return dishes.map(dishWrapper => {
+      const dish = dishWrapper.dish;
+      // Your 'dish' object likely has an 'image' property with the buffer
+      const imageUrl = dish && dish.image ? bufferToUrl(dish.image) : null;
+      
+      // Return a new object with the processed imageUrl
+      return {
+        ...dishWrapper,
+        dish: {
+          ...dish,
+          imageUrl: imageUrl,
+        },
+      };
+    });
+  }, [dishes]);
+
+  if (!dishes) {
+    return <Loader />;
+  }
+
   return (
-    <Section expanded={expanded}>
-      {dishes.length > 0 ? (
-        dishes.map((dish) => {
-          return dish.isHidden !== true ? (
-            <Dish key={dish.id} dish={dish.dish} />
-          ) : null;
-        })
+    <MasonryLayout expanded={expanded}>
+      {/* We now map over the processed list */}
+      {dishesWithImageUrls.length > 0 ? (
+        dishesWithImageUrls.map((dishWrapper) => (
+          dishWrapper.isHidden !== true ? (
+            <Dish
+              key={dishWrapper.id}
+              dish={dishWrapper.dish}
+              isSubscribed={isSubscribed}
+            />
+          ) : null
+        ))
       ) : (
         <NoAvailableDishes>
           <Content>{t("noDishesAvailable")}</Content>
         </NoAvailableDishes>
       )}
-    </Section>
+    </MasonryLayout>
   );
 };
 

@@ -14,7 +14,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../../components/Loader";
 import NotFoundPage from "../../NotFoundPage";
-import FoodShop from "./FoodShop";
+import MenuPage from "./MenuPage";
 import Shop from "./Shop";
 
 const Section = styled.div`
@@ -73,7 +73,7 @@ const ShopPageWithUsername = () => {
       {" "}
       <Section>
         {domainKeyWord === "food" ? (
-          <FoodShop
+          <MenuPage
             selectedShop={selectedShop}
             selectedShopImage={selectedShopImage}
           />

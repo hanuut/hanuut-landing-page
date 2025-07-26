@@ -1,59 +1,59 @@
-import React, { useState } from "react";
+// src/pages/Categories/components/Category.js
+
+import React from "react";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 
-const Section = styled.button`
-  min-width: fit-content;
-  align-self: center;
-  background-color: ${(props) =>
-    props.selected ? props.theme.primaryColor : "rgba(255, 255, 255, 0.15);"};
-  border: none;
-  padding: ${(props) => props.theme.actionButtonPaddingMobile};
-  font-size: ${(props) => props.theme.fontxxl};
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-direction: column;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid ${(props) => props.theme.primaryColor};
+const CategoryButton = styled.button`
+  // --- Layout & Spacing ---
+  // This adds the padding you were missing.
+  padding: 0.75rem 1.5rem;
+  flex-shrink: 0; // Prevents buttons from shrinking when the container is full.
+
+  // --- Typography ---
+  font-size: ${(props) => props.theme.fontlg};
+  font-weight: 500;
+  white-space: nowrap;
+
+  // --- Appearance & Styling ---
   border-radius: ${(props) => props.theme.defaultRadius};
-  text-align: center;
-  @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
-    padding: ${(props) => props.theme.smallPadding};
-    border-radius: ${(props) => props.theme.smallRadius};
-  }
-`;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 
-const CategoryName = styled.h5`
-  width: 100%;
-  text-align: center;
-  transition: all 0.3s ease;
-  font-family: "Tajawal", sans-serif;
-  font-size: ${(props) =>
-    props.selected ? props.theme.fontmd : props.theme.fontsm};
+  // --- Conditional Styling (This is the key part) ---
+  
+  // 1. Set background color: Hanuut Green if selected, otherwise the subtle surface color.
+  background-color: ${(props) =>
+    props.isSelected ? props.theme.primary : props.theme.surface};
+  
+  // 2. Set text color: The light background color if selected, otherwise the main dark text color.
   color: ${(props) =>
-    props.selected ? props.theme.body : props.theme.primaryColor};
+    props.isSelected ? props.theme.body : props.theme.text};
+  
+  // 3. Set border color: The same as the background if selected, otherwise the subtle border color.
+  border: 1px solid ${(props) => 
+    props.isSelected ? props.theme.primary : props.theme.surfaceBorder};
 
-  @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontsm};
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
 `;
-const Category = ({ category, onCategoryClick, selectedCategory }) => {
-  const handleHeadingClick = () => {
-    onCategoryClick(category.id);
-  };
+
+const Category = ({ category, selectedCategory, onCategoryClick }) => {
+ 
+  const categoryIsSelected = selectedCategory === category.id;
+  const { i18n } = useTranslation();
+  const isArabic= i18n.language === "ar";
+  const categoryName = !isArabic && category.nameFr !==null ? category.nameFr : category.name;
 
   return (
-    <Section
-      onClick={handleHeadingClick}
-      selected={selectedCategory === category.id}
+    <CategoryButton
+      isSelected={categoryIsSelected}
+      onClick={() => onCategoryClick(category.id)}
     >
-      <CategoryName selected={selectedCategory === category.id}>
-        {category.name}
-      </CategoryName>
-    </Section>
+      {categoryName}
+    </CategoryButton>
   );
 };
 
