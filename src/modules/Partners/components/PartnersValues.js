@@ -58,7 +58,7 @@ const Icon = styled.img`
 const Title = styled.h2`
   font-size: ${(props) => props.theme.fontxxxl};
   text-transform: capitalize;
-  color: ${(props) => props.theme.primaryColor};
+  color: ${(props) => props.theme.accent};
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontxl};
   }
@@ -66,7 +66,7 @@ const Title = styled.h2`
 
 const CardDescription = styled.p`
   font-size: ${(props) => props.theme.fontxl};
-
+  color: ${(props) => props.theme.body};
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontxl};
   }

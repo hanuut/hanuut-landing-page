@@ -70,14 +70,14 @@ const LeftBox = styled.div`
 const Heading = styled.h1`
   width: 100%;
   margin-bottom: 1rem;
-  font-size: 2.5rem;
+  font-size: 4rem;
   color: ${(props) => props.theme.primaryColor};
   font-weight: 900;
   text-transform: uppercase;
 
   @media (max-width: 768px) {
     width: 90%;
-    font-size: ${(props) => props.theme.fontxxxl};
+    font-size: ${(props) => props.theme.fontxxl};
   }
 `;
 
@@ -85,7 +85,7 @@ const SubHeading = styled.h2`
   width: 100%;
   font-size: ${(props) => props.theme.fontxxxl};
   margin-bottom: 0.5rem;
-
+font-weight: 500;
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontxl};
@@ -116,7 +116,7 @@ const SmallParagraph = styled.p`
 `;
 
 const IllustrationContainer = styled.img`
-  height: 70vh;
+  height: 50vh;
 `;
 
 const HomePage = () => {
@@ -188,7 +188,7 @@ const HomePage = () => {
           <LeftBox>
             <Heading>{t("homeHeading")}</Heading>
             <SubHeading>{t("homeSubHeading")}</SubHeading>
-            <Paragraph>{t("homeParagraph")}</Paragraph>
+            {/* <Paragraph>{t("homeParagraph")}</Paragraph> */}
             <Link to={link} name="playsore">
               <ButtonWithIcon
                 image={Playstore}
@@ -202,8 +202,10 @@ const HomePage = () => {
           </LeftBox>
         </Container>
       </Section>
-      <AboutUs />
+     
       <HowItWorks />
+      <AboutUs />
+
       {/* 
       <Testimonials />
       <Partners /> 

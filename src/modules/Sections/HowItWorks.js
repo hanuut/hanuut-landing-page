@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import AddToCart from "../../assets/addToCart.svg";
-import CartManagment from "../../assets/cartManagment.svg";
-import Delivery from "../../assets/delivery.svg";
+import AddToCart from "../../assets/girl_sofa.png";
+import CartManagment from "../../assets/mobile_order.png";
+import Delivery from "../../assets/order_here.png";
 import { useTranslation } from "react-i18next";
 import BackgroundImage from "../../assets/background.webp";
 
@@ -38,7 +38,7 @@ const Container = styled.div`
 `;
 
 const HowItWorksTitle = styled.h2`
-  font-size: ${(props) => props.theme.fontLargest};
+  font-size: ${(props) => props.theme.fontxxxl};
   font-weight: bold;
   color: ${(props) => props.theme.primaryColor};
   @media (max-width: 768px) {
@@ -74,7 +74,7 @@ const HowItWorksCard = styled.div`
 `;
 
 const HowItWorksIcon = styled.img`
-  width: 75%;
+  width: auto;
   height: 30vh;
   object-fit: fill;
   @media (max-width: 768px) {
@@ -119,6 +119,7 @@ function HowItWorks() {
         <HowItWorksTitle isArabic={i18n.language === "ar"}>
           {t("howItWorksTitle")}
         </HowItWorksTitle>
+
         <CardsContainer>
           <HowItWorksCard>
             <HowItWorksIcon src={AddToCart} alt="Shop and Add to cart" />
@@ -127,6 +128,7 @@ function HowItWorks() {
               {t("howItWorksShoping")}
             </HowItWorksText>
           </HowItWorksCard>
+
           <HowItWorksCard>
             <HowItWorksIcon src={CartManagment} alt="Proceed To Delivery" />
             <HowItWorksStep isArabic={i18n.language === "ar"}>2</HowItWorksStep>

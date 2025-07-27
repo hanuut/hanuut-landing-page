@@ -53,12 +53,12 @@ const ContentWrapper = styled.div`
 const Title = styled(motion.h2)`
   font-size: clamp(1.2rem, 5vw, 2.5rem);
   font-weight: 700;
-  color: ${({ theme }) => theme.primaryColor};
+  color: ${({ theme }) => theme.primary};
   line-height: 1;
   letter-spacing: -0.02em;
 
   span {
-    color: ${({ theme }) => theme.orangeColor};
+    color: ${({ theme }) => theme.accent};
   }
 `;
 
@@ -68,7 +68,7 @@ const FeatureSection = styled.div`
 
 const FeatureStepTitle = styled.h3`
   font-size: ${(props) => props.theme.fontxl};
-  color: ${(props) => props.theme.primaryColor};
+  color: ${(props) => props.theme.primary};
   margin-bottom: 1rem;
   @media (max-width: 768px) {
     font-size: ${(props) => props.theme.fontlg};
@@ -120,14 +120,14 @@ const GuideButton = styled(motion.a)`
   backdrop-filter: blur(10px);
 
   &:hover {
-    background: ${({ theme }) => `${theme.primaryColor}08`};
+    background: ${({ theme }) => `${theme.primary}08`};
     transform: translateY(-2px);
   }
 
   h3 {
     font-size: 1.25rem;
     font-weight: 600;
-    color: ${({ theme }) => theme.primaryColor};
+    color: ${({ theme }) => theme.primary};
   }
 
   p {

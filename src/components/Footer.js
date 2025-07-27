@@ -5,6 +5,8 @@ import { FaFacebook, FaGooglePlay, FaInstagram } from "react-icons/fa";
 
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import logoAr from "../assets/logo-ar.png";
+import logoEn from "../assets/logo-en.png";
 
 const Section = styled.div`
   background-color: #000;
@@ -106,11 +108,13 @@ const Footer = () => {
   const instagramLink = process.env.REACT_APP_INSTAGRAM_SOCIAL_MEDIA;
   const facebookLink = process.env.REACT_APP_FACBOOK_SOCIAL_MEDIA;
   const downloadLink = process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK;
+  const currentLogo = i18n.language === "ar" ? logoAr : logoEn;
+  
   return (
     <Section isArabic={i18n.language === "ar"}>
       <UpperBox>
         <LeftBox>
-          <Logo />
+          <Logo image={currentLogo}/>
         </LeftBox>
         <RightBox>
           <Title>{t("footerFindUs")}</Title>

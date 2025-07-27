@@ -176,14 +176,12 @@ const Navbar = () => {
     setIsActive(false);
   };
 
-  // --- THE FIX: Determine which logo to use ---
   const currentLogo = i18n.language === "ar" ? logoAr : logoEn;
   const isArabic = i18n.language === "ar";
 
   return (
     <Section $brandColor={brandColor}>
       <Navigation $isArabic={isArabic}>
-        {/* --- THE FIX: Pass the correct logo image --- */}
         <Logo image={currentLogo} />
 
         <HamburgerMenuContainer onClick={handleClick}>

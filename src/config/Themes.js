@@ -5,13 +5,17 @@ export const light = {
   // Neutral Tones
   body: "#FDF4E3",              // Soft Ivory - Main page background
   text: "#111217",              // Deep Charcoal - Primary text for high contrast
+  textColor: "#111217",              // Deep Charcoal - Primary text for high contrast
   textRgba: "17, 18, 23",       // RGB for Deep Charcoal
   
   // Primary & Secondary
   primary: "#39A170",           // Hanuut Green - For key actions and branding
+  primaryColor: "#39A170",           // Hanuut Green - For key actions and branding
+  darkGreen: "#194435",           // Hanuut Green - For key actions and branding
   primaryRgba: "57, 161, 112",  // RGB for Hanuut Green
   primaryLight: "#6ED3A3",      // Mint Breeze - Lighter shade for hover or active states
   secondary: "#397FF9",         //Electric Blue - For secondary actions or highlights
+  secondaryColor: "#397FF9",         //Electric Blue - For secondary actions or highlights
   
   // System Tones
   accent: "#F07A48",            // // Sunset Coral - For Call-to-action or special highlights
@@ -27,6 +31,7 @@ export const light = {
   fontxxxl: "clamp(2rem, 5vw, 3rem)",    // Page titles
   fontxxl: "clamp(1.5rem, 4vw, 2rem)",   // Section titles
   fontxl: "1.25rem",                      // Card titles
+  actionButtonPadding: "1.25rem",                      // Card titles
   fontlg: "1rem",                         // Body text, descriptions
   fontmd: "1rem",                         // Default body text
   fontsm: "0.875rem",                     // Captions, ingredients

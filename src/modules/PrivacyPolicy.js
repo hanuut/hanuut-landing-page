@@ -14,29 +14,30 @@ const Container = styled.div`
   }
 `;
 const Heading = styled.h1`
-  font-size: ${(props) => props.theme.fontLargest};
+  font-size: ${(props) => props.theme.fontxxl};
   font-weight: bold;
   margin-bottom: 15px;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontxxxl};
+    font-size: ${(props) => props.theme.fontlg};
   }
 `;
 
 const SubHeading = styled.h2`
-  font-size: ${(props) => props.theme.fontxxxl};
+  font-size: ${(props) => props.theme.fontlg};
   font-weight: bold;
   margin-bottom: 8px;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontxxl};
+    font-size: ${(props) => props.theme.fontmd};
   }
 `;
 
 const Paragraph = styled.p`
-  font-size: ${(props) => props.theme.fontlg};
+  font-size: ${(props) => props.theme.fontmd};
   margin-bottom: 10px;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontmd};
+    font-size: ${(props) => props.theme.fontsm};
   }
+
 `;
 const Link = styled.a`
   color: #0077cc;
@@ -279,7 +280,7 @@ const PrivacyPolicy = () => {
         advised to review this page periodically for any changes. We will notify
         you of any changes by posting the new Privacy Policy on this page.
       </Paragraph>
-      <Paragraph>This policy is effective as of 05-19-2023</Paragraph>
+      <Paragraph>This policy is effective as of 05-19-2025</Paragraph>
       <SubHeading>Contact Us</SubHeading>
       <Paragraph>
         If you have any questions or suggestions about our Privacy Policy, do
