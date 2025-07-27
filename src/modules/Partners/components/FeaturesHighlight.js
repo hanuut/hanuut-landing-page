@@ -76,7 +76,7 @@ const Container = styled.div`
 const Title = styled.h1`
   padding-top: 2rem;
   font-size: 3rem;
-  color: ${(props) => props.theme.orangeColor};
+  color: ${(props) => props.theme.accent};
   text-align: center;
   margin-bottom: 1rem;
 `;
@@ -93,23 +93,23 @@ const Button = styled.button`
   background-color: ${(props) =>
     props.isSelected ? props.theme.darkGreen : props.theme.body};
   color: ${(props) =>
-    props.isSelected ? props.theme.orangeColor : props.theme.darkGreen};
+    props.isSelected ? props.theme.accent : props.theme.darkGreen};
   font-size: ${(props) => props.theme.fontxl};
   border: 1px solid;
   border-radius: ${(props) => props.theme.smallRadius};
-  border-color: ${(props) => props.theme.primaryColor};
+  border-color: ${(props) => props.theme.primary};
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: ${(props) => (props.isSelected ? 900 : 400)};
   &:hover {
     background-color: ${(props) => props.theme.darkGreen};
-    color: ${(props) => props.theme.orangeColor};
+    color: ${(props) => props.theme.accent};
     border-color: ${(props) => props.theme.body};
   }
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px ${(props) => props.theme.orangeColor}40;
+    box-shadow: 0 0 0 3px ${(props) => props.theme.accent}40;
   }
 `;
 
@@ -132,7 +132,7 @@ const FeaturesHighlightContainer = styled.div`
   z-index: 1000;
 `;
 
-const FeaturesHighlight = () => {
+const FeaturesHighlight = ({alReadySelected}) => {
   const { t, i18n } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState("supermarkets");
   const [isSticky, setIsSticky] = useState(true);
@@ -169,6 +169,12 @@ const FeaturesHighlight = () => {
     return currentFeaturesSteps.slice(0, 1);
   };
 
+  // // If already selected, set the initial state
+  // useEffect(() => {
+  //   if (alReadySelected) {
+  //     setSelectedCategory(alReadySelected);
+  //   }
+  // }, [alReadySelected]);
   return (
     <Container isArabic={i18n.language === "ar"}>
       <FeaturesHighlightContainer

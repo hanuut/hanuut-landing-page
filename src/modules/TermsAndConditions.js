@@ -14,28 +14,28 @@ const Container = styled.div`
   }
 `;
 const Heading = styled.h1`
-  font-size: ${(props) => props.theme.fontLargest};
+  font-size: ${(props) => props.theme.fontxxl};
   font-weight: bold;
   margin-bottom: 15px;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontxxxl};
+    font-size: ${(props) => props.theme.fontlg};
   }
 `;
 
 const SubHeading = styled.h2`
-  font-size: ${(props) => props.theme.fontxxxl};
+  font-size: ${(props) => props.theme.fontlg};
   font-weight: bold;
   margin-bottom: 8px;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontxxl};
+    font-size: ${(props) => props.theme.fontmd};
   }
 `;
 
 const Paragraph = styled.p`
-  font-size: ${(props) => props.theme.fontlg};
+  font-size: ${(props) => props.theme.fontmd};
   margin-bottom: 10px;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontmd};
+    font-size: ${(props) => props.theme.fontsm};
   }
 
 `;
@@ -198,7 +198,7 @@ const TermsAndConditions = () => {
          لك أي تغييرات عن طريق نشر الشروط والأحكام الجديدة على هذه الصفحة.
       </Paragraph>
       <Paragraph>
-      تسري هذه الشروط والأحكام اعتبارًا من 2023-05-19
+      تسري هذه الشروط والأحكام اعتبارًا من 2025-05-19
       </Paragraph>
 
       <SubHeading>13. اتصل بنا</SubHeading>
@@ -363,7 +363,7 @@ const TermsAndConditions = () => {
           You may make any changes by posting the new terms and conditions on this page.
        </Paragraph>
        <Paragraph>
-       These terms and conditions are effective from 2023-05-19
+       These terms and conditions are effective from 2025-05-19
        </Paragraph>
 
        <SubHeading>13. Contact us</SubHeading>

@@ -52,7 +52,7 @@ const Button = styled.button`
   font-size: ${(props) => props.theme.fontsm};
   border: 1px solid;
   border-radius: ${(props) => props.theme.smallRadius};
-  border-color: ${(props) => props.theme.primaryColor};
+  border-color: ${(props) => props.theme.body};
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: ${(props) => (props.isSelected ? 900 : 400)};
@@ -61,8 +61,8 @@ const Button = styled.button`
       props.isSelected
         ? props.theme.primaryColorDark
         : props.theme.primaryColor};
-    color: ${(props) => props.theme.body};
-    border-color: ${(props) => props.theme.body};
+    color: ${(props) => props.theme.accent};
+    border-color: ${(props) => props.theme.accent};
   }
 
   &:focus {
@@ -152,13 +152,13 @@ const Heading = styled.h1`
   font-size: 1.2rem;
   font-weight: 500;
   text-transform: uppercase;
-  color: ${(props) => props.theme.primaryColor};
+  color: ${(props) => props.theme.body};
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontxxxl};
   }
   span {
-    color: ${(props) => props.theme.orangeColor};
+    color: ${(props) => props.theme.accent};
     font-size: 2rem;
     font-weight: 900;
   }

@@ -250,7 +250,7 @@ const Benefits = () => {
       text: t("benefits_riders_title"),
       subtext: t("benefits_riders_description"),
       backGroundColor: (props) => props.theme.secondaryColor,
-      textColor: (props) => props.theme.white,
+      textColor: (props) => props.theme.body,
     },
     {
       text: t("howItWorksCustomer_step1") + "\n" + t("howItWorksCustomer_step2") + "\n" + t("howItWorksCustomer_step3"),
@@ -265,8 +265,8 @@ const Benefits = () => {
     {
       text: t("benefits_drivers_title"),
       subtext: t("benefits_drivers_description"),
-      backGroundColor: (props) => props.theme.secondaryColorDark,
-      textColor: (props) => props.theme.white,
+      backGroundColor: (props) => props.theme.secondaryColor,
+      textColor: (props) => props.theme.body,
     },
   ];
 
