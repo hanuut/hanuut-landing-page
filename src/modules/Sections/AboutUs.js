@@ -1,187 +1,137 @@
 import styled from "styled-components";
-import AboutUsIllutstration from "../../assets/aboutUs.webp";
-import MissionIllustration from "../../assets/mission.svg";
 import { useTranslation } from "react-i18next";
-import BackgroundImage from "../../assets/background.webp";
-const Section = styled.div`
-  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
+import { Link } from "react-router-dom"; // Import Link for the CTA
+import AboutUsIllustration from "../../assets/shop_owner_illustration.png"; // Using your existing illustration
+
+// Section: Cleaned up to use padding for spacing instead of min-height. Removed background image for clarity.
+const Section = styled.section`
+  width: 100%;
+  padding: 6rem 0; 
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-image: url(${BackgroundImage});
-  background-size: 100%;
-  gap: 2rem;
-  background-position: center;
-  overflow-x: hidden;
-  @media (max-width: 768px) {
-    justify-content: flex-start;
-    width: 100%;
-  }
+  background-color: #f9f9f9;
+  overflow: hidden;
 `;
 
+// Container: Standardized for better responsiveness.
 const Container = styled.div`
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  width: 80%;
+  max-width: 1200px;
+  width: 90%;
+  margin: 0 auto;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+  justify-content: center;
+  gap: 4rem; // Increased gap for more white space
+
   @media (max-width: 768px) {
-    width: 90%;
     flex-direction: column;
-    align-items: flex-start;
+    gap: 3rem;
   }
 `;
-const RightBox = styled.div`
-  width: 50%;
+
+// LeftBox: Will now contain all the text content for a clear reading flow.
+const TextContainer = styled.div`
+  flex: 1; // Takes up 50% of the space
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
-  gap: 0.5rem;
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const MissionContainer = styled.div`
-  margin-top: 0.5rem;
-  align-self: start;
-  max-width: 90%;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 0.5rem;
-  background-color: ${(props) => props.theme.body};
-  padding: 1.5rem 1rem;
-  border-radius: ${(props) => props.theme.defaultRadius};
-  border: 1px solid rgba(${(props) => props.theme.primaryColorRgba}, 0.75);
-  box-shadow: ${(props) =>
-    props.isArabic
-      ? `-15px 15px rgba(${props.theme.primaryColorRgba}, 0.5)`
-      : `15px 15px rgba(${props.theme.primaryColorRgba}, 0.5)`};
-  transition: all 0.5s ease;
-  .missionText {
-    font-size: ${(props) => props.theme.fontxxxl};
-    padding-left: ${(props) => (props.isArabic ? "0" : "2rem")};
-    padding-right: ${(props) => (props.isArabic ? "2rem" : "0")};
-  }
-
-  @media (max-width: 768px) {
-    margin-top: 1rem;
-    max-width: 100%;
-    padding: 0.7rem 0.4rem;
-    box-shadow: ${(props) =>
-      props.isArabic
-        ? `-10px 10px rgba(${props.theme.primaryColorRgba}, 0.75)`
-        : `10px 10px rgba(${props.theme.primaryColorRgba}, 0.75)`};
-    .missionText {
-      font-size: ${(props) => props.theme.fontlg};
-      padding-left: ${(props) => (props.isArabic ? "0" : "1rem")};
-      padding-right: ${(props) => (props.isArabic ? "1rem" : "0")};
-    }
-  }
-`;
-
-const MissionHeaderContainer = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
   gap: 1rem;
-  .mission {
-    font-size: ${(props) => props.theme.fontxxxl};
-    @media (max-width: 768px) {
-      font-size: ${(props) => props.theme.fontxl};
-    }
-  }
-  @media (max-width: 768px) {
-    gap: 0.5rem;
-  }
-`;
-const MissionIllutstrationContainer = styled.img`
-  max-width: 15%;
-  background-color: ${(props) => props.theme.body};
-  object-fit: fill;
-  @media (max-width: 768px) {
-    width: auto;
-  }
-`;
 
-const LeftBox = styled.div`
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-radius: 10px;
-  justify-content: flex-start;
   @media (max-width: 768px) {
     align-items: center;
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-`;
-const AboutUsIllutstrationContainer = styled.img`
-  max-height: 60vh;
-  align-self: ${(props) => (props.isArabic ? "flex-end" : "center")};
-  @media (max-width: 768px) {
-    align-self: center;
-    width: auto;
+    text-align: center;
   }
 `;
 
-const AboutTitle = styled.h1`
+// RightBox: Dedicated to the illustration.
+const IllustrationContainer = styled.div`
+  flex: 1; // Takes up the other 50%
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Illustration = styled.img`
+  width: 100%;
+  max-width: 450px;
+  height: auto;
+  object-fit: contain; // Prevents image distortion
+`;
+
+const Title = styled.h2`
+  font-size: ${(props) => props.theme.fontxxxl};
+  font-weight: 700;
   color: ${(props) => props.theme.primaryColor};
-  font-weight: bold;
-      font-size: 5rem;
+`;
+
+const Paragraph = styled.p`
+  font-size: ${(props) => props.theme.fontlg};
+  color: rgb(${(props) => props.theme.textRgba}, 0.8);
+  line-height: 1.7;
+  max-width: 600px; // Keeps line length readable
+`;
+
+// --- New Call to Action Components ---
+const CtaContainer = styled.div`
+  width: 100%;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(${(props) => props.theme.textRgba}, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+
   @media (max-width: 768px) {
-    font-size: 3rem;
+    align-items: center;
   }
 `;
 
-const AboutText = styled.p`
-  font-size: ${(props) => props.theme.fontxxl};
+const CtaText = styled.p`
+  font-size: ${(props) => props.theme.fontlg};
+  font-weight: 600;
   color: ${(props) => props.theme.text};
-  line-height: 1.5;
-  @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontlg};
+`;
+
+const CtaButton = styled(Link)`
+  font-size: ${(props) => props.theme.fontlg};
+  font-weight: 600;
+  color: ${(props) => props.theme.primaryColor};
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
   }
 `;
 
 function AboutUs() {
   const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
+
   return (
     <Section>
-      <Container isArabic={i18n.language === "ar"}>
-        <RightBox>
-          <AboutTitle>{t("appTitle")}</AboutTitle>
-          <MissionContainer isArabic={i18n.language === "ar"}>
-            <MissionHeaderContainer>
-              <MissionIllutstrationContainer
-                src={MissionIllustration}
-                alt="mission"
-                loading="lazy"
-              />
-               <AboutText className="missionText">
-              {t("aboutUsMissionText")}
-               </AboutText>
-            </MissionHeaderContainer>
-          </MissionContainer>
-        </RightBox>
-        <LeftBox>
-          <AboutUsIllutstrationContainer
-            src={AboutUsIllutstration}
-            isArabic={i18n.language === "ar"}
-            alt="hanuut"
+      <Container isArabic={isArabic}>
+        <TextContainer>
+          <Title>{t("aboutUsTitle")}</Title>
+          <Paragraph>{t("aboutUsParagraph")}</Paragraph>
+          <CtaContainer>
+            <CtaText>{t("aboutUsCtaText")}</CtaText>
+            <CtaButton to="/partners">{t("aboutUsCtaButton")} &rarr;</CtaButton>
+          </CtaContainer>
+        </TextContainer>
+
+        <IllustrationContainer>
+          <Illustration
+            src={AboutUsIllustration}
+            alt={t("aboutUsAlt")}
             loading="lazy"
           />
-        </LeftBox>
+        </IllustrationContainer>
       </Container>
-      {/* <AboutTitle>{t("aboutUsValues")}</AboutTitle>
-      <Values /> */}
     </Section>
   );
 }
