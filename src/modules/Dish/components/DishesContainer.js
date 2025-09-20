@@ -1,25 +1,53 @@
-// src/pages/Dish/components/DishesContainer.js
+// src/modules/Dish/components/DishesContainer.js
 
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import Dish from "./Dish.js";
+import DishCard from "./Dish.js";
+import PremiumDishCard from "./PremiumDishCard.js";
 import Loader from "../../../components/Loader";
 import NothingFoundImage from "../../../assets/nothing.png";
 
-// This layout is ONLY for when there are dishes to display.
-const MasonryLayout = styled.div`
+// This layout is for the Standard (non-subscribed) shops
+const StandardLayout = styled.div`
+ width: 100%;
+  box-sizing: border-box;
+  padding-top: 2rem;
+  
+  column-count: 3;
+
+  /* --- THIS IS THE EXACT LINE FOR HORIZONTAL SPACING --- */
+  /* It creates the gap between the columns. */
+  column-gap: 1.5rem;
+
+  @media (max-width: 992px) {
+    column-count: 2;
+  }
+  @media (max-width: 576px) {
+    column-count: 1;
+  }
+`;
+
+// This is the Masonry layout for Premium shops
+const PremiumMasonryLayout = styled.div`
   width: 100%;
   box-sizing: border-box;
   padding-top: 2rem;
-  column-width: 320px;
+  
+  column-count: 3;
+
+  /* --- THIS IS THE EXACT LINE FOR HORIZONTAL SPACING --- */
+  /* It creates the gap between the columns. */
   column-gap: 1.5rem;
-   opacity: ${(props) => (props.$expanded ? 1 : 0)};
-  transform: ${(props) => (props.$expanded ? "translateY(0)" : "translateY(20px)")};
-  transition: opacity 0.5s ease, transform 0.5s ease;
+
+  @media (max-width: 992px) {
+    column-count: 2;
+  }
+  @media (max-width: 576px) {
+    column-count: 1;
+  }
 `;
 
-// This is a separate layout for the empty state.
 const NoAvailableDishes = styled.div`
   padding: 4rem 1rem;
   width: 100%;
@@ -42,17 +70,13 @@ const Content = styled.p`
   text-align: center;
 `;
 
-const DishesContainer = ({ dishes, expanded, isSubscribed, isLoading }) => {
+const DishesContainer = ({ dishes, expanded, isSubscribed, isLoading, onAddToCart, brandColors,cartItems,onUpdateQuantity ,isShopOpen}) => {
   const { t } = useTranslation();
 
-  // --- THE FIX: We structure the entire return ---
-
-  // Case 1: We are currently loading.
   if (isLoading) {
     return <Loader fullscreen={false} />;
   }
 
-  // Case 2: We are done loading, and there are no dishes.
   if (dishes.length === 0) {
     return (
       <NoAvailableDishes>
@@ -62,20 +86,42 @@ const DishesContainer = ({ dishes, expanded, isSubscribed, isLoading }) => {
     );
   }
 
-  // Case 3: We are done loading, and there ARE dishes.
-  return (
-    <MasonryLayout $expanded={expanded}>
-      {dishes.map((dishWrapper) => (
+  if (isSubscribed) {
+    return (
+    
+        <PremiumMasonryLayout>
+            {dishes.map((dishWrapper) => {
+        const cartItem = cartItems.find(item => item.dish._id === dishWrapper.dish._id);
+        return dishWrapper.isHidden !== true ? (
+          <PremiumDishCard
+                    key={dishWrapper.id}
+                    dish={dishWrapper.dish}
+                    brandColors={brandColors}
+                    onAddToCart={() => onAddToCart(dishWrapper.dish)}
+                    onUpdateQuantity={onUpdateQuantity}
+                    cartItem={cartItem}
+                    isShopOpen = {isShopOpen}
+                />
+        ) : null;
+      })}
+        </PremiumMasonryLayout>
+    );
+  }else{return (
+    <PremiumMasonryLayout>
+            {dishes.map((dishWrapper) => (
         dishWrapper.isHidden !== true ? (
-          <Dish
+          <DishCard
             key={dishWrapper.id}
             dish={dishWrapper.dish}
-            isSubscribed={isSubscribed}
+            onAddToCart={() => onAddToCart(dishWrapper.dish)}
           />
         ) : null
       ))}
-    </MasonryLayout>
-  );
+        </PremiumMasonryLayout>
+  
+  );}
+
+  
 };
 
 export default DishesContainer;

@@ -461,7 +461,223 @@
   "benefits_title": "Local & Responsive",
   "benefits_description": "Connect instantly with people in your neighborhood.",
   "ctaReinforcement": "Ready to move efficiently? Download now.",
+  "payment_success_title": "Payment Successful!",
+  "payment_success_message": "Thank you! Your order is being processed.",
+  "payment_failure_title": "Payment Failed",
+  "payment_failure_message": "We were unable to process your payment.",
+  "payment_failure_generic_error": "An unknown error occurred. Please contact support.",
+  "payment_back_to_home_button": "Back to Home",
+  "payment_order_id": "Order ID",
+  "payment_error_details": "Details",
   "loading": {
     "message": "Loading, please wait..."
-  }
+  },
+  "satim_terms": {
+    "main_title": "Terms and Conditions for Online Payment",
+    "sections": [
+      {
+        "title": "Specific Conditions of Use for Online Payment",
+        "paragraphs": [
+          "Preamble: These specific conditions of use for online payment via the EDAHABIA card or CIB cards, hereinafter referred to as 'CSU: Specific Conditions of Use,' apply to all online transactions established on the website www.hanuut.com or our mobile application Hanuut Customer. Any use of the online payment service via the EDAHABIA card on this site implies the prior and unconditional acceptance by the E-consumer of these CSU."
+        ]
+      },
+      {
+        "title": "1. Purpose",
+        "paragraphs": [
+          "These CSU aim to define the conditions and terms under which Hanuut Express offers the E-consumer holding an EDAHABIA card or CIB cards the use of the online payment service on its website www.hanuut.com or its mobile application Hanuut Customer."
+        ]
+      },
+      {
+        "title": "2. Definitions",
+        "paragraphs": [
+          "In accordance with these specific conditions of use, the following terms shall have the following meanings:"
+        ],
+        "list_items": [
+          "2.1 ORDER: is the means by which the E-consumer agrees to purchase services sold by the E-SUPPLIER online, which, in turn, undertakes to deliver them in accordance with the current legislative and regulatory provisions.",
+          "2.2 E-SUPPLIER: SARL HANUUT EXPRESS, which offers the electronic provision of services defined in these CSU.",
+          "2.3 E-consumer: Any natural or legal person who acquires a service electronically from the E-SUPPLIER for final use.",
+          "2.4 Online store: the virtual shop for online services of the E-SUPPLIER.",
+          "2.5 ALGERIA POST MONETARY CARD OR CIB CARDS: Monetary cards linked to a Postal or banking Current Account, compliant with the required standards, constituting an authorized means of payment for electronic transactions.",
+          "2.6 SPECIFIC CONDITIONS OF USE 'CSU': All rules displayed on the E-SUPPLIER's online store governing the use of the electronic payment service accepted by the E-consumer.",
+          "2.7 ELECTRONIC PAYMENT: Service that allows the holder of the ALGERIA POST MONETARY CARD Eddahabia, as an E-consumer, to perform payment transactions for services on the E-SUPPLIER's online store."
+        ]
+      },
+      {
+        "title": "3. Specific Conditions of Use",
+        "paragraphs": [
+          "By checking the acceptance box during the purchase process, the customer confirms their unconditional acceptance of these terms and conditions of sale."
+        ],
+        "list_items": [
+          "Access to the service is reserved for holders of the ALGERIA POST MONETARY CARD EDAHABIA or CIB cards, who have the right to use it on the Hanuut Express online payment site or its mobile application, and who have legal capacity. In general, this means that an individual must be at least 19 years old to become an E-consumer and place orders on the website www.hanuut.com or the Hanuut Customer mobile application.",
+          "The E-consumer must provide all the required information before validating their order. After selecting the service or product, it will be added to the payment receipt. Once the product or service choices are completed, the order is validated, and then the E-consumer will be asked to authenticate with a password.",
+          "The E-consumer is solely responsible for any input errors, especially those regarding the beneficiary's online payment number, and therefore assumes full responsibility.",
+          "The E-consumer can cancel their order without any conditions before its final validation.",
+          "In the event of a complaint by the E-consumer to Hanuut Express, they must provide all the evidence justifying their purchase (reason for the complaint, transaction amount, online payment receipt, date of debiting the transaction amount, account statement, etc.). The sale price of the product is the one in effect at the time of the order's registration, excluding any delivery fees that may be borne by the E-consumer and will be indicated at the time of order registration.",
+          "The prices mentioned in the catalog are indicated in DZD (Algerian dinar) including taxes, valid at the time of consultation by the E-consumer and at the time of order registration.",
+          "The payment receipt and transactions are denominated in DZD.",
+          "The minimum amount per transaction is 200 DZD.",
+          "The E-consumer has the right to file a claim for non-execution of the order with the E-supplier within 01 hour after validating their order (transaction), within a period of 15 days.",
+          "In the event of unavailability of the ordered product or service, the E-consumer will be informed as soon as possible and will have the option to cancel their order. They will then have the choice to either receive a full refund of the amounts paid within a maximum of 60 days from the date of payment or exchange the product or service.",
+          "The refund will be made to the E-consumer's account.",
+          "The E-consumer has the right to rectify their personal data.",
+          "The E-consumer may receive advertisements from the E-supplier unless they refuse the use of their personal data for marketing purposes.",
+          "The recorded transaction data constitutes proof of all past commercial transactions between the E-consumer and the E-supplier.",
+          "The account statement also serves as proof of transactions made with the Algerian Post Monetary Card via the website.",
+          "All products sold on the website are guaranteed against manufacturing defects and material flaws. The duration of this warranty is at least 12 months from the invoice date. This warranty does not cover damages resulting from accidents, misuse, or negligence on the part of the user.",
+          "Any fraudulent use of the service by the E-consumer will result in their automatic liability."
+        ]
+      },
+      {
+        "title": "4. Confidentiality",
+        "list_items": [
+          "All data provided by the E-consumer is necessary for order processing and is treated confidentially.",
+          "This confidentiality may be lifted in case of fraud or upon request by judicial authorities."
+        ]
+      },
+      {
+        "title": "5. Obligation of the E-supplier",
+        "list_items": [
+          "All data provided by the E-consumer is necessary for order processing and is treated confidentially.",
+          "This confidentiality may be lifted in case of fraud or upon request by judicial authorities."
+        ]
+      },
+      {
+        "title": "6. Obligation of the customer",
+        "paragraphs": [
+          "The E-consumer agrees to use the electronic payment service via the EDAHABIA card or CIB cards responsibly, in compliance with these terms and conditions, applicable laws, and regulations."
+        ]
+      },
+      {
+        "title": "7. Termination",
+        "paragraphs": [
+          "In case of non-compliance with these specific terms of use, Hanuut Express reserves the right, without compensation or prior notice, to suspend or close the user's account and refuse them all or part of the service in the future, without prejudice to any legal or contractual actions that may be taken against them."
+        ]
+      },
+      {
+        "title": "8. Applicable law",
+        "paragraphs": [
+          "These specific terms are subject to Algerian law. Any disputes of any nature that may arise between the E-consumer and the E-supplier regarding the interpretation, validity, and/or enforcement of these specific terms will be settled amicably by the Parties. In the absence of an amicable settlement, the disputes will be submitted to the competent Algerian jurisdiction."
+        ]
+      },
+      {
+        "title": "9. Modification",
+        "paragraphs": [
+          "Hanuut Express may modify or update these terms at any time without prior notice."
+        ]
+      },
+      {
+        "title": "10. Effective date",
+        "paragraphs": [
+          "The terms and conditions come into effect upon acceptance by the E-consumer or use of the service and remain valid until the acceptance of the product by the E-consumer and after the service is delivered."
+        ]
+      },
+      {
+        "title": "General terms and conditions of sale and online payment",
+        "paragraphs": [
+          "Preamble: These general terms and conditions of sale govern all online transactions established on the website www.hanuut.com. Placing an order on this site implies the unconditional and irrevocable acceptance of these conditions by the web buyer.",
+          "These general terms and conditions of sale are the minimum required conditions that BNA (National Bank of Algeria) requests the web merchant to include on their website, and which the web buyer must acknowledge, accept, and agree to. The order validation can only be done if the web buyer accepts the provided conditions."
+        ]
+      },
+      {
+        "title": "1. Object",
+        "paragraphs": [
+          "This contract, subject to these general terms and conditions of sale, is a distance contract that aims to define the rights and obligations of the parties in the context of the online sale of products and services by the company SARL Hanuut Express through its online website www.hanuut.com or its mobile application Hanuut Customer."
+        ]
+      },
+      {
+        "title": "2. Definitions",
+        "paragraphs": [
+          "In this contract, each of the mentioned expressions shall have the meaning as defined below:"
+        ],
+        "list_items": [
+          "2.1 Order form: a summary document that indicates the characteristics of the products ordered by the web buyer and must be signed by them ('double click') to commit and proceed with the payment.",
+          "2.2 Distance contract: any contract for the acquisition of products or services between the company SARL Hanuut Express and a web buyer within the framework of a system of distance selling or provision of services organized by the company SARL Hanuut Express, which exclusively uses the Internet until the conclusion of the contract.",
+          "2.3 Order: the act by which the web buyer commits to purchasing products and/or services, and the company SARL Hanuut Express commits to delivering them by any means necessary.",
+          "2.4 Force majeure: any event beyond the control of the parties, insurmountable, unforeseeable, and irresistible.",
+          "2.5 Web buyer: a customer of the web merchant on the Internet or a user of the online payment service. The web buyer refers to any individual or legal entity who has entered into an agreement with a card-issuing bank, resulting in the issuance of a payment and withdrawal bank card. In the context of online payment, the cardholder is a buyer who uses their card to make a payment for goods or services online.",
+          "2.6 Web merchant: refers to SARL Hanuut Express, which is an Algerian merchant operating a shop on the Internet. The web merchant benefits from the secure online payment service."
+        ]
+      },
+      {
+        "title": "3. The General Conditions of Use for the online payment service are as follows:",
+        "paragraphs": [
+          "By checking the acceptance box during the purchase process, the customer confirms their unconditional acceptance of these terms and conditions of sale.",
+          "Access to the service is reserved for CIB cardholders who have the right to use it on Hanuut Express's online payment site and who have legal capacity. In general, this means that an individual must be at least 19 years old to become a customer and place orders on the website www.hanuut.com or the Hanuut Customer mobile application.",
+          "All products and services in the catalog are marketed until stocks are depleted or the offered service is discontinued. Hanuut reserves the right to remove a product or service from the catalog without prior notice. In such cases, Hanuut cannot be held liable for compensation, cancellation of an order, or refund of the corresponding amount due to the inability to use the purchased product due to incompatibility with the web buyer's existing hardware or improper use by the web buyer.",
+          "The web buyer must provide all the required information before validating their order. After selecting the product or service, it will be added to the order form. Once the product or service choices are completed, the order is validated, and the web buyer will be asked to authenticate with a password.",
+          "The web buyer is solely responsible for input errors, especially those regarding the beneficiary number for online payment. Consequently, they will assume full responsibility.",
+          "The web buyer can cancel their order without any conditions before the final validation.",
+          "In case of a complaint from the web buyer to their bank or to Hanuut Express, they must provide all the evidence justifying their purchase (reason for the complaint, transaction amount, online payment receipt, transaction debit date, bank account statement, etc.).",
+          "The selling price of the product is the one in effect at the time of order registration, including the delivery fees that are the responsibility of the web buyer and will be indicated upon order registration.",
+          "The selling price of a product may be modified at any time, and this modification will be notified to the web buyer before any order validation.",
+          "The prices mentioned in the catalog are indicated in DZD (Algerian Dinar) including taxes, valid at the time of consultation by the web buyer, and are those in effect at the time of order registration.",
+          "The order form and transactions are denominated in DZD.",
+          "The minimum amount per transaction is 200 DZD.",
+          "The web buyer has the right to file a claim for non-execution of the order with the web merchant or their bank within 01 hour after order validation.",
+          "The web buyer has a period of 15 days from the transaction date to formalize their claim with their bank.",
+          "In case of unavailability of the ordered product or service, the web buyer will be notified as soon as possible and will have the option to cancel their order. They will then have the choice to request either a full refund of the amount for the unavailable product or service or the exchange of the product or service.",
+          "The refund will be made exclusively through the web buyer's bank, with whom they must contact for this purpose.",
+          "All data provided by the web buyer is necessary for order processing and will be treated confidentially.",
+          "This confidentiality may be lifted in case of fraud or at the request of judicial authorities.",
+          "The web buyer may receive advertisements from Hanuut Express unless they refuse to have their personal data used for commercial and advertising purposes.",
+          "The recorded transaction data constitutes evidence of all commercial transactions between the web buyer and Hanuut Express.",
+          "The bank account statement also constitutes evidence of transactions made by credit card via the website.",
+          "The minimum amount per transaction is 200 DZD."
+        ]
+      },
+      {
+        "title": "4. Termination",
+        "paragraphs": [
+          "In the event of non-compliance with these general terms and conditions of sale, Hanuut Express reserves the right, without compensation or notice, to suspend or close the user's account and to refuse them all or part of the service in the future, without prejudice to any legal actions that may be taken against them."
+        ]
+      },
+      {
+        "title": "5. Effective Date",
+        "paragraphs": [
+          "In case of non-compliance with these general terms and conditions of sale, Hanuut Express reserves the right, without compensation or notice, to suspend or close the user's account and to refuse them all or part of the service in the future, without prejudice to any legal actions that may be taken against them."
+        ]
+      },
+      {
+        "title": "6. Applicable Law:",
+        "paragraphs": [
+          "These general terms and conditions are subject to Algerian law."
+        ]
+      },
+      {
+        "title": "7. Dispute Resolution",
+        "paragraphs": [
+          "All disputes of any kind that may arise between the user and Hanuut Express regarding the interpretation, validity, and/or execution of the general terms and conditions will be resolved amicably by the parties. In the absence of an amicable settlement, the disputes will be submitted to the competent Algerian jurisdiction."
+        ]
+      },
+      {
+        "title": "8. Modification",
+        "paragraphs": [
+          "Hanuut Express may modify or update these terms and conditions at any time without prior notice."
+        ]
+      }
+    ]
+  },
+    "payment_processing_title": "Confirm Your Payment",
+  "payment_amount_label": "Total Amount",
+  "payment_proceed_button": "Proceed to Secure Payment",
+  "payment_processing_error_url": "Could not get payment URL. Please try again.",
+  "payment_processing_error_api": "An error occurred while contacting our server.",
+  "payment_processing_error_missing_params": "Missing order information. Please restart the process.",
+  "digital_menu_title": "Digital Menu",
+  "add_to_cart": "Add to cart",
+  "cart_items": "items",
+  "your_order": "Your Order",
+  "total": "Total",
+  "form_full_name": "Full Name",
+  "form_phone_number": "Phone Number",
+  "form_table_number": "Table Number",
+  "optional": "Optional",
+  "place_order_button": "Place Order",
+  "form_validation_alert": "Please fill in your name and phone number.",
+  "form_preparation_note": "Preparation Note",
+ "placing_order": "Placing Order...",
+"order_success_title": "Order Placed!",
+"order_success_message": "The shop has received your order and will begin preparing it shortly.",
+"order_error_title": "Submission Failed",
+"order_error_message": "We couldn't submit your order at this time. Please try again."
 }

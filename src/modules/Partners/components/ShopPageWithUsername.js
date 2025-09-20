@@ -26,7 +26,7 @@ const Section = styled.div`
   background-image: url(${BackgroundImage});
   background-size: 100%;
   background-position: center;
-  padding: 2rem 0;
+  padding: 0rem 0;
   @media (max-width: 768px) {
     justify-content: flex-start;
     width: 100%;
@@ -46,21 +46,27 @@ const ShopPageWithUsername = () => {
   }, [dispatch, username]);
 
   useEffect(() => {
-    if (selectedShop.domainId) {
+    if (selectedShop?.domainId) { // Added optional chaining for safety
       setDomainKeyWord(selectedShop.domainId.keyword);
     }
   }, [dispatch, selectedShop]);
 
   useEffect(() => {
-    if (selectedShop && selectedShop.imageId) {
+    if (selectedShop?.imageId) { // Added optional chaining for safety
       dispatch(fetchImage(selectedShop.imageId));
     }
   }, [dispatch, selectedShop]);
 
-  if (error) {
-    return <NotFoundPage />;
-  }
-  if (!selectedShop || !selectedShopImage || loading || !domainKeyWord) {
+  // --- THIS IS THE CORRECTED LOGIC ---
+
+  // 1. If we are currently loading, ALWAYS show the loader.
+  // This takes priority over any potential initial error state.
+  if (loading || !selectedShop || !selectedShopImage || !domainKeyWord) {
+    // If there's an error AND we are not loading, then it's a real 404.
+    if (error && !loading) {
+      return <NotFoundPage />;
+    }
+    // Otherwise, it's just a normal loading state.
     return (
       <Section>
         <Loader />
@@ -68,9 +74,14 @@ const ShopPageWithUsername = () => {
     );
   }
 
+  // 2. If we are NOT loading and there is still an error, it's a true 404.
+  if (error) {
+    return <NotFoundPage />;
+  }
+  
+  // 3. If we have made it this far, the data is loaded and there is no error.
   return (
     <>
-      {" "}
       <Section>
         {domainKeyWord === "food" ? (
           <MenuPage

@@ -7,14 +7,17 @@ import {
 } from "../../Categories/state/reducers";
 import { selectDishes, fetchDishesByCategory } from "../../Dish/state/reducers";
 import { useDispatch, useSelector } from "react-redux";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import Category from "./Category.js";
 import Loader from "../../../components/Loader";
 import DishesContainer from "../../Dish/components/DishesContainer.js";
 import { useTranslation } from "react-i18next";
 
+// --- 1. IMPORT THE NEW ILLUSTRATION ---
+import ScanMenuIllustration from "../../../assets/scan_menu.png";
+
+
 const Section = styled.div`
-  margin-top: 1rem;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -23,6 +26,7 @@ const Section = styled.div`
 `;
 
 const Categories = styled.div`
+  width: 100%;
   max-width: 100%;
   padding: 5px;
   display: flex;
@@ -46,20 +50,33 @@ const SelectCategory = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2rem; /* Added a gap for spacing */
+`;
+
+
+const EmptyStateIllustration = styled.img`
+  max-width: 100px;
+  width: 30%;
+  opacity: 0.7;
 `;
 
 const Content = styled.p`
-  font-size: ${(props) => props.theme.fontxxl};
+  font-size: ${(props) => props.theme.fontxl};
   color: ${(props) => props.theme.secondaryText};
   text-align: center;
+
+  ${(props) =>
+    props.$isPremium &&
+    css`
+      color: rgba(255, 255, 255, 0.7);
+    `}
 `;
 
-const CategoriesContainer = ({ shopData, isSubscribed }) => {
+const CategoriesContainer = ({ shopData, isSubscribed, onAddToCart, brandColors, cartItems, onUpdateQuantity,isShopOpen}) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const { categories, loading: categoriesLoading } = useSelector(selectCategories);
-  // --- THE FIX: We now get the loading state for dishes directly from Redux ---
   const { dishes, loading: dishesLoading } = useSelector(selectDishes);
 
   const [dishesPerCategory, setDishesPerCategory] = useState([]);
@@ -75,7 +92,6 @@ const CategoriesContainer = ({ shopData, isSubscribed }) => {
     dispatch(fetchCategories(availableCategories));
   }, [dispatch, shopData]);
 
-  // This useEffect now ONLY filters the dishes when the Redux 'dishes' state changes.
   useEffect(() => {
     if (!shopData) return;
     const filteredDishes = dishes.filter(
@@ -112,6 +128,8 @@ const CategoriesContainer = ({ shopData, isSubscribed }) => {
             category={category}
             selectedCategory={selectedCategory}
             onCategoryClick={handleCategoryClick}
+            isSubscribed={isSubscribed}
+            brandColors={brandColors}
           />
         ))}
       </Categories>
@@ -121,12 +139,17 @@ const CategoriesContainer = ({ shopData, isSubscribed }) => {
           dishes={dishesPerCategory}
           expanded={expanded}
           isSubscribed={isSubscribed}
-          // --- THE FIX: We pass the Redux loading state directly ---
           isLoading={dishesLoading}
+          onAddToCart={onAddToCart}
+          brandColors={brandColors}
+          cartItems={cartItems}
+          onUpdateQuantity={onUpdateQuantity}
+          isShopOpen = {isShopOpen}
         />
       ) : (
         <SelectCategory>
-          <Content>{t("selectCategory")}</Content>
+          <EmptyStateIllustration src={ScanMenuIllustration} alt="Scan QR code for menu" />
+          <Content $isPremium={isSubscribed}>{t("selectCategory")}</Content>
         </SelectCategory>
       )}
     </Section>

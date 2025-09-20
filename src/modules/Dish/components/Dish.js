@@ -1,112 +1,101 @@
-// src/modules/Dish/components/Dish.js
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-// THE FIX: Use a correct relative path to find the service.
 import { getImage } from "../../Images/services/imageServices.js";
+import PlusIcon from '../../../assets/icons/cart.svg'; // We'll use an icon for the button
+
 
 const bufferToUrl = (imageObject) => {
-  if (!imageObject || !imageObject.buffer || !imageObject.buffer.data) {
-    return null;
-  }
+  if (!imageObject || !imageObject.buffer?.data) return null;
   const imageData = imageObject.buffer.data;
-  const base64String = btoa(
-    new Uint8Array(imageData).reduce(
-      (data, byte) => data + String.fromCharCode(byte),
-      ''
-    )
-  );
+  const base64String = btoa(new Uint8Array(imageData).reduce((data, byte) => data + String.fromCharCode(byte), ''));
   const format = imageObject.originalname.split('.').pop().toLowerCase();
   const mimeType = format === 'jpg' ? 'jpeg' : format;
   return `data:image/${mimeType};base64,${base64String}`;
 };
 
-const DishImage = styled.img`
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: ${(props) => props.theme.smallRadius};
-  background-color: #eee;
-  margin-bottom: 0.5rem;
-`;
+// const Card = styled.div`
+//  
+//   border: 1px solid #EAEAEA;
+//    border-radius: ${(props) => props.theme.defaultRadius}; 
+//    padding: 1rem;
+//     display: flex;
+//      flex-direction: column;
+//       transition: all 0.3s ease;
+//        width: 100%;
+//         margin-bottom: 1.5rem;
+//          break-inside: avoid;
+//           &:hover { transform: translateY(-5px);
+//            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07); } `;
 
 const Card = styled.div`
-  background-color: ${(props) => props.theme.surface};
-  border: 1px solid ${(props) => props.theme.surfaceBorder};
+  background-color: #FFFFFF; 
   border-radius: ${(props) => props.theme.defaultRadius};
-  padding: 1.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
+  flex-direction: column; /* THIS IS THE CORE FIX: The card is now vertical */
   width: 100%;
-  margin-bottom: 1.5rem;
-  break-inside: avoid;
-  &:hover {
-    ${(props) => props.theme.cardHoverEffect};
-  }
+  margin-bottom: 1.5rem; /* This creates the vertical gap */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  break-inside: avoid; /* Prevents the card from breaking across columns */
+  overflow: hidden; /* Ensures image corners are rounded */
 `;
 
-const CardHeader = styled.div`
+// const DishImage = styled.img` width: 100%; height: 180px; object-fit: cover; border-radius: ${(props) => props.theme.smallRadius}; background-color: #F5F5F5; margin-bottom: 1rem; `;
+// const CardBody = styled.div` display: flex; flex-direction: column; flex-grow: 1; gap: 0.5rem; `;
+// const Name = styled.h3` font-size: ${(props) => props.theme.fontlg}; color: ${(props) => props.theme.text}; font-weight: 600; line-height: 1.4; `;
+// const Ingredients = styled.p` font-size: ${(props) => props.theme.fontsm}; color: ${(props) => props.theme.secondaryText}; line-height: 1.5; flex-grow: 1; `; 
+// const CardFooter = styled.div` display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; `;
+// const Price = styled.h3` font-size: ${(props) => props.theme.fontxl}; color: ${(props) => props.theme.primaryColor}; font-weight: 700; `;
+// const AddButton = styled.button` background-color: ${(props) => props.theme.primaryColor}; color: #FFFFFF; width: 40px; height: 40px; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease-in-out; &:hover { transform: scale(1.1); } `;
+const PlusIconStyled = styled.img` width: 20px; height: 20px; `;
+
+const DishImage = styled.img`
+  width: 100%;
+  height: 180px; /* A taller, more appealing image */
+  object-fit: cover;
+  background-color: #333;
+`;
+
+const CardBody = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
+  flex-direction: column;
+  padding: 1rem;
+  flex-grow: 1;
 `;
 
 const Name = styled.h3`
-  font-size: ${(props) => props.theme.fontxl};
-  color: ${(props) => props.theme.text};
+  font-size: ${(props) => props.theme.fontlg};
   font-weight: 600;
-  line-height: 1.3;
-`;
-
-const Price = styled.h3`
-  font-size: ${(props) => props.theme.fontxl};
-  color: ${(props) => props.theme.primary};
-  font-weight: 600;
-  white-space: nowrap;
+  margin-bottom: 0.5rem;
 `;
 
 const Ingredients = styled.p`
   font-size: ${(props) => props.theme.fontsm};
-  color: ${(props) => props.theme.secondaryText};
   line-height: 1.5;
-  flex-grow: 1; 
+  flex-grow: 1;
+  margin-bottom: 0rem;
 `;
 
-// const ActionRow = styled.div`
-//   display: flex;
-//   justify-content: flex-end;
-//   margin-top: 1rem;
-// `;
+const CardFooter = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding: 0 1rem 1rem ;
+`;
 
-// const AddToCartButton = styled.button`
-//   background-color: ${(props) => props.theme.primary};
-//   color: ${(props) => props.theme.body};
-//   font-size: ${(props) => props.theme.fontlg};
-//   font-weight: 500;
-//   padding: 0.5rem 1rem;
-//   border: none;
-//   border-radius: ${(props) => props.theme.smallRadius};
-//   cursor: pointer;
-//   transition: all 0.2s ease-in-out;
-//   &:hover {
-//     opacity: 0.9;
-//     transform: scale(1.05);
-//   }
-// `;
+const Price = styled.h3`
+  font-size: ${(props) => props.theme.fontxl};
+  color: ${({ $primaryColor, theme }) => $primaryColor || theme.primaryColor};
+  font-weight: 700;
+`;
 
-const DishCard = ({ dish, isSubscribed }) => {
+const DishCard = ({ dish, onAddToCart }) => {
   const { i18n, t } = useTranslation();
   const [imageUrl, setImageUrl] = useState(null);
 
-  // THE FIX: The useEffect hook is now called *after* the main hooks,
-  // but *before* any early returns.
   useEffect(() => {
-    if (isSubscribed && dish && dish.imageId) {
+    if (dish?.imageId) {
       const fetchImageData = async () => {
         try {
           const response = await getImage(dish.imageId);
@@ -114,45 +103,33 @@ const DishCard = ({ dish, isSubscribed }) => {
           setImageUrl(url);
         } catch (error) {
           console.error("Failed to fetch dish image:", error);
-          setImageUrl(null);
         }
       };
       fetchImageData();
     }
-  }, [dish, isSubscribed]); // Simplified dependency array
+  }, [dish]);
 
-  // THE FIX: The early return is now AFTER the hooks.
-  if (!dish) {
-    return null;
-  }
+  if (!dish) return null;
   
-  const { name, nameFr, sellingPrice, ingredients, } = dish;
+  const { name, nameFr, sellingPrice, ingredients } = dish;
   const isArabic = i18n.language === "ar";
-  const dishName = (!isArabic && nameFr && nameFr.length > 0) ? nameFr : name;
+  const dishName = (!isArabic && nameFr) ? nameFr : name;
   const ingredientString = ingredients?.filter(item => item.trim() !== "").join(' · ');
 
   return (
     <Card>
-      {isSubscribed && imageUrl && (
-        <DishImage src={imageUrl} alt={dishName} />
-      )}
-      <CardHeader>
+      {imageUrl && <DishImage src={imageUrl} alt={dishName} />}
+      <CardBody>
         <Name>{dishName}</Name>
+        {ingredientString && <Ingredients>{ingredientString}</Ingredients>}
+      </CardBody>
+      <CardFooter>
         <Price>
           {parseInt(sellingPrice)} {t("dzd")}
         </Price>
-      </CardHeader>
-      {ingredientString && (
-        <Ingredients>{ingredientString}</Ingredients>
-      )}
-      {/* {isSubscribed && (
-        <ActionRow>
-          <AddToCartButton>{t("addToCart")}</AddToCartButton>
-        </ActionRow>
-      )} */}
+      </CardFooter>
     </Card>
   );
 };
 
-// Renamed component back to Dish to match your file structure.
 export default DishCard;

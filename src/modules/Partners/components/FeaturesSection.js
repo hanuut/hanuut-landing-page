@@ -11,18 +11,14 @@ import Grocery1 from "../../../assets/my_hanuut_features/grocery_1.png";
 import Grocery2 from "../../../assets/my_hanuut_features/grocery_2.png";
 import Grocery3 from "../../../assets/my_hanuut_features/grocery_3.png";
 
-// --- Styled Components ---
+// --- Styled Components with ALL FIXES ---
 
-// WHY IT WORKS: The Section is tall (300vh). This gives the main browser
-// scrollbar "room" to move, which is essential for the logic to work.
 const Section = styled.section`
   position: relative;
   background-color: #f9f9ff;
-  height: 240vh; 
+  height: 300vh; 
 `;
 
-// WHY IT WORKS: This container sticks to the top of the viewport
-// for the entire 300vh scroll duration of its parent, <Section>.
 const StickyContainer = styled.div`
   position: sticky;
   top: 0;
@@ -31,24 +27,26 @@ const StickyContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* --- THE FIX: Align from the top, don't center vertically --- */
   justify-content: flex-start;
   overflow: hidden;
 `;
 
 const HeaderContainer = styled.div`
+  /* --- THE FIX: Corrected typo 'position' --- */
+  position: relative; 
   width: 100%;
   padding: 4rem 0 2rem 0;
   text-align: center;
   z-index: 10;
-  flex-shrink: 0;
+  flex-shrink: 0; /* Prevent header from shrinking */
 `;
 
 const SectionTitle = styled.h2`
   font-size: clamp(1.5rem, 4vw, 2.5rem);
   font-weight: 700;
   color: ${(props) => props.theme.text};
-  margin-bottom: 1rem;
-  margin-top: 2rem;
+  margin-bottom: 2rem;
 `;
 
 const TabsContainer = styled.div`
@@ -77,25 +75,65 @@ const TabButton = styled.button`
 
 const ContentLayout = styled.div`
   position: relative;
-  flex-grow: 1;
+  flex-grow: 1; /* Allows it to take up the remaining vertical space */
   width: 90%;
   max-width: 1200px;
   display: flex;
   align-items: center;
   gap: 3rem;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+
   @media (max-width: 768px) {
-    flex-direction: column;
+    flex-direction: column-reverse; /* Show image first on mobile */
     text-align: center;
+    gap: 2rem;
+    justify-content: center; /* Center the stacked content */
   }
 `;
 
-const TextColumn = styled.div` flex: 1; position: relative; height: 200px; `;
-const ImageColumn = styled.div` flex: 1; display: flex; justify-content: center; align-items: center; position: relative; `;
-const FeatureImage = styled(motion.img)` width: 100%; max-width: 400px; height: auto; position: absolute;`;
-const FeatureTextContainer = styled(motion.div)` position: absolute; width: 100%; `;
-const FeatureTitle = styled.h3` font-size: ${(props) => props.theme.fontxxl}; font-weight: 700; color: ${(props) => props.theme.text}; margin-bottom: 1rem; `;
-const FeatureDescription = styled.p` font-size: ${(props) => props.theme.fontlg}; color: rgba(${(props) => props.theme.textRgba}, 0.7); line-height: 1.6; `;
+const TextColumn = styled.div`
+  flex: 1;
+  position: relative;
+  /* --- THE FIX: Allow height to be flexible --- */
+  height: auto; 
+  width: 100%;
+`;
+
+const ImageColumn = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 400px;
+  width: 100%;
+  /* --- THE FIX: Adjust image height on mobile --- */
+  @media (max-width: 768px) {
+    height: 300px;
+  }
+`;
+
+const FeatureImage = styled(motion.img)`
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  position: absolute;
+`;
+const FeatureTextContainer = styled(motion.div)`
+  position: relative; /* Changed from absolute to relative */
+  width: 100%;
+`;
+const FeatureTitle = styled.h3`
+  font-size: ${(props) => props.theme.fontxxl};
+  font-weight: 700;
+  color: ${(props) => props.theme.text};
+  margin-bottom: 1rem;
+`;
+const FeatureDescription = styled.p`
+  font-size: ${(props) => props.theme.fontlg};
+  color: rgba(${(props) => props.theme.textRgba}, 0.7);
+  line-height: 1.6;
+`;
 
 const FeaturesSection = () => {
   const { t, i18n } = useTranslation();
@@ -141,8 +179,6 @@ const FeaturesSection = () => {
             setActiveFeatureIndex((prev) => prev + 1);
             setTimeout(() => setIsTransitioning(false), 1000);
           } else {
-            // WHY IT WORKS: At the last feature, we DO NOT preventDefault,
-            // allowing the user to scroll normally to the next section.
             return; 
           }
         } else { // Scrolling up
@@ -152,8 +188,6 @@ const FeaturesSection = () => {
             setActiveFeatureIndex((prev) => prev - 1);
             setTimeout(() => setIsTransitioning(false), 1000);
           } else {
-            // WHY IT WORKS: At the first feature, we DO NOT preventDefault,
-            // allowing the user to scroll normally back up to the previous section.
             return;
           }
         }

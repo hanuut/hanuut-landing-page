@@ -1,217 +1,294 @@
-// src/components/Navbar.js
-
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
-import LanguagesDropDown from "./LanguagesDropDown";
-import Logo from "./Logo";
+import React, { useState, useEffect, useMemo } from "react";
+import { Link, useLocation } from "react-router-dom";
+import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-// --- FIX: This selector seems to be the correct one from your file ---
 import { selectShop } from "../modules/Partners/state/reducers";
-
-// --- FIX: Import both of your logo images ---
+import { selectSelectedShopImage } from "../modules/Images/state/reducers";
+import LanguagesDropDown from "./LanguagesDropDown";
+import Logo from "./Logo";
 import logoAr from "../assets/logo-ar.png";
 import logoEn from "../assets/logo-en.png";
+import { usePalette } from 'color-thief-react';
+import btoa from 'btoa';
 
+// Helper function to convert the image buffer to a usable URL
+const bufferToUrl = (imageObject) => {
+  if (!imageObject || !imageObject.buffer?.data) return null;
+  const imageData = imageObject.buffer.data;
+  const base64String = btoa(new Uint8Array(imageData).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+  const format = imageObject.originalname.split('.').pop().toLowerCase();
+  const mimeType = format === 'jpg' ? 'jpeg' : format;
+  return `data:image/${mimeType};base64,${base64String}`;
+};
+
+// --- Styled Components ---
 
 const Section = styled.section`
   position: sticky;
   top: 0;
   width: 100vw;
-  // --- THE FIX: Dynamic Background ---
-  background: ${({ theme, $brandColor }) =>
-    $brandColor
-      ? `linear-gradient(90deg, ${theme.body} 70%, ${$brandColor}40 100%)`
-      : theme.body};
   height: ${(props) => props.theme.navHeight};
   z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: background 0.5s ease-in-out;
+  transition: background-color 0.4s ease;
+  background-color: ${({ theme, $brandColor }) => $brandColor || theme.body};
+
   @media (max-width: 768px) {
-    position: relative;
     height: ${(props) => props.theme.navHeightMobile};
   }
 `;
 
 const Navigation = styled.nav`
-  width: 80%;
+  width: 95%;
   height: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 0 auto;
-  // --- THE FIX: Pass direction with '$' prefix ---
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
     width: 90%;
   }
 `;
 
-const Menu = styled.ul`
+const NavLeft = styled.div`
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const NavRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const DesktopMenu = styled.ul`
+  display: flex;
   align-items: center;
   list-style: none;
+  gap: 1rem;
   @media (max-width: 768px) {
-    position: absolute;
-    top: ${(props) => props.theme.navHeight};
-    border-radius: ${(props) => props.theme.smallRadius};
-    width: 90%;
-    height: calc(100vh - ${(props) => props.theme.navHeight});
-    flex-direction: column;
-    justify-content: center;
-    gap: 1.5rem;
-    background-color: ${(props) => props.theme.body};
-    // --- THE FIX: Use '$' prefix for 'show' prop ---
-    transform: ${(props) =>
-      props.$show ? "translateY(0px)" : "translateY(-150%)"};
-    transition: transform 0.5s ease-in-out;
-    z-index: 2;
+    display: none;
   }
 `;
 
 const MenuItem = styled.li`
-  margin: 0 1rem;
-  color: ${(props) => props.theme.text};
+  a {
+    color: ${({ theme, $textColor }) => $textColor || theme.text};
+    text-decoration: none;
+  }
   cursor: pointer;
+  position: relative;
   &::after {
     content: " ";
     display: block;
     width: 0%;
     height: 2px;
-    border-radius: 2px;
-    transition: width 0.5s ease;
-    background-color: ${(props) => props.theme.text};
+    background-color: ${({ theme, $textColor }) => $textColor || theme.text};
+    transition: width 0.3s ease;
   }
-  &:hover::after {
-    width: 100%;
-  }
-  @media (max-width: 768px) {
-    margin: 0;
-    font-size: ${(props) => props.theme.fontmd};
-  }
+  &:hover::after { width: 100%; }
 `;
 
-const LanguageMenuItem = styled.li`
-  padding: 0.5rem 1rem;
-  color: ${(props) => props.theme.text};
-  cursor: pointer;
-  @media (max-width: 768px) {
-    margin: 0;
-    font-size: ${(props) => props.theme.fontmd};
-  }
-`;
-
-const HamburgerMenuContainer = styled.div`
-  height: 1.5rem;
-  width: 1.5rem;
-  padding: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const HamburgerMenu = styled.span`
-  width: 1.5rem;
-  height: 2px;
-  background-color: ${(props) => props.theme.text};
-  position: absolute;
-  top: 50%;
-  right: ${(props) => (props.$isArabic ? "85%" : "0")};
-  transform: translate(-100%, -50%);
+const HamburgerButton = styled.button`
   display: none;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.5s ease;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
   cursor: pointer;
-
+  z-index: 1001;
   @media (max-width: 768px) {
-    top: 50%;
-    display: flex;
+    display: block;
   }
+`;
 
-  &::after,
-  &::before {
-    content: "  ";
-    width: 1.5rem;
-    height: 2px;
-    background-color: ${(props) => props.theme.text};
+const HamburgerIcon = styled.div`
+  width: 28px;
+  height: 2px;
+  background-color: ${({ theme, $iconColor }) => $iconColor || theme.text};
+  position: relative;
+  transition: all 0.3s ease;
+  
+  ${(props) => props.$isOpen && css`
+    background-color: transparent;
+  `}
+
+  &::before, &::after {
+    content: '';
     position: absolute;
-    transition: transform 0.5s ease;
+    left: 0;
+    width: 28px;
+    height: 2px;
+    background-color: ${({ theme, $iconColor }) => $iconColor || theme.text};
+    transition: transform 0.3s ease;
   }
-
-  &::after { top: 0.5rem; }
-  &::before { bottom: 0.5rem; }
-
-  &.active {
-    transform: translateX(-100%) rotate(180deg);
-    height: 0px;
-    &::after { transform: translateY(-0.65rem) rotate(-45deg); }
-    &::before { transform: translateY(0.5rem) rotate(45deg); }
+  &::before {
+    top: -8px;
+    ${(props) => props.$isOpen && css`
+      top: 0;
+      transform: rotate(45deg);
+    `}
   }
+  &::after {
+    top: 8px;
+    ${(props) => props.$isOpen && css`
+      top: 0;
+      transform: rotate(-45deg);
+    `}
+  }
+`;
+
+const SidePanel = styled.nav`
+  position: fixed;
+  top: 0;
+  right: ${(props) => (props.$isArabic ? 'auto' : (props.$isOpen ? "0" : "-100%"))};
+  left: ${(props) => (props.$isArabic ? (props.$isOpen ? "0" : "-100%") : 'auto')};
+  width: 80%;
+  max-width: 300px;
+  height: 100%;
+  background-color: ${(props) => props.theme.body};
+  box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+  transition: all 0.4s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: 6rem 2rem;
+  align-items: ${(props) => (props.$isArabic ? "flex-end" : "flex-start")};
+`;
+
+const SidePanelMenu = styled.ul`
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
+`;
+
+const SidePanelItem = styled.li`
+  font-size: ${(props) => props.theme.fontxl};
+  font-weight: 500;
+  a {
+    color: ${(props) => props.theme.text};
+    text-decoration: none;
+  }
+`;
+
+const ShopLogo = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+`;
+
+
+const TitleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+`;
+
+const SmallHanuutLogo = styled.img`
+  padding: 0.25rem;
+  height: 10px;
+  width: auto;
+`;
+
+const MenuTitle = styled.h2`
+  font-size: ${(props) => props.theme.fontlg};
+  font-weight: 600;
+  color: ${({ $textColor }) => $textColor || 'inherit'};
 `;
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
-  const [isActive, setIsActive] = useState(false);
-  
-  // Use the correct selector and check for the shop object
+  const location = useLocation();
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [brandColor, setBrandColor] = useState(null);
+  const [textColor, setTextColor] = useState(null);
+
   const selectedShop = useSelector(selectShop);
-  
-  const isSubscribed = selectedShop && selectedShop.subscriptionPlanId !== null;
-  let brandColor = null;
+  const selectedShopImage = useSelector(selectSelectedShopImage);
 
-  if (isSubscribed && selectedShop.styles && selectedShop.styles.mainColor) {
-    brandColor = selectedShop.styles.mainColor;
-  }
+  const isMenuPage = /^\/(@[^/]+|shop\/[^/]+)$/.test(location.pathname);
+  const isSubscribed = isMenuPage && selectedShop && selectedShop.subscriptionPlanId !== null;
   
-  const handleClick = () => {
-    setIsActive(!isActive);
-  };
+  const shopImageUrl = useMemo(() => bufferToUrl(selectedShopImage), [selectedShopImage]);
 
-  const handleMenuItemClick = () => {
-    setIsActive(false);
-  };
+  const { data: logoPalette } = usePalette(shopImageUrl, 2, 'hex', {
+    crossOrigin: 'Anonymous',
+    quality: 10,
+  });
+
+  useEffect(() => {
+    if (isSubscribed) {
+      const mainColor = selectedShop.styles?.mainColor || (logoPalette && logoPalette[0]);
+      if (mainColor) {
+        setBrandColor(mainColor);
+        const isDark = (parseInt(mainColor.substr(1, 2), 16) * 0.299 + parseInt(mainColor.substr(3, 2), 16) * 0.587 + parseInt(mainColor.substr(5, 2), 16) * 0.114) < 186;
+        setTextColor(isDark ? '#FFFFFF' : '#1E1E1E');
+      }
+    } else {
+      setBrandColor(null);
+      setTextColor(null);
+    }
+  }, [isSubscribed, selectedShop, logoPalette, location.pathname]);
 
   const currentLogo = i18n.language === "ar" ? logoAr : logoEn;
   const isArabic = i18n.language === "ar";
 
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
   return (
     <Section $brandColor={brandColor}>
       <Navigation $isArabic={isArabic}>
-        <Logo image={currentLogo} />
+        <NavLeft>
+          {isMenuPage && isSubscribed && shopImageUrl && <ShopLogo src={shopImageUrl} alt={selectedShop.name ? `${selectedShop.name} logo` : 'Shop logo'} />}
+          {isMenuPage && shopImageUrl ? (
+            // --- THE FIX: Shop Logo and Title Container ---
+            <TitleContainer>
+              <SmallHanuutLogo src={currentLogo} alt="Hanuut Logo" />
+              <MenuTitle $textColor={textColor}>{t("digital_menu_title")}</MenuTitle>
+            </TitleContainer>
+          ) : (
+            <Link to="/"><Logo image={currentLogo} /></Link>
+          )}
+        </NavLeft>
 
-        <HamburgerMenuContainer onClick={handleClick}>
-          <HamburgerMenu
-            $isArabic={isArabic}
-            className={isActive ? "active" : ""}
-          />
-        </HamburgerMenuContainer>
-        
-        <Menu $show={isActive}>
-          <MenuItem>
-            <Link to="/" onClick={handleMenuItemClick}>
-              {t("navHome")}
-            </Link>
-          </MenuItem>
-          <MenuItem>
-            <Link to="/partners" onClick={handleMenuItemClick}>
-              {t("navPartners")}
-            </Link>
-          </MenuItem>
-          <MenuItem>
-            <Link to="/tawsila" onClick={handleMenuItemClick}>
-              {t("navTawsila")}
-            </Link>
-          </MenuItem>
-          <LanguageMenuItem>
-            <LanguagesDropDown handleChooseLanguage={handleMenuItemClick} />
-          </LanguageMenuItem>
-        </Menu>
+        <NavRight>
+          <DesktopMenu>
+            <MenuItem $textColor={textColor}><Link to="/">{t("navHome")}</Link></MenuItem>
+            <MenuItem $textColor={textColor}><Link to="/partners">{t("navPartners")}</Link></MenuItem>
+            <MenuItem $textColor={textColor}><Link to="/tawsila">{t("navTawsila")}</Link></MenuItem>
+            {/* --- THE FIX: Pass textColor prop --- */}
+            <li><LanguagesDropDown textColor={textColor} /></li>
+          </DesktopMenu>
+
+          <HamburgerButton onClick={toggleMobileMenu}>
+            <HamburgerIcon $isOpen={isMobileMenuOpen} $iconColor={textColor} />
+          </HamburgerButton>
+        </NavRight>
       </Navigation>
+      
+      <SidePanel $isOpen={isMobileMenuOpen} $isArabic={isArabic}>
+        <SidePanelMenu>
+          {isMenuPage && (
+             <SidePanelItem><Link to="/" onClick={closeMobileMenu}><Logo image={currentLogo} /></Link></SidePanelItem>
+          )}
+          <SidePanelItem><Link to="/" onClick={closeMobileMenu}>{t("navHome")}</Link></SidePanelItem>
+          <SidePanelItem><Link to="/partners" onClick={closeMobileMenu}>{t("navPartners")}</Link></SidePanelItem>
+          <SidePanelItem><Link to="/tawsila" onClick={closeMobileMenu}>{t("navTawsila")}</Link></SidePanelItem>
+          {/* --- THE FIX: Pass textColor prop --- */}
+          <SidePanelItem><LanguagesDropDown handleChooseLanguage={closeMobileMenu} textColor={textColor} /></SidePanelItem>
+        </SidePanelMenu>
+      </SidePanel>
     </Section>
   );
 };
