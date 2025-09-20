@@ -1,6 +1,6 @@
 # This file tells Netlify how to build your site.
 [build]
-  command = "CI=false npm run build"
+  command = "npm install --legacy-peer-deps && CI=false npm run build"
   publish = "build"
 
 # This section defines the build environment.
