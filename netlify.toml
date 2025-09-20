@@ -1,17 +1,18 @@
 # This file tells Netlify how to build your site.
+
 [build]
-  # This command tells Netlify to first install dependencies using npm
-  # (respecting your package-lock.json) and then run the build.
+  # This command now handles EVERYTHING. Netlify will not run its
+  # own "yarn install" or "npm install" before this.
   command = "npm install --legacy-peer-deps && CI=false npm run build"
   
-  # This is the directory that contains the final build artifacts.
   publish = "build"
 
-# This section defines the build environment.
+# This section tells Netlify which tools to use.
 [build.environment]
-  # This is a critical best practice.
   NODE_VERSION = "22"
-  
-  # This line explicitly tells Netlify to use a specific version of npm
-  # and NOT to use Yarn. This will solve the "Invariant Violation" error.
   NPM_VERSION = "10.9.3"
+  
+# --- THIS IS THE FINAL, CRITICAL FIX ---
+# This tells Netlify to use the command from this file instead of its default behavior.
+[build.processing]
+  skip_install = true
