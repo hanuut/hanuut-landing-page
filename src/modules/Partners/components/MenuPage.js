@@ -94,7 +94,7 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
     }
   };
 
-    const handlePlaceOrder = async (customerDetails) => {
+    const handlePlaceOrder = async (customerDetails,deliveryNote,orderNote) => {
     if (isSubmitting === 'submitting') return;
     setIsSubmitting('submitting');
 
@@ -102,6 +102,8 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
     const orderPayload = {
       ...customerDetails,
       shopId: selectedShop._id,
+      deliveryNote: deliveryNote,
+      orderNote: orderNote,
       products: cartItems.map(item => ({
         productId: item.dish._id,
         title: item.dish.name,

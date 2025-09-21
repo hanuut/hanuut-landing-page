@@ -257,10 +257,8 @@ const Cart = ({
     const orderDetails = {
       customerName,
       customerPhone,
-      tableNumber,
-      note, 
     };
-    onSubmitOrder(orderDetails);
+    onSubmitOrder(orderDetails, tableNumber, note);
   };
 
   const backdropVariants = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
@@ -274,7 +272,7 @@ const Cart = ({
   };
 
   const renderContent = () => {
-    if (isSubmitting === 'submitting') {
+    if (isSubmitting === "submitting") {
       return (
         <StatusContainer>
           <Loader />
@@ -282,7 +280,7 @@ const Cart = ({
       );
     }
 
-    if (isSubmitting === 'success') {
+    if (isSubmitting === "success") {
       return (
         <StatusContainer>
           <StatusTitle>✅ {t("order_success_title")}</StatusTitle>
@@ -291,7 +289,7 @@ const Cart = ({
       );
     }
 
-    if (isSubmitting === 'error') {
+    if (isSubmitting === "error") {
       return (
         <StatusContainer>
           <StatusTitle>❌ {t("order_error_title")}</StatusTitle>
@@ -301,17 +299,15 @@ const Cart = ({
     }
 
     return (
-        <ModalGrid>
-            <ItemsColumn>
-                {/* Mapping items and TotalContainer */}
-            </ItemsColumn>
-            <FormColumn>
-                <Form onSubmit={handleSubmit}>
-                    {/* All FormGroups */}
-                    <SubmitButton type="submit">{t("place_order_button")}</SubmitButton>
-                </Form>
-            </FormColumn>
-        </ModalGrid>
+      <ModalGrid>
+        <ItemsColumn>{/* Mapping items and TotalContainer */}</ItemsColumn>
+        <FormColumn>
+          <Form onSubmit={handleSubmit}>
+            {/* All FormGroups */}
+            <SubmitButton type="submit">{t("place_order_button")}</SubmitButton>
+          </Form>
+        </FormColumn>
+      </ModalGrid>
     );
   };
 
@@ -441,8 +437,10 @@ const Cart = ({
                       />
                     </FormGroup>
                     <SubmitButton type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? t("placing_order") : t("place_order_button")}
-                </SubmitButton>
+                      {isSubmitting
+                        ? t("placing_order")
+                        : t("place_order_button")}
+                    </SubmitButton>
                   </Form>
                 </FormColumn>
               </ModalGrid>
