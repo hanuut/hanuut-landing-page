@@ -16,72 +16,99 @@ import Loader from "../../../components/Loader";
 import NotFoundPage from "../../NotFoundPage";
 import MenuPage from "./MenuPage";
 import Shop from "./Shop";
+import { useTranslation } from "react-i18next"; // 1. Import useTranslation
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  /* --- FIX: Justify center to correctly position the loader --- */
+  justify-content: center; 
   background-image: url(${BackgroundImage});
   background-size: 100%;
   background-position: center;
   padding: 0rem 0;
   @media (max-width: 768px) {
+    /* Allow flex-start on mobile if needed, but center is better for the loader */
     justify-content: flex-start;
     width: 100%;
+    padding: 2rem 0; /* Add padding back for mobile content */
   }
 `;
+
+const MAX_RETRIES = 2; // Total number of automatic retries
 
 const ShopPageWithUsername = () => {
   const { username } = useParams();
   const dispatch = useDispatch();
+  const { t } = useTranslation(); // 2. Initialize translation hook
+
   const { loading, error } = useSelector(selectShops);
   const selectedShop = useSelector(selectShop);
   const selectedShopImage = useSelector(selectSelectedShopImage);
+  
   const [domainKeyWord, setDomainKeyWord] = useState(null);
+  // 3. Add state to track our retry attempts
+  const [retryCount, setRetryCount] = useState(0);
 
+  // Initial fetch effect
   useEffect(() => {
     dispatch(fetchShopWithUsername(username));
   }, [dispatch, username]);
 
+  // --- 4. THE RETRY LOGIC ---
   useEffect(() => {
-    if (selectedShop?.domainId) { // Added optional chaining for safety
-      setDomainKeyWord(selectedShop.domainId.keyword);
+    // Condition: If there is an error, we are NOT currently loading, and we haven't exceeded our retries...
+    if (error && !loading && retryCount < MAX_RETRIES) {
+      // ...then wait 2 seconds and try again.
+      const timer = setTimeout(() => {
+        console.log(`Failed to fetch shop. Retrying attempt ${retryCount + 1}...`);
+        setRetryCount(prev => prev + 1);
+        dispatch(fetchShopWithUsername(username));
+      }, 2000); // 2-second delay
+
+      // Cleanup function to clear the timer if the component unmounts
+      return () => clearTimeout(timer);
     }
-  }, [dispatch, selectedShop]);
+  }, [error, loading, retryCount, dispatch, username]);
+
 
   useEffect(() => {
-    if (selectedShop?.imageId) { // Added optional chaining for safety
+    if (selectedShop?.domainId) {
+      setDomainKeyWord(selectedShop.domainId.keyword);
+    }
+  }, [selectedShop]);
+
+  useEffect(() => {
+    if (selectedShop?.imageId) {
       dispatch(fetchImage(selectedShop.imageId));
     }
   }, [dispatch, selectedShop]);
 
-  // --- THIS IS THE CORRECTED LOGIC ---
+  // --- 5. ROBUST RENDERING LOGIC ---
 
-  // 1. If we are currently loading, ALWAYS show the loader.
-  // This takes priority over any potential initial error state.
-  if (loading || !selectedShop || !selectedShopImage || !domainKeyWord) {
-    // If there's an error AND we are not loading, then it's a real 404.
-    if (error && !loading) {
-      return <NotFoundPage />;
-    }
-    // Otherwise, it's just a normal loading state.
+  // Show loader if we are loading OR if we are in a retry cycle
+  if (loading || (error && retryCount < MAX_RETRIES)) {
+    const loaderMessage = retryCount > 0 
+      ? `${t("shop_load_error_retrying")} (${retryCount}/${MAX_RETRIES})` 
+      : null; // Use null for the default "Loading..." message
+
     return (
       <Section>
-        <Loader />
+        <Loader message={loaderMessage} fullscreen={false} />
       </Section>
     );
   }
 
-  // 2. If we are NOT loading and there is still an error, it's a true 404.
-  if (error) {
+  // Show 404 page ONLY if there is an error AND we have exhausted all retries
+  if (error && retryCount >= MAX_RETRIES) {
     return <NotFoundPage />;
   }
-  
-  // 3. If we have made it this far, the data is loaded and there is no error.
-  return (
-    <>
+
+  // If data is ready and there's no error, show the page
+  if (selectedShop && selectedShopImage && domainKeyWord) {
+    return (
       <Section>
         {domainKeyWord === "food" ? (
           <MenuPage
@@ -95,8 +122,15 @@ const ShopPageWithUsername = () => {
           />
         )}
       </Section>
-    </>
-  );
+    );
+  }
+
+  // This is a fallback loader for the very initial render before any other condition is met.
+  return (
+      <Section>
+        <Loader fullscreen={false} />
+      </Section>
+    );
 };
 
 export default ShopPageWithUsername;

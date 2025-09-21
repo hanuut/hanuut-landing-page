@@ -679,5 +679,6 @@
 "order_success_title": "Order Placed!",
 "order_success_message": "The shop has received your order and will begin preparing it shortly.",
 "order_error_title": "Submission Failed",
-"order_error_message": "We couldn't submit your order at this time. Please try again."
+"order_error_message": "We couldn't submit your order at this time. Please try again.",
+"try_again_button": "Try Again"
 }

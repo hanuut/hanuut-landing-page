@@ -682,5 +682,6 @@
   "order_success_title": "Commande Passée !",
   "order_success_message": "Le commerçant a reçu votre commande et commencera à la préparer sous peu.",
   "order_error_title": "Échec de l'envoi",
-  "order_error_message": "Nous n'avons pas pu envoyer votre commande pour le moment. Veuillez réessayer."
+  "order_error_message": "Nous n'avons pas pu envoyer votre commande pour le moment. Veuillez réessayer.",
+  "try_again_button": "Réessayer"
 }

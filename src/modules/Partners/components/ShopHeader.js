@@ -89,9 +89,9 @@ const ShopName = styled.h1`
   ${(props) =>
     props.$isPremium &&
     css`
-      color: ${props.$brandColor || '#FFFFFF'};
-      text-shadow: 0 0 15px ${(props) => props.$accentColor || props.theme.primaryColor};
-      
+      color: ${props.$accentColor || '#FFFFFF'};
+      text-shadow: 0 0 15px ${(props) => props.$brandColor || props.theme.primaryColor};
+      font-family: 'Cairo Variable', sans-serif;
     `}
   
   /* --- THE FIX: Smaller font size on mobile --- */
