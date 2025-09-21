@@ -94,17 +94,15 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
     }
   };
 
-    const handlePlaceOrder = async (customerDetails,deliveryNote,orderNote) => {
-    if (isSubmitting === 'submitting') return;
-    setIsSubmitting('submitting');
+  const handlePlaceOrder = async (customerDetails) => {
+    if (isSubmitting === "submitting") return;
+    setIsSubmitting("submitting");
 
     // Prepare the payload as defined in the API's DTO
     const orderPayload = {
       ...customerDetails,
       shopId: selectedShop._id,
-      deliveryNote: deliveryNote,
-      orderNote: orderNote,
-      products: cartItems.map(item => ({
+      products: cartItems.map((item) => ({
         productId: item.dish._id,
         title: item.dish.name,
         quantity: item.quantity,
@@ -115,7 +113,7 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
 
     try {
       await createPosOrder(orderPayload);
-      setIsSubmitting('success'); // Set to success state
+      setIsSubmitting("success"); // Set to success state
 
       // Automatically close the modal and clear the cart after a short delay
       setTimeout(() => {
@@ -125,21 +123,21 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
       }, 2000);
     } catch (error) {
       console.error("Failed to submit order:", error);
-      setIsSubmitting('error'); // Set to error state
+      setIsSubmitting("error"); // Set to error state
 
       // Give the user a chance to see the error, then reset
       setTimeout(() => {
         setIsSubmitting(null);
       }, 3000);
-      }
+    }
   };
 
   const handleCloseCart = () => {
-      setIsCartOpen(false);
-      // If the cart is closed after a submission, reset the state
-      if (isSubmitting === 'success' || isSubmitting === 'error') {
-          setIsSubmitting(null);
-      }
+    setIsCartOpen(false);
+    // If the cart is closed after a submission, reset the state
+    if (isSubmitting === "success" || isSubmitting === "error") {
+      setIsSubmitting(null);
+    }
   };
 
   const imageUrl = useMemo(
@@ -154,7 +152,7 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
 
   if (!selectedShop) return <Loader />;
 
-  const isSubscribed = selectedShop.subscriptionPlanId !== null ;
+  const isSubscribed = selectedShop.subscriptionPlanId !== null;
   const isShopOpen = selectedShop.isOpen;
   const brandColors = {
     main: selectedShop.styles?.mainColor || (logoPalette && logoPalette[0]),
@@ -181,24 +179,23 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
           brandColors={brandColors}
           cartItems={cartItems}
           onUpdateQuantity={handleUpdateQuantity}
-          isShopOpen = {isShopOpen}
+          isShopOpen={isShopOpen}
         />
       </MenuContainer>
       {isSubscribed && (
-          <Cart
-            items={cartItems}
-            isOpen={isCartOpen}
-            onOpen={() => setIsCartOpen(true)}
-            onClose={() => handleCloseCart}
-            onUpdateQuantity={handleUpdateQuantity}
-            isShopOpen = {isShopOpen}
-            onSubmitOrder={handlePlaceOrder}
-            isPremium={isSubscribed}
-            brandColors={brandColors}
-            isSubmitting={isSubmitting}
-          />
+        <Cart
+          items={cartItems}
+          isOpen={isCartOpen}
+          onOpen={() => setIsCartOpen(true)}
+          onClose={() => handleCloseCart}
+          onUpdateQuantity={handleUpdateQuantity}
+          isShopOpen={isShopOpen}
+          onSubmitOrder={handlePlaceOrder}
+          isPremium={isSubscribed}
+          brandColors={brandColors}
+          isSubmitting={isSubmitting}
+        />
       )}
-      
     </PageWrapper>
   );
 };

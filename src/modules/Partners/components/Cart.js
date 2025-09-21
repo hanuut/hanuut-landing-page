@@ -258,7 +258,7 @@ const Cart = ({
       customerName,
       customerPhone,
     };
-    onSubmitOrder(orderDetails, tableNumber, note);
+    onSubmitOrder(orderDetails);
   };
 
   const backdropVariants = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
