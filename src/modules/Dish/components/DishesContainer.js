@@ -8,36 +8,13 @@ import PremiumDishCard from "./PremiumDishCard.js";
 import Loader from "../../../components/Loader";
 import NothingFoundImage from "../../../assets/nothing.png";
 
-// This layout is for the Standard (non-subscribed) shops
-const StandardLayout = styled.div`
- width: 100%;
-  box-sizing: border-box;
-  padding-top: 2rem;
-  
-  column-count: 3;
 
-  /* --- THIS IS THE EXACT LINE FOR HORIZONTAL SPACING --- */
-  /* It creates the gap between the columns. */
-  column-gap: 1.5rem;
-
-  @media (max-width: 992px) {
-    column-count: 2;
-  }
-  @media (max-width: 576px) {
-    column-count: 1;
-  }
-`;
-
-// This is the Masonry layout for Premium shops
-const PremiumMasonryLayout = styled.div`
+const MasonryLayout = styled.div`
   width: 100%;
   box-sizing: border-box;
   padding-top: 2rem;
   
   column-count: 3;
-
-  /* --- THIS IS THE EXACT LINE FOR HORIZONTAL SPACING --- */
-  /* It creates the gap between the columns. */
   column-gap: 1.5rem;
 
   @media (max-width: 992px) {
@@ -70,14 +47,16 @@ const Content = styled.p`
   text-align: center;
 `;
 
-const DishesContainer = ({ dishes, expanded, isSubscribed, isLoading, onAddToCart, brandColors,cartItems,onUpdateQuantity ,isShopOpen}) => {
+const DishesContainer = ({ dishes, isSubscribed, isLoading, onAddToCart, onUpdateQuantity, brandColors, cartItems }) => {
   const { t } = useTranslation();
 
   if (isLoading) {
     return <Loader fullscreen={false} />;
   }
 
-  if (dishes.length === 0) {
+   const visibleDishes = dishes.filter(dishWrapper => dishWrapper.isHidden !== true);
+
+  if (visibleDishes.length === 0) {
     return (
       <NoAvailableDishes>
         <EmptyStateImage src={NothingFoundImage} alt="No items found" />
@@ -86,42 +65,32 @@ const DishesContainer = ({ dishes, expanded, isSubscribed, isLoading, onAddToCar
     );
   }
 
-  if (isSubscribed) {
-    return (
-    
-        <PremiumMasonryLayout>
-            {dishes.map((dishWrapper) => {
+  return (
+    <MasonryLayout>
+      {visibleDishes.map((dishWrapper) => {
         const cartItem = cartItems.find(item => item.dish._id === dishWrapper.dish._id);
-        return dishWrapper.isHidden !== true ? (
+        
+        return isSubscribed ? (
           <PremiumDishCard
-                    key={dishWrapper.id}
-                    dish={dishWrapper.dish}
-                    brandColors={brandColors}
-                    onAddToCart={() => onAddToCart(dishWrapper.dish)}
-                    onUpdateQuantity={onUpdateQuantity}
-                    cartItem={cartItem}
-                    isShopOpen = {isShopOpen}
-                />
-        ) : null;
-      })}
-        </PremiumMasonryLayout>
-    );
-  }else{return (
-    <PremiumMasonryLayout>
-            {dishes.map((dishWrapper) => (
-        dishWrapper.isHidden !== true ? (
+            key={dishWrapper.id}
+            dish={dishWrapper.dish}
+            brandColors={brandColors}
+            onAddToCart={onAddToCart}
+            onUpdateQuantity={onUpdateQuantity}
+            cartItem={cartItem}
+          />
+        ) : (
           <DishCard
             key={dishWrapper.id}
             dish={dishWrapper.dish}
-            onAddToCart={() => onAddToCart(dishWrapper.dish)}
+            onAddToCart={onAddToCart}
+            onUpdateQuantity={onUpdateQuantity}
+            cartItem={cartItem} 
           />
-        ) : null
-      ))}
-        </PremiumMasonryLayout>
-  
-  );}
-
-  
+        );
+      })}
+    </MasonryLayout>
+  );
 };
 
 export default DishesContainer;
