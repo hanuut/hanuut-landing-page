@@ -54,7 +54,8 @@ const DishesContainer = ({ dishes, isSubscribed, isLoading, onAddToCart, onUpdat
     return <Loader fullscreen={false} />;
   }
 
-   const visibleDishes = dishes.filter(dishWrapper => dishWrapper.isHidden !== true);
+   const visibleDishes = dishes.filter(dishWrapper => dishWrapper.dish.isHidden !== true);
+console.log(visibleDishes)
 
   if (visibleDishes.length === 0) {
     return (
