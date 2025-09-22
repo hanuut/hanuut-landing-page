@@ -93,12 +93,11 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
     }
   };
 
-  // --- THIS IS THE CORRECTED PAYLOAD LOGIC ---
   const handlePlaceOrder = async (customerDetails) => {
     if (isSubmitting === "submitting") return;
     setIsSubmitting("submitting");
 
-    // The payload now matches the DTO exactly (customerName, customerPhone, tableNumber, note)
+
     const orderPayload = {
       ...customerDetails,
       shopId: selectedShop._id,
