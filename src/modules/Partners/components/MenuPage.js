@@ -6,7 +6,6 @@ import Loader from "../../../components/Loader";
 import CategoriesContainer from "../../Categories/components/CategoriesContainer";
 import ShopHeader from "./ShopHeader";
 import Cart from "./Cart";
-
 import { createPosOrder } from "../services/orderServices";
 
 const PageWrapper = styled.main`
@@ -94,11 +93,12 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
     }
   };
 
+  // --- THIS IS THE CORRECTED PAYLOAD LOGIC ---
   const handlePlaceOrder = async (customerDetails) => {
     if (isSubmitting === "submitting") return;
     setIsSubmitting("submitting");
 
-    // Prepare the payload as defined in the API's DTO
+    // The payload now matches the DTO exactly (customerName, customerPhone, tableNumber, note)
     const orderPayload = {
       ...customerDetails,
       shopId: selectedShop._id,
@@ -107,25 +107,23 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
         title: item.dish.name,
         quantity: item.quantity,
         sellingPrice: item.dish.sellingPrice,
-        categoryId: item.dish.categoryId, // Field you requested
+        categoryId: item.dish.categoryId,
       })),
     };
 
     try {
       await createPosOrder(orderPayload);
-      setIsSubmitting("success"); // Set to success state
+      setIsSubmitting("success");
 
-      // Automatically close the modal and clear the cart after a short delay
       setTimeout(() => {
         setIsCartOpen(false);
         setCartItems([]);
-        setIsSubmitting(null); // Reset for next time
+        setIsSubmitting(null);
       }, 2000);
     } catch (error) {
       console.error("Failed to submit order:", error);
-      setIsSubmitting("error"); // Set to error state
+      setIsSubmitting("error");
 
-      // Give the user a chance to see the error, then reset
       setTimeout(() => {
         setIsSubmitting(null);
       }, 3000);
@@ -134,7 +132,6 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
 
   const handleCloseCart = () => {
     setIsCartOpen(false);
-    // If the cart is closed after a submission, reset the state
     if (isSubmitting === "success" || isSubmitting === "error") {
       setIsSubmitting(null);
     }
@@ -176,9 +173,9 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
           shopData={selectedShop}
           isSubscribed={isSubscribed}
           onAddToCart={handleAddToCart}
-          brandColors={brandColors}
-          cartItems={cartItems}
           onUpdateQuantity={handleUpdateQuantity}
+          cartItems={cartItems}
+          brandColors={brandColors}
           isShopOpen={isShopOpen}
         />
       </MenuContainer>
@@ -187,7 +184,7 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
           items={cartItems}
           isOpen={isCartOpen}
           onOpen={() => setIsCartOpen(true)}
-          onClose={() => handleCloseCart}
+          onClose={handleCloseCart}
           onUpdateQuantity={handleUpdateQuantity}
           isShopOpen={isShopOpen}
           onSubmitOrder={handlePlaceOrder}
