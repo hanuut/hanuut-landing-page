@@ -178,7 +178,8 @@ const Navbar = () => {
           <DesktopMenu>
             <MenuItem $textColor={textColor}><Link to="/">{t("navHome")}</Link></MenuItem>
             <MenuItem $textColor={textColor}><Link to="/partners">{t("navPartners")}</Link></MenuItem>
-            <MenuItem $textColor={textColor}><Link to="/tawsila">{t("navTawsila")}</Link></MenuItem>
+             <MenuItem $textColor={textColor}><Link to="/blog">{t("navBlog")}</Link></MenuItem>
+            {/* <MenuItem $textColor={textColor}><Link to="/tawsila">{t("navTawsila")}</Link></MenuItem> */}
             <li><LanguagesDropDown textColor={textColor} /></li>
           </DesktopMenu>
 
@@ -192,7 +193,8 @@ const Navbar = () => {
         <SidePanelMenu>
           <SidePanelItem><Link to="/" onClick={closeMobileMenu}>{t("navHome")}</Link></SidePanelItem>
           <SidePanelItem><Link to="/partners" onClick={closeMobileMenu}>{t("navPartners")}</Link></SidePanelItem>
-          <SidePanelItem><Link to="/tawsila" onClick={closeMobileMenu}>{t("navTawsila")}</Link></SidePanelItem>
+           <MenuItem $textColor={textColor}><Link to="/blog">{t("navBlog")}</Link></MenuItem>
+          {/* <SidePanelItem><Link to="/tawsila" onClick={closeMobileMenu}>{t("navTawsila")}</Link></SidePanelItem> */}
           <SidePanelItem><LanguagesDropDown handleChooseLanguage={closeMobileMenu} /></SidePanelItem>
         </SidePanelMenu>
       </SidePanel>

@@ -18,7 +18,7 @@ export const getShopById = (id) => {
 };
 
 export const getShopByUsername = (username) => {
-  console.log("url of api:", prodUrl);
+console.log("url of api:",username);
   return axios.get(`${prodUrl}/shop/findByUsername/${username}`, { headers });
 };
 

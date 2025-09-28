@@ -680,5 +680,15 @@
 "order_success_message": "The shop has received your order and will begin preparing it shortly.",
 "order_error_title": "Submission Failed",
 "order_error_message": "We couldn't submit your order at this time. Please try again.",
-"try_again_button": "Try Again"
+"try_again_button": "Try Again",
+  "navBlog": "Blog",
+  "blogSeoTitle": "Hanuut Blog & Resources",
+  "blogSeoDescription": "Tips, guides, and resources for local shop owners to grow their business with Hanuut.",
+  "blogPageTitle": "Hanuut Blog & Resources",
+  "blogError": "There was an error loading the articles. Please try again later.",
+  "blogNoPosts": "No articles found. Check back soon!",
+  "postNotFoundSeoTitle": "Post Not Found",
+  "blogPostError": "The article you are looking for could not be found.",
+  "backToBlog": "← Back to Blog",
+  "postedBy": "By"
 }

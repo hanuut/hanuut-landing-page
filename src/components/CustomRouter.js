@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useMemo } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
 
@@ -28,6 +28,15 @@ const DeepLinkRedirect = lazy(() => import("./DeepLinkRedirect"));
 
 const PaymentResultPage = lazy(() => import("../modules/payment/PaymentResultPage"));
 const PaymentProcessingPage = lazy(() => import("../modules/payment/PaymentProcessingPage"));
+
+const BlogListPage = lazy(() => import("../modules/Blog/component/BlogListPage"));
+const BlogPostPage = lazy(() => import("../modules/Blog/BlogPostPage"));
+
+const ShopRedirector = () => {
+  const { username } = useParams();
+  // Permanently redirect to the clean URL
+  return <Navigate to={`/@${username}`} replace />;
+};
 
 const CustomRouter = ({ appConfig, location }) => {
   const deepLinkRoutes = useMemo(() => {
@@ -112,21 +121,32 @@ const CustomRouter = ({ appConfig, location }) => {
           />
           <Route path="/delete_account" element={<DeleteAccountPage />} />
 
+        <Route path="/blog" element={<BlogListPage />} />
+    
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
+          <Route path="/product/:productId" element={<ProductPage />} />
+
           {/* Product and shop routes */}
           <Route path="/product/:productId" element={<ProductPage />} />
-          <Route path="/shop/:username" element={<ShopPageWithUsername />} />
-          <Route path="/:username" element={<ShopPageWithUsername />} />
+          {/* 3. The redirect route. This will catch /shop/some-name... */}
+          <Route path="/shop/:username" element={<ShopRedirector />} />
 
-          {/* Tawsila related routes */}
+          
+
+          {/* Tawsila related routes
           <Route path="/tawsila" element={<Tawsila />} />
-          <Route path="/get-started-with-Tawsila" element={<GetStarted />} />
+          <Route path="/get-started-with-Tawsila" element={<GetStarted />} /> */}
+
+
 
           {/* Legacy redirects */}
           <Route
             path="/app/*"
             element={<Navigate to="/deeplink/*" replace />}
           />
-
+          {/* 4. The CANONICAL shop route. THIS MUST BE NEAR THE END. */}
+          {/* This path is now more specific, starting with /@ */}
+          <Route path="/:username" element={<ShopPageWithUsername />} />
           {/* Catch all route - must be last */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

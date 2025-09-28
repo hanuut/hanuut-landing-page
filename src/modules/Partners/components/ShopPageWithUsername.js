@@ -42,7 +42,7 @@ const MAX_RETRIES = 2; // Total number of automatic retries
 const ShopPageWithUsername = () => {
   const { username } = useParams();
   const dispatch = useDispatch();
-  const { t } = useTranslation(); // 2. Initialize translation hook
+  const { t } = useTranslation();
 
   const { loading, error } = useSelector(selectShops);
   const selectedShop = useSelector(selectShop);
@@ -65,7 +65,11 @@ const ShopPageWithUsername = () => {
       const timer = setTimeout(() => {
         console.log(`Failed to fetch shop. Retrying attempt ${retryCount + 1}...`);
         setRetryCount(prev => prev + 1);
-        dispatch(fetchShopWithUsername(username));
+        if (username && username.startsWith('@')) {
+      // 3. Extract the actual username by removing the '@'
+      // 4. Dispatch the fetch action with the clean username
+      dispatch(fetchShopWithUsername(username));
+    }
       }, 2000); // 2-second delay
 
       // Cleanup function to clear the timer if the component unmounts

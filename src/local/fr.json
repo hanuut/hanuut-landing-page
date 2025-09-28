@@ -683,5 +683,15 @@
   "order_success_message": "Le commerçant a reçu votre commande et commencera à la préparer sous peu.",
   "order_error_title": "Échec de l'envoi",
   "order_error_message": "Nous n'avons pas pu envoyer votre commande pour le moment. Veuillez réessayer.",
-  "try_again_button": "Réessayer"
+  "try_again_button": "Réessayer",
+  "navBlog": "Blog",
+  "blogSeoTitle": "Blog et Ressources Hanuut",
+  "blogSeoDescription": "Conseils, guides et ressources pour les commerçants locaux afin de développer leur activité avec Hanuut.",
+  "blogPageTitle": "Blog et Ressources Hanuut",
+  "blogError": "Une erreur est survenue lors du chargement des articles. Veuillez réessayer plus tard.",
+  "blogNoPosts": "Aucun article trouvé. Revenez bientôt !",
+  "postNotFoundSeoTitle": "Article non trouvé",
+  "blogPostError": "L'article que vous recherchez n'a pas pu être trouvé.",
+  "backToBlog": "← Retour au Blog",
+  "postedBy": "Par"
 }
