@@ -2,14 +2,28 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   fetchAllBlogPosts as fetchAllPostsService,
+  fetchBlogPostsBySourceAndLanguage as fetchPostBySourceAndLanguageService,
+  fetchAllBlogPostsByLanguage as fetchAllPostsByLanguageService,
   fetchBlogPostBySlug as fetchPostBySlugService,
 } from "../services/blogServices";
 
 export const fetchAllBlogPosts = createAsyncThunk(
   "blog/fetchAll",
-  async (_, { rejectWithValue }) => {
+  async (language, { rejectWithValue }) =>  {
     try {
-      const posts = await fetchAllPostsService();
+      const posts = await fetchAllPostsByLanguageService(language);
+      return posts;
+    } catch (error) {
+      return rejectWithValue(error.message || "Failed to fetch posts");
+    }
+  }
+);
+
+export const fetchBlogPostsBySourceType = createAsyncThunk(
+  "blog/fetchAll",
+  async (language,sourceType, { rejectWithValue }) =>  {
+    try {
+      const posts = await fetchPostBySourceAndLanguageService(sourceType, language);
       return posts;
     } catch (error) {
       return rejectWithValue(error.message || "Failed to fetch posts");

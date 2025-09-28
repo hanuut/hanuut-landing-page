@@ -5,11 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
-import { fetchAllBlogPosts, selectBlog } from '../state/reducers';
+import { fetchAllBlogPosts, selectBlog ,} from '../state/reducers';
 import BlogPostCard from './BlogPostCard';
 import Loader from '../../../components/Loader';
 
-// --- Styled Components Using the New Theme ---
 
 const BlogSection = styled.div`
   background-color: ${(props) => props.theme.body};
@@ -48,13 +47,16 @@ const BlogListPage = () => {
   const dispatch = useDispatch();
   const { posts, loading, error } = useSelector(selectBlog);
 
-  useEffect(() => {
+ 
+
+  const currentLanguage = i18n.language;
+
+ useEffect(() => {
     if (!posts || posts.length === 0) {
-      dispatch(fetchAllBlogPosts());
+      dispatch(fetchAllBlogPosts(currentLanguage));
     }
   }, [dispatch, posts]);
 
-  const currentLanguage = i18n.language;
   const seo = {
     title: t('blogSeoTitle', 'Hanuut Blog & Resources'),
     description: t('blogSeoDescription', 'Tips, guides, and resources for local shop owners to grow their business with Hanuut.'),
