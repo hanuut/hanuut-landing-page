@@ -35,7 +35,7 @@ const BlogPostPage = lazy(() => import("../modules/Blog/BlogPostPage"));
 const ShopRedirector = () => {
   const { username } = useParams();
   // Permanently redirect to the clean URL
-  return <Navigate to={`/@${username}`} replace />;
+  return <Navigate to={`/${username}`} replace />;
 };
 
 const CustomRouter = ({ appConfig, location }) => {
