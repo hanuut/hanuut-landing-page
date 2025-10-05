@@ -55,7 +55,7 @@ const bufferToUrl = (imageObject) => {
   return `data:image/${mimeType};base64,${base64String}`;
 };
 
-const MenuPage = ({ selectedShop, selectedShopImage }) => {
+const MenuPage = ({ selectedShop, selectedShopImage ,shopDomain}) => {
   const { i18n } = useTranslation();
 
   const [cartItems, setCartItems] = useState([]);
@@ -190,6 +190,7 @@ const MenuPage = ({ selectedShop, selectedShopImage }) => {
           isPremium={isSubscribed}
           brandColors={brandColors}
           isSubmitting={isSubmitting}
+          shoopDomain={shopDomain}
         />
       )}
     </PageWrapper>

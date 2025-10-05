@@ -47,7 +47,7 @@ const Content = styled.p`
   text-align: center;
 `;
 
-const DishesContainer = ({ dishes, isSubscribed, isLoading, onAddToCart, onUpdateQuantity, brandColors, cartItems }) => {
+const DishesContainer = ({ dishes, isSubscribed, isLoading, onAddToCart, onUpdateQuantity, brandColors, cartItems,isShopOpen }) => {
   const { t } = useTranslation();
 
   if (isLoading) {
@@ -79,6 +79,7 @@ console.log(visibleDishes)
             onAddToCart={onAddToCart}
             onUpdateQuantity={onUpdateQuantity}
             cartItem={cartItem}
+            isShopOpen={isShopOpen}
           />
         ) : (
           <DishCard

@@ -16,3 +16,13 @@ const headers = {
 export const createPosOrder = (orderData) => {
   return axios.post(`${prodUrl}/order/pos`, orderData, { headers });
 };
+
+/**
+ * Submits a new Global E-commerce order to the API.
+ * @param {object} orderData - The complete order payload for a global order.
+ * @returns {Promise} Axios promise object.
+ */
+export const createGlobalOrder = (orderData) => {
+  // We will post to the '/order/global' endpoint we planned
+  return axios.post(`${prodUrl}/order/global`, orderData, { headers });
+};

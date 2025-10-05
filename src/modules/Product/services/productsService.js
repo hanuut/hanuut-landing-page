@@ -47,3 +47,29 @@ export const getProductById = async (productId) => {
     throw new Error("Failed to fetch product");
   }
 };
+
+export const getFeaturedProductsByShop = async (shopId) => {
+  try {
+    const response = await axios.get(
+      `${prodUrl}/global-product/findFeaturedByShop/${shopId}`,
+      { headers }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch featured products:", error);
+    throw error.response?.data || { message: 'An unknown error occurred while fetching featured products.' };
+  }
+};
+
+export const getAvailableProductsByShop = async (shopId) => {
+    try {
+        const response = await axios.get(
+            `${prodUrl}/global-product/findAvailableByShop/${shopId}`,
+            { headers }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch available products:", error);
+        throw error.response?.data || { message: 'An unknown error occurred while fetching available products.' };
+    }
+};

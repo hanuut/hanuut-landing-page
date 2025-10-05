@@ -18,6 +18,8 @@ const DeleteAccountPage = lazy(() => import("../modules/DeleteAccountPage"));
 const ShopPageWithUsername = lazy(() =>
   import("../modules/Partners/components/ShopPageWithUsername")
 );
+const ShopCategoryPage = lazy(() => import("../modules/Product/components/landing/ShopCategoryPage"));
+
 const Tawsila = lazy(() => import("../modules/Tawsila/Tawsila"));
 const GetStarted = lazy(() => import("../modules/Tawsila/GetStarted"));
 const LinksPage = lazy(() => import("../modules/LinksPage"));
@@ -144,6 +146,7 @@ const CustomRouter = ({ appConfig, location }) => {
             path="/app/*"
             element={<Navigate to="/deeplink/*" replace />}
           />
+          <Route path="/:username/category/:categoryId" element={<ShopCategoryPage />} />
           {/* 4. The CANONICAL shop route. THIS MUST BE NEAR THE END. */}
           {/* This path is now more specific, starting with /@ */}
           <Route path="/:username" element={<ShopPageWithUsername />} />

@@ -693,6 +693,14 @@
   "postNotFoundSeoTitle": "المقال غير موجود",
   "blogPostError": "تعذر العثور على المقال الذي تبحث عنه.",
   "backToBlog": "→ العودة إلى المدونة",
-  "postedBy": "بواسطة"
+  "postedBy": "بواسطة",
+  "featured_products_title": "منتجات مميزة",
+  "new_arrivals_title": "وصل حديثا",
+  "shop_by_category_title": "تسوق حسب الفئة",
+  "backToShop": "العودة",
+  "grocery_page_info": "يمكنك استخدام تطبيق حانوت كعربة تسوق داخل هذا المتجر، ومعرفة الأسعار والقيام بالتسوق براحة بال تامة",
+  "grocery_page_download_title": "حمّل التطبيق الآن",
+  "landing_page_title": "صفحة الهبوط",
+  "live_shopping_title": "التسوق المباشر"
 
 }

@@ -693,5 +693,13 @@
   "postNotFoundSeoTitle": "Article non trouvé",
   "blogPostError": "L'article que vous recherchez n'a pas pu être trouvé.",
   "backToBlog": "← Retour au Blog",
-  "postedBy": "Par"
+  "postedBy": "Par",
+  "featured_products_title": "Produits en Vedette",
+  "new_arrivals_title": "Nouveautés",
+  "shop_by_category_title": "Acheter par Catégorie",
+  "backToShop": "Retour",
+  "grocery_page_info": "Vous pouvez utiliser l'application Hanuut comme panier dans ce magasin, connaître les prix et faire vos achats en toute tranquillité d'esprit",
+  "grocery_page_download_title": "Téléchargez l'application maintenant",
+  "landing_page_title": "Page d'Accueil",
+  "live_shopping_title": "Shopping en Direct"
 }

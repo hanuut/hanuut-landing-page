@@ -690,5 +690,13 @@
   "postNotFoundSeoTitle": "Post Not Found",
   "blogPostError": "The article you are looking for could not be found.",
   "backToBlog": "← Back to Blog",
-  "postedBy": "By"
+  "postedBy": "By",
+  "featured_products_title": "Featured Products",
+  "new_arrivals_title": "New Arrivals",
+  "shop_by_category_title": "Shop by Category",
+  "backToShop": "Back",
+  "grocery_page_info": "You can use hanuut app as your cart inside this shop, know the prices and do your shopping with complete peace of mind",
+  "grocery_page_download_title": "Download the App Now",
+  "landing_page_title": "Landing Page",
+  "live_shopping_title": "Live Shopping"
 }

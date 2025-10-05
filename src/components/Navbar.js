@@ -1,9 +1,11 @@
+// components/Navbar.js
+
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { selectShop } from "../modules/Partners/state/reducers";
+import { selectShop } from "../modules/Partners/state/reducers"; 
 import { selectSelectedShopImage } from "../modules/Images/state/reducers";
 import LanguagesDropDown from "./LanguagesDropDown";
 import Logo from "./Logo";
@@ -21,7 +23,7 @@ const bufferToUrl = (imageObject) => {
   return `data:image/${mimeType};base64,${base64String}`;
 };
 
-// --- (Styled Components are mostly the same, with minor tweaks) ---
+// --- (Styled Components are unchanged) ---
 const Section = styled.section`
   position: sticky; top: 0; width: 100vw; height: ${(props) => props.theme.navHeight};
   z-index: 1000; display: flex; justify-content: center; align-items: center;
@@ -86,7 +88,6 @@ const SidePanel = styled.nav`
 const SidePanelMenu = styled.ul` list-style: none; display: flex; flex-direction: column; gap: 2.5rem; width: 100%; `;
 const SidePanelItem = styled.li` font-size: ${(props) => props.theme.fontxl}; font-weight: 500; a { color: ${(props) => props.theme.text}; text-decoration: none; } `;
 
-// --- STYLES FOR THE NEW LAYOUT ---
 const ShopLogo = styled.img`
   width: 45px;
   height: 45px;
@@ -96,15 +97,12 @@ const ShopLogo = styled.img`
 
 const TitleContainer = styled.div`
   display: flex;
-  /* --- THE FIX: Changed to column layout --- */
   flex-direction: column;
-  /* --- THE FIX: Align based on text direction --- */
   align-items: flex-start;
   gap: 0.25rem;
 `;
 
 const SmallHanuutLogo = styled.img`
-  /* --- THE FIX: Smaller Hanuut Logo --- */
   height: 20px;
   width: auto;
 `;
@@ -123,7 +121,7 @@ const Navbar = () => {
   const [brandColor, setBrandColor] = useState(null);
   const [textColor, setTextColor] = useState(null);
 
-  const selectedShop = useSelector(selectShop);
+  const selectedShop = useSelector(selectShop); 
   const selectedShopImage = useSelector(selectSelectedShopImage);
 
   const isMenuPage = /^\/(@[^/]+|shop\/[^/]+)$/.test(location.pathname);
@@ -141,6 +139,7 @@ const Navbar = () => {
       const mainColor = selectedShop.styles?.mainColor || (logoPalette && logoPalette[0]);
       if (mainColor) {
         setBrandColor(mainColor);
+        // FIX: Replaced 'main' with 'mainColor' to resolve the undefined error.
         const isDark = (parseInt(mainColor.substr(1, 2), 16) * 0.299 + parseInt(mainColor.substr(3, 2), 16) * 0.587 + parseInt(mainColor.substr(5, 2), 16) * 0.114) < 186;
         setTextColor(isDark ? '#FFFFFF' : '#1E1E1E');
       }
@@ -149,6 +148,22 @@ const Navbar = () => {
       setTextColor(null);
     }
   }, [isSubscribed, selectedShop, logoPalette, shopImageUrl]);
+  
+  const menuTitleKey = useMemo(() => {
+    if (!isSubscribed) return null;
+
+    const domainKeyWord = selectedShop?.domainId?.keyword;
+    
+    switch (domainKeyWord) {
+      case 'global':
+        return 'landing_page_title';
+      case 'grocery':
+        return 'live_shopping_title';
+      case 'food':
+      default:
+        return 'digital_menu_title';
+    }
+  }, [isSubscribed, selectedShop]);
 
   const currentLogo = i18n.language === "ar" ? logoAr : logoEn;
   const isArabic = i18n.language === "ar";
@@ -159,14 +174,13 @@ const Navbar = () => {
   return (
     <Section $brandColor={brandColor}>
       <Navigation $isArabic={isArabic}>
-        {/* --- THE FIX: Re-ordered and re-structured JSX --- */}
         <NavGroup>
-          {isSubscribed ? (
+          {isSubscribed && menuTitleKey ? (
             <NavGroup>
               {shopImageUrl && <ShopLogo src={shopImageUrl} alt={selectedShop.name ? `${selectedShop.name} logo` : 'Shop logo'} />}
               <TitleContainer $isArabic={isArabic}>
                 <SmallHanuutLogo src={currentLogo} alt="Hanuut Logo" />
-                <MenuTitle $textColor={textColor}>{t("digital_menu_title")}</MenuTitle>
+                <MenuTitle $textColor={textColor}>{t(menuTitleKey)}</MenuTitle>
               </TitleContainer>
             </NavGroup>
           ) : (
@@ -179,7 +193,6 @@ const Navbar = () => {
             <MenuItem $textColor={textColor}><Link to="/">{t("navHome")}</Link></MenuItem>
             <MenuItem $textColor={textColor}><Link to="/partners">{t("navPartners")}</Link></MenuItem>
              <MenuItem $textColor={textColor}><Link to="/blog">{t("navBlog")}</Link></MenuItem>
-            {/* <MenuItem $textColor={textColor}><Link to="/tawsila">{t("navTawsila")}</Link></MenuItem> */}
             <li><LanguagesDropDown textColor={textColor} /></li>
           </DesktopMenu>
 
@@ -194,7 +207,6 @@ const Navbar = () => {
           <SidePanelItem><Link to="/" onClick={closeMobileMenu}>{t("navHome")}</Link></SidePanelItem>
           <SidePanelItem><Link to="/partners" onClick={closeMobileMenu}>{t("navPartners")}</Link></SidePanelItem>
            <MenuItem $textColor={textColor}><Link to="/blog">{t("navBlog")}</Link></MenuItem>
-          {/* <SidePanelItem><Link to="/tawsila" onClick={closeMobileMenu}>{t("navTawsila")}</Link></SidePanelItem> */}
           <SidePanelItem><LanguagesDropDown handleChooseLanguage={closeMobileMenu} /></SidePanelItem>
         </SidePanelMenu>
       </SidePanel>

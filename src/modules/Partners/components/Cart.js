@@ -3,8 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import Loader from "../../../components/Loader";
-
-// --- Styled Components for Cart ---
+import AddressesDropDown from "../../../components/AddressesDropDown";
 
 const FloatingButton = styled(motion.button)`
   position: fixed;
@@ -98,6 +97,12 @@ const ItemInfo = styled.div`
 const ItemName = styled.p`
   font-size: ${(props) => props.theme.fontmd};
   font-weight: 500;
+`;
+
+const ItemVariant = styled.p`
+    font-size: ${props => props.theme.fontsm};
+    color: rgba(${props => props.theme.textRgba}, 0.6);
+    margin-top: 0.25rem;
 `;
 
 const ItemPrice = styled.p`
@@ -222,7 +227,7 @@ const StatusMessage = styled.p`
   color: ${(props) => props.theme.secondaryText};
 `;
 
-const Cart = ({ items, isOpen, onOpen, onClose, onUpdateQuantity, onSubmitOrder, isPremium, brandColors, isSubmitting }) => {
+const Cart = ({ items, isOpen, onOpen, onClose, onUpdateQuantity, onSubmitOrder, isPremium, brandColors, isSubmitting,shopDomain }) => {
   const { t } = useTranslation();
   
   const [customerName, setCustomerName] = useState("");
@@ -231,25 +236,45 @@ const Cart = ({ items, isOpen, onOpen, onClose, onUpdateQuantity, onSubmitOrder,
   const [note, setNote] = useState("");
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + (parseInt(item.dish.sellingPrice, 10) * item.quantity), 0);
-
+  const totalPrice = items.reduce((sum, item) => {
+      const price = item.dish ? item.dish.sellingPrice : item.sellingPrice;
+      return sum + (parseInt(price, 10) * item.quantity);
+  }, 0);
+  const [address, setAddress] = useState(null);
+  const handleAddressChange = (newAddress) => {
+    setAddress(newAddress);
+  };
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (!customerName) {
-      alert(t("form_validation_alert"));
-      return;
-    }
     const orderDetails = {
       customerName,
       customerPhone,
       tableNumber,
       note,
+      address,
     };
     onSubmitOrder(orderDetails);
   };
 
   const backdropVariants = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
   const modalVariants = { hidden: { y: 50, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } };
+
+const renderItemDetails = (item) => {
+      
+      if(shopDomain === 'food') {
+          return <ItemName>{item.dish.name}</ItemName>;
+      }
+      
+      if(shopDomain === 'global') {
+          return (
+              <>
+                <ItemName>{item.product.name}</ItemName>
+                <ItemVariant>{t('color', 'Color')}: {item.color}, {t('size', 'Size')}: {item.size}</ItemVariant>
+              </>
+          );
+      }
+      return null;
+  };
 
   const renderContent = () => {
     if (isSubmitting === 'submitting') {
@@ -281,49 +306,81 @@ const Cart = ({ items, isOpen, onOpen, onClose, onUpdateQuantity, onSubmitOrder,
     return (
         <ModalGrid>
             <ItemsColumn>
-                {items.map((item) => (
-                    <CartItem key={item.dish._id}>
-                      <ItemInfo>
-                        <ItemName>{item.dish.name}</ItemName>
-                        <ItemPrice>{parseInt(item.dish.sellingPrice)} {t("dzd")}</ItemPrice>
-                      </ItemInfo>
-                      <QuantityControl>
-                        <QuantityButton onClick={() => onUpdateQuantity(item.dish._id, item.quantity - 1)}>-</QuantityButton>
-                        <span>{item.quantity}</span>
-                        <QuantityButton onClick={() => onUpdateQuantity(item.dish._id, item.quantity + 1)}>+</QuantityButton>
-                      </QuantityControl>
-                    </CartItem>
-                ))}
+                {items.map((item) => {
+                    const id = item.dish ? item.dish._id : item.variantId;
+                    const price = item.dish ? item.dish.sellingPrice : item.sellingPrice;
+
+                    return (
+                        <CartItem key={id}>
+                          <ItemInfo>
+                            {renderItemDetails(item)}
+                            <ItemPrice>{parseInt(price)} {t("dzd")}</ItemPrice>
+                          </ItemInfo>
+                          <QuantityControl>
+                            {/* ***** UPDATE onUpdateQuantity CALL ***** */}
+                            <QuantityButton onClick={() => onUpdateQuantity(id, item.quantity - 1)}>−</QuantityButton>
+                            <span>{item.quantity}</span>
+                            <QuantityButton onClick={() => onUpdateQuantity(id, item.quantity + 1)}>+</QuantityButton>
+                          </QuantityControl>
+                        </CartItem>
+                    );
+                })}
                 <TotalContainer>
                     <TotalLabel>{t("total")}</TotalLabel>
                     <TotalLabel>{totalPrice} {t("dzd")}</TotalLabel>
                 </TotalContainer>
             </ItemsColumn>
             <FormColumn>
-                <Form onSubmit={handleSubmit}>
-                    <FormGroup>
-                      <InputLabel htmlFor="name">{t("form_full_name")}</InputLabel>
-                      <Input type="text" id="name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} required />
-                    </FormGroup>
-                    {/* 
-                    <FormGroup>
-                      <InputLabel htmlFor="phone">{t("form_phone_number")}</InputLabel>
-                      <Input type="tel" id="phone" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} required />
-                    </FormGroup> 
-                    */}
-                    <FormGroup>
-                      <InputLabel htmlFor="table">{t("form_table_number")} ({t("optional")})</InputLabel>
-                      <Input type="text" id="table" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} />
-                    </FormGroup>
-                    <FormGroup>
-                      <InputLabel htmlFor="note">{t("form_preparation_note")} ({t("optional")})</InputLabel>
-                      <TextArea id="note" value={note} onChange={(e) => setNote(e.target.value)} />
-                    </FormGroup>
-                    <SubmitButton type="submit" disabled={isSubmitting}>
-                        {isSubmitting === 'submitting' ? t("placing_order") : t("place_order_button")}
-                    </SubmitButton>
-                </Form>
-            </FormColumn>
+    <Form onSubmit={handleSubmit}>
+        {/* CONDITIONAL RENDERING BASED ON DOMAIN */}
+        {shopDomain === 'global' ? (
+            <>
+                {/* --- E-COMMERCE FORM --- */}
+                <FormGroup>
+                    <InputLabel htmlFor="name">{t("form_full_name")}</InputLabel>
+                    <Input type="text" id="name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} required />
+                </FormGroup>
+                
+                <FormGroup>
+                    <InputLabel htmlFor="phone">{t("form_phone_number")}</InputLabel>
+                    <Input type="tel" id="phone" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} required />
+                </FormGroup>
+
+                <AddressesDropDown
+                    target="partners" // Use 'partners' or 'tawsila' style, adjust if needed
+                    onChooseAddress={handleAddressChange}
+                />
+
+                <FormGroup>
+                    <InputLabel htmlFor="note">{t("form_preparation_note")} ({t("optional")})</InputLabel>
+                    <TextArea id="note" value={note} onChange={(e) => setNote(e.target.value)} />
+                </FormGroup>
+            </>
+        ) : (
+            <>
+                {/* --- FOOD (POS) FORM --- */}
+                <FormGroup>
+                    <InputLabel htmlFor="name">{t("form_full_name")}</InputLabel>
+                    <Input type="text" id="name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} required />
+                </FormGroup>
+
+                <FormGroup>
+                    <InputLabel htmlFor="table">{t("form_table_number")} ({t("optional")})</InputLabel>
+                    <Input type="text" id="table" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} />
+                </FormGroup>
+
+                <FormGroup>
+                    <InputLabel htmlFor="note">{t("form_preparation_note")} ({t("optional")})</InputLabel>
+                    <TextArea id="note" value={note} onChange={(e) => setNote(e.target.value)} />
+                </FormGroup>
+            </>
+        )}
+
+        <SubmitButton type="submit" disabled={isSubmitting}>
+            {isSubmitting === 'submitting' ? t("placing_order") : t("place_order_button")}
+        </SubmitButton>
+    </Form>
+</FormColumn>
         </ModalGrid>
     );
   };
