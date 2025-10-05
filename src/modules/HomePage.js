@@ -8,7 +8,8 @@ import HowItWorks from "./Sections/HowItWorks";
 import ButtonWithIcon from "../components/ButtonWithIcon";
 import { Helmet } from "react-helmet";
 
-import HanuutIllustration from "../assets/illustrations/HanuutAnimation.gif";
+import HanuutIllustration from "../assets/illustrations/home_animation_en.gif";
+import HanuutIllustrationAr from "../assets/illustrations/home_animation_ar.gif";
 
 const Section = styled.div`
    min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -65,7 +66,7 @@ const LeftBox = styled.div`
 `;
 
 const Heading = styled.h1`
-  font-size: 4rem; 
+  font-size: 3rem; 
   color: ${(props) => props.theme.primaryColor};
   font-weight: 700; 
   text-transform: none; 
@@ -80,7 +81,7 @@ const Heading = styled.h1`
 
 const SubHeading = styled.h2`
   width: 100%;
-  font-size: ${(props) => props.theme.fontxxxl};
+  font-size: ${(props) => props.theme.fontxxl};
   margin-bottom: 0.5rem;
 font-weight: 500;
   @media (max-width: 768px) {
@@ -113,7 +114,7 @@ const SmallParagraph = styled.p`
 `;
 
 const IllustrationContainer = styled.img`
-  width: 100%; // Make it take the full width of the RightBox
+  width: 60%; // Make it take the full width of the RightBox
   height: auto; // Let the height adjust automatically to maintain aspect ratio
   max-width: 500px; // Optional: constrain the max size on desktop
 `;
@@ -181,7 +182,7 @@ const HomePage = () => {
         <Container isArabic={isArabic}>
        
           <RightBox>
-           <IllustrationContainer src={HanuutIllustration} alt="Hanuut" />
+           <IllustrationContainer src={isArabic ? HanuutIllustrationAr : HanuutIllustration} alt="Hanuut" />
           </RightBox>
           <LeftBox>
             <Heading>{t("homeHeading")}</Heading>
