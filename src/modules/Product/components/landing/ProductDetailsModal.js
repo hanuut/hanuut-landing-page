@@ -30,11 +30,12 @@ const ModalBackdrop = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  /* --- THE FIX IS HERE --- */
+  direction: ltr; 
 `;
 
 const ModalContent = styled(motion.div)`
-  width: 90%;
+  width: 95%;
   max-width: 600px;
   background-color: #FFFFFF;
   border-radius: ${props => props.theme.defaultRadius};
@@ -42,12 +43,16 @@ const ModalContent = styled(motion.div)`
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  /* Set direction based on language for the content inside the modal */
+  direction: ${props => (props.isArabic ? 'rtl' : 'ltr')};
 `;
 
 const CloseButton = styled.button`
   position: absolute;
   top: 1rem;
-  right: 1rem;
+  /* Adjust position based on direction */
+  right: ${props => (props.isArabic ? 'auto' : '1rem')};
+  left: ${props => (props.isArabic ? '1rem' : 'auto')};
   background: none;
   border: none;
   font-size: 1.5rem;
@@ -129,26 +134,23 @@ const AddToCartButton = styled.button`
 
 
 const ProductDetailsModal = ({ product, onClose, onAddToCart,shopIsOpen }) => {
-    const { t } = useTranslation();
-
+    const { t, i18n } = useTranslation();
+    const isArabic = i18n.language === 'ar';
     
-
     const [selectedColor, setSelectedColor] = useState(product?.availabilities[0]?.color || '');
     const [selectedSize, setSelectedSize] = useState(product?.availabilities[0]?.sizes[0]?.size || '');
     const [imageUrl, setImageUrl] = useState(null);
-    // Find the current availability based on selected color
+    
     const currentAvailability = useMemo(() => 
         product.availabilities.find(av => av.color === selectedColor),
         [product, selectedColor]
     );
 
-    // Find the current size details (including price)
     const currentSizeDetails = useMemo(() =>
         currentAvailability?.sizes.find(s => s.size === selectedSize),
         [currentAvailability, selectedSize]
     );
 
-    // Update image and reset size when color changes
     useEffect(() => {
         if (currentAvailability) {
             const fetchImageData = async () => {
@@ -160,18 +162,15 @@ const ProductDetailsModal = ({ product, onClose, onAddToCart,shopIsOpen }) => {
                 }
             };
             fetchImageData();
-            // Reset to the first available size for the new color
             setSelectedSize(currentAvailability.sizes[0]?.size || '');
         }
     }, [currentAvailability]);
     
     if (!product) return null;
     
-
     const handleAddToCart = () => {
         if (!currentSizeDetails) return; 
 
-        // Create a specific variant object to add to the cart
         const cartVariant = {
             product: product,
             variantId: `${product._id}_${selectedColor}_${selectedSize}`,
@@ -190,8 +189,8 @@ const ProductDetailsModal = ({ product, onClose, onAddToCart,shopIsOpen }) => {
     return (
         <AnimatePresence>
             <ModalBackdrop variants={backdropVariants} initial="hidden" animate="visible" exit="hidden" onClick={onClose}>
-                <ModalContent variants={modalVariants} onClick={(e) => e.stopPropagation()}>
-                    <CloseButton onClick={onClose}>&times;</CloseButton>
+                <ModalContent variants={modalVariants} onClick={(e) => e.stopPropagation()} isArabic={isArabic}>
+                    <CloseButton onClick={onClose} isArabic={isArabic}>&times;</CloseButton>
                     <ProductName>{product.name}</ProductName>
 
                     {imageUrl && <MainImage src={imageUrl} alt={product.name} />}
@@ -215,7 +214,7 @@ const ProductDetailsModal = ({ product, onClose, onAddToCart,shopIsOpen }) => {
                                     <OptionButton key={s.size} $isSelected={selectedSize === s.size} onClick={() => setSelectedSize(s.size)}>
                                         {s.size}
                                     </OptionButton>
-                                ))}
+                                ))}\
                             </OptionButtons>
                         </OptionsGroup>
                     )}

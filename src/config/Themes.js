@@ -33,9 +33,9 @@ export const light = {
   fontxl: "1.25rem",                      // Card titles
   actionButtonPadding: "1.25rem",                      // Card titles
   fontlg: "1rem",                         // Body text, descriptions
-  fontmd: "1rem",                         // Default body text
-  fontsm: "0.875rem",                     // Captions, ingredients
-  fontxs: "0.75rem",                      // Fine print
+  fontmd: "0.8rem",                         // Default body text
+  fontsm: "0.75rem",                     // Captions, ingredients
+  fontxs: "0.65rem",                      // Fine print
 
   // ----------------- LAYOUT & EFFECTS -----------------
   // Consistent spacing, sizing, and effects

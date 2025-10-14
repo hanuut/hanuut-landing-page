@@ -10,7 +10,7 @@ const ShowcaseSection = styled.section`
     padding: 3rem 0;
     
     @media (max-width: 768px) {
-        padding: 2rem 0;
+        padding: 0;
     }
 `;
 
@@ -31,8 +31,9 @@ const ProductsGrid = styled.div`
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 2rem;
 
-    @media (max-width: 576px) {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    /* This media query ensures a two-column layout on mobile */
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
     }
 `;
@@ -60,11 +61,12 @@ const ProductShowcase = ({ title, products, loading, error, onCardClick ,shopIsO
 
     return (
         <ShowcaseSection>
-            {/* <SectionTitle>{title}</SectionTitle> */}
+            {/* <SectionTitle>{title}</SectionTitle> */}\
             <ProductsGrid>
                 {products.map(product => {
                     return (
                         <ProductCard
+                            key={product._id} // Added key for best practice
                             product={product}
                             onCardClick={onCardClick}
                             shopIsOpen={shopIsOpen}

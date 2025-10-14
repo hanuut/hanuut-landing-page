@@ -90,11 +90,17 @@ const ShopName = styled.h1`
     props.$isPremium &&
     css`
       color: ${props.$accentColor || '#FFFFFF'};
-      text-shadow: 0 0 15px ${(props) => props.$brandColor || props.theme.primaryColor};
+      text-shadow: 
+        /* 1. Stroke effect (a subtle, dark border) */
+        -1px -1px 0 ${props.$brandColor || props.theme.primaryColor},  
+         1px -1px 0 ${props.$brandColor || props.theme.primaryColor},
+        -1px  1px 0 ${props.$brandColor || props.theme.primaryColor},
+         1px  1px 0 ${props.$brandColor || props.theme.primaryColor},
+        /* 2. Glow effect (the original shadow) */
+        0 0 15px ${props.$brandColor || props.theme.primaryColor};
       font-family: 'Cairo Variable', sans-serif;
     `}
-  
-  /* --- THE FIX: Smaller font size on mobile --- */
+
   @media (max-width: 768px) {
     font-size: 1.8rem;
   }

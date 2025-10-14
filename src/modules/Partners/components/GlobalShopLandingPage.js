@@ -29,13 +29,13 @@ const bufferToUrl = (imageObject) => {
 };
 
 const PageWrapper = styled.main`
-    width: 100%;
+    width: 90%;
     max-width: 1280px;
-    padding: 2rem;
+    padding: 1rem;
     direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
 
     @media (max-width: 768px) {
-        padding: 1.5rem 1rem;
+        padding: 0;
     }
 `;
 
