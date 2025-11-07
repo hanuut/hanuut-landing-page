@@ -58,36 +58,21 @@ const CustomRouter = ({ appConfig, location }) => {
       "/deeplink/category/:id": { path: (params) => `category/${params.id}` },
       "/deeplink/search": { path: () => "search" },
       "/deeplink/cart": { path: () => "cart" },
-      "/deeplink/ad/:adRef": {
+       "/deeplink/ad/:adId": { 
         path: (params) => `ad/${params.adId}`,
       },
     };
+
+    const RouteWithParams = ({ path, config }) => {
+      const params = useParams();
+      return <DeepLinkRedirect {...deepLinkConfig} finalPath={config.path(params)} />;
+    };
+
     return Object.entries(deepLinkPatterns).map(([path, config]) => (
       <Route
         key={`deeplink-${path}`}
         path={path}
-        element={
-          <DeepLinkRedirect
-            {...deepLinkConfig}
-            transformPath={(normalizedPath) => {
-              console.log("Normalized Path:", normalizedPath);
-              const pathParts = normalizedPath.split("/");
-              console.log("Path Parts:", pathParts);
-              const params = {};
-              path.split("/").forEach((segment, index) => {
-                if (segment.startsWith(":")) {
-                  const paramName = segment.substring(1);
-                  params[paramName] = pathParts[index];
-                }else if (segment !== pathParts[index]) {
-                  const paramName = segment;
-                  params[paramName] = pathParts[index];
-                }
-              });
-              console.log("Params in transformPath:", params);
-              return config.path(params);
-            }}
-          />
-        }
+        element={<RouteWithParams path={path} config={config} />}
       />
     ));
   }, [appConfig]);

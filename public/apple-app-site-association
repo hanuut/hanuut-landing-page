@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "7F5G27C5PH.com.hanuut.shop",
+        "paths": [ "/deeplink/*" ]
+      }
+    ]
+  }
+}
