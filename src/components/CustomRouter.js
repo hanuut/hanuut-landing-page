@@ -116,7 +116,7 @@ const CustomRouter = ({ appConfig, location }) => {
           <Route path="/links" element={<LinksPage />} />
 
           {/* Legal pages */}
-          <Route path="/privacy_policy" element={<PrivacyPolicy />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route
             path="/terms_and_conditions"
             element={<TermsAndConditions />}
