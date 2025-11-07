@@ -59,7 +59,7 @@ const CustomRouter = ({ appConfig, location }) => {
       "/deeplink/search": { path: () => "search" },
       "/deeplink/cart": { path: () => "cart" },
       "/deeplink/ad/:adRef": {
-        path: (params) => `ad/${params.adRef}`,
+        path: (params) => `ad/${params.adId}`,
       },
     };
     return Object.entries(deepLinkPatterns).map(([path, config]) => (
