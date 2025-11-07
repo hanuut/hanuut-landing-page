@@ -16,3 +16,8 @@
 # This tells Netlify to use the command from this file instead of its default behavior.
 [build.processing]
   skip_install = true
+
+  [[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
