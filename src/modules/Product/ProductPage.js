@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import ButtonWithIcon from "../../components/ButtonWithIcon";
 import Playstore from "../../assets/playstore.webp";
 import ProductDetails from "./components/ProductDetails";
+import { Helmet } from "react-helmet";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -191,9 +192,19 @@ const ProductPage = () => {
     }
   }, [dispatch, selectedShop]);
 
+
+
   if (error || (!selectedProduct && !loading)) {
     return <NotFoundPage />;
   }
+
+  const getPublicImageUrl = (availabilities) => {
+    if (availabilities && availabilities.length > 0 && availabilities[0].imageId) {
+       return `${process.env.REACT_APP_API_PROD_URL}/image/${availabilities[0].imageId}`;
+    }
+    return ""; // Fallback image URL here
+  };
+
   if (!selectedShop || !selectedShopImage || loading) {
     return (
       <Section>
@@ -201,8 +212,29 @@ const ProductPage = () => {
       </Section>
     );
   }
+
+  const productTitle = selectedProduct?.name || "Hanuut Product";
+  const productDesc = selectedProduct?.description || selectedProduct?.shortDescription || "Buy on Hanuut";
+  const productImage = getPublicImageUrl(selectedProduct?.availabilities);
+
+
   return (
     <Section>
+      <Helmet>
+          <title>{productTitle} | Hanuut</title>
+          <meta name="description" content={productDesc} />
+          
+          <meta property="og:type" content="product" />
+          <meta property="og:title" content={productTitle} />
+          <meta property="og:description" content={productDesc} />
+          <meta property="og:image" content={productImage} />
+          <meta property="og:price:amount" content={selectedProduct?.sellingPrice} />
+          <meta property="og:price:currency" content="DZD" />
+          
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={productTitle} />
+          <meta name="twitter:image" content={productImage} />
+        </Helmet>
       <Container>
         {" "}
         <UpperBox>

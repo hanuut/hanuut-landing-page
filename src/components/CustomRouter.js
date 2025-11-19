@@ -18,7 +18,9 @@ const DeleteAccountPage = lazy(() => import("../modules/DeleteAccountPage"));
 const ShopPageWithUsername = lazy(() =>
   import("../modules/Partners/components/ShopPageWithUsername")
 );
-const ShopCategoryPage = lazy(() => import("../modules/Product/components/landing/ShopCategoryPage"));
+const ShopCategoryPage = lazy(() =>
+  import("../modules/Product/components/landing/ShopCategoryPage")
+);
 
 const Tawsila = lazy(() => import("../modules/Tawsila/Tawsila"));
 const GetStarted = lazy(() => import("../modules/Tawsila/GetStarted"));
@@ -27,12 +29,20 @@ const MyHanuutGuide = lazy(() => import("../modules/MyHanuutGuide"));
 const ProductPage = lazy(() => import("../modules/Product/ProductPage"));
 const DeepLinkRedirect = lazy(() => import("./DeepLinkRedirect"));
 
+const PaymentResultPage = lazy(() =>
+  import("../modules/payment/PaymentResultPage")
+);
+const PaymentProcessingPage = lazy(() =>
+  import("../modules/payment/PaymentProcessingPage")
+);
 
-const PaymentResultPage = lazy(() => import("../modules/payment/PaymentResultPage"));
-const PaymentProcessingPage = lazy(() => import("../modules/payment/PaymentProcessingPage"));
-
-const BlogListPage = lazy(() => import("../modules/Blog/component/BlogListPage"));
+const BlogListPage = lazy(() =>
+  import("../modules/Blog/component/BlogListPage")
+);
 const BlogPostPage = lazy(() => import("../modules/Blog/BlogPostPage"));
+const MarketplaceAdRedirectPage = lazy(() =>
+  import("../modules/Marketplace/MarketplaceAdRedirectPage")
+);
 
 const ShopRedirector = () => {
   const { username } = useParams();
@@ -54,27 +64,41 @@ const CustomRouter = ({ appConfig, location }) => {
     const deepLinkPatterns = {
       "/deeplink": { path: () => "" },
       "/deeplink/product/:id": { path: (params) => `product/${params.id}` },
-      "/deeplink/shop/:username": { path: (params) => `shop/${params.username}` },
+      "/deeplink/shop/:username": {
+        path: (params) => `shop/${params.username}`,
+      },
       "/deeplink/category/:id": { path: (params) => `category/${params.id}` },
       "/deeplink/search": { path: () => "search" },
       "/deeplink/cart": { path: () => "cart" },
-       "/deeplink/ad/:adId": { 
-        path: (params) => `ad/${params.adId}`,
-      },
     };
 
     const RouteWithParams = ({ path, config }) => {
       const params = useParams();
-      return <DeepLinkRedirect {...deepLinkConfig} finalPath={config.path(params)} />;
+      return (
+        <DeepLinkRedirect {...deepLinkConfig} finalPath={config.path(params)} />
+      );
     };
 
-    return Object.entries(deepLinkPatterns).map(([path, config]) => (
+    // Map standard routes
+    const routes = Object.entries(deepLinkPatterns).map(([path, config]) => (
       <Route
         key={`deeplink-${path}`}
         path={path}
         element={<RouteWithParams path={path} config={config} />}
       />
     ));
+
+    // 3. Push the SPECIAL route for Marketplace Ads
+    // This route uses the dedicated component we created to fetch data before redirecting
+    routes.push(
+      <Route
+        key="deeplink-ad-special"
+        path="/deeplink/ad/:adId"
+        element={<MarketplaceAdRedirectPage appConfig={appConfig} />}
+      />
+    );
+
+    return routes;
   }, [appConfig]);
 
   return (
@@ -108,8 +132,8 @@ const CustomRouter = ({ appConfig, location }) => {
           />
           <Route path="/delete_account" element={<DeleteAccountPage />} />
 
-        <Route path="/blog" element={<BlogListPage />} />
-    
+          <Route path="/blog" element={<BlogListPage />} />
+
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/product/:productId" element={<ProductPage />} />
 
@@ -118,20 +142,19 @@ const CustomRouter = ({ appConfig, location }) => {
           {/* 3. The redirect route. This will catch /shop/some-name... */}
           <Route path="/shop/:username" element={<ShopRedirector />} />
 
-          
-
           {/* Tawsila related routes
           <Route path="/tawsila" element={<Tawsila />} />
           <Route path="/get-started-with-Tawsila" element={<GetStarted />} /> */}
-
-
 
           {/* Legacy redirects */}
           <Route
             path="/app/*"
             element={<Navigate to="/deeplink/*" replace />}
           />
-          <Route path="/:username/category/:categoryId" element={<ShopCategoryPage />} />
+          <Route
+            path="/:username/category/:categoryId"
+            element={<ShopCategoryPage />}
+          />
           {/* 4. The CANONICAL shop route. THIS MUST BE NEAR THE END. */}
           {/* This path is now more specific, starting with /@ */}
           <Route path="/:username" element={<ShopPageWithUsername />} />

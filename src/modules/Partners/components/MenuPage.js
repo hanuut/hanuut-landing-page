@@ -20,7 +20,6 @@ const PageWrapper = styled.main`
 
 const MenuContainer = styled.div`
   width: 100%;
-  max-width: 1280px;
   padding: 2rem;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -55,7 +54,7 @@ const bufferToUrl = (imageObject) => {
   return `data:image/${mimeType};base64,${base64String}`;
 };
 
-const MenuPage = ({ selectedShop, selectedShopImage ,shopDomain}) => {
+const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
   const { i18n } = useTranslation();
 
   const [cartItems, setCartItems] = useState([]);
@@ -96,7 +95,6 @@ const MenuPage = ({ selectedShop, selectedShopImage ,shopDomain}) => {
   const handlePlaceOrder = async (customerDetails) => {
     if (isSubmitting === "submitting") return;
     setIsSubmitting("submitting");
-
 
     const orderPayload = {
       ...customerDetails,
