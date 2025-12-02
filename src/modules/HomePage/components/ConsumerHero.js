@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -26,8 +26,8 @@ const blobMove = keyframes`
 const Section = styled.section`
   width: 100%;
   /* Full height minus nav */
-  min-height: calc(100vh - 5rem); 
-  background-color: #FDF4E3; /* Soft Ivory */
+  min-height: calc(100vh - 5rem);
+  background-color: #fdf4e3; /* Soft Ivory */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -87,11 +87,11 @@ const Title = styled(motion.h1)`
   font-weight: 800;
   line-height: 1.2;
   color: #111217;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   margin: 0;
 
   span {
-    background: linear-gradient(135deg, #39A170 0%, #F07A48 100%);
+    background: linear-gradient(135deg, #39a170 0%, #f07a48 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -102,7 +102,7 @@ const Subtitle = styled(motion.p)`
   color: #52525b;
   line-height: 1.7;
   max-width: 550px;
-  font-family: 'Cairo Variable', sans-serif;
+  font-family: "Cairo Variable", sans-serif;
 `;
 
 const ImageContent = styled(motion.div)`
@@ -112,7 +112,7 @@ const ImageContent = styled(motion.div)`
   align-items: center;
   position: relative;
   height: 600px;
-  
+
   @media (max-width: 900px) {
     height: auto;
     width: 100%;
@@ -121,15 +121,21 @@ const ImageContent = styled(motion.div)`
 
 const PhoneWrapper = styled.div`
   position: relative;
-  width: 300px; 
+  width: 300px;
   border-radius: 45px;
-  border: 12px solid rgba(255,255,255,0.4);
-  box-shadow: 
-    0 30px 60px rgba(57, 161, 112, 0.25), 
-    inset 0 0 0 2px rgba(255,255,255,0.5);
+  border: 12px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 30px 60px rgba(57, 161, 112, 0.25),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.5);
   overflow: hidden;
   animation: ${float} 6s ease-in-out infinite;
   background: white;
+  cursor: pointer; /* Indicate clickable */
+
+  /* Add a subtle scale on hover to suggest interaction */
+  transition: transform 0.3s ease;
+  &:hover {
+    transform: scale(1.02) translateY(-5px);
+  }
 
   img {
     width: 100%;
@@ -149,7 +155,7 @@ const FloatingBadge = styled(motion.div)`
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -157,8 +163,8 @@ const FloatingBadge = styled(motion.div)`
   color: #111217;
   font-size: 0.9rem;
   z-index: 3;
-  border: 1px solid rgba(255,255,255,0.6);
-  font-family: 'Tajawal', sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  font-family: "Tajawal", sans-serif;
 
   top: ${(props) => props.top};
   bottom: ${(props) => props.bottom};
@@ -172,30 +178,43 @@ const FloatingBadge = styled(motion.div)`
     border-radius: 50%;
     box-shadow: 0 0 10px ${(props) => props.color || "#39A170"};
   }
-  
+
   @media (max-width: 900px) {
-    display: none; 
+    display: none;
   }
 `;
 
 const Icon = styled.img`
   height: 1.5rem;
   margin-right: 10px;
-  filter: invert(1); 
+  filter: invert(1);
 `;
 
 const ConsumerHero = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
- const handleDownload = () => {
-    const link = process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK;
-    if (link) window.open(link, "_blank");
+  const [gifKey, setGifKey] = useState(0);
+
+  const handleDownload = () =>
+    window.open(process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK, "_blank");
+
+ const [replayCount, setReplayCount] = useState(0);
+
+  const handleReplayGif = () => {
+    setReplayCount((prev) => prev + 1);
   };
+
+  // Select the correct asset based on language
+  const gifSource = isArabic ? HanuutIllustrationAr : HanuutIllustration;
 
   const itemVars = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
   };
 
   return (
@@ -204,27 +223,28 @@ const ConsumerHero = () => {
       <Blob color="rgba(240, 122, 72, 0.2)" bottom="10%" right="-5%" />
 
       <Container $isArabic={isArabic}>
-        
         <TextContent
           $isArabic={isArabic}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={{
-            visible: { transition: { staggerChildren: 0.2 } }
+            visible: { transition: { staggerChildren: 0.2 } },
           }}
         >
           <motion.div variants={itemVars}>
-            <span style={{ 
-              background: 'rgba(57, 161, 112, 0.1)', 
-              color: '#39A170', 
-              padding: '8px 16px', 
-              borderRadius: '30px', 
-              fontWeight: '700',
-              fontSize: '0.85rem',
-              letterSpacing: '0.5px',
-              border: '1px solid rgba(57, 161, 112, 0.2)'
-            }}>
+            <span
+              style={{
+                background: "rgba(57, 161, 112, 0.1)",
+                color: "#39A170",
+                padding: "8px 16px",
+                borderRadius: "30px",
+                fontWeight: "700",
+                fontSize: "0.85rem",
+                letterSpacing: "0.5px",
+                border: "1px solid rgba(57, 161, 112, 0.2)",
+              }}
+            >
               ✨ {t("appTitle")} Customer App
             </span>
           </motion.div>
@@ -239,14 +259,18 @@ const ConsumerHero = () => {
           </Subtitle>
 
           <motion.div variants={itemVars}>
-            <BorderBeamButton 
-                onClick={handleDownload}
-                beamColor="#39A170"
-            >
-               <Icon src={Playstore} alt="Play Store" />
-               <span>{t("googlePlay")}</span>
+            <BorderBeamButton onClick={handleDownload} beamColor="#39A170">
+              <Icon src={Playstore} alt="Play Store" />
+              <span>{t("googlePlay")}</span>
             </BorderBeamButton>
-            <p style={{ marginTop: '15px', fontSize: '0.9rem', color: '#888', fontFamily: 'Cairo Variable' }}>
+            <p
+              style={{
+                marginTop: "15px",
+                fontSize: "0.9rem",
+                color: "#888",
+                fontFamily: "Cairo Variable",
+              }}
+            >
               {t("homeSmallerParagraph")}
             </p>
           </motion.div>
@@ -258,37 +282,37 @@ const ConsumerHero = () => {
           transition={{ duration: 0.8 }}
         >
           {/* Badge 1: Live Shopping (Green) */}
-          <FloatingBadge 
-            top="15%" 
-            left={isArabic ? "-40px" : "auto"} 
+          <FloatingBadge
+            top="15%"
+            left={isArabic ? "-40px" : "auto"}
             right={isArabic ? "auto" : "20px"}
-            color="#39A170" 
-            animate={{ y: [0, -15, 0] }} 
+            color="#39A170"
+            animate={{ y: [0, -15, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           >
             <span></span> {t("live_shopping_title") || "Live Shopping"}
           </FloatingBadge>
-          
+
           {/* Badge 2: C2C Marketplace (Blue) */}
-          <FloatingBadge 
-            bottom="20%" 
+          <FloatingBadge
+            bottom="20%"
             right={isArabic ? "-30px" : "auto"}
             left={isArabic ? "auto" : "-20px"}
             color="#397FF9" /* Blue for Market */
-            animate={{ y: [0, 15, 0] }} 
+            animate={{ y: [0, 15, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
             <span></span> {t("home_market_title") || "Community Market"}
           </FloatingBadge>
 
-          <PhoneWrapper>
-            <img 
-              src={isArabic ? HanuutIllustrationAr : HanuutIllustration} 
-              alt="Hanuut App" 
+          <PhoneWrapper onClick={handleReplayGif} title="Hanuut - حانووت">
+            <img
+              key={gifKey}
+              src={`${gifSource}?t=${replayCount}`} 
+              alt="Hanuut App : Online marketplace and shopping"
             />
           </PhoneWrapper>
         </ImageContent>
-
       </Container>
     </Section>
   );

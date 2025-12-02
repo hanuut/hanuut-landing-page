@@ -7,7 +7,7 @@ import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.webp";
 
 // --- NEW IMPORT: Make sure to save your image here ---
-import AppLogo3D from "../../../assets/logos/myHanuut/with_frame.png"; // <--- 3D Logo Image
+import AppLogo3D from "../../../assets/logos/myHanuut/logo_ar.png"; // <--- 3D Logo Image
 
 // --- 1. Animations ---
 
