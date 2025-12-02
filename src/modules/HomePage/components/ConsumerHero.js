@@ -188,7 +188,10 @@ const ConsumerHero = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
-  const handleDownload = () => window.open(process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK, "_blank");
+ const handleDownload = () => {
+    const link = process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK;
+    if (link) window.open(link, "_blank");
+  };
 
   const itemVars = {
     hidden: { opacity: 0, y: 30 },
@@ -236,7 +239,10 @@ const ConsumerHero = () => {
           </Subtitle>
 
           <motion.div variants={itemVars}>
-            <BorderBeamButton onClick={handleDownload}>
+            <BorderBeamButton 
+                onClick={handleDownload}
+                beamColor="#39A170"
+            >
                <Icon src={Playstore} alt="Play Store" />
                <span>{t("googlePlay")}</span>
             </BorderBeamButton>

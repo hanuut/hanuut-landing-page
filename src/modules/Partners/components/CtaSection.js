@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.webp";
+import BorderBeamButton from "../../../components/BorderBeamButton";
 
 // --- Styled Components ---
 
@@ -106,9 +107,15 @@ const GlassButtonWrapper = styled.div`
 const CtaSection = () => {
   const { t, i18n } = useTranslation();
 
-  const handleDownloadPlay = () => window.open(process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY, "_blank");
-  const handleDownloadWindows = () => window.open(process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK, "_blank");
+const handleDownloadPlay = () => {
+    const link = process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
+    if (link) window.open(link, "_blank");
+  };
 
+  const handleDownloadWindows = () => {
+    const link = process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK;
+    if (link) window.open(link, "_blank");
+  };
   return (
     <Section>
       <Glow />
@@ -135,25 +142,24 @@ const CtaSection = () => {
         </motion.div>
 
         <ButtonsRow>
-          <DarkButtonWrapper>
-            <ButtonWithIcon
-              image={Playstore}
-              text1={t("getItOn")}
-              text2={t("googlePlay")}
-              className="homeDownloadButton"
-              onClick={handleDownloadPlay}
-            />
-          </DarkButtonWrapper>
+          {/* Principal */}
+          <BorderBeamButton 
+            onClick={handleDownloadPlay}
+            beamColor="#F07A48"
+          >
+              <img src={Playstore} alt="Google Play" style={{ height: '1.5rem' }} />
+              <span>Google Play</span>
+          </BorderBeamButton>
           
-          <GlassButtonWrapper>
-            <ButtonWithIcon
-              image={Windows}
-              text1={t("getItOn")}
-              text2={"Windows"}
-              className="homeDownloadButton"
-              onClick={handleDownloadWindows}
-            />
-          </GlassButtonWrapper>
+          {/* Secondary */}
+          <BorderBeamButton 
+            onClick={handleDownloadWindows}
+            secondary={true}
+            beamColor="#F07A48"
+          >
+              <img src={Windows} alt="Windows" style={{ height: '1.5rem' }} />
+              <span>Windows</span>
+          </BorderBeamButton>
         </ButtonsRow>
       </Container>
     </Section>

@@ -6,6 +6,9 @@ import BorderBeamButton from "../../../components/BorderBeamButton";
 import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.webp";
 
+// --- NEW IMPORT: Make sure to save your image here ---
+import AppLogo3D from "../../../assets/logos/myHanuut/with_frame.png"; // <--- 3D Logo Image
+
 // --- 1. Animations ---
 
 const pulseGlow = keyframes`
@@ -16,7 +19,7 @@ const pulseGlow = keyframes`
 
 const float = keyframes`
   0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-15px); } /* Increased range for the logo */
   100% { transform: translateY(0px); }
 `;
 
@@ -24,8 +27,8 @@ const float = keyframes`
 
 const Section = styled.section`
   width: 100%;
-  min-height: 85vh;
-  background-color: #050505; /* Deepest Black */
+  min-height: 90vh; /* Slightly taller to accommodate the logo */
+  background-color: #050505;
   color: white;
   display: flex;
   flex-direction: column;
@@ -35,8 +38,7 @@ const Section = styled.section`
   overflow: hidden;
 `;
 
-// Layer 1: The Soft Orange Ambient Glow
-// INCREASED OPACITY: from 0.15 -> 0.35 to make it clearly visible
+// ... (Keep OrangeAmbient and GridPattern exactly as they were) ...
 const OrangeAmbient = styled.div`
   position: absolute;
   width: 100%;
@@ -54,23 +56,16 @@ const OrangeAmbient = styled.div`
   animation: ${pulseGlow} 8s ease-in-out infinite;
 `;
 
-// Layer 2: The Grid Rectangles
-// INCREASED OPACITY: from 0.05 -> 0.15 so lines are crisp
 const GridPattern = styled.div`
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   z-index: 1;
-  
-  /* The Lines: White with 15% opacity */
   background-image: 
     linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
-  
   background-size: 60px 60px;
-  
-  /* Mask: Widen the visible area so it doesn't look like a small circle */
   mask-image: radial-gradient(ellipse at center, black 50%, transparent 90%);
   pointer-events: none;
 `;
@@ -83,8 +78,47 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 2.5rem;
+  gap: 2rem; /* Reduced slightly to fit everything */
   padding-top: 2rem;
+`;
+
+// --- NEW: 3D Logo Container ---
+const LogoContainer = styled(motion.div)`
+  position: relative;
+  width: 60px; 
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: -1rem; /* Pull the badge closer */
+  
+  /* The Physics Animation */
+  animation: ${float} 8s ease-in-out infinite;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: relative;
+    z-index: 2;
+    /* Enhance the 3D look */
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
+  }
+`;
+
+// --- NEW: Logo Glow ---
+// This makes the logo look like it's glowing from behind
+const LogoBacklight = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(240, 122, 72, 0.6) 0%, transparent 70%);
+  filter: blur(40px);
+  z-index: 1;
+  opacity: 0.8;
 `;
 
 const Badge = styled(motion.div)`
@@ -93,21 +127,16 @@ const Badge = styled(motion.div)`
   justify-content: center;
   padding: 0.6rem 1.5rem;
   border-radius: 100px;
-  
-  /* Glass Style with Orange Tint */
   background: rgba(240, 122, 72, 0.15); 
   border: 1px solid rgba(240, 122, 72, 0.4);
   box-shadow: 0 0 30px rgba(240, 122, 72, 0.15);
   backdrop-filter: blur(5px);
-
   color: #F07A48; 
   font-size: 0.9rem;
   font-weight: 700;
   font-family: 'Tajawal', sans-serif;
   letter-spacing: 0.5px;
   margin-bottom: 0.5rem;
-  
-  animation: ${float} 6s ease-in-out infinite;
 `;
 
 const HeroTitle = styled(motion.h1)`
@@ -127,7 +156,7 @@ const HeroTitle = styled(motion.h1)`
 
 const SubHeading = styled(motion.p)`
   font-size: clamp(1.1rem, 2vw, 1.3rem);
-  color: #d4d4d8; /* Zinc 300 - Lighter grey for better contrast on dark */
+  color: #d4d4d8;
   max-width: 650px;
   line-height: 1.8;
   font-family: 'Cairo Variable', sans-serif;
@@ -147,10 +176,9 @@ const Icon = styled.img`
   filter: invert(1);
 `;
 
-// --- Animation Config ---
 const containerVars = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
+  visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
 };
 
 const itemVars = {
@@ -176,8 +204,15 @@ const PartnersHero = () => {
 
       <Container as={motion.div} variants={containerVars} initial="hidden" animate="visible">
         
+        {/* --- NEW: The Floating Logo --- */}
+        <LogoContainer variants={itemVars}>
+          <LogoBacklight />
+          <img src={AppLogo3D} alt="My Hanuut App" />
+        </LogoContainer>
+
         <Badge variants={itemVars}>
-          {t("partnerHeadingBoost")} {t("myHanuutTitle")}
+          {/* Removed emoji as per previous request if you prefer clean look */}
+           {t("partnerHeadingBoost")} {t("myHanuutTitle")}
         </Badge>
 
         <HeroTitle variants={itemVars} lang={i18n.language}>
@@ -190,12 +225,12 @@ const PartnersHero = () => {
         </SubHeading>
 
         <ButtonGroup variants={itemVars}>
-          <BorderBeamButton onClick={handleDownloadPlay}>
+          <BorderBeamButton onClick={handleDownloadPlay} beamColor="#F07A48">
              <Icon src={Playstore} alt="Google Play" />
              <span>Google Play</span>
           </BorderBeamButton>
           
-          <BorderBeamButton onClick={handleDownloadWindows}>
+          <BorderBeamButton onClick={handleDownloadWindows} secondary={true} beamColor="#F07A48">
              <Icon src={Windows} alt="Windows" />
              <span>Windows</span>
           </BorderBeamButton>

@@ -25,9 +25,9 @@ import Food2 from "../../../assets/my_hanuut_features/food_2.png";
 import Food3 from "../../../assets/my_hanuut_features/food_3.png";
 
 // Assuming these exist for Global (or reusing relevant ones)
-import Ecom1 from "../../../assets/illustrations/desktopIllustration2.png";
-import Ecom2 from "../../../assets/illustrations/desktopIllustration.png";
-import Ecom3 from "../../../assets/my_hanuut_features/grocery_3.png";
+import Ecom1 from "../../../assets/my_hanuut_features/ecom_1.png";
+import Ecom2 from "../../../assets/my_hanuut_features/ecom_2.png";
+import Ecom3 from "../../../assets/my_hanuut_features/ecom_3.png";
 
 // --- Styled Components ---
 
