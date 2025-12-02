@@ -1,49 +1,78 @@
-// src/modules/Partners/components/GlobalShopLandingPage.js
-
-import React, { useEffect, useMemo } from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useMemo, useState } from 'react';
+import styled, { ThemeProvider } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { usePalette } from 'color-thief-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// Import child components
+// --- Imports ---
 import ShopHeader from './ShopHeader';
 import ProductShowcase from '../../Product/components/landing/ProductShowcase';
-import CategoryShowcase from '../../Product/components/landing/CategoryShowcase';
+import ProductDetailsModal from '../../Product/components/landing/ProductDetailsModal';
+import ProductFilterBar from '../../Product/components/landing/ProductFilterBar';
+import Cart from './Cart';
+import { getImageUrl } from '../../../utils/imageUtils';
 
-// Import Redux actions and selectors
+// --- Redux ---
 import {
     fetchFeaturedProductsByShop,
     fetchNewArrivalsByShop,
     selectProducts,
 } from '../../Product/state/reducers';
+import { fetchCategories, selectCategories } from '../../Categories/state/reducers';
 
-// Utility to convert image buffer to a displayable URL
-const bufferToUrl = (imageObject) => {
-    if (!imageObject || !imageObject.buffer?.data) return null;
-    const imageData = imageObject.buffer.data;
-    const base64String = btoa(new Uint8Array(imageData).reduce((data, byte) => data + String.fromCharCode(byte), ''));
-    const format = imageObject.originalname.split('.').pop().toLowerCase();
-    const mimeType = format === 'jpg' ? 'jpeg' : format;
-    return `data:image/${mimeType};base64,${base64String}`;
-};
+// --- Theme ---
+import { partnerTheme } from '../../../config/Themes';
 
 const PageWrapper = styled.main`
-    width: 90%;
-    max-width: 1280px;
-    padding: 1rem;
-    direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+    width: 100%;
+    min-height: 100vh;
+    background-color: #050505; /* Deep Black */
+    color: white;
+    padding-bottom: 6rem;
+    
+    /* FIX 1: Increase top padding significantly */
+    /* NavHeight (5rem) + 3rem extra breathing room = ~8rem total */
+    padding-top: calc(${(props) => props.theme.navHeight} + 3rem); 
+    
+    position: absolute; 
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
 
     @media (max-width: 768px) {
-        padding: 0;
+        /* Slightly less on mobile, but still spacious */
+        padding-top: calc(${(props) => props.theme.navHeightMobile} + 2rem); 
     }
 `;
 
-const GlobalShopLandingPage = ({ shop, image, onCardClick }) => {
+const Container = styled.div`
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 1rem;
+    direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
+    box-sizing: border-box;
+`;
+
+// We removed the Spacer styled component as it's no longer needed
+
+const GlobalShopLandingPage = ({ shop, image }) => {
     const { t, i18n } = useTranslation();
     const dispatch = useDispatch();
+    const isArabic = i18n.language === 'ar';
 
-    // Select product data from the Redux store
+    // --- State ---
+    const [selectedProductForModal, setSelectedProductForModal] = useState(null);
+    const [cartItems, setCartItems] = useState([]);
+    const [isCartOpen, setIsCartOpen] = useState(false);
+    
+    // Filter State
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState(null);
+
+    // --- Redux Selectors ---
     const {
         featuredProducts,
         featuredLoading,
@@ -53,61 +82,160 @@ const GlobalShopLandingPage = ({ shop, image, onCardClick }) => {
         newArrivalsError,
     } = useSelector(selectProducts);
 
-    // Fetch data when the component mounts
+    const { categories } = useSelector(selectCategories);
+
+    // --- Fetching ---
     useEffect(() => {
         if (shop?._id) {
             dispatch(fetchFeaturedProductsByShop(shop._id));
             dispatch(fetchNewArrivalsByShop(shop._id));
+            
+            if (shop.categories && shop.categories.length > 0) {
+                dispatch(fetchCategories(shop.categories));
+            }
         }
     }, [dispatch, shop]);
-    
-    // Memoize image URL conversion and color palette extraction
-    const imageUrl = useMemo(() => bufferToUrl(image), [image]);
-    const { data: logoPalette } = usePalette(imageUrl, 2, 'hex', {
-        crossOrigin: 'Anonymous',
-        quality: 10,
-    });
-    
+
+    // --- Branding ---
+    const imageUrl = useMemo(() => getImageUrl(image), [image]);
+    const { data: logoPalette } = usePalette(imageUrl, 2, 'hex', { crossOrigin: 'Anonymous' });
     const isSubscribed = shop.subscriptionPlanId !== null;
     const brandColors = {
-        main: shop.styles?.mainColor || (logoPalette && logoPalette[0]),
-        accent: shop.styles?.secondaryColor || (logoPalette && logoPalette[1]),
+        main: shop.styles?.mainColor || logoPalette?.[0] || "#F07A48",
+        accent: shop.styles?.secondaryColor || logoPalette?.[1] || "#39A170",
     };
-
     const shopIsOpen = shop.isOpen;
 
+    // --- Filter Logic ---
+    const allProducts = useMemo(() => {
+        const productMap = new Map();
+        featuredProducts.forEach(p => productMap.set(p._id, p));
+        newArrivals.forEach(p => productMap.set(p._id, p));
+        return Array.from(productMap.values());
+    }, [featuredProducts, newArrivals]);
+
+    const filteredProducts = useMemo(() => {
+        return allProducts.filter(product => {
+            const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                  (product.brand && product.brand.toLowerCase().includes(searchQuery.toLowerCase()));
+            const matchesCategory = selectedCategory ? product.categoryId === selectedCategory : true;
+            return matchesSearch && matchesCategory;
+        });
+    }, [allProducts, searchQuery, selectedCategory]);
+
+    const isFiltering = searchQuery.length > 0 || selectedCategory !== null;
+
+    // --- Handlers ---
+    const handleCardClick = (product) => setSelectedProductForModal(product);
+    const handleCloseModal = () => setSelectedProductForModal(null);
+    const handleAddToCart = (cartItem) => {
+        setCartItems(prev => [...prev, { ...cartItem }]);
+    };
+
     return (
-        <PageWrapper isArabic={i18n.language === 'ar'}>
-            <ShopHeader
-                shop={shop}
-                imageData={imageUrl}
-                isSubscribed={isSubscribed}
-                brandColors={brandColors}
-            />
+        <ThemeProvider theme={partnerTheme}>
+            <PageWrapper>
+                <Container isArabic={isArabic}>
+                    
+                    <ShopHeader
+                        shop={shop}
+                        imageData={imageUrl}
+                        isSubscribed={isSubscribed}
+                        brandColors={brandColors}
+                    />
+                    
+                    {/* 
+                       FIX 2: Removed Spacer.
+                       Added a small margin to FilterBar to separate it slightly from header 
+                    */}
+                    <div style={{ marginTop: '2rem' }}>
+                        <ProductFilterBar 
+                            searchQuery={searchQuery}
+                            setSearchQuery={setSearchQuery}
+                            categories={categories}
+                            selectedCategory={selectedCategory}
+                            setSelectedCategory={setSelectedCategory}
+                        />
+                    </div>
 
-            {/* Featured Products Section */}
-            <ProductShowcase
-                title={t('featured_products_title', 'Featured Products')}
-                products={featuredProducts}
-                loading={featuredLoading}
-                error={featuredError}
-                onCardClick={onCardClick}
-                shopIsOpen={shopIsOpen}
-            />
+                    <AnimatePresence mode="wait">
+                        {isFiltering ? (
+                            <motion.div
+                                key="filtered"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.3 }}
+                                // FIX 3: Negative margin to pull grid closer to filter bar
+                                style={{ marginTop: '-1.5rem' }}
+                            >
+                                <ProductShowcase
+                                    title={searchQuery ? `${t('search_results_for', 'Results for')} "${searchQuery}"` : t('productsListTitle', 'Products')}
+                                    products={filteredProducts}
+                                    loading={newArrivalsLoading} 
+                                    error={newArrivalsError}
+                                    onCardClick={handleCardClick}
+                                    shopIsOpen={shopIsOpen}
+                                />
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="default"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                // FIX 3: Negative margin to pull "Featured" closer to filter bar
+                                style={{ marginTop: '-1.5rem' }}
+                            >
+                                {featuredProducts.length > 0 && (
+                                    <ProductShowcase
+                                        title={t('featured_products_title', 'Featured Collection')}
+                                        products={featuredProducts}
+                                        loading={featuredLoading}
+                                        error={featuredError}
+                                        onCardClick={handleCardClick}
+                                        shopIsOpen={shopIsOpen}
+                                    />
+                                )}
 
-            {/* New Arrivals Section */}
-            <ProductShowcase
-                title={t('new_arrivals_title', 'New Arrivals')}
-                products={newArrivals}
-                loading={newArrivalsLoading}
-                error={newArrivalsError}
-                onCardClick={onCardClick}
-                shopIsOpen={shopIsOpen}
-            />
+                                <ProductShowcase
+                                    title={t('new_arrivals_title', 'New Arrivals')}
+                                    products={newArrivals}
+                                    loading={newArrivalsLoading}
+                                    error={newArrivalsError}
+                                    onCardClick={handleCardClick}
+                                    shopIsOpen={shopIsOpen}
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
-            {/* Categories Section */}
-            {/* <CategoryShowcase shop={shop} /> */}
-        </PageWrapper>
+                    {/* Modals & Cart */}
+                    {selectedProductForModal && (
+                        <ProductDetailsModal
+                            product={selectedProductForModal}
+                            onClose={handleCloseModal}
+                            onAddToCart={handleAddToCart}
+                            shopIsOpen={shopIsOpen}
+                        />
+                    )}
+
+                    <Cart 
+                        items={cartItems}
+                        isOpen={isCartOpen}
+                        onOpen={() => setIsCartOpen(true)}
+                        onClose={() => setIsCartOpen(false)}
+                        onUpdateQuantity={() => {}}
+                        onSubmitOrder={() => {}}
+                        isPremium={true}
+                        brandColors={brandColors}
+                        shopDomain="global"
+                    />
+
+                </Container>
+            </PageWrapper>
+        </ThemeProvider>
     );
 };
 

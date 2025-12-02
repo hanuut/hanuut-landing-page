@@ -36,7 +36,6 @@ const Section = styled.div`
   @media (max-width: 768px) {
     justify-content: flex-start;
     width: 100%;
-    padding: 2rem 0;
   }
 `;
 

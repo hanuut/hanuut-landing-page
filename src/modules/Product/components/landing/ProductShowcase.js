@@ -1,78 +1,77 @@
-// src/modules/Product/components/landing/ProductShowcase.js
-
 import React from 'react';
 import styled from 'styled-components';
-import ProductCard from './ProductCard';
+import PremiumProductCard from './PremiumProductCard';
 import Loader from '../../../../components/Loader';
 
 const ShowcaseSection = styled.section`
     width: 100%;
-    padding: 3rem 0;
-    
-    @media (max-width: 768px) {
-        padding: 0;
-    }
+    /* Reduced vertical padding to fix gap between header and products */
+    padding: 2rem 0; 
+    border-bottom: 1px solid #27272a;
+`;
+
+const Header = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.5rem; /* Reduced margin */
+    padding: 0 0.5rem; /* Small side padding */
 `;
 
 const SectionTitle = styled.h2`
-    font-size: 2.5rem;
+    /* Fixed: Half the size as requested */
+    font-size: 1.5rem; 
     font-weight: 700;
-    color: ${props => props.theme.text};
-    margin-bottom: 2.5rem;
-    text-align: center;
+    color: white;
+    font-family: 'Tajawal', sans-serif;
+    margin: 0;
 
-    @media (max-width: 768px) {
-        font-size: 2rem;
+    span {
+        color: ${props => props.theme.primaryColor || '#F07A48'};
     }
 `;
 
 const ProductsGrid = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 2rem;
+    /* Desktop: 4-5 cards per row depending on screen width */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 0 0.5rem;
 
-    /* This media query ensures a two-column layout on mobile */
+    /* Mobile: Strictly 2 cards per row, smaller gap */
     @media (max-width: 768px) {
         grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
+        gap: 0.75rem; 
     }
 `;
 
 const StatusMessage = styled.p`
   text-align: center;
-  font-size: ${(props) => props.theme.fontlg};
-  color: rgba(${(props) => props.theme.textRgba}, 0.7);
-  padding: 2rem 0;
+  font-size: 1rem;
+  color: #71717a;
+  padding: 4rem 0;
 `;
 
-const ProductShowcase = ({ title, products, loading, error, onCardClick ,shopIsOpen }) => {
-    if (loading) {
-        return <Loader fullscreen={false} />;
-    }
-
-    if (error) {
-        return <StatusMessage>Error: {error}</StatusMessage>;
-    }
-
-    if (!products || products.length === 0) {
-        // Don't render the section at all if there's nothing to show
-        return null;
-    }
+const ProductShowcase = ({ title, products, loading, error, onCardClick, shopIsOpen }) => {
+    if (loading) return <Loader fullscreen={false} />;
+    if (error) return <StatusMessage>Error loading products</StatusMessage>;
+    if (!products || products.length === 0) return null;
 
     return (
         <ShowcaseSection>
-            {/* <SectionTitle>{title}</SectionTitle> */}\
+            <Header>
+                <SectionTitle>{title}</SectionTitle>
+            </Header>
+            
             <ProductsGrid>
-                {products.map(product => {
-                    return (
-                        <ProductCard
-                            key={product._id} // Added key for best practice
-                            product={product}
-                            onCardClick={onCardClick}
-                            shopIsOpen={shopIsOpen}
-                        />
-                    );
-                })}
+                {products.map(product => (
+                    <PremiumProductCard
+                        key={product._id}
+                        product={product}
+                        onCardClick={onCardClick}
+                        shopIsOpen={shopIsOpen}
+                    />
+                ))}
             </ProductsGrid>
         </ShowcaseSection>
     );

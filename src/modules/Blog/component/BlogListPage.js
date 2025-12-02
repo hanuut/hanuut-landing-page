@@ -1,105 +1,251 @@
-// src/modules/Blog/component/BlogListPage.js
-
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
-import { fetchAllBlogPosts, selectBlog ,} from '../state/reducers';
-import BlogPostCard from './BlogPostCard';
+import { Link } from 'react-router-dom';
+
+// --- Imports ---
+import { fetchAllBlogPosts, selectBlog } from '../state/reducers';
 import Loader from '../../../components/Loader';
+import SpotlightCard from '../../../components/SpotlightCard'; 
+import { partnerTheme } from '../../../config/Themes'; 
 
+// --- Styled Components ---
 
-const BlogSection = styled.div`
-  background-color: ${(props) => props.theme.body};
-  min-height: calc(100vh - ${(props) => props.theme.navHeight});
-  padding: 4rem 0;
+const PageWrapper = styled.div`
+  background-color: #050505;
+  min-height: 100vh;
+  padding: 8rem 0; 
+  color: white;
 `;
 
-const PageContainer = styled.div`
+const Container = styled.div`
   max-width: 1200px;
   width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+`;
+
+const Header = styled.div`
+  text-align: center;
+  max-width: 700px;
   margin: 0 auto;
 `;
 
 const PageTitle = styled.h1`
-  font-weight: 700;
-  font-size: ${(props) => props.theme.fontxxxl};
-  color: ${(props) => props.theme.text};
-  margin-bottom: 2.5rem;
-  text-align: center;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  margin-bottom: 1rem;
+  font-family: 'Tajawal', sans-serif;
+  
+  span {
+    background: linear-gradient(135deg, #FFFFFF 30%, #F07A48 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 `;
 
-const PostsGrid = styled.div`
+const PageDesc = styled.p`
+  font-size: 1.2rem;
+  color: #a1a1aa;
+  line-height: 1.6;
+`;
+
+const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 2rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-const StatusMessage = styled.p`
-  text-align: center;
-  font-size: ${(props) => props.theme.fontlg};
-  color: rgba(${(props) => props.theme.textRgba}, 0.7);
+// --- Custom Article Card ---
+const ArticleImage = styled.div`
+  width: 100%;
+  height: 240px;
+  background-color: #18181b;
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  position: relative;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+`;
+
+const Tag = styled.span`
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  color: #F07A48;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-weight: 700;
+  border: 1px solid rgba(240, 122, 72, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;
+
+const ArticleTitle = styled.h2`
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+  font-family: 'Tajawal', sans-serif;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #F07A48;
+  }
+`;
+
+const ArticleExcerpt = styled.p`
+  font-size: 0.95rem;
+  color: #a1a1aa;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+`;
+
+const MetaRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.85rem;
+  color: #71717a;
+`;
+
+const ReadLink = styled(Link)`
+  text-decoration: none;
+  display: block;
+  height: 100%;
+`;
+
+const FeaturedPost = styled.div`
+  grid-column: 1 / -1; 
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 `;
 
 const BlogListPage = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
-  const { posts, loading, error } = useSelector(selectBlog);
+  const { posts, loading } = useSelector(selectBlog);
 
- 
-
-  const currentLanguage = i18n.language;
-
- useEffect(() => {
-    if (!posts || posts.length === 0) {
-      dispatch(fetchAllBlogPosts(currentLanguage));
-    }
-  }, [dispatch, posts]);
+  useEffect(() => {
+    dispatch(fetchAllBlogPosts(i18n.language));
+  }, [dispatch, i18n.language]);
 
   const seo = {
     title: t('blogSeoTitle', 'Hanuut Blog & Resources'),
-    description: t('blogSeoDescription', 'Tips, guides, and resources for local shop owners to grow their business with Hanuut.'),
+    description: t('blogSeoDescription'),
   };
 
+  if (loading && posts.length === 0) return <Loader fullscreen={true} />;
+
+  const [heroPost, ...otherPosts] = posts || [];
+
   return (
-    <>
-      <Helmet>
-        <html lang={currentLanguage} />
-        <title>{seo.title}</title>
-        <meta name="description" content={seo.description} />
-        <link rel="canonical" href="https://www.hanuut.com/blog" />
-      </Helmet>
+    <ThemeProvider theme={partnerTheme}>
+      <PageWrapper>
+        <Helmet>
+          <html lang={i18n.language} />
+          <title>{seo.title}</title>
+          <meta name="description" content={seo.description} />
+        </Helmet>
 
-      <BlogSection>
-        <PageContainer>
-          <PageTitle>{t('blogPageTitle', 'Hanuut Blog & Resources')}</PageTitle>
-          
-          {loading && <Loader fullscreen={false} />}
+        <Container>
+          <Header>
+            <PageTitle>Hanuut <span>Resources</span></PageTitle>
+            <PageDesc>{seo.description}</PageDesc>
+          </Header>
 
-          {error && <StatusMessage>{t('blogError', 'There was an error loading the articles.')}</StatusMessage>}
-          
-          {!loading && !error && posts.length === 0 && (
-            <StatusMessage>{t('blogNoPosts', 'No articles found. Check back soon!')}</StatusMessage>
+          {/* --- Hero Post (Featured) --- */}
+          {heroPost && (
+             <ReadLink to={`/blog/${heroPost.slug}`}>
+                <SpotlightCard>
+                   <FeaturedPost>
+                      <ArticleImage style={{ height: '400px', marginBottom: 0 }}>
+                         {/* DIRECT CLOUDINARY URL */}
+                         <img src={heroPost.sourceId} alt={heroPost.title} />
+                         <Tag>Featured</Tag>
+                      </ArticleImage>
+                      <div style={{ padding: '1rem' }}>
+                         <ArticleTitle style={{ fontSize: '2.5rem' }}>{heroPost.title}</ArticleTitle>
+                         <ArticleExcerpt style={{ fontSize: '1.1rem', WebkitLineClamp: 5 }}>
+                            {heroPost.content.replace(/<[^>]*>?/gm, '').substring(0, 250)}...
+                         </ArticleExcerpt>
+                         <MetaRow>
+                            <span>{new Date(heroPost.createdAt).toLocaleDateString()}</span>
+                            <span style={{ color: '#F07A48', fontWeight: 'bold' }}>Read Article →</span>
+                         </MetaRow>
+                      </div>
+                   </FeaturedPost>
+                </SpotlightCard>
+             </ReadLink>
           )}
 
-          {!loading && !error && posts.length > 0 && (
-            <PostsGrid>
-              {posts.map((post) => (
-                <BlogPostCard
-                  key={post._id}
-                  slug={post.slug}
-                  title={post.title}
-                  imageUrl={post.sourceId}
-                  author={post.author}
-                  createdAt={post.createdAt}
-                />
-              ))}
-            </PostsGrid>
+          {/* --- Grid Posts --- */}
+          <Grid>
+            {otherPosts.map((post) => (
+              <ReadLink to={`/blog/${post.slug}`} key={post._id}>
+                <SpotlightCard>
+                  <ArticleImage>
+                    {/* DIRECT CLOUDINARY URL */}
+                    <img src={post.sourceId} alt={post.title} loading="lazy" />
+                    <Tag>Guide</Tag>
+                  </ArticleImage>
+                  <ArticleTitle>{post.title}</ArticleTitle>
+                  <ArticleExcerpt>
+                    {post.content.replace(/<[^>]*>?/gm, '').substring(0, 120)}...
+                  </ArticleExcerpt>
+                  <MetaRow>
+                    <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                    <span>{post.author || "Hanuut Team"}</span>
+                  </MetaRow>
+                </SpotlightCard>
+              </ReadLink>
+            ))}
+          </Grid>
+
+          {posts.length === 0 && !loading && (
+             <p style={{ textAlign: 'center', color: '#555' }}>{t("blogNoPosts")}</p>
           )}
-        </PageContainer>
-      </BlogSection>
-    </>
+
+        </Container>
+      </PageWrapper>
+    </ThemeProvider>
   );
 };
 

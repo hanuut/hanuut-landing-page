@@ -1,47 +1,109 @@
-export const light = {
-  // ----------------- COLORS -----------------
-  // Based on your new brand palette
-
-  // Neutral Tones
-  body: "#FDF4E3",              // Soft Ivory - Main page background
-  text: "#111217",              // Deep Charcoal - Primary text for high contrast
-  textColor: "#111217",              // Deep Charcoal - Primary text for high contrast
-  textRgba: "17, 18, 23",       // RGB for Deep Charcoal
+// Shared typography and layout values (Keep your existing settings)
+const commonSettings = {
+  // Typography
+  fontxxxl: "clamp(2rem, 5vw, 3rem)",
+  fontxxl: "clamp(1.5rem, 4vw, 2rem)",
+  fontxl: "1.25rem",
+  fontlg: "1rem",
+  fontmd: "0.8rem",
+  fontsm: "0.75rem",
+  fontxs: "0.65rem",
   
-  // Primary & Secondary
-  primary: "#39A170",           // Hanuut Green - For key actions and branding
-  primaryColor: "#39A170",           // Hanuut Green - For key actions and branding
-  darkGreen: "#194435",           // Hanuut Green - For key actions and branding
-  primaryRgba: "57, 161, 112",  // RGB for Hanuut Green
-  primaryLight: "#6ED3A3",      // Mint Breeze - Lighter shade for hover or active states
-  secondary: "#397FF9",         //Electric Blue - For secondary actions or highlights
-  secondaryColor: "#397FF9",         //Electric Blue - For secondary actions or highlights
-  
-  // System Tones
-  accent: "#F07A48",            // // Sunset Coral - For Call-to-action or special highlights
-  accentRgba: "57, 127, 249",   // RGB for Electric Blue
-  error: "#D9404D",             // Bold Red - For error messages or destructive actions
-  
-  // Surface Tones for UI Elements
-  surface: "rgba(255, 255, 255, 0.45)", // A clean white with transparency for the glass effect
-  surfaceBorder: "rgba(0, 0, 0, 0.1)", // A subtle, semi-transparent black for card borders
+  // Layout
+  navHeight: "5rem",
+  navHeightMobile: "4rem",
+  defaultRadius: "12px",
+  bigRadius: "24px", // Added for the new Bento Grids
+  smallRadius: "8px",
+  actionButtonPadding: "1.25rem",
+  actionButtonPaddingMobile: "0.8rem", // Added to prevent mobile breaking
 
-  // ----------------- TYPOGRAPHY -----------------
-  // Hierarchical and responsive font scale
-  fontxxxl: "clamp(2rem, 5vw, 3rem)",    // Page titles
-  fontxxl: "clamp(1.5rem, 4vw, 2rem)",   // Section titles
-  fontxl: "1.25rem",                      // Card titles
-  actionButtonPadding: "1.25rem",                      // Card titles
-  fontlg: "1rem",                         // Body text, descriptions
-  fontmd: "0.8rem",                         // Default body text
-  fontsm: "0.75rem",                     // Captions, ingredients
-  fontxs: "0.65rem",                      // Fine print
-
-  // ----------------- LAYOUT & EFFECTS -----------------
-  // Consistent spacing, sizing, and effects
-  navHeight: "5rem",                      // Standard navigation bar height
-  defaultRadius: "12px",                  // Modern, larger radius for containers
-  smallRadius: "8px",                     // Radius for smaller elements like buttons/tags
+  // Effects
   cardHoverEffect: "transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.07);",
   glassmorphism: "background-color: rgba(255, 255, 255, 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);",
+};
+
+// ---------------------------------------------------------
+// 1. CUSTOMER THEME (The "Light" Theme - Green Dominant)
+// ---------------------------------------------------------
+export const light = {
+  ...commonSettings,
+  
+  // --- EXISTING VARIABLES (DO NOT DELETE) ---
+  body: "#FDF4E3",              // Soft Ivory
+  text: "#111217",              // Deep Charcoal
+  textColor: "#111217",         
+  textRgba: "17, 18, 23",
+  
+  primary: "#39A170",           // Hanuut Green
+  primaryColor: "#39A170",      
+  darkGreen: "#194435",         
+  primaryRgba: "57, 161, 112",
+  primaryLight: "#6ED3A3",
+  
+  secondary: "#397FF9",         // Electric Blue
+  secondaryColor: "#397FF9",
+  
+  accent: "#F07A48",            // Sunset Coral (Orange)
+  accentRgba: "240, 122, 72",   
+  error: "#D9404D",
+  
+  surface: "rgba(255, 255, 255, 0.45)", 
+  surfaceBorder: "rgba(0, 0, 0, 0.1)",
+
+  // --- NEW GEMINI VARIABLES (Mapped for Light Mode) ---
+  // We keep these dark because the "SpotlightCard" component is designed to be dark
+  // even on a light website (for contrast).
+  zinc950: "#09090b", 
+  zinc900: "#18181b",
+  zinc800: "#27272a",
+  zinc500: "#71717a",
+  zinc100: "#f4f4f5",
+
+  beamColor: "#39A170", // Green beam for customers
+  glassSurface: "rgba(255, 255, 255, 0.6)",
+  glassBorder: "rgba(0, 0, 0, 0.1)",
+};
+
+// ---------------------------------------------------------
+// 2. PARTNER THEME (The "Dark" Theme - Orange Dominant)
+// ---------------------------------------------------------
+// Use this theme specifically for the /partners route
+export const partnerTheme = {
+  ...commonSettings,
+
+  // Backgrounds
+  body: "#050505",              // Deepest Black for "Cosmic" feel
+  text: "#FAFAFA",              // White text
+  textColor: "#FAFAFA",
+  textRgba: "250, 250, 250",
+
+  // Brand Colors (Orange Dominant)
+  primary: "#F07A48",           // Hanuut Orange
+  primaryColor: "#F07A48",      
+  darkGreen: "#0F0F0F",         // Replaced with dark for header backgrounds
+  primaryRgba: "240, 122, 72",
+  primaryLight: "#FDBA74",      // Lighter orange
+
+  secondary: "#39A170",         // Green becomes the secondary accent
+  secondaryColor: "#39A170",
+
+  accent: "#397FF9",            // Blue accent
+  accentRgba: "57, 127, 249",
+  error: "#D9404D",
+
+  // Surface (Dark Glass)
+  surface: "#101012", 
+  surfaceBorder: "rgba(255, 255, 255, 0.08)", 
+
+  // Gemini Specifics
+  zinc950: "#050505", 
+  zinc900: "#121212",
+  zinc800: "#27272a",
+  zinc500: "#71717a",
+  zinc100: "#f4f4f5",
+
+  beamColor: "#F07A48", // Orange beam for partners
+  glassSurface: "rgba(255, 255, 255, 0.03)", // Very subtle dark glass
+  glassBorder: "rgba(255, 255, 255, 0.08)",  // Subtle border
 };

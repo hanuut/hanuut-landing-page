@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { useTranslation } from "react-i18next";
 import Playstore from "../assets/playstore.webp";
 import { Link } from "react-router-dom";
@@ -7,12 +7,14 @@ import AboutUs from "./Sections/AboutUs";
 import HowItWorks from "./Sections/HowItWorks";
 import ButtonWithIcon from "../components/ButtonWithIcon";
 import { Helmet } from "react-helmet";
-
+import ConsumerHero from "./HomePage/components/ConsumerHero";
+import ServicesGrid from "./HomePage/components/ServicesGrid";
 import HanuutIllustration from "../assets/illustrations/home_animation_en.gif";
 import HanuutIllustrationAr from "../assets/illustrations/home_animation_ar.gif";
+import { light } from "../config/Themes";
 
 const Section = styled.div`
-   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
+  min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,16 +28,16 @@ const Section = styled.div`
 
 const Container = styled.div`
   max-width: 1200px;
-  width: 90%; 
-  margin: 0 auto; 
+  width: 90%;
+  margin: 0 auto;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
-   flex-direction: column-reverse;
-    gap: 3rem; 
+    flex-direction: column-reverse;
+    gap: 3rem;
     width: 90%;
     align-items: flex-start;
   }
@@ -66,11 +68,11 @@ const LeftBox = styled.div`
 `;
 
 const Heading = styled.h1`
-  font-size: 3rem; 
+  font-size: 3rem;
   color: ${(props) => props.theme.primaryColor};
-  font-weight: 700; 
-  text-transform: none; 
-  line-height: 1.2; 
+  font-weight: 700;
+  text-transform: none;
+  line-height: 1.2;
   width: 100%;
   margin-bottom: 1rem;
   @media (max-width: 768px) {
@@ -83,7 +85,7 @@ const SubHeading = styled.h2`
   width: 100%;
   font-size: ${(props) => props.theme.fontxxl};
   margin-bottom: 0.5rem;
-font-weight: 500;
+  font-weight: 500;
   @media (max-width: 768px) {
     width: 90%;
     font-size: ${(props) => props.theme.fontxl};
@@ -119,6 +121,11 @@ const IllustrationContainer = styled.img`
   max-width: 500px; // Optional: constrain the max size on desktop
 `;
 
+const PageWrapper = styled.main`
+  width: 100%;
+  background-color: #fdf4e3;
+`;
+
 const HomePage = () => {
   const { t, i18n } = useTranslation();
   const link = process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK;
@@ -128,31 +135,40 @@ const HomePage = () => {
   const seoContent = {
     ar: {
       title: "حانووت | حانوتك في جيبك",
-      description: "تطبيق حانووت يجمعلك كامل حوانت حومتك في مكان واحد. تسوق من متاجر موثوقة تعرفها، مع تتبع مباشر لطلبيتك. التسوق المحلي، بكل بساطة.",
-      keywords: "حانوت, تطبيق حانوت, تسوق الجزائر, متاجر محلية, توصيل طلبات, قضيان, حوانت",
+      description:
+        "تطبيق حانووت يجمعلك كامل حوانت حومتك في مكان واحد. تسوق من متاجر موثوقة تعرفها، مع تتبع مباشر لطلبيتك. التسوق المحلي، بكل بساطة.",
+      keywords:
+        "حانوت, تطبيق حانوت, تسوق الجزائر, متاجر محلية, توصيل طلبات, قضيان, حوانت",
       schema: {
         name: "حانووت - حانوتك في جيبك",
-        description: "تطبيق يربطك بمتاجر حيك الموثوقة في الجزائر لتسوق سهل وآمن."
-      }
+        description:
+          "تطبيق يربطك بمتاجر حيك الموثوقة في الجزائر لتسوق سهل وآمن.",
+      },
     },
     en: {
       title: "Hanuut | Your Local Shop, Online",
-      description: "The Hanuut app brings all your neighborhood stores to you. Shop from verified local businesses you already trust, with live order tracking. Local shopping, made simple.",
-      keywords: "hanuut, hanuut app, shop local algeria, trusted stores, local delivery, online grocery algeria",
+      description:
+        "The Hanuut app brings all your neighborhood stores to you. Shop from verified local businesses you already trust, with live order tracking. Local shopping, made simple.",
+      keywords:
+        "hanuut, hanuut app, shop local algeria, trusted stores, local delivery, online grocery algeria",
       schema: {
         name: "Hanuut - Your Local Shop, Online",
-        description: "An app that connects you with your trusted neighborhood stores in Algeria for simple, safe shopping."
-      }
+        description:
+          "An app that connects you with your trusted neighborhood stores in Algeria for simple, safe shopping.",
+      },
     },
     fr: {
       title: "Hanuut | Votre Commerce de Quartier, en Ligne",
-      description: "L'application Hanuut rassemble les commerces de votre quartier. Achetez auprès des magasins locaux vérifiés que vous connaissez, avec suivi de commande en direct. Le shopping local, en toute simplicité.",
-      keywords: "hanuut, app hanuut, commerce local algérie, magasins de confiance, livraison locale, courses en ligne algérie",
+      description:
+        "L'application Hanuut rassemble les commerces de votre quartier. Achetez auprès des magasins locaux vérifiés que vous connaissez, avec suivi de commande en direct. Le shopping local, en toute simplicité.",
+      keywords:
+        "hanuut, app hanuut, commerce local algérie, magasins de confiance, livraison locale, courses en ligne algérie",
       schema: {
         name: "Hanuut - Votre Commerce de Quartier, en Ligne",
-        description: "Une application qui vous connecte à vos commerces de quartier de confiance en Algérie pour un shopping simple et sécurisé."
-      }
-    }
+        description:
+          "Une application qui vous connecte à vos commerces de quartier de confiance en Algérie pour un shopping simple et sécurisé.",
+      },
+    },
   };
 
   // Default to Arabic if the language is not supported
@@ -170,40 +186,25 @@ const HomePage = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": activeSeoContent.schema.name,
-            "description": activeSeoContent.schema.description,
-            "url": "https://www.hanuut.com",
-            "inLanguage": currentLanguage
+            name: activeSeoContent.schema.name,
+            description: activeSeoContent.schema.description,
+            url: "https://www.hanuut.com",
+            inLanguage: currentLanguage,
           })}
         </script>
       </Helmet>
-      
-      <Section>
-        <Container isArabic={isArabic}>
-       
-          <RightBox>
-           <IllustrationContainer src={isArabic ? HanuutIllustrationAr : HanuutIllustration} alt="Hanuut" />
-          </RightBox>
-          <LeftBox>
-            <Heading>{t("homeHeading")}</Heading>
-            <SubHeading>{t("homeSubHeading")}</SubHeading>
-            <Paragraph>{t("homeParagraph")}</Paragraph> 
-            <Link to={link} name="playsore">
-              <ButtonWithIcon
-                image={Playstore}
-                backgroundColor="#000000"
-                text1={t("getItOn")}
-                text2={t("googlePlay")}
-                className="homeDownloadButton"
-              />
-            </Link>
-            <SmallParagraph>{t("homeSmallerParagraph")}</SmallParagraph>
-          </LeftBox>
-        </Container>
-      </Section>
 
-      <HowItWorks />
-      <AboutUs />
+      <ThemeProvider theme={light}>
+        <PageWrapper>
+          {/* 1. The New Cinematic Hero */}
+          <ConsumerHero />
+
+          {/* 2. The New "One App" Grid */}
+          <ServicesGrid />
+
+          {/* 3. Legacy SEO Content (Optional: Refactor later) */}
+        </PageWrapper>
+      </ThemeProvider>
     </>
   );
 };

@@ -8,6 +8,7 @@ import PartnersHero from "./components/PartnersHero";
 import PartnersValues from "./components/PartnersValues";
 import FeaturesSection from "./components/FeaturesSection";
 import CtaSection from "./components/CtaSection";
+import FeaturesBento from "./components/FeaturesBento";
 
 // --- Main Page Container ---
 const PageWrapper = styled.main`
@@ -43,10 +44,10 @@ const PartnersPage = () => {
           })}
         </script>
       </Helmet>
-      
+
       <PageWrapper>
         <PartnersHero />
-        <FeaturesSection />
+        <FeaturesBento />
         <PartnersValues />
         <CtaSection />
       </PageWrapper>

@@ -1,207 +1,197 @@
-// src/modules/Blog/BlogPostPage.js
-
 import React, { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
-import {
-  fetchBlogPostBySlug,
-  clearSelectedPost,
-  selectBlog,
-} from "./state/reducers";
+import { motion, useScroll, useSpring } from "framer-motion";
+
+import { fetchBlogPostBySlug, clearSelectedPost, selectBlog } from "./state/reducers";
 import Loader from "../../components/Loader";
+import { partnerTheme } from "../../config/Themes";
 
-const formatDate = (dateString, locale) => {
-  if (!dateString) return "";
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(dateString).toLocaleDateString(locale, options);
-};
-
-const PostSection = styled.article`
-  background-color: ${(props) => props.theme.body};
-  padding: 4rem 0;
-  min-height: calc(100vh - ${(props) => props.theme.navHeight});
+const PageWrapper = styled.article`
+  background-color: #050505;
+  min-height: 100vh;
+  color: #e4e4e7; /* Zinc 200 */
+  padding-bottom: 6rem;
 `;
 
-const PostContainer = styled.div`
+// Reading Progress Bar
+const ProgressBar = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #F07A48;
+  transform-origin: 0%;
+  z-index: 9999;
+`;
+
+const HeaderSection = styled.header`
+  width: 100%;
+  height: 60vh;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4rem;
+  overflow: hidden;
+
+  /* Background Image (Cloudinary) with Scrim */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url(${(props) => props.$bg});
+    background-size: cover;
+    background-position: center;
+    /* Dim the image so text is readable */
+    filter: brightness(0.4);
+    z-index: 0;
+  }
+  
+  /* Gradient fade into content */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, #050505 100%);
+    z-index: 1;
+  }
+`;
+
+const HeaderContent = styled.div`
+  position: relative;
+  z-index: 2;
   max-width: 800px;
   width: 90%;
+  text-align: center;
+`;
+
+const Title = styled.h1`
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  font-family: 'Tajawal', sans-serif;
+  text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+`;
+
+const Meta = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 1rem;
+  color: rgba(255,255,255,0.7);
+`;
+
+const ContentContainer = styled.div`
+  max-width: 740px; 
+  width: 90%;
   margin: 0 auto;
-  background-color: ${(props) => props.theme.surface};
-  border: 1px solid ${(props) => props.theme.surfaceBorder};
-  border-radius: ${(props) => props.theme.defaultRadius};
-  padding: 3rem;
-
-  @media (max-width: 768px) {
-    padding: 1.5rem;
-  }
-`;
-
-const HeaderImage = styled.img`
-  width: 100%;
-  height: auto;
-  max-height: 400px;
-  object-fit: cover;
-  border-radius: ${(props) => props.theme.smallRadius};
-  margin-bottom: 2rem;
-  background-color: ${(props) => props.theme.surfaceBorder};
-`;
-
-const PostTitle = styled.h1`
-  font-weight: 700;
-  font-size: ${(props) => props.theme.fontxxxl};
-  color: ${(props) => props.theme.text};
-  line-height: 1.3;
-  margin-bottom: 1rem;
-`;
-
-const PostMeta = styled.p`
-  font-size: ${(props) => props.theme.fontsm};
-  color: rgba(${(props) => props.theme.textRgba}, 0.7);
-  margin-bottom: 2.5rem;
-`;
-
-const PostContent = styled.div`
-  font-size: ${(props) => props.theme.fontlg};
+  font-size: 1.15rem;
   line-height: 1.8;
-  color: ${(props) => props.theme.text};
+  font-family: 'Cairo', sans-serif; 
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    color: ${(props) => props.theme.text};
-    margin-top: 2rem;
+  /* Markdown/HTML Styles for Dark Mode */
+  h1, h2, h3, h4 {
+    color: white;
+    margin-top: 3rem;
     margin-bottom: 1rem;
-    font-weight: 600;
+    font-weight: 700;
+    line-height: 1.3;
   }
-  p {
-    margin-bottom: 1.5rem;
+  
+  h2 { font-size: 2rem; border-left: 4px solid #F07A48; padding-left: 1rem; }
+  h3 { font-size: 1.5rem; }
+  
+  p { margin-bottom: 1.5rem; color: #d4d4d8; }
+  
+  a { 
+    color: #F07A48; 
+    text-decoration: none; 
+    border-bottom: 1px solid rgba(240, 122, 72, 0.3);
+    transition: all 0.2s;
+    &:hover { border-color: #F07A48; }
   }
-  a {
-    color: ${(props) => props.theme.primary};
-    text-decoration: underline;
-  }
+
   img {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
-    margin: 1.5rem 0;
+    border-radius: 12px;
+    margin: 2rem 0;
+    border: 1px solid #27272a;
   }
-`;
 
-const StatusContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50vh;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const StatusMessage = styled.p`
-  text-align: center;
-  font-size: ${(props) => props.theme.fontlg};
-  color: rgba(${(props) => props.theme.textRgba}, 0.7);
-`;
-
-const BackLink = styled(Link)`
-  color: ${(props) => props.theme.primary};
-  text-decoration: none;
-  font-weight: 500;
-  &:hover {
-    text-decoration: underline;
+  ul, ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+    color: #d4d4d8;
   }
+  
+  li { margin-bottom: 0.5rem; }
 `;
 
 const BlogPostPage = () => {
   const { slug } = useParams();
   const dispatch = useDispatch();
-  const { t, i18n } = useTranslation();
-  const { selectedPost, selectedPostLoading, selectedPostError } =
-    useSelector(selectBlog);
+  const { t } = useTranslation();
+  const { selectedPost, selectedPostLoading } = useSelector(selectBlog);
+
+  // Hook for the reading progress bar
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   useEffect(() => {
-    if (slug) {
-      dispatch(fetchBlogPostBySlug(slug));
-    }
-    return () => {
-      dispatch(clearSelectedPost());
-    };
+    if (slug) dispatch(fetchBlogPostBySlug(slug));
+    return () => dispatch(clearSelectedPost());
   }, [slug, dispatch]);
 
-  const createMarkup = (htmlContent) => {
-    return { __html: htmlContent };
-  };
-
-  const generateMetaDescription = (content) => {
-    if (!content) return "";
-    const plainText = content.replace(/<[^>]*>?/gm, " ");
-    return plainText.substring(0, 155).trim() + "...";
-  };
-
-  // 1. If we are loading, ALWAYS show the loader.
-  if (selectedPostLoading) {
+  if (selectedPostLoading) return <Loader fullscreen={true} />;
+  
+  if (!selectedPost && !selectedPostLoading) {
     return (
-      <PostSection>
-        <StatusContainer>
-          <Loader fullscreen={false} />
-        </StatusContainer>
-      </PostSection>
+       <ThemeProvider theme={partnerTheme}>
+          <PageWrapper style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+             <h2>{t("postNotFoundSeoTitle")}</h2>
+          </PageWrapper>
+       </ThemeProvider>
     );
   }
 
-  // 2. If loading is finished AND there is an error OR there is no post, show the "Not Found" message.
-  if (!selectedPostLoading && (selectedPostError || !selectedPost)) {
-    return (
-      <PostSection>
-        <Helmet>
-          <title>{t("postNotFoundSeoTitle", "Post Not Found")}</title>
-        </Helmet>
-        <StatusContainer>
-          <StatusMessage>
-            {t(
-              "blogPostError",
-              "The article you are looking for could not be found."
-            )}
-          </StatusMessage>
-          <BackLink to="/blog">{t("backToBlog", "← Back to Blog")}</BackLink>
-        </StatusContainer>
-      </PostSection>
-    );
-  }
-
-  // 3. If we've made it this far, loading is finished, there is no error, and we have a post.
-  const { title, content, author, createdAt, sourceId } = selectedPost;
-  const metaDescription = generateMetaDescription(content);
+  const { title, content, createdAt, sourceId } = selectedPost;
 
   return (
-    <>
-      <Helmet>
-        <html lang={i18n.language} />
-        <title>{title} | Hanuut</title>
-        <meta name="description" content={metaDescription} />
-        <link rel="canonical" href={`https://www.hanuut.com/blog/${slug}`} />
-      </Helmet>
+    <ThemeProvider theme={partnerTheme}>
+      <PageWrapper>
+        <Helmet>
+          <title>{title} | Hanuut</title>
+        </Helmet>
 
-      <PostSection>
-        <PostContainer>
-          <header>
-            <PostTitle>{title}</PostTitle>
-            <PostMeta>
-              {t("postedBy", "By")} {author} •{" "}
-              {formatDate(createdAt, i18n.language)}
-            </PostMeta>
-            {sourceId && <HeaderImage src={sourceId} alt={title} />}
-          </header>
-          <PostContent dangerouslySetInnerHTML={createMarkup(content)} />
-        </PostContainer>
-      </PostSection>
-    </>
+        <ProgressBar style={{ scaleX }} />
+
+        <HeaderSection $bg={sourceId}>
+           <HeaderContent>
+              <Title>{title}</Title>
+              <Meta>
+                 <span>{new Date(createdAt).toLocaleDateString()}</span>
+                 <span>•</span>
+                 <span>{selectedPost.author || "Hanuut"}</span>
+              </Meta>
+           </HeaderContent>
+        </HeaderSection>
+
+        <ContentContainer dangerouslySetInnerHTML={{ __html: content }} />
+
+      </PageWrapper>
+    </ThemeProvider>
   );
 };
 

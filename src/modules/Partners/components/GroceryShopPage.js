@@ -1,5 +1,4 @@
-
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -7,13 +6,18 @@ import { Link } from "react-router-dom";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import Playstore from "../../../assets/playstore.webp";
 // Restore the illustration import
-import GroceryIllustration from "../../../assets/grocery-illustration.webp"; 
-
+import GroceryIllustration from "../../../assets/grocery-illustration.webp";
+import ShopStoryView from "./ShopStoryView";
 // Utility to convert image buffer to a displayable URL
 const bufferToUrl = (imageObject) => {
   if (!imageObject || !imageObject.buffer?.data) return null;
   const imageData = imageObject.buffer.data;
-  const base64String = btoa(new Uint8Array(imageData).reduce((data, byte) => data + String.fromCharCode(byte), ""));
+  const base64String = btoa(
+    new Uint8Array(imageData).reduce(
+      (data, byte) => data + String.fromCharCode(byte),
+      ""
+    )
+  );
   const format = imageObject.originalname.split(".").pop().toLowerCase();
   const mimeType = format === "jpg" ? "jpeg" : format;
   return `data:image/${mimeType};base64,${base64String}`;
@@ -72,7 +76,7 @@ const ShopHeader = styled.div`
   align-items: center;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
-  font-family: 'serif';
+  font-family: "serif";
 
   /* The previous centered layout from last step is now applied here */
   flex-direction: column;
@@ -129,9 +133,10 @@ const Illustration = styled.img`
 
   &:hover {
     transform: scale(1.03);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 25px rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8),
+      0 0 25px rgba(255, 255, 255, 0.6);
   }
-  
+
   @media (max-width: 900px) {
     max-width: 300px;
   }
@@ -153,36 +158,51 @@ const DownloadRow = styled.div`
   }
 `;
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  return isMobile;
+};
 
 const GroceryShopPage = ({ shop, image }) => {
   const { t, i18n } = useTranslation();
   const imageUrl = useMemo(() => bufferToUrl(image), [image]);
-  const playStoreLink = "https://play.google.com/store/apps/details?id=com.hanuut.shop";
-  const deepLinkUrl = `/deeplink/shop/${shop.username}`;
+  const playStoreLink =
+    "https://play.google.com/store/apps/details?id=com.hanuut.shop";
 
+  const isMobile = useIsMobile();
+
+  // 1. If Mobile, Return the Story View
+  if (isMobile) {
+    return (
+      <ShopStoryView shop={shop} shopImage={imageUrl} appLink={playStoreLink} />
+    );
+  }
+
+  // 2. If Desktop, Return the existing layout (it works fine for desktop)
   return (
-    <PageWrapper isArabic={i18n.language === 'ar'}>
+    <PageWrapper isArabic={i18n.language === "ar"}>
       <ContentContainer>
         {/* Left Column */}
-        <InfoColumn isArabic={i18n.language === 'ar'}>
+        <InfoColumn isArabic={i18n.language === "ar"}>
           <ShopHeader>
             <Logo src={imageUrl} alt={`${shop.name} Logo`} />
             <ShopName>{shop.name}</ShopName>
           </ShopHeader>
-        
-          <ShopDescription>
-            {t("grocery_page_info")}
-          </ShopDescription>
+
+          <ShopDescription>{t("grocery_page_info")}</ShopDescription>
 
           <DownloadRow>
-            <DownloadTitle>
-              {t("grocery_page_download_title")}
-            </DownloadTitle>
-            
+            <DownloadTitle>{t("grocery_page_download_title")}</DownloadTitle>
+
             <Link to={playStoreLink} target="_blank" rel="noopener noreferrer">
               <ButtonWithIcon
                 image={Playstore}
-                backgroundColor="#000000"
+                backgroundColor="#39A170" /* Explicit Green for Customer */
                 text1={t("getItOn")}
                 text2={t("googlePlay")}
               />
@@ -192,9 +212,10 @@ const GroceryShopPage = ({ shop, image }) => {
 
         {/* Right Column */}
         <IllustrationColumn>
-          <Link to={deepLinkUrl}>
-            <Illustration src={GroceryIllustration} alt="Interactive grocery shopping illustration" />
-          </Link>
+          <Illustration
+            src={GroceryIllustration}
+            alt="Interactive grocery shopping illustration"
+          />
         </IllustrationColumn>
       </ContentContainer>
     </PageWrapper>
