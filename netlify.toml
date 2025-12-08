@@ -16,13 +16,18 @@
 # This tells Netlify to use the command from this file instead of its default behavior.
 [build.processing]
   skip_install = true
+  
+  [[edge_functions]]
+    path = "/blog/*"
+    function = "bot-proxy"
+
 
   [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+    from = "/*"
+    to = "/index.html"
+    status = 200
 
   [[headers]]
-  for = "/.well-known/apple-app-site-association"
-  [headers.values]
+    for = "/.well-known/apple-app-site-association"
+    [headers.values]
     Content-Type = "application/json"

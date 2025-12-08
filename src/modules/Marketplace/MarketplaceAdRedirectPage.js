@@ -278,13 +278,30 @@ const MarketplaceAdRedirectPage = ({ appConfig }) => {
     showUI: true
   };
 
+  const shareableImageUrl = useMemo(() => {
+    if (selectedAd?.images && selectedAd.images.length > 0) {
+      const imgId = selectedAd.images[0];
+      // Use the new RAW endpoint
+      return `${prodUrl}/image/raw/${imgId}`;
+    }
+    return "https://hanuut.com/static/placeholder.png"; // Fallback
+  }, [selectedAd]);
+
   return (
     <ThemeProvider theme={marketTheme}>
       <PageWrapper>
         <Helmet>
-          <title>{selectedAd.name} | Hanuut Market</title>
-          <meta name="description" content={selectedAd.shortDescription} />
-          <meta property="og:image" content={imageUrl} />
+          <title>{selectedAd ? selectedAd.name : "Hanuut"} | Market</title>
+          <meta name="description" content={selectedAd?.shortDescription} />
+          
+          
+          <meta property="og:image" content={shareableImageUrl} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:type" content="product" />
+          
+          
+          <meta property="og:url" content={window.location.href} />
         </Helmet>
 
         {triggerRedirect && <DeepLinkRedirect {...deepLinkProps} />}
