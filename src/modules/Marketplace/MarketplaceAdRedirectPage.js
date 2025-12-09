@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
-import styled, { ThemeProvider, keyframes } from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { motion } from "framer-motion";
-import { FaMapMarkerAlt, FaUserCircle, FaGavel, FaTag, FaShareAlt } from "react-icons/fa";
+import { FaMapMarkerAlt, FaUserCircle, FaGavel, FaTag } from "react-icons/fa";
 
 // --- Imports ---
 import { fetchAdById, selectMarketplace } from "./state/reducers";
@@ -15,6 +15,9 @@ import ButtonWithIcon from "../../components/ButtonWithIcon";
 import Playstore from "../../assets/playstore.webp";
 import { getImageUrl } from "../../utils/imageUtils";
 import { getImage } from "../Images/services/imageServices";
+
+// --- FIX 2: Define prodUrl at the top level ---
+const prodUrl = process.env.REACT_APP_API_PROD_URL;
 
 // --- Theme for Marketplace (Green/Light) ---
 const marketTheme = {
@@ -227,7 +230,24 @@ const MarketplaceAdRedirectPage = ({ appConfig }) => {
 
   const { selectedAd, loading } = useSelector(selectMarketplace);
   
-  // --- Image Logic ---
+  // --- FIX 1: Move useMemo BEFORE the conditional return ---
+  // We use "selectedAd?.images" safely because selectedAd might be null here
+  const shareableImage = useMemo(() => {
+    if (selectedAd?.images && selectedAd.images.length > 0) {
+      const imgId = selectedAd.images[0];
+      // If it's a full URL (Cloudinary), use it
+      if (typeof imgId === 'string' && imgId.startsWith('http')) return imgId;
+      
+      // If it's a MongoDB ID, use the raw endpoint using prodUrl
+      if (prodUrl) {
+         return `${prodUrl}/image/raw/${imgId}`;
+      }
+    }
+    // Fallback image
+    return "https://hanuut.com/static/og-placeholder.png";
+  }, [selectedAd]);
+
+  // --- Image Logic (Buffer for browser display) ---
   const [imageBuffer, setImageBuffer] = useState(null);
   
   // 1. Fetch Ad Data
@@ -252,20 +272,21 @@ const MarketplaceAdRedirectPage = ({ appConfig }) => {
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
 
-  // 3. Redirect Logic (Triggered by Button)
+  // 3. Redirect Logic
   const [triggerRedirect, setTriggerRedirect] = useState(false);
-
   const handleDownloadApp = () => {
       setTriggerRedirect(true);
   };
 
+  // --- CONDITIONAL RETURN ---
+  // This must happen AFTER all hooks (useMemo, useEffect, useState) are declared
   if (loading || !selectedAd) {
     return <PageWrapper><Loader message={t("loading.message")} fullscreen={false} /></PageWrapper>;
   }
 
   // Helpers
   const price = selectedAd.sellingPrice || 0;
-  const isAuction = selectedAd.isAuction || false; // Assume boolean from API
+  const isAuction = selectedAd.isAuction || false; 
   const sellerName = selectedAd.user?.fullName || "Hanuut User";
   
   // Deep Link Props
@@ -278,30 +299,18 @@ const MarketplaceAdRedirectPage = ({ appConfig }) => {
     showUI: true
   };
 
-  const shareableImageUrl = useMemo(() => {
-    if (selectedAd?.images && selectedAd.images.length > 0) {
-      const imgId = selectedAd.images[0];
-      // Use the new RAW endpoint
-      return `${prodUrl}/image/raw/${imgId}`;
-    }
-    return "https://hanuut.com/static/placeholder.png"; // Fallback
-  }, [selectedAd]);
-
   return (
     <ThemeProvider theme={marketTheme}>
       <PageWrapper>
         <Helmet>
-          <title>{selectedAd ? selectedAd.name : "Hanuut"} | Market</title>
-          <meta name="description" content={selectedAd?.shortDescription} />
-          
-          
-          <meta property="og:image" content={shareableImageUrl} />
+          <title>{selectedAd.name} | Hanuut Market</title>
+          <meta name="description" content={selectedAd.shortDescription} />
+          {/* Use the shareableImage we calculated at the top */}
+          <meta property="og:image" content={shareableImage} />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
-          <meta property="og:type" content="product" />
-          
-          
           <meta property="og:url" content={window.location.href} />
+          <meta property="og:type" content="product" />
         </Helmet>
 
         {triggerRedirect && <DeepLinkRedirect {...deepLinkProps} />}
