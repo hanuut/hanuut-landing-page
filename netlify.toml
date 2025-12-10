@@ -16,18 +16,25 @@
 # This tells Netlify to use the command from this file instead of its default behavior.
 [build.processing]
   skip_install = true
-  
-  [[edge_functions]]
-    path = "/blog/*"
-    function = "bot-proxy"
 
 
-  [[redirects]]
-    from = "/*"
-    to = "/index.html"
-    status = 200
+  # 1. Blog Rule
+[[edge_functions]]
+  function = "bot-proxy"
+  path = "/blog/*"
 
-  [[headers]]
-    for = "/.well-known/apple-app-site-association"
-    [headers.values]
-    Content-Type = "application/json"
+# 2. Marketplace Ad Rule
+[[edge_functions]]
+  function = "bot-proxy"
+  path = "/deeplink/ad/*"
+
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/.well-known/apple-app-site-association"
+  [headers.values]
+  Content-Type = "application/json"
