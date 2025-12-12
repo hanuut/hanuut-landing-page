@@ -9,75 +9,84 @@ export default async (request, context) => {
 
   // Bot Detection
   const botPattern = /facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|slackbot|googlebot/i;
-  // Proxy humans for deeplinks, but only bots for blog
   const isBot = botPattern.test(userAgent);
+  
+  // Rule: Deep Links are proxied for EVERYONE (Bots + Humans)
   const isDeepLink = path.startsWith("/deeplink/");
 
-  if (isDeepLink || (path.startsWith("/blog/") && isBot)) {
+  // === ROUTING LOGIC ===
 
-    // --- A. SHOP DISH (New Rule - Specificity matters, check this before generic shop) ---
-    // URL: /deeplink/shop/{username}/dish/{id}
+  // 1. Handle Shop Username Shortcuts (e.g. hanuut.com/@myshop)
+  // We only intercept BOTS here. Humans go straight to React.
+  if (path.startsWith("/@") && isBot) {
+    // path is "/@username" -> we need to send "@username" to backend
+    const username = path.substring(1); // removes the leading "/" -> "@le_cheese_arris"
+    targetUrl = `${API_URL}/shop/share/${username}`;
+  }
+
+  // 2. Handle Blog Posts (Bots Only)
+  else if (path.startsWith("/blog/") && isBot) {
+    const slug = path.split("/blog/")[1];
+    if (slug) targetUrl = `${API_URL}/feedback/share/${slug}`;
+  }
+
+  // 3. Handle Deep Links (Everyone)
+  else if (isDeepLink) {
+    // A. Shop Dish
     if (path.includes("/dish/")) {
-      const parts = path.split("/dish/"); // ["/deeplink/shop/user", "12345"]
+      const parts = path.split("/dish/");
       const dishId = parts[1];
       if (dishId) targetUrl = `${API_URL}/dish/share/${dishId}`;
     }
-
-    // --- B. MARKETPLACE AD ---
+    // B. Marketplace Ad
     else if (path.includes("/deeplink/ad/")) {
       const parts = path.split("/deeplink/ad/");
       const adId = parts[1];
       if (adId) targetUrl = `${API_URL}/market/share/${adId}`;
     }
-    
-    // --- C. SHOP PRODUCT (Global) ---
-    // URL: /deeplink/shop/{username}/{productId} (No "dish" keyword)
+    // C. Shop Product
     else if (path.startsWith("/deeplink/shop/") && path.split("/").length > 4) {
       const parts = path.split("/");
       const productId = parts[4]; 
       if (productId) targetUrl = `${API_URL}/global-product/share/${productId}`;
     }
-
-    // --- D. SHOP PROFILE ---
+    // D. Shop Profile (Deep Link version)
     else if (path.startsWith("/deeplink/shop/")) {
       const parts = path.split("/deeplink/shop/");
       const username = parts[1]; 
       const cleanUsername = username ? username.replace(/\/$/, "") : null;
       if (cleanUsername) targetUrl = `${API_URL}/shop/share/${cleanUsername}`;
     }
-
-    // --- E. BLOG ---
-    else if (path.startsWith("/blog/")) {
-      const slug = path.split("/blog/")[1];
-      if (slug) targetUrl = `${API_URL}/feedback/share/${slug}`;
-    }
-
-    // --- F. ORDER ---
+    // E. Order
     else if (path.includes("/deeplink/order/")) {
       const parts = path.split("/deeplink/order/");
       const orderId = parts[1];
       if (orderId) targetUrl = `${API_URL}/share/order/${orderId}`;
     }
+  }
 
-    // EXECUTE PROXY
-    if (targetUrl) {
-      try {
-        console.log(`[Edge] Proxying to: ${targetUrl}`);
-        const response = await fetch(targetUrl);
-        if (response.ok) {
-          return new Response(response.body, {
-            headers: {
-              "content-type": "text/html",
-              "cache-control": "public, max-age=0, must-revalidate",
-              "access-control-allow-origin": "*" 
-            },
-          });
-        }
-      } catch (error) {
-        console.error("Proxy error:", error);
+  // === EXECUTE PROXY ===
+  if (targetUrl) {
+    try {
+      console.log(`[Edge] Proxying ${isBot ? 'BOT' : 'USER'} to: ${targetUrl}`);
+      const response = await fetch(targetUrl);
+      
+      if (response.ok) {
+        return new Response(response.body, {
+          headers: {
+            "content-type": "text/html",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "access-control-allow-origin": "*" 
+          },
+        });
+      } else {
+        console.error(`[Edge] Backend error: ${response.status}`);
       }
+    } catch (error) {
+      console.error("[Edge] Proxy fetch error:", error);
     }
   }
 
+  // Fallback: Continue to React App
   return context.next();
 };

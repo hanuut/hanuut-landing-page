@@ -18,15 +18,20 @@
   skip_install = true
 
 
-  # 1. Blog Rule
+# 1. Short Username Links
+[[edge_functions]]
+  function = "bot-proxy"
+  path = "/@*"
+
+# 2. Blog
 [[edge_functions]]
   function = "bot-proxy"
   path = "/blog/*"
 
-# 2. Marketplace Ad Rule
+# 3. All Deep Links
 [[edge_functions]]
   function = "bot-proxy"
-  path = "/deeplink/ad/*"
+  path = "/deeplink/*"
 
 
 [[redirects]]
