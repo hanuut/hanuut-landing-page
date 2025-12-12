@@ -54,7 +54,6 @@
   "orderStatus": "Order status",
   "depositeAmount": "Deposite Amount",
   "homeInputButton": "Get the Hanuut App",
-  "homeSmallerParagraph": "Free on the Google Play Store.",
   "aboutUsTitle": "Our Mission",
   "aboutUsParagraph": "In a world of anonymous sellers and risky online transactions, we wanted to bring back trust. Hanuut was built to digitize the local, face-to-face shopping experience you rely on. Our platform is a simple promise: to connect you with verified neighborhood businesses, so you can shop online with total peace of mind.",
   "aboutUsAlt": "Illustration of a friendly shop owner at a counter",
@@ -728,5 +727,7 @@
   "features_ecom_2_title": "Sell Variants Easily",
   "features_ecom_2_desc": "Selling clothes or gadgets? Easily manage different sizes, colors, and models. Inventory updates automatically as you sell.",
   "features_ecom_3_title": "Nationwide Reach",
-  "features_ecom_3_desc": "Don't just sell to your neighborhood. Accept orders from anywhere and manage shipping logistics directly from the dashboard."
+  "features_ecom_3_desc": "Don't just sell to your neighborhood. Accept orders from anywhere and manage shipping logistics directly from the dashboard.",
+  "appleStore": "App Store",
+  "homeSmallerParagraph": "Available on iOS & Android."
 }

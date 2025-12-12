@@ -2,12 +2,17 @@ import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+// 1. Import the Apple Icon
+import { FaApple } from "react-icons/fa"; 
 import BorderBeamButton from "../../../components/BorderBeamButton";
 import Playstore from "../../../assets/playstore.webp";
 import HanuutIllustration from "../../../assets/illustrations/home_animation_en.gif";
 import HanuutIllustrationAr from "../../../assets/illustrations/home_animation_ar.gif";
 
-// --- 1. Animations ---
+// --- 2. PASTE YOUR COPIED LINK HERE ---
+const IOS_LINK = "https://apps.apple.com/us/app/hanuut/id6752300426"; 
+
+// --- Animations ---
 const float = keyframes`
   0% { transform: translateY(0px) rotate(0deg); }
   50% { transform: translateY(-15px) rotate(1deg); }
@@ -21,13 +26,12 @@ const blobMove = keyframes`
   100% { transform: translate(0, 0) scale(1); }
 `;
 
-// --- 2. Styled Components ---
+// --- Styled Components ---
 
 const Section = styled.section`
   width: 100%;
-  /* Full height minus nav */
   min-height: calc(100vh - 5rem);
-  background-color: #fdf4e3; /* Soft Ivory */
+  background-color: #fdf4e3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -129,9 +133,7 @@ const PhoneWrapper = styled.div`
   overflow: hidden;
   animation: ${float} 6s ease-in-out infinite;
   background: white;
-  cursor: pointer; /* Indicate clickable */
-
-  /* Add a subtle scale on hover to suggest interaction */
+  cursor: pointer;
   transition: transform 0.3s ease;
   &:hover {
     transform: scale(1.02) translateY(-5px);
@@ -184,6 +186,17 @@ const FloatingBadge = styled(motion.div)`
   }
 `;
 
+// 3. Buttons Row Container
+const ButtonsRow = styled.div`
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  
+  @media (max-width: 900px) {
+    justify-content: center;
+  }
+`;
+
 const Icon = styled.img`
   height: 1.5rem;
   margin-right: 10px;
@@ -193,19 +206,26 @@ const Icon = styled.img`
 const ConsumerHero = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
-
   const [gifKey, setGifKey] = useState(0);
+  const [replayCount, setReplayCount] = useState(0);
 
-  const handleDownload = () =>
+  // Link Handlers
+  const handleAndroidDownload = () =>
     window.open(process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK, "_blank");
 
- const [replayCount, setReplayCount] = useState(0);
+  // 4. iOS Link Handler
+  const handleIOSDownload = () => {
+    if (IOS_LINK.includes("YOUR_APP_ID_HERE")) {
+      alert("Please add the correct iOS link in the code!");
+      return;
+    }
+    window.open(IOS_LINK, "_blank");
+  };
 
   const handleReplayGif = () => {
     setReplayCount((prev) => prev + 1);
   };
 
-  // Select the correct asset based on language
   const gifSource = isArabic ? HanuutIllustrationAr : HanuutIllustration;
 
   const itemVars = {
@@ -259,10 +279,26 @@ const ConsumerHero = () => {
           </Subtitle>
 
           <motion.div variants={itemVars}>
-            <BorderBeamButton onClick={handleDownload} beamColor="#39A170">
-              <Icon src={Playstore} alt="Play Store" />
-              <span>{t("googlePlay")}</span>
-            </BorderBeamButton>
+            {/* 5. Updated Buttons Row */}
+            <ButtonsRow>
+              <BorderBeamButton onClick={handleAndroidDownload} beamColor="#39A170">
+                <Icon src={Playstore} alt="Play Store" />
+                <span>{t("googlePlay")}</span>
+              </BorderBeamButton>
+
+              <BorderBeamButton onClick={handleIOSDownload} beamColor="#111217">
+                <FaApple 
+                  size={24} 
+                  style={{ 
+                    // Flip margins for Arabic layout
+                    marginRight: isArabic ? "0" : "10px", 
+                    marginLeft: isArabic ? "10px" : "0" 
+                  }} 
+                />
+                <span>{t("appleStore")}</span>
+              </BorderBeamButton>
+            </ButtonsRow>
+
             <p
               style={{
                 marginTop: "15px",
@@ -281,7 +317,6 @@ const ConsumerHero = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Badge 1: Live Shopping (Green) */}
           <FloatingBadge
             top="15%"
             left={isArabic ? "-40px" : "auto"}
@@ -293,12 +328,11 @@ const ConsumerHero = () => {
             <span></span> {t("live_shopping_title") || "Live Shopping"}
           </FloatingBadge>
 
-          {/* Badge 2: C2C Marketplace (Blue) */}
           <FloatingBadge
             bottom="20%"
             right={isArabic ? "-30px" : "auto"}
             left={isArabic ? "auto" : "-20px"}
-            color="#397FF9" /* Blue for Market */
+            color="#397FF9"
             animate={{ y: [0, 15, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
@@ -308,8 +342,8 @@ const ConsumerHero = () => {
           <PhoneWrapper onClick={handleReplayGif} title="Hanuut - حانووت">
             <img
               key={gifKey}
-              src={`${gifSource}?t=${replayCount}`} 
-              alt="Hanuut App : Online marketplace and shopping"
+              src={`${gifSource}?t=${replayCount}`}
+              alt="Hanuut App"
             />
           </PhoneWrapper>
         </ImageContent>

@@ -59,7 +59,6 @@
   "orderStatus": "Statut de la commande",
   "depositeAmount": "Montant du dépôt",
   "homeInputButton": "Télécharger l'App Hanuut",
-  "homeSmallerParagraph": "Gratuit sur le Google Play Store.",
   "aboutUsTitle": "Notre Mission",
   "aboutUsParagraph": "Face aux vendeurs anonymes et aux risques du commerce en ligne, nous voulions restaurer la confiance. Hanuut a été créé pour numériser l'expérience d'achat locale et humaine que vous connaissez. Notre promesse est simple : vous connecter à des commerces de quartier vérifiés, pour que vous puissiez acheter en ligne en toute sérénité.",
   "aboutUsAlt": "Illustration d'un commerçant sympathique à son comptoir",
@@ -732,5 +731,7 @@
   "features_ecom_2_title": "Gérez les Variantes",
   "features_ecom_2_desc": "Vêtements ou gadgets ? Gérez facilement les tailles, couleurs et modèles. L'inventaire s'ajuste automatiquement à chaque vente.",
   "features_ecom_3_title": "Portée Nationale",
-  "features_ecom_3_desc": "Ne vous limitez pas à votre quartier. Acceptez des commandes de partout et gérez la logistique d'expédition directement depuis l'application."
+  "features_ecom_3_desc": "Ne vous limitez pas à votre quartier. Acceptez des commandes de partout et gérez la logistique d'expédition directement depuis l'application.",
+  "appleStore": "App Store",
+  "homeSmallerParagraph": "Disponible sur iOS et Android."
 }
