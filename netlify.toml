@@ -23,6 +23,11 @@
   function = "bot-proxy"
   path = "/@*"
 
+#  Long Shop Links (for the Redirect)
+[[edge_functions]]
+  function = "bot-proxy"
+  path = "/shop/*"
+
 # 2. Blog
 [[edge_functions]]
   function = "bot-proxy"
