@@ -87,7 +87,7 @@ const TextContent = styled(motion.div)`
 `;
 
 const Title = styled(motion.h1)`
-  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-size: clamp(3rem, 6vw, 3.2rem);
   font-weight: 800;
   line-height: 1.2;
   color: #111217;

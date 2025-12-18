@@ -1,17 +1,10 @@
-import React from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { useTranslation } from "react-i18next";
-import Playstore from "../assets/playstore.webp";
-import { Link } from "react-router-dom";
-import AboutUs from "./Sections/AboutUs";
-import HowItWorks from "./Sections/HowItWorks";
-import ButtonWithIcon from "../components/ButtonWithIcon";
 import { Helmet } from "react-helmet";
 import ConsumerHero from "./HomePage/components/ConsumerHero";
 import ServicesGrid from "./HomePage/components/ServicesGrid";
-import HanuutIllustration from "../assets/illustrations/home_animation_en.gif";
-import HanuutIllustrationAr from "../assets/illustrations/home_animation_ar.gif";
 import { light } from "../config/Themes";
+import MarketplaceShowcase from "./HomePage/MarketplaceShowcase";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -198,6 +191,7 @@ const HomePage = () => {
         <PageWrapper>
           {/* 1. The New Cinematic Hero */}
           <ConsumerHero />
+          <MarketplaceShowcase />
 
           {/* 2. The New "One App" Grid */}
           <ServicesGrid />

@@ -733,5 +733,19 @@
   "features_ecom_3_title": "Portée Nationale",
   "features_ecom_3_desc": "Ne vous limitez pas à votre quartier. Acceptez des commandes de partout et gérez la logistique d'expédition directement depuis l'application.",
   "appleStore": "App Store",
-  "homeSmallerParagraph": "Disponible sur iOS et Android."
+  "homeSmallerParagraph": "Disponible sur iOS et Android.",
+   "market_section_badge": "Marketplace 2.0",
+  "market_section_title": "Vendez local. <span>Achetez malin.</span>",
+  "market_section_desc": "Hanuut Market n'est pas juste un site d'annonces. C'est votre tableau de bord personnel pour vendre vos objets inutilisés à vos voisins ou dénicher des affaires rares sans vous déplacer. Sécurisé, local et intelligent.",
+  
+  "market_feat_1_title": "Système d'Enchères Simplifié",
+  "market_feat_1_desc": "Ne fixez pas de limites. Recevez des offres via notre système de 'Meilleure Offre' et vendez au prix réel du marché.",
+  
+  "market_feat_2_title": "Vente Hyper-Locale",
+  "market_feat_2_desc": "Pas envie de gérer la livraison ? Activez le filtre 'Local Uniquement' pour ne traiter qu'avec des acheteurs de votre ville.",
+  
+  "market_feat_3_title": "Messagerie Intégrée",
+  "market_feat_3_desc": "Négociez, validez et fixez vos rendez-vous via notre chat sécurisé. Gardez votre numéro privé jusqu'à la conclusion de l'affaire.",
+  
+  "market_cta": "Publier une annonce"
 }

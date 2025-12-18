@@ -729,5 +729,19 @@
   "features_ecom_3_title": "Nationwide Reach",
   "features_ecom_3_desc": "Don't just sell to your neighborhood. Accept orders from anywhere and manage shipping logistics directly from the dashboard.",
   "appleStore": "App Store",
-  "homeSmallerParagraph": "Available on iOS & Android."
+  "homeSmallerParagraph": "Available on iOS & Android.",
+  "market_section_badge": "Marketplace 2.0",
+  "market_section_title": "Your Neighborhood. <span>Your Market.</span>",
+  "market_section_desc": "Hanuut Market redefines peer-to-peer commerce. It's a powerful tool to sell unused items to verified neighbors or find local deals without the hassle. Secure, smart, and hyper-local.",
+  
+  "market_feat_1_title": "Smart Bidding System",
+  "market_feat_1_desc": "Don't guess the price. Let buyers send you their 'Best Offer' and sell to the one that matches your expectations.",
+  
+  "market_feat_2_title": "Hyper-Local Selling",
+  "market_feat_2_desc": "Don't want to ship? Toggle 'Local Only' to hide your ad from distant buyers and deal only with people in your city.",
+  
+  "market_feat_3_title": "Secure Chat & Deals",
+  "market_feat_3_desc": "Negotiate privately and set meeting points without exposing your phone number to strangers.",
+  
+  "market_cta": "Post Your First Ad"
 }
