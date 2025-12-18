@@ -2,10 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.webp";
 import BorderBeamButton from "../../../components/BorderBeamButton";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { FaMagic } from "react-icons/fa";
 
 // --- Styled Components ---
 
@@ -77,37 +78,45 @@ const ButtonsRow = styled.div`
   justify-content: center;
 `;
 
-// Custom styling for the download buttons to fit the dark theme
-const DarkButtonWrapper = styled.div`
-  button {
-    background-color: white !important;
-    color: black !important;
-    border: 1px solid white;
-    
-    &:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(255,255,255,0.2);
-    }
+
+const WizardButton = styled.button`
+  margin-top: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  font-family: 'Tajawal', sans-serif;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #39A170;
+    transform: translateY(-2px);
+  }
+
+  svg {
+    color: #39A170;
   }
 `;
 
-const GlassButtonWrapper = styled.div`
-  button {
-    background-color: rgba(255,255,255,0.05) !important;
-    color: white !important;
-    border: 1px solid rgba(255,255,255,0.2);
-    
-    &:hover {
-      background-color: rgba(255,255,255,0.1) !important;
-      transform: scale(1.05);
-    }
-  }
+const SubText = styled.p`
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
 `;
 
 const CtaSection = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const navigate = useNavigate(); // Hook for navigation
 
-const handleDownloadPlay = () => {
+  const handleDownloadPlay = () => {
     const link = process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
     if (link) window.open(link, "_blank");
   };
@@ -116,6 +125,12 @@ const handleDownloadPlay = () => {
     const link = process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK;
     if (link) window.open(link, "_blank");
   };
+
+  const handleWizardClick = () => {
+    navigate("/partners/onboarding"); // The route we will define next
+    window.scrollTo(0, 0);
+  };
+
   return (
     <Section>
       <Glow />
@@ -140,7 +155,13 @@ const handleDownloadPlay = () => {
         >
           <Description>{t("cta_section_description")}</Description>
         </motion.div>
-
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <WizardButton onClick={handleWizardClick}>
+            <FaMagic /> {/* Magic Icon */}
+            {t("cta_wizard_button")}
+          </WizardButton>
+          <SubText>{t("cta_wizard_sub")}</SubText>
+        </div>
         <ButtonsRow>
           {/* Principal */}
           <BorderBeamButton 
@@ -161,6 +182,7 @@ const handleDownloadPlay = () => {
               <span>Windows</span>
           </BorderBeamButton>
         </ButtonsRow>
+         
       </Container>
     </Section>
   );

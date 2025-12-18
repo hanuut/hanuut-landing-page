@@ -743,5 +743,55 @@
   "market_feat_3_title": "Secure Chat & Deals",
   "market_feat_3_desc": "Negotiate privately and set meeting points without exposing your phone number to strangers.",
   
-  "market_cta": "Post Your First Ad"
+  "market_cta": "Post Your First Ad",
+  "// --- Onboarding Wizard ---": "",
+  "onboarding_step_contact": "Contact",
+  "onboarding_step_shop": "Shop Info",
+  "onboarding_step_location": "Location",
+  "onboarding_step_menu": "Products",
+  
+  "wiz_step1_title": "Let's start with you",
+  "wiz_step1_subtitle": "Who will manage this shop?",
+  "wiz_label_firstname": "First Name",
+  "wiz_label_lastname": "Last Name",
+  "wiz_label_phone": "Business Phone",
+  "wiz_label_email": "Email (Optional)",
+  
+  "wiz_step2_title": "Tell us about your business",
+  "wiz_step2_subtitle": "What will customers see?",
+  "wiz_label_shopname": "Shop Name",
+  "wiz_label_domain": "Business Type",
+  "wiz_label_desc": "Short Description (Optional)",
+  "wiz_placeholder_desc": "Ex: Best pizza in town, open late...",
+  
+  "wiz_step3_title": "Where are you located?",
+  "wiz_step3_subtitle": "We'll help customers find you.",
+  "wiz_label_wilaya": "State (Wilaya)",
+  "wiz_label_commune": "City (Commune)",
+  "wiz_label_district": "District / Street",
+  
+  "wiz_step4_title": "What do you sell?",
+  "wiz_step4_subtitle": "Add a few categories and products to get started.",
+  "wiz_label_category": "Category",
+  "wiz_btn_add_category": "+ Add Category",
+  "wiz_btn_add_product": "+ Product",
+  "wiz_placeholder_cat": "Category Name",
+  "wiz_placeholder_prod": "Product Name",
+  "onboarding_page_title": "Create Your Shop - My Hanuut",
+  
+  "wiz_btn_next": "Next",
+  "wiz_btn_back": "Back",
+  "wiz_btn_finish": "Submit Request",
+  
+  "wiz_success_title": "Request Received!",
+  "wiz_success_desc": "Thank you! Our team will create your shop and send you the login details soon.",
+  "wiz_btn_home": "Back to Home",
+  "cta_wizard_button": "Let us build your shop",
+"cta_wizard_sub": "Not tech-savvy? Our team will set it up for free.",
+"wiz_label_activity": "Business Activity (Optional)",
+  "wiz_placeholder_activity": "Ex: Handmade crafts, Electronics, Bakery...",
+  "wiz_type_general": "General / E-commerce",
+  "wiz_type_food": "Restaurant / Food",
+  "wiz_type_grocery": "Grocery / Supermarket",
+  "wiz_select_type_label": "Choose your shop type:"
 }

@@ -2,7 +2,7 @@ import React, { Suspense, lazy, useMemo } from "react";
 import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
-
+import OnboardingWizard from "../modules/Partners/components/Onboarding/OnboardingWizard";
 // Import Loader component for Suspense fallback
 import Loader from "./Loader";
 
@@ -123,6 +123,7 @@ const CustomRouter = ({ appConfig, location }) => {
           <Route path="/partners" element={<PartnersPage />} />
           <Route path="/my-hanuut-guide" element={<MyHanuutGuide />} />
           <Route path="/links" element={<LinksPage />} />
+          <Route path="/partners/onboarding" element={<OnboardingWizard />} />
 
           {/* Legal pages */}
           <Route path="/privacy" element={<PrivacyPolicy />} />

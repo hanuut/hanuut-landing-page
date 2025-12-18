@@ -747,5 +747,55 @@
   "market_feat_3_title": "Messagerie Intégrée",
   "market_feat_3_desc": "Négociez, validez et fixez vos rendez-vous via notre chat sécurisé. Gardez votre numéro privé jusqu'à la conclusion de l'affaire.",
   
-  "market_cta": "Publier une annonce"
+  "market_cta": "Publier une annonce",
+  "// --- Onboarding Wizard ---": "",
+  "onboarding_step_contact": "Contact",
+  "onboarding_step_shop": "Boutique",
+  "onboarding_step_location": "Localisation",
+  "onboarding_step_menu": "Produits",
+  
+  "wiz_step1_title": "Faisons connaissance",
+  "wiz_step1_subtitle": "Qui va gérer cette boutique ?",
+  "wiz_label_firstname": "Prénom",
+  "wiz_label_lastname": "Nom",
+  "wiz_label_phone": "Numéro de téléphone prof.",
+  "wiz_label_email": "Email (Optionnel)",
+  
+  "wiz_step2_title": "Parlez-nous de votre projet",
+  "wiz_step2_subtitle": "Que verront vos clients ?",
+  "wiz_label_shopname": "Nom de la boutique",
+  "wiz_label_domain": "Type d'activité (Resto, Épicerie...)",
+  "wiz_label_desc": "Courte description (Optionnel)",
+  "wiz_placeholder_desc": "Ex: Les meilleures pizzas du quartier, ouvert tard...",
+  
+  "wiz_step3_title": "Où êtes-vous situé ?",
+  "wiz_step3_subtitle": "Nous aiderons les clients à vous trouver.",
+  "wiz_label_wilaya": "Wilaya",
+  "wiz_label_commune": "Commune",
+  "wiz_label_district": "Quartier / Rue",
+  
+  "wiz_step4_title": "Que vendez-vous ?",
+  "wiz_step4_subtitle": "Ajoutez quelques catégories et produits pour commencer.",
+  "wiz_label_category": "Catégorie",
+  "wiz_btn_add_category": "+ Ajouter Catégorie",
+  "wiz_btn_add_product": "+ Produit",
+  "wiz_placeholder_cat": "Nom de catégorie",
+  "wiz_placeholder_prod": "Nom du produit",
+  
+  "wiz_btn_next": "Suivant",
+  "wiz_btn_back": "Retour",
+  "wiz_btn_finish": "Envoyer la demande",
+  "onboarding_page_title": "Créer votre boutique - My Hanuut",
+  
+  "wiz_success_title": "Demande reçue !",
+  "wiz_success_desc": "Merci ! Notre équipe va créer votre boutique et vous envoyer vos accès très bientôt.",
+  "wiz_btn_home": "Retour à l'accueil",
+  "cta_wizard_button": "Laissez-nous créer votre boutique",
+"cta_wizard_sub": "Besoin d'un coup de main ? Notre équipe s'en charge gratuitement.",
+"wiz_label_activity": "Activité (Optionnel)",
+  "wiz_placeholder_activity": "Ex: Gâteaux traditionnels, Couture, Téléphones...",
+  "wiz_type_general": "E-commerce / Général",
+  "wiz_type_food": "Restauration",
+  "wiz_type_grocery": "Épicerie / Supérette",
+  "wiz_select_type_label": "Choisissez votre type de boutique :"
 }

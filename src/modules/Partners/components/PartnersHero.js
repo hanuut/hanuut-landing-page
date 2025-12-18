@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import BorderBeamButton from "../../../components/BorderBeamButton";
 import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.webp";
-
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { FaMagic } from "react-icons/fa";
 // --- NEW IMPORT: Make sure to save your image here ---
 import AppLogo3D from "../../../assets/logos/myHanuut/logo_ar.png"; // <--- 3D Logo Image
 
@@ -140,7 +141,7 @@ const Badge = styled(motion.div)`
 `;
 
 const HeroTitle = styled(motion.h1)`
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-size: clamp(2.5rem, 5vw, 2.5rem);
   font-weight: 800;
   line-height: 1.3;
   color: white;
@@ -150,7 +151,7 @@ const HeroTitle = styled(motion.h1)`
     background: linear-gradient(135deg, #FFFFFF 20%, #F07A48 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 10px 40px rgba(240, 122, 72, 0.3);
+    text-shadow: 0 10px 40px rgba(145, 245, 179, 1);
   }
 `;
 
@@ -164,8 +165,8 @@ const SubHeading = styled(motion.p)`
 
 const ButtonGroup = styled(motion.div)`
   display: flex;
-  gap: 2rem;
-  margin-top: 2rem;
+  gap: 1rem;
+  margin-top: 0.5rem;
   flex-wrap: wrap;
   justify-content: center;
 `;
@@ -174,6 +175,39 @@ const Icon = styled.img`
   height: 1.6rem;
   width: auto;
   filter: invert(1);
+`;
+
+const WizardButton = styled.button`
+  margin-top: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  font-family: 'Tajawal', sans-serif;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #39A170;
+    transform: translateY(-2px);
+  }
+
+  svg {
+    color: #39A170;
+  }
+`;
+
+const SubText = styled.p`
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
 `;
 
 const containerVars = {
@@ -193,9 +227,14 @@ const itemVars = {
 
 const PartnersHero = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate(); 
 
   const handleDownloadPlay = () => window.open(process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY, "_blank");
   const handleDownloadWindows = () => window.open(process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK, "_blank");
+ const handleWizardClick = () => {
+    navigate("/partners/onboarding"); // The route we will define next
+    window.scrollTo(0, 0);
+  };
 
   return (
     <Section>
@@ -216,8 +255,7 @@ const PartnersHero = () => {
         </Badge>
 
         <HeroTitle variants={itemVars} lang={i18n.language}>
-          {t("partnersHero_heading_part1")} <br />
-          <span className="highlight">{t("partnersHero_heading_part2")}</span>
+          <span className="highlight">{t("partnersHero_heading_part1")}</span>
         </HeroTitle>
         
         <SubHeading variants={itemVars}>
@@ -235,6 +273,14 @@ const PartnersHero = () => {
              <span>Windows</span>
           </BorderBeamButton>
         </ButtonGroup>
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <WizardButton onClick={handleWizardClick}>
+            <FaMagic /> {/* Magic Icon */}
+            {t("cta_wizard_button")}
+          </WizardButton>
+          <SubText>{t("cta_wizard_sub")}</SubText>
+        </div>
 
       </Container>
     </Section>
