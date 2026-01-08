@@ -1,28 +1,30 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-// Thunks for cart operations
-export const addToCart = createAsyncThunk(
-  "cart/addToCart",
-  async (cartItem) => cartItem
-);
+// 1. Helper to Load from Browser Storage
+const loadCartFromStorage = () => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const serializedState = localStorage.getItem("hanuut_cart");
+    if (serializedState === null) return [];
+    return JSON.parse(serializedState);
+  } catch (err) {
+    console.error("Error loading cart:", err);
+    return [];
+  }
+};
 
-export const removeFromCart = createAsyncThunk(
-  "cart/removeFromCart",
-  async (cartItem) => cartItem
-);
-
-export const incrementQuantity = createAsyncThunk(
-  "cart/incrementQuantity",
-  async (productId) => productId
-);
-
-export const decrementQuantity = createAsyncThunk(
-  "cart/decrementQuantity",
-  async (cartItem) => cartItem
-);
+// 2. Helper to Save to Browser Storage
+const saveCartToStorage = (cart) => {
+  try {
+    const serializedState = JSON.stringify(cart);
+    localStorage.setItem("hanuut_cart", serializedState);
+  } catch (err) {
+    console.error("Error saving cart:", err);
+  }
+};
 
 const initialState = {
-  cart: [],
+  cart: loadCartFromStorage(), // <--- LOADS SAVED DATA ON STARTUP
   loading: false,
   error: null,
 };
@@ -31,125 +33,55 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    resetCart: (state) => {
-      state.cart = [];
+    addToCart: (state, action) => {
+      const { variantId, quantity } = action.payload;
+
+      // Check if item exists
+      const existingIndex = state.cart.findIndex(
+        (item) => item.variantId === variantId
+      );
+
+      if (existingIndex >= 0) {
+        // Update quantity if exists
+        state.cart[existingIndex].quantity += quantity;
+      } else {
+        // Add new item
+        state.cart.push(action.payload);
+      }
+      
+      // Save immediately
+      saveCartToStorage(state.cart);
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(addToCart.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(addToCart.fulfilled, (state, action) => {
-        state.loading = false;
 
-        const {
-          _id: productId,
-          name: title,
-          sellingPrice,
-          shopId,
-          brand,
-          type = "product", // Default to "product" if type is not provided
-          color = "Not Specified", // Provide default value if color is not provided
-          size = "Not Specified", // Provide default value if size is not provided
-          imageId = "", // Default to empty string if imageId is not provided
-        } = action.payload;
-
-        const existingItemIndex = state.cart.findIndex(
-          (item) =>
-            item.productId === productId &&
-            item.color === color &&
-            item.size === size &&
-            item.type === type
-        );
-
-        if (existingItemIndex !== -1) {
-          // If the item exists, increment its quantity
-          state.cart[existingItemIndex] = {
-            ...state.cart[existingItemIndex],
-            quantity: state.cart[existingItemIndex].quantity + 1,
-          };
-        } else {
-          // If the item doesn't exist, add it to the cart
-          state.cart.push({
-            productId,
-            title,
-            quantity: 1,
-            sellingPrice,
-            shopId,
-            brand,
-            type,
-            color,
-            size,
-            imageId,
-          });
+    updateCartQuantity: (state, action) => {
+      const { variantId, quantity } = action.payload;
+      
+      if (quantity <= 0) {
+        state.cart = state.cart.filter((item) => item.variantId !== variantId);
+      } else {
+        const index = state.cart.findIndex((item) => item.variantId === variantId);
+        if (index >= 0) {
+          state.cart[index].quantity = quantity;
         }
-      })
+      }
+      // Save immediately
+      saveCartToStorage(state.cart);
+    },
 
-      .addCase(addToCart.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-      .addCase(removeFromCart.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(removeFromCart.fulfilled, (state, action) => {
-        state.loading = false;
-        const { _id } = action.payload;
-        state.cart = state.cart.filter((item) => !(item.productId === _id));
-      })
-      .addCase(removeFromCart.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-      .addCase(incrementQuantity.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(incrementQuantity.fulfilled, (state, action) => {
-        state.loading = false;
-
-        const existingItemIndex = state.cart.findIndex(
-          (item) => item.productId === action.payload
-        );
-
-        if (existingItemIndex !== -1) {
-          state.cart[existingItemIndex].quantity += 1;
-        }
-      })
-      .addCase(incrementQuantity.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-      .addCase(decrementQuantity.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(decrementQuantity.fulfilled, (state, action) => {
-        const existingItemIndex = state.cart.findIndex(
-          (item) => item.productId === action.payload
-        );
-
-        if (existingItemIndex !== -1) {
-          if (state.cart[existingItemIndex].quantity > 1) {
-            state.cart[existingItemIndex].quantity -= 1;
-          } else {
-            state.cart = state.cart.filter(
-              (item) => !(item.productId === action.payload)
-            );
-          }
-        }
-      })
-      .addCase(decrementQuantity.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      });
+    clearCart: (state) => {
+      state.cart = [];
+      saveCartToStorage([]);
+    },
+    
+    // Add specific removal action if needed
+    removeFromCart: (state, action) => {
+       const variantId = action.payload;
+       state.cart = state.cart.filter((item) => item.variantId !== variantId);
+       saveCartToStorage(state.cart);
+    }
   },
 });
 
-export const { resetCart } = cartSlice.actions;
-export const { reducer } = cartSlice;
-
+export const { addToCart, updateCartQuantity, clearCart, removeFromCart } = cartSlice.actions;
+export const reducer = cartSlice.reducer;
 export const selectCart = (state) => state.cart;

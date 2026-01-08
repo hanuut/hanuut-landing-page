@@ -8,7 +8,7 @@ import { getImage } from "../../../Images/services/imageServices";
 const CardWrapper = styled(motion.div)`
   background-color: #18181B; 
   border: 1px solid #27272A;
-  border-radius: 16px; /* Slightly smaller radius for smaller cards */
+  border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@ const CardWrapper = styled(motion.div)`
 
 const ImageContainer = styled.div`
   width: 100%;
-  aspect-ratio: 1 / 1; /* Square aspect ratio fits more cards */
+  aspect-ratio: 1 / 1;
   position: relative;
   overflow: hidden;
   background-color: #09090b;
@@ -43,7 +43,7 @@ const ImageContainer = styled.div`
 `;
 
 const Content = styled.div`
-  padding: 0.75rem; /* Reduced padding */
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -59,14 +59,13 @@ const Brand = styled.p`
 `;
 
 const ProductName = styled.h3`
-  font-size: 0.95rem; /* Smaller font */
+  font-size: 0.95rem;
   font-weight: 600;
   color: #FFFFFF;
   margin: 0;
   line-height: 1.3;
   font-family: 'Tajawal', sans-serif;
   
-  /* Truncate text to 2 lines */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -94,7 +93,11 @@ const LoadingSkeleton = styled.div`
   opacity: 0.5;
 `;
 
-const PremiumProductCard = ({ product, onCardClick }) => {
+const PremiumProductCard = ({ 
+  product, 
+  onCardClick, 
+  isOrderingEnabled // <--- New Prop
+}) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
 
@@ -132,11 +135,13 @@ const PremiumProductCard = ({ product, onCardClick }) => {
 
   return (
     <CardWrapper
-      /* FIX: Always allow click, handle "closed" state in modal or checkout */
       onClick={() => onCardClick(product)}
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
+      // --- VISUAL CUE ---
+      // Dim the card if ordering is disabled, but keep it clickable
+      style={{ opacity: isOrderingEnabled ? 1 : 0.75, filter: isOrderingEnabled ? 'none' : 'grayscale(30%)' }}
     >
       <ImageContainer>
         {imageUrl ? (

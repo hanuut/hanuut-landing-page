@@ -793,5 +793,7 @@
   "wiz_type_general": "General / E-commerce",
   "wiz_type_food": "Restaurant / Food",
   "wiz_type_grocery": "Grocery / Supermarket",
-  "wiz_select_type_label": "Choose your shop type:"
+  "wiz_select_type_label": "Choose your shop type:",
+  "shop_not_validated": "Shop Under Review",
+  "sales_disabled": "Online Sales Currently Disabled"
 }

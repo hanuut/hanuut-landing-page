@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useEffect } from "react";
 import styled from "styled-components";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { confirmOrder } from "./services/paymentServices";
-import { SatimConfirmationErrorCodes } from "./models/paymentErrorCodes.js";
-
-// We will create these two new, clean components next
-import SuccessDisplay from "./components/SuccessDisplay";
-import FailureDisplay from "./components/FailureDisplay";
-import Loader from "../../components/Loader";
+import SuccessDisplay from "./components/SuccessDisplay"; // Reusing your existing component
+import FailureDisplay from "./components/FailureDisplay"; // Reusing your existing component
 
 const PageWrapper = styled.main`
   width: 100%;
@@ -19,63 +14,59 @@ const PageWrapper = styled.main`
   background-color: #f9f9ff;
 `;
 
-const PaymentResultPage = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [paymentData, setPaymentData] = useState(null);
-  const [isSuccess, setIsSuccess] = useState(false);
+const RedirectMessage = styled.p`
+  margin-top: 1rem;
+  color: #666;
+  font-size: 0.9rem;
+`;
 
-  const { i18n } = useTranslation();
+const PaymentReturnPage = () => {
   const [searchParams] = useSearchParams();
-  const orderId = searchParams.get("orderId");
+  const { t } = useTranslation();
+  
+  // These params come from the Dynamic URL we set in the Backend
+  const type = searchParams.get("type"); // FLEXY, ORDER, SUBSCRIPTION
+  const id = searchParams.get("id");     // Internal ID
+  const status = searchParams.get("status"); // Chargily might append this, but we assume success if they land here via success_url
 
   useEffect(() => {
-    // Only run if we have an orderId and haven't fetched yet
-    if (orderId && isLoading) {
-      const fetchPaymentStatus = async () => {
-        try {
-          const response = await confirmOrder(orderId);
-          const responseData = response.data;
-          setPaymentData(responseData);
-
-          // Check if the confirmation was successful
-          const errorCode = responseData.ErrorCode;
-          if (errorCode === "0" || errorCode === "2") { // 0: Success, 2: Already Confirmed
-            setIsSuccess(true);
-          } else {
-            setIsSuccess(false);
-          }
-        } catch (error) {
-          console.error("Payment confirmation failed:", error);
-          setIsSuccess(false);
-          setPaymentData({ ErrorMessage: "Network or server error." }); // Set a generic error
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      fetchPaymentStatus();
-    } else if (!orderId) {
-        setIsLoading(false);
+    // 1. Construct the Deep Link
+    // Scheme must match AndroidManifest.xml / Info.plist in Flutter
+    // hanuut://payment/success?type=FLEXY&id=...
+    const appScheme = `hanuut://payment/success?type=${type}&id=${id}`;
+    
+    // 2. Attempt to redirect to the app automatically
+    if (id && type) {
+        setTimeout(() => {
+            window.location.href = appScheme;
+        }, 1500); // Small delay to let user see "Success"
     }
-  }, [orderId, isLoading, i18n.language]);
+  }, [type, id]);
 
-  if (isLoading) {
-    return <PageWrapper><Loader /></PageWrapper>;
-  }
-
-  if (!orderId) {
-    // Optionally, redirect to a 404 page
-    return <PageWrapper><h1>Order ID not found.</h1></PageWrapper>;
-  }
+  // Construct a dummy data object for SuccessDisplay to render correctly
+  const paymentData = {
+    OrderNumber: id || "Unknown",
+  };
 
   return (
     <PageWrapper>
-      {isSuccess ? (
+      <div>
         <SuccessDisplay paymentData={paymentData} />
-      ) : (
-        <FailureDisplay paymentData={paymentData} />
-      )}
+        <RedirectMessage>
+           {t("redirecting_to_app", "Redirecting back to Hanuut App...")}
+        </RedirectMessage>
+        {/* Fallback button if auto-redirect fails */}
+        <div style={{textAlign: 'center', marginTop: '10px'}}>
+             <a 
+               href={`hanuut://payment/success?type=${type}&id=${id}`}
+               style={{color: '#39A170', fontWeight: 'bold'}}
+             >
+                {t("click_here_if_not_redirected", "Click here if not redirected")}
+             </a>
+        </div>
+      </div>
     </PageWrapper>
   );
 };
 
-export default PaymentResultPage;
+export default PaymentReturnPage;

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import Playstore from "../../../assets/playstore.webp";
 
-// --- Styled Components for the Redesigned Header ---
+// --- Styled Components ---
 
 const HeaderWrapper = styled.header`
   width: 100%;
@@ -15,11 +15,15 @@ const HeaderWrapper = styled.header`
   position: relative;
   overflow: hidden;
 
+  /* Premium (Subscribed) Styles */
   ${(props) =>
     props.$isPremium
       ? css`
-          /* Premium Styles */
-          padding: 3rem 2rem; /* Adjusted padding */
+          padding: 3rem 2rem;
+          background-color: #18181B; /* Fallback */
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          
+          /* Background Image Blur Effect */
           &::before {
             content: '';
             position: absolute;
@@ -27,12 +31,23 @@ const HeaderWrapper = styled.header`
             background-image: url(${(props) => props.$bgImage});
             background-size: cover;
             background-position: center;
-            filter: blur(20px) brightness(0.35); 
-            transform: scale(1.2);
+            filter: blur(25px) brightness(0.4); 
+            transform: scale(1.2); /* Zoom in to hide blur edges */
+            z-index: 1;
+            opacity: 0.8;
+          }
+          
+          /* Gradient Overlay */
+          &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(24,24,27,0.4), rgba(24,24,27,0.9));
             z-index: 1;
           }
+
           @media (max-width: 768px) {
-            padding: 2rem 1.5rem; /* Responsive padding */
+            padding: 2rem 1.5rem;
           }
         `
       : css`
@@ -48,57 +63,65 @@ const HeaderWrapper = styled.header`
 
 const ContentContainer = styled.div`
   position: relative;
-  z-index: 2;
+  z-index: 2; /* Sit above the background */
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
 
-  /* --- THE FIX: Only standard version goes to column on mobile --- */
+  /* Stack on mobile only for Standard, Premium keeps row if possible or specific layout */
   ${(props) => !props.$isPremium && css`
     @media (max-width: 850px) {
       flex-direction: column;
       gap: 1.5rem;
     }
   `}
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
 `;
 
 const ShopInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const Logo = styled.img`
   width: 90px;
   height: 90px;
-  border-radius: ${(props) => props.theme.defaultRadius};
+  border-radius: 20px; /* Softer corners */
   object-fit: cover;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
 `;
 
 const ShopText = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 `;
 
 const ShopName = styled.h1`
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 800;
   color: ${(props) => props.theme.text};
+  margin: 0;
+  line-height: 1.1;
 
   ${(props) =>
     props.$isPremium &&
     css`
-      color: ${props.$accentColor || '#FFFFFF'};
-      text-shadow: 
-        /* 1. Stroke effect (a subtle, dark border) */
-        -1px -1px 0 ${props.$brandColor || props.theme.primaryColor},  
-         1px -1px 0 ${props.$brandColor || props.theme.primaryColor},
-        -1px  1px 0 ${props.$brandColor || props.theme.primaryColor},
-         1px  1px 0 ${props.$brandColor || props.theme.primaryColor},
-        /* 2. Glow effect (the original shadow) */
-        0 0 15px ${props.$brandColor || props.theme.primaryColor};
-      font-family: 'Cairo Variable', sans-serif;
+      color: #FFFFFF;
+      font-family: 'Tajawal', sans-serif;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     `}
 
   @media (max-width: 768px) {
@@ -107,19 +130,19 @@ const ShopName = styled.h1`
 `;
 
 const ShopDescription = styled.p`
-  font-size: ${(props) => props.theme.fontlg};
+  font-size: 1rem;
   color: ${(props) => props.theme.secondaryText};
+  max-width: 600px;
   
   ${(props) =>
     props.$isPremium &&
     css`
-      color: rgba(255, 255, 255, 0.85);
-      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+      color: #a1a1aa; /* Zinc 400 */
+      line-height: 1.5;
     `}
 
-  /* --- THE FIX: Smaller font size on mobile --- */
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.fontmd};
+    font-size: 0.9rem;
   }
 `;
 
@@ -129,34 +152,45 @@ const DownloadApp = styled.div`
   align-items: flex-end;
   gap: 0.5rem;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    align-items: flex-start;
+    width: 100%;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
 `;
 
 const DownloadTitle = styled.p`
-  font-size: ${(props) => props.theme.fontsm};
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
   color: ${(props) => props.theme.secondaryText};
   
   ${(props) =>
     props.$isPremium &&
     css`
-      color: rgba(255, 255, 255, 0.8);
+      color: #71717a;
     `}
 `;
 
-// --- THE FIX: Create a smaller version of the button for mobile premium ---
-const ScaledButton = styled(ButtonWithIcon)`
+// Helper to scale button on mobile
+const ScaledButtonWrapper = styled.div`
   @media (max-width: 768px) {
-    transform: scale(0.85);
-    transform-origin: right;
+    width: 100%;
+    button {
+        width: 100%;
+        justify-content: center;
+    }
   }
 `;
-
 
 const ShopHeader = ({ shop, imageData, isSubscribed, brandColors }) => {
   const { t } = useTranslation();
 
-  if (!shop) {
-    return null;
-  }
+  if (!shop) return null;
   
   const link = "https://play.google.com/store/apps/details?id=com.hanuut.shop";
   
@@ -164,10 +198,11 @@ const ShopHeader = ({ shop, imageData, isSubscribed, brandColors }) => {
     <HeaderWrapper $isPremium={isSubscribed} $bgImage={imageData}>
       <ContentContainer $isPremium={isSubscribed}>
         <ShopInfo>
-          {!isSubscribed && imageData && <Logo src={imageData} alt={`${shop.name} logo`} />}
+          {/* Always show Logo for Premium (using the passed imageData as logo if available, or a placeholder) */}
+          {imageData && <Logo src={imageData} alt={`${shop.name} logo`} />}
           
           <ShopText>
-            <ShopName $isPremium={isSubscribed} $brandColor={brandColors.main} $accentColor={brandColors?.accent}>
+            <ShopName $isPremium={isSubscribed} $brandColor={brandColors?.main}>
               {shop.name}
             </ShopName>
             <ShopDescription $isPremium={isSubscribed}>
@@ -178,23 +213,15 @@ const ShopHeader = ({ shop, imageData, isSubscribed, brandColors }) => {
 
         <DownloadApp>
           <DownloadTitle $isPremium={isSubscribed}>{t("toOrder")}</DownloadTitle>
-          <Link to={link}>
-            {/* --- THE FIX: Use the new ScaledButton for the premium version --- */}
-            {isSubscribed ? (
-                <ScaledButton
-                    image={Playstore}
-                    backgroundColor="#000000"
-                    text1={t("getItOn")}
-                    text2={t("googlePlay")}
-                />
-            ) : (
+          <Link to={link} style={{ width: '100%' }}>
+            <ScaledButtonWrapper>
                 <ButtonWithIcon
                     image={Playstore}
-                    backgroundColor="#000000"
+                    backgroundColor={isSubscribed ? "#000000" : "#000000"}
                     text1={t("getItOn")}
                     text2={t("googlePlay")}
                 />
-            )}
+            </ScaledButtonWrapper>
           </Link>
         </DownloadApp>
       </ContentContainer>

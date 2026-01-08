@@ -8,9 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 // --- Imports ---
 import ShopHeader from './ShopHeader';
 import ProductShowcase from '../../Product/components/landing/ProductShowcase';
-import ProductDetailsModal from '../../Product/components/landing/ProductDetailsModal';
 import ProductFilterBar from '../../Product/components/landing/ProductFilterBar';
-import Cart from './Cart';
 import { getImageUrl } from '../../../utils/imageUtils';
 
 // --- Redux ---
@@ -27,12 +25,9 @@ import { partnerTheme } from '../../../config/Themes';
 const PageWrapper = styled.main`
     width: 100%;
     min-height: 100vh;
-    background-color: #050505; /* Deep Black */
+    background-color: #050505;
     color: white;
     padding-bottom: 6rem;
-    
-    /* FIX 1: Increase top padding significantly */
-    /* NavHeight (5rem) + 3rem extra breathing room = ~8rem total */
     padding-top: calc(${(props) => props.theme.navHeight} + 3rem); 
     
     position: absolute; 
@@ -42,7 +37,6 @@ const PageWrapper = styled.main`
     z-index: 1;
 
     @media (max-width: 768px) {
-        /* Slightly less on mobile, but still spacious */
         padding-top: calc(${(props) => props.theme.navHeightMobile} + 2rem); 
     }
 `;
@@ -56,19 +50,17 @@ const Container = styled.div`
     box-sizing: border-box;
 `;
 
-// We removed the Spacer styled component as it's no longer needed
-
-const GlobalShopLandingPage = ({ shop, image }) => {
+const GlobalShopLandingPage = ({ 
+    shop, 
+    image, 
+    onCardClick, // <--- Only uses this to notify parent
+    isOrderingEnabled 
+}) => {
     const { t, i18n } = useTranslation();
     const dispatch = useDispatch();
     const isArabic = i18n.language === 'ar';
 
-    // --- State ---
-    const [selectedProductForModal, setSelectedProductForModal] = useState(null);
-    const [cartItems, setCartItems] = useState([]);
-    const [isCartOpen, setIsCartOpen] = useState(false);
-    
-    // Filter State
+    // --- Filter State ---
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -104,7 +96,6 @@ const GlobalShopLandingPage = ({ shop, image }) => {
         main: shop.styles?.mainColor || logoPalette?.[0] || "#F07A48",
         accent: shop.styles?.secondaryColor || logoPalette?.[1] || "#39A170",
     };
-    const shopIsOpen = shop.isOpen;
 
     // --- Filter Logic ---
     const allProducts = useMemo(() => {
@@ -125,13 +116,6 @@ const GlobalShopLandingPage = ({ shop, image }) => {
 
     const isFiltering = searchQuery.length > 0 || selectedCategory !== null;
 
-    // --- Handlers ---
-    const handleCardClick = (product) => setSelectedProductForModal(product);
-    const handleCloseModal = () => setSelectedProductForModal(null);
-    const handleAddToCart = (cartItem) => {
-        setCartItems(prev => [...prev, { ...cartItem }]);
-    };
-
     return (
         <ThemeProvider theme={partnerTheme}>
             <PageWrapper>
@@ -144,10 +128,6 @@ const GlobalShopLandingPage = ({ shop, image }) => {
                         brandColors={brandColors}
                     />
                     
-                    {/* 
-                       FIX 2: Removed Spacer.
-                       Added a small margin to FilterBar to separate it slightly from header 
-                    */}
                     <div style={{ marginTop: '2rem' }}>
                         <ProductFilterBar 
                             searchQuery={searchQuery}
@@ -166,7 +146,6 @@ const GlobalShopLandingPage = ({ shop, image }) => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -20 }}
                                 transition={{ duration: 0.3 }}
-                                // FIX 3: Negative margin to pull grid closer to filter bar
                                 style={{ marginTop: '-1.5rem' }}
                             >
                                 <ProductShowcase
@@ -174,8 +153,8 @@ const GlobalShopLandingPage = ({ shop, image }) => {
                                     products={filteredProducts}
                                     loading={newArrivalsLoading} 
                                     error={newArrivalsError}
-                                    onCardClick={handleCardClick}
-                                    shopIsOpen={shopIsOpen}
+                                    onCardClick={onCardClick} // Calls Parent
+                                    isOrderingEnabled={isOrderingEnabled} 
                                 />
                             </motion.div>
                         ) : (
@@ -185,7 +164,6 @@ const GlobalShopLandingPage = ({ shop, image }) => {
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.3 }}
-                                // FIX 3: Negative margin to pull "Featured" closer to filter bar
                                 style={{ marginTop: '-1.5rem' }}
                             >
                                 {featuredProducts.length > 0 && (
@@ -194,8 +172,8 @@ const GlobalShopLandingPage = ({ shop, image }) => {
                                         products={featuredProducts}
                                         loading={featuredLoading}
                                         error={featuredError}
-                                        onCardClick={handleCardClick}
-                                        shopIsOpen={shopIsOpen}
+                                        onCardClick={onCardClick} // Calls Parent
+                                        isOrderingEnabled={isOrderingEnabled} 
                                     />
                                 )}
 
@@ -204,35 +182,12 @@ const GlobalShopLandingPage = ({ shop, image }) => {
                                     products={newArrivals}
                                     loading={newArrivalsLoading}
                                     error={newArrivalsError}
-                                    onCardClick={handleCardClick}
-                                    shopIsOpen={shopIsOpen}
+                                    onCardClick={onCardClick} // Calls Parent
+                                    isOrderingEnabled={isOrderingEnabled}
                                 />
                             </motion.div>
                         )}
                     </AnimatePresence>
-
-                    {/* Modals & Cart */}
-                    {selectedProductForModal && (
-                        <ProductDetailsModal
-                            product={selectedProductForModal}
-                            onClose={handleCloseModal}
-                            onAddToCart={handleAddToCart}
-                            shopIsOpen={shopIsOpen}
-                        />
-                    )}
-
-                    <Cart 
-                        items={cartItems}
-                        isOpen={isCartOpen}
-                        onOpen={() => setIsCartOpen(true)}
-                        onClose={() => setIsCartOpen(false)}
-                        onUpdateQuantity={() => {}}
-                        onSubmitOrder={() => {}}
-                        isPremium={true}
-                        brandColors={brandColors}
-                        shopDomain="global"
-                    />
-
                 </Container>
             </PageWrapper>
         </ThemeProvider>

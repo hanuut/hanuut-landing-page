@@ -797,5 +797,7 @@
   "wiz_type_general": "E-commerce / Général",
   "wiz_type_food": "Restauration",
   "wiz_type_grocery": "Épicerie / Supérette",
-  "wiz_select_type_label": "Choisissez votre type de boutique :"
+  "wiz_select_type_label": "Choisissez votre type de boutique :",
+  "shop_not_validated": "Boutique en cours d'examen",
+  "sales_disabled": "Vente en ligne désactivée"
 }

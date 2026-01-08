@@ -10,6 +10,7 @@ import Loader from "./Loader";
 import HomePage from "../modules/HomePage";
 import NotFoundPage from "../modules/NotFoundPage";
 
+const PaymentReturnPage = lazy(() => import("../modules/payment/PaymentReturnPage"));
 // Lazy-loaded page components for better performance
 const PrivacyPolicy = lazy(() => import("../modules/PrivacyPolicy"));
 const TermsAndConditions = lazy(() => import("../modules/TermsAndConditions"));
@@ -115,16 +116,19 @@ const CustomRouter = ({ appConfig, location }) => {
           {/* Main routes */}
           <Route path="/" element={<HomePage />} />
 
-          {/* --- Payment Routes --- */}
+           {/* --- Payment Routes --- */}
           <Route path="/payment/process" element={<PaymentProcessingPage />} />
           <Route path="/payment/result" element={<PaymentResultPage />} />
+          
+          {/* 2. Add the Return Route here */}
+          <Route path="/payment/return" element={<PaymentReturnPage />} />
 
           {/* Content pages */}
           <Route path="/partners" element={<PartnersPage />} />
           <Route path="/my-hanuut-guide" element={<MyHanuutGuide />} />
           <Route path="/links" element={<LinksPage />} />
           <Route path="/partners/onboarding" element={<OnboardingWizard />} />
-
+         
           {/* Legal pages */}
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route
@@ -140,6 +144,7 @@ const CustomRouter = ({ appConfig, location }) => {
 
           {/* Product and shop routes */}
           <Route path="/product/:productId" element={<ProductPage />} />
+
           {/* 3. The redirect route. This will catch /shop/some-name... */}
           <Route path="/shop/:username" element={<ShopRedirector />} />
 

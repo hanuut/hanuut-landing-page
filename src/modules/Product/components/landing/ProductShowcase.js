@@ -5,7 +5,6 @@ import Loader from '../../../../components/Loader';
 
 const ShowcaseSection = styled.section`
     width: 100%;
-    /* Reduced vertical padding to fix gap between header and products */
     padding: 2rem 0; 
     border-bottom: 1px solid #27272a;
 `;
@@ -14,12 +13,11 @@ const Header = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 1.5rem; /* Reduced margin */
-    padding: 0 0.5rem; /* Small side padding */
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
 `;
 
 const SectionTitle = styled.h2`
-    /* Fixed: Half the size as requested */
     font-size: 1.5rem; 
     font-weight: 700;
     color: white;
@@ -52,7 +50,14 @@ const StatusMessage = styled.p`
   padding: 4rem 0;
 `;
 
-const ProductShowcase = ({ title, products, loading, error, onCardClick, shopIsOpen }) => {
+const ProductShowcase = ({ 
+    title, 
+    products, 
+    loading, 
+    error, 
+    onCardClick, 
+    isOrderingEnabled // <--- Receive Prop
+}) => {
     if (loading) return <Loader fullscreen={false} />;
     if (error) return <StatusMessage>Error loading products</StatusMessage>;
     if (!products || products.length === 0) return null;
@@ -69,7 +74,7 @@ const ProductShowcase = ({ title, products, loading, error, onCardClick, shopIsO
                         key={product._id}
                         product={product}
                         onCardClick={onCardClick}
-                        shopIsOpen={shopIsOpen}
+                        isOrderingEnabled={isOrderingEnabled} // <--- Pass Down
                     />
                 ))}
             </ProductsGrid>

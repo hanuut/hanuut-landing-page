@@ -793,6 +793,8 @@
   "wiz_type_general": "متجر عام / إلكتروني",
   "wiz_type_food": "مطعم / أكل سريع",
   "wiz_type_grocery": "بقالة / سوبرماركت",
-  "wiz_select_type_label": "نوع النظام الذي يناسبك:"
+  "wiz_select_type_label": "نوع النظام الذي يناسبك:",
+  "shop_not_validated": "المتجر قيد المراجعة",
+  "sales_disabled": "البيع متوقف حالياً"
 
 }
