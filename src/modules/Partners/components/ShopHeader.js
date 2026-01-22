@@ -1,231 +1,174 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import ButtonWithIcon from "../../../components/ButtonWithIcon";
-import Playstore from "../../../assets/playstore.webp";
+import { motion } from "framer-motion";
 
 // --- Styled Components ---
 
-const HeaderWrapper = styled.header`
+const HeroContainer = styled.header`
   width: 100%;
-  border-radius: ${(props) => props.theme.defaultRadius};
-  margin-bottom: 2rem;
-  box-sizing: border-box;
   position: relative;
-  overflow: hidden;
-
-  /* Premium (Subscribed) Styles */
-  ${(props) =>
-    props.$isPremium
-      ? css`
-          padding: 3rem 2rem;
-          background-color: #18181B; /* Fallback */
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          
-          /* Background Image Blur Effect */
-          &::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url(${(props) => props.$bgImage});
-            background-size: cover;
-            background-position: center;
-            filter: blur(25px) brightness(0.4); 
-            transform: scale(1.2); /* Zoom in to hide blur edges */
-            z-index: 1;
-            opacity: 0.8;
-          }
-          
-          /* Gradient Overlay */
-          &::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, rgba(24,24,27,0.4), rgba(24,24,27,0.9));
-            z-index: 1;
-          }
-
-          @media (max-width: 768px) {
-            padding: 2rem 1.5rem;
-          }
-        `
-      : css`
-          /* Standard Styles */
-          padding: 1.5rem 2rem;
-          background-color: #ffffff;
-          border: 1px solid ${(props) => props.theme.surfaceBorder};
-          @media (max-width: 850px) {
-            padding: 1.5rem 1rem;
-          }
-        `}
-`;
-
-const ContentContainer = styled.div`
-  position: relative;
-  z-index: 2; /* Sit above the background */
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-
-  /* Stack on mobile only for Standard, Premium keeps row if possible or specific layout */
-  ${(props) => !props.$isPremium && css`
-    @media (max-width: 850px) {
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-  `}
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.5rem;
-  }
+  flex-direction: column;
+  /* 
+     FIX: Changed from 'center' to 'flex-start' 
+     This moves the whole block to the Right (in Arabic) or Left (in English)
+  */
+  align-items: flex-start; 
+  padding: 1rem 0 2rem 0; 
+  margin-bottom: 0.5rem;
 `;
 
-const ShopInfo = styled.div`
+// Glow Layer (Shifted position since content is no longer centered)
+const GlowLayer = styled.div`
+  position: absolute;
+  /* 
+     Adjusted glow to be dynamic based on direction, 
+     or just wide enough to cover the top area 
+  */
+  top: 50%;
+  left: 50%; 
+  transform: translate(-50%, -50%);
+  width: 100%; 
+  height: 80%;
+  background: radial-gradient(
+    ellipse, 
+    ${(props) => props.$glowColor || "rgba(240, 122, 72, 0.12)"} 0%, 
+    transparent 70%
+  );
+  filter: blur(60px);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+`;
+
+const Content = styled.div`
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  /* FIX: Align content to start */
+  justify-content: flex-start;
+`;
+
+// --- Horizontal Layout ---
+const HeaderFlex = styled.div`
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  
+  /* FIX: Force text alignment to start (Right in AR, Left in EN) */
+  text-align: start; 
+  max-width: 800px;
+
+  /* Mobile Stack */
   @media (max-width: 768px) {
-    width: 100%;
+    flex-direction: column;
+    /* FIX: Align items to start on mobile too, per request */
+    align-items: flex-start; 
+    text-align: start;
+    gap: 0.75rem;
   }
 `;
 
-const Logo = styled.img`
-  width: 90px;
-  height: 90px;
-  border-radius: 20px; /* Softer corners */
+const HeroLogo = styled(motion.img)`
+  width: 80px; 
+  height: 80px;
+  border-radius: 20px;
   object-fit: cover;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
   border: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+  
+  @media (max-width: 768px) {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+  }
 `;
 
-const ShopText = styled.div`
+const TextGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 `;
 
-const ShopName = styled.h1`
-  font-size: 2.5rem;
+const HeroTitle = styled(motion.h1)`
+  font-size: clamp(1.5rem, 4vw, 2.2rem); 
   font-weight: 800;
-  color: ${(props) => props.theme.text};
+  color: #FFFFFF;
   margin: 0;
   line-height: 1.1;
-
-  ${(props) =>
-    props.$isPremium &&
-    css`
-      color: #FFFFFF;
-      font-family: 'Tajawal', sans-serif;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    `}
-
-  @media (max-width: 768px) {
-    font-size: 1.8rem;
-  }
+  font-family: 'Tajawal', sans-serif;
+  letter-spacing: -0.01em;
 `;
 
-const ShopDescription = styled.p`
-  font-size: 1rem;
-  color: ${(props) => props.theme.secondaryText};
-  max-width: 600px;
+const HeroDescription = styled(motion.p)`
+  font-size: 0.95rem; 
+  color: #A1A1AA;
+  max-width: 500px;
+  line-height: 1.4;
+  margin: 0;
   
-  ${(props) =>
-    props.$isPremium &&
-    css`
-      color: #a1a1aa; /* Zinc 400 */
-      line-height: 1.5;
-    `}
-
-  @media (max-width: 768px) {
-    font-size: 0.9rem;
-  }
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
-const DownloadApp = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
-  flex-shrink: 0;
+// --- Animations ---
+const fadeUp = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+};
 
-  @media (max-width: 768px) {
-    align-items: flex-start;
-    width: 100%;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
-`;
-
-const DownloadTitle = styled.p`
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-  color: ${(props) => props.theme.secondaryText};
-  
-  ${(props) =>
-    props.$isPremium &&
-    css`
-      color: #71717a;
-    `}
-`;
-
-// Helper to scale button on mobile
-const ScaledButtonWrapper = styled.div`
-  @media (max-width: 768px) {
-    width: 100%;
-    button {
-        width: 100%;
-        justify-content: center;
-    }
-  }
-`;
-
-const ShopHeader = ({ shop, imageData, isSubscribed, brandColors }) => {
+const ShopHeader = ({ shop, imageData, brandColors }) => {
   const { t } = useTranslation();
 
   if (!shop) return null;
   
-  const link = "https://play.google.com/store/apps/details?id=com.hanuut.shop";
-  
-  return (
-    <HeaderWrapper $isPremium={isSubscribed} $bgImage={imageData}>
-      <ContentContainer $isPremium={isSubscribed}>
-        <ShopInfo>
-          {/* Always show Logo for Premium (using the passed imageData as logo if available, or a placeholder) */}
-          {imageData && <Logo src={imageData} alt={`${shop.name} logo`} />}
-          
-          <ShopText>
-            <ShopName $isPremium={isSubscribed} $brandColor={brandColors?.main}>
-              {shop.name}
-            </ShopName>
-            <ShopDescription $isPremium={isSubscribed}>
-              {shop.description}
-            </ShopDescription>
-          </ShopText>
-        </ShopInfo>
+  const glowColor = brandColors?.main ? `${brandColors.main}30` : null; 
 
-        <DownloadApp>
-          <DownloadTitle $isPremium={isSubscribed}>{t("toOrder")}</DownloadTitle>
-          <Link to={link} style={{ width: '100%' }}>
-            <ScaledButtonWrapper>
-                <ButtonWithIcon
-                    image={Playstore}
-                    backgroundColor={isSubscribed ? "#000000" : "#000000"}
-                    text1={t("getItOn")}
-                    text2={t("googlePlay")}
-                />
-            </ScaledButtonWrapper>
-          </Link>
-        </DownloadApp>
-      </ContentContainer>
-    </HeaderWrapper>
+  return (
+    <HeroContainer>
+      <GlowLayer $glowColor={glowColor} />
+      
+      <Content>
+        <HeaderFlex>
+          {imageData && (
+            <HeroLogo 
+              src={imageData} 
+              alt={`${shop.name} logo`} 
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+            />
+          )}
+          
+          <TextGroup>
+            <HeroTitle 
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              transition={{ delay: 0.1 }}
+            >
+              {shop.name}
+            </HeroTitle>
+            
+            {shop.description && (
+              <HeroDescription
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                transition={{ delay: 0.2 }}
+              >
+                {shop.description}
+              </HeroDescription>
+            )}
+          </TextGroup>
+        </HeaderFlex>
+      </Content>
+    </HeroContainer>
   );
 };
 

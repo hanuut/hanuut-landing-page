@@ -10,102 +10,82 @@ import ShopHeader from "./ShopHeader";
 import StickyCategoryNav from "../../Categories/components/StickyCategoryNav"; 
 import PremiumDishCard from "../../Dish/components/PremiumDishCard"; 
 import Cart from "./Cart";
+import PoweredByHanuut from "../../../components/PoweredByHanuut";
 
 // --- Services & Utils ---
 import { createPosOrder } from "../services/orderServices";
-import { getImageUrl } from "../../../utils/imageUtils"; // The Blob Utility we created
+import { getImageUrl } from "../../../utils/imageUtils";
 
 // --- Redux State ---
 import { fetchCategories, selectCategories } from "../../Categories/state/reducers";
 import { fetchDishesByCategory, selectDishes } from "../../Dish/state/reducers";
+import { 
+    addToCart, 
+    updateCartQuantity, 
+    closeCart, 
+    selectCart 
+} from "../../Cart/state/reducers"; // Import Actions
 
 // --- Themes ---
 import { partnerTheme } from "../../../config/Themes"; 
 
-// --- Styled Components ---
-
+// --- Styled Components (Kept same) ---
 const PageWrapper = styled.main`
   width: 100%;
   min-height: 100vh;
-  background-color: #050505; /* Force Deep Dark Background */
-  color: white;
-  padding-bottom: 120px; /* Extra space for Floating Cart Button */
+  background-color: ${(props) => props.theme.body}; 
+  color: ${(props) => props.theme.text};
+  padding-bottom: 6rem;
+  padding-top: 0;
   position: relative;
+  z-index: 1;
 `;
 
-const HeaderContainer = styled.div`
+const MainContainer = styled.div`
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  width: 100%;
-  padding: 1rem;
-  box-sizing: border-box;
-`;
-
-const ContentContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 0 1rem;
+  padding: calc(${(props) => props.theme.navHeight} + 1rem) 1rem 1rem 1rem;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   box-sizing: border-box;
-`;
 
-const CategorySection = styled.div`
-  margin-bottom: 3rem;
-  scroll-margin-top: 160px; /* Offset for sticky nav + header */
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  color: white;
-  font-family: 'Tajawal', sans-serif;
-  font-weight: 700;
-  border-bottom: 1px solid #27272a;
-  padding-bottom: 0.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const DishesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-  
-  @media (max-width: 500px) {
-    grid-template-columns: 1fr; /* Full width cards on mobile */
+  @media (max-width: 768px) {
+    padding-top: calc(${(props) => props.theme.navHeightMobile} + 1rem);
   }
 `;
 
-const EmptyState = styled.div`
-  padding: 4rem;
-  text-align: center;
-  color: #71717a;
-  font-size: 1.2rem;
+const ContentContainer = styled.div` width: 100%; margin-top: 1rem; `;
+const CategorySection = styled.div` margin-bottom: 3rem; scroll-margin-top: 180px; `;
+const SectionTitle = styled.h2`
+  font-size: 1.5rem; margin-bottom: 1.5rem; color: white; font-family: 'Tajawal', sans-serif; font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.5rem;
 `;
+const DishesGrid = styled.div`
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+`;
+const EmptyState = styled.div` padding: 4rem; text-align: center; color: #8E8E93; font-size: 1.2rem; `;
 
 const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
 
   // --- Redux Data ---
-  // We fetch categories and dishes from the store
   const { categories, loading: categoriesLoading } = useSelector(selectCategories);
   const { dishes, loading: dishesLoading } = useSelector(selectDishes);
+  const { cart } = useSelector(selectCart); // Get Global Cart
 
-  // --- Local State ---
-  const [cartItems, setCartItems] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  // --- Filter Cart for CURRENT SHOP ---
+  const shopCartItems = useMemo(() => {
+      if (!selectedShop?._id) return [];
+      return cart.filter(item => item.shopId === selectedShop._id);
+  }, [cart, selectedShop]);
+
   const [activeCategory, setActiveCategory] = useState(null); 
   const [isSubmitting, setIsSubmitting] = useState(null);
-  
-  // Track which categories we have already fetched dishes for to avoid loops
   const [fetchedCategories, setFetchedCategories] = useState(new Set());
 
   // --- 1. Initial Data Fetching ---
-  
-  // Fetch Categories when shop loads
   useEffect(() => {
     if (selectedShop && selectedShop.categories) {
       const validCategories = selectedShop.categories.filter(
@@ -115,7 +95,6 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     }
   }, [dispatch, selectedShop]);
 
-  // Fetch Dishes for ALL visible categories (Waterfall)
   useEffect(() => {
     if (categories.length > 0 && selectedShop._id) {
       categories.forEach((cat) => {
@@ -130,59 +109,38 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     }
   }, [dispatch, categories, selectedShop, fetchedCategories]);
 
-
-  // --- 2. Branding & Visuals ---
-  
-  // Use the new Blob utility for the header image
+  // --- 2. Branding ---
   const imageUrl = useMemo(() => getImageUrl(selectedShopImage), [selectedShopImage]);
-  
-  const { data: logoPalette } = usePalette(imageUrl, 2, "hex", { 
-    crossOrigin: "Anonymous",
-    quality: 10
-  });
+  const { data: logoPalette } = usePalette(imageUrl, 2, "hex", { crossOrigin: "Anonymous", quality: 10 });
 
   const brandColors = useMemo(() => ({
     main: selectedShop.styles?.mainColor || logoPalette?.[0] || "#F07A48",
     accent: selectedShop.styles?.secondaryColor || logoPalette?.[1] || "#39A170",
   }), [selectedShop, logoPalette]);
 
-
-  // --- 3. Cart Logic ---
-
+  // --- 3. Cart Logic (Redux Based) ---
+  
   const handleAddToCart = (dish) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.dish._id === dish._id);
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.dish._id === dish._id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        return [...prevItems, { dish: dish, quantity: 1 }];
-      }
-    });
-    // Optional: Open cart automatically on first add?
-    // setIsCartOpen(true); 
+    const cartItemPayload = {
+        shopId: selectedShop._id,
+        productId: dish._id,
+        variantId: dish._id, // Food dishes usually don't have complex variants in this view
+        title: dish.name,
+        sellingPrice: dish.sellingPrice,
+        quantity: 1,
+        dish: dish // Store full object for UI rendering if needed
+    };
+    dispatch(addToCart(cartItemPayload));
   };
 
-  const handleUpdateQuantity = (dishId, newQuantity) => {
-    if (newQuantity <= 0) {
-      setCartItems((prev) => prev.filter((item) => item.dish._id !== dishId));
-    } else {
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.dish._id === dishId ? { ...item, quantity: newQuantity } : item
-        )
-      );
-    }
+  const handleUpdateQuantity = (variantId, newQuantity) => {
+    dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
   };
 
   const handlePlaceOrder = async (customerDetails) => {
     if (isSubmitting === "submitting") return;
     setIsSubmitting("submitting");
 
-    // Basic validation
     if (!customerDetails.customerName) {
        alert(t("form_validation_alert"));
        setIsSubmitting(null);
@@ -192,14 +150,15 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     const orderPayload = {
       shopId: selectedShop._id,
       customerName: customerDetails.customerName,
-      tableNumber: customerDetails.tableNumber, // Specific to Food
+      tableNumber: customerDetails.tableNumber,
       note: customerDetails.note,
-      products: cartItems.map((item) => ({
-        productId: item.dish._id,
-        title: item.dish.name,
+      // Use filtered shopItems, not global cart
+      products: shopCartItems.map((item) => ({
+        productId: item.productId,
+        title: item.title,
         quantity: item.quantity,
-        sellingPrice: item.dish.sellingPrice,
-        categoryId: item.dish.categoryId,
+        sellingPrice: item.sellingPrice,
+        categoryId: item.dish?.categoryId, 
       })),
     };
 
@@ -207,8 +166,12 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
       await createPosOrder(orderPayload);
       setIsSubmitting("success");
       setTimeout(() => {
-        setIsCartOpen(false);
-        setCartItems([]);
+        dispatch(closeCart()); 
+        // We might want to clear ONLY this shop's items, but for now assuming clearCart is acceptable behavior on success
+        // Ideally: dispatch(clearShopCart(selectedShop._id))
+        // For simplicity based on existing reducers:
+        shopCartItems.forEach(item => dispatch(updateCartQuantity({ variantId: item.variantId, quantity: 0 })));
+        
         setIsSubmitting(null);
       }, 2500);
     } catch (error) {
@@ -218,9 +181,6 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     }
   };
 
-
-  // --- 4. Navigation Logic ---
-  
   const handleScrollToCategory = (catId) => {
     setActiveCategory(catId);
     if (!catId) {
@@ -229,102 +189,92 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     }
     const element = document.getElementById(`category-${catId}`);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      const yOffset = -180; 
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
 
-
-  // --- Render ---
-
-  if (!selectedShop || categoriesLoading && categories.length === 0) {
+  if (!selectedShop || (categoriesLoading && categories.length === 0)) {
     return <Loader fullscreen={true} />;
   }
 
-  // Filter out hidden categories for display
   const visibleCategories = categories.filter(c => !c.isHidden);
 
   return (
     <ThemeProvider theme={partnerTheme}>
       <PageWrapper>
-        
-        {/* 1. Header */}
-        <HeaderContainer>
+        <MainContainer isArabic={i18n.language === 'ar'}>
+          
           <ShopHeader 
             shop={selectedShop} 
             imageData={imageUrl} 
             isSubscribed={true} 
             brandColors={brandColors} 
           />
-        </HeaderContainer>
 
-        {/* 2. Sticky Nav */}
-        <StickyCategoryNav 
-          categories={visibleCategories} 
-          activeCategory={activeCategory} 
-          onSelect={handleScrollToCategory} 
-        />
+          <StickyCategoryNav 
+            categories={visibleCategories} 
+            activeCategory={activeCategory} 
+            onSelect={handleScrollToCategory} 
+          />
 
-        {/* 3. Content */}
-        <ContentContainer isArabic={i18n.language === 'ar'}>
-          
-          {visibleCategories.length > 0 ? (
-            visibleCategories.map((category) => {
-              // Filter dishes from Redux for this specific category
-              // Note: Redux dishes array structure is { dish: {...}, categoryId, ... }
-              const categoryDishes = dishes.filter(
-                (d) => d.categoryId === category.id && d.dish.isHidden !== true
-              );
+          <ContentContainer>
+            {visibleCategories.length > 0 ? (
+              visibleCategories.map((category) => {
+                const categoryDishes = dishes.filter(
+                  (d) => d.categoryId === category.id && d.dish.isHidden !== true
+                );
 
-              if (categoryDishes.length === 0) return null; // Don't show empty categories
+                if (categoryDishes.length === 0) return null;
 
-              return (
-                <CategorySection key={category.id} id={`category-${category.id}`}>
-                  <SectionTitle>
-                    {i18n.language === 'ar' ? category.name : (category.nameFr || category.name)}
-                  </SectionTitle>
-                  
-                  <DishesGrid>
-                    {categoryDishes.map((dishWrapper) => {
-                      const currentDish = dishWrapper.dish;
-                      const cartItem = cartItems.find(
-                        (item) => item.dish._id === currentDish._id
-                      );
+                return (
+                  <CategorySection key={category.id} id={`category-${category.id}`}>
+                    <SectionTitle>
+                      {i18n.language === 'ar' ? category.name : (category.nameFr || category.name)}
+                    </SectionTitle>
+                    
+                    <DishesGrid>
+                      {categoryDishes.map((dishWrapper) => {
+                        const currentDish = dishWrapper.dish;
+                        // Find this specific item in the Redux store
+                        const cartItem = shopCartItems.find(
+                          (item) => item.variantId === currentDish._id
+                        );
 
-                      return (
-                        <PremiumDishCard
-                          key={currentDish._id}
-                          dish={currentDish}
-                          brandColors={brandColors}
-                          isShopOpen={selectedShop.isOpen}
-                          onAddToCart={() => handleAddToCart(currentDish)}
-                          onUpdateQuantity={handleUpdateQuantity}
-                          cartItem={cartItem}
-                        />
-                      );
-                    })}
-                  </DishesGrid>
-                </CategorySection>
-              );
-            })
-          ) : (
-            <EmptyState>{t("noCategories")}</EmptyState>
-          )}
+                        return (
+                          <PremiumDishCard
+                            key={currentDish._id}
+                            dish={currentDish}
+                            brandColors={brandColors}
+                            isShopOpen={selectedShop.isOpen}
+                            onAddToCart={() => handleAddToCart(currentDish)}
+                            onUpdateQuantity={handleUpdateQuantity}
+                            cartItem={cartItem}
+                          />
+                        );
+                      })}
+                    </DishesGrid>
+                  </CategorySection>
+                );
+              })
+            ) : (
+              <EmptyState>{t("noCategories")}</EmptyState>
+            )}
+          </ContentContainer>
 
-        </ContentContainer>
+        </MainContainer>
 
-        {/* 4. Floating Cart */}
+        {/* 4. Cart Modal */}
         <Cart 
-          items={cartItems} 
-          isOpen={isCartOpen} 
-          onOpen={() => setIsCartOpen(true)} 
-          onClose={() => setIsCartOpen(false)}
+          items={shopCartItems} // Pass only shop items
           onUpdateQuantity={handleUpdateQuantity}
           onSubmitOrder={handlePlaceOrder}
-          isPremium={true}
-          brandColors={brandColors}
           isSubmitting={isSubmitting}
-          shopDomain={shopDomain} // "food"
+          shopDomain={shopDomain}
         />
+
+        <PoweredByHanuut />
 
       </PageWrapper>
     </ThemeProvider>

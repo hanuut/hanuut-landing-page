@@ -6,10 +6,11 @@ import { FaSearch, FaTimes } from 'react-icons/fa';
 
 const Wrapper = styled.div`
     width: 100%;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem; 
+    margin-top: 0.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem; 
     position: relative;
     z-index: 10;
 `;
@@ -19,63 +20,68 @@ const SearchContainer = styled.div`
     position: relative;
     width: 100%;
     max-width: 500px;
-    margin: 0 auto;
+    /* 
+       FIX: Removed 'margin: 0 auto' to stop centering.
+       It will now obey the parent's text direction (RTL/LTR).
+    */
+    margin: 0; 
 `;
 
 const SearchInput = styled.input`
     width: 100%;
-    background-color: #18181B; /* Zinc 900 */
-    border: 1px solid #27272A; /* Zinc 800 */
+    background-color: #2C2C2E; 
+    border: 1px solid rgba(255, 255, 255, 0.05); 
     color: white;
-    font-size: 1rem;
-    padding: 1rem 3rem; /* Space for icons */
-    border-radius: 99px;
+    font-size: 0.95rem; 
+    padding: 0.8rem 2.8rem; 
+    border-radius: 12px; 
     transition: all 0.3s ease;
     font-family: 'Tajawal', sans-serif;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 
     &:focus {
         outline: none;
         border-color: ${(props) => props.theme.primaryColor || '#F07A48'};
-        box-shadow: 0 0 0 4px rgba(240, 122, 72, 0.1);
-        background-color: #27272A;
+        background-color: #3A3A3C;
     }
 
     &::placeholder {
-        color: #71717a;
+        color: #8E8E93;
     }
 `;
 
 const SearchIcon = styled.div`
     position: absolute;
-    left: ${(props) => (props.isArabic ? 'auto' : '1.2rem')};
-    right: ${(props) => (props.isArabic ? '1.2rem' : 'auto')};
+    left: ${(props) => (props.isArabic ? 'auto' : '1rem')};
+    right: ${(props) => (props.isArabic ? '1rem' : 'auto')};
     top: 50%;
     transform: translateY(-50%);
-    color: #71717a;
-    font-size: 1.1rem;
+    color: #8E8E93;
+    font-size: 1rem;
     pointer-events: none;
 `;
 
 const ClearButton = styled.button`
     position: absolute;
-    right: ${(props) => (props.isArabic ? 'auto' : '1.2rem')};
-    left: ${(props) => (props.isArabic ? '1.2rem' : 'auto')};
+    right: ${(props) => (props.isArabic ? 'auto' : '1rem')};
+    left: ${(props) => (props.isArabic ? '1rem' : 'auto')};
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    background: rgba(142, 142, 147, 0.2);
     border: none;
-    color: #71717a;
+    color: #D1D1D6;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 4px;
     border-radius: 50%;
-    transition: all 0.2s;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
 
     &:hover {
-        background-color: rgba(255,255,255,0.1);
+        background-color: rgba(255,255,255,0.2);
         color: white;
     }
 `;
@@ -83,36 +89,41 @@ const ClearButton = styled.button`
 // --- Category Pills Styling ---
 const CategoryList = styled.div`
     display: flex;
-    gap: 0.8rem;
+    gap: 0.6rem; 
     overflow-x: auto;
-    padding-bottom: 0.5rem;
+    /* 
+       FIX: Added padding to ensure the first chip isn't cut off 
+       and shadows render correctly.
+    */
+    padding: 4px 4px 12px 4px; 
+    
+    /* 
+       FIX: Always flex-start. 'center' breaks scrolling when content overflows. 
+    */
     justify-content: flex-start;
     
     /* Hide scrollbar */
     -ms-overflow-style: none; 
     scrollbar-width: none; 
     &::-webkit-scrollbar { display: none; }
-
-    @media (min-width: 768px) {
-        justify-content: center;
-    }
 `;
 
 const CategoryPill = styled(motion.button)`
-    padding: 0.6rem 1.4rem;
-    border-radius: 12px;
-    font-size: 0.9rem;
+    padding: 0.5rem 1rem; 
+    border-radius: 8px;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.2s ease;
     font-family: 'Tajawal', sans-serif;
+    
     border: 1px solid ${(props) => props.$isActive ? props.theme.primaryColor : 'transparent'};
-    background-color: ${(props) => props.$isActive ? 'rgba(240, 122, 72, 0.15)' : '#18181B'};
-    color: ${(props) => props.$isActive ? props.theme.primaryColor : '#A1A1AA'};
+    background-color: ${(props) => props.$isActive ? 'rgba(240, 122, 72, 0.15)' : '#2C2C2E'};
+    color: ${(props) => props.$isActive ? props.theme.primaryColor : '#D1D1D6'};
 
     &:hover {
-        background-color: #27272A;
+        background-color: #3A3A3C;
         color: white;
     }
 `;

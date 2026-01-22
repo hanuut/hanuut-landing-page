@@ -1,17 +1,19 @@
-// components/Navbar.js
-
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux"; 
+import { FaShoppingCart } from "react-icons/fa"; 
+
+// Redux
 import { selectShop } from "../modules/Partners/state/reducers"; 
 import { selectSelectedShopImage } from "../modules/Images/state/reducers";
+import { selectCart, toggleCart } from "../modules/Cart/state/reducers"; 
+
 import LanguagesDropDown from "./LanguagesDropDown";
 import Logo from "./Logo";
 import logoAr from "../assets/logo-ar.png";
 import logoEn from "../assets/logo-en.png";
-import { usePalette } from 'color-thief-react';
 import btoa from 'btoa';
 
 const bufferToUrl = (imageObject) => {
@@ -23,12 +25,32 @@ const bufferToUrl = (imageObject) => {
   return `data:image/${mimeType};base64,${base64String}`;
 };
 
-// --- (Styled Components are unchanged) ---
+// --- STYLED COMPONENTS ---
+
 const Section = styled.section`
-  position: sticky; top: 0; width: 100vw; height: ${(props) => props.theme.navHeight};
-  z-index: 1000; display: flex; justify-content: center; align-items: center;
-  transition: background-color 0.4s ease;
-  background-color: ${({ theme, $brandColor }) => $brandColor || theme.body};
+  position: fixed; 
+  top: 0; 
+  left: 0;
+  width: 100vw; 
+  height: ${(props) => props.theme.navHeight};
+  z-index: 1000; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  background-color: ${({ $isScrolled }) => 
+    $isScrolled ? "rgba(28, 28, 30, 0.85)" : "transparent"};
+  
+  backdrop-filter: ${({ $isScrolled }) => 
+    $isScrolled ? "blur(20px) saturate(180%)" : "none"};
+    
+  -webkit-backdrop-filter: ${({ $isScrolled }) => 
+    $isScrolled ? "blur(20px) saturate(180%)" : "none"};
+
+  border-bottom: 1px solid ${({ $isScrolled }) => 
+    $isScrolled ? "rgba(255, 255, 255, 0.1)" : "transparent"};
+
   @media (max-width: 768px) { height: ${(props) => props.theme.navHeightMobile}; }
 `;
 
@@ -42,6 +64,8 @@ const NavGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  height: 100%;
+  position: relative;
 `;
 
 const DesktopMenu = styled.ul`
@@ -50,9 +74,20 @@ const DesktopMenu = styled.ul`
 `;
 
 const MenuItem = styled.li`
-  a { color: ${({ theme, $textColor }) => $textColor || theme.text}; text-decoration: none; }
+  a { 
+    /* Force color with !important to override global defaults */
+    color: ${({ $textColor }) => $textColor} !important; 
+    text-decoration: none; 
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
   cursor: pointer; position: relative;
-  &::after { content: " "; display: block; width: 0%; height: 2px; background-color: ${({ theme, $textColor }) => $textColor || theme.text}; transition: width 0.3s ease; }
+  
+  &::after { 
+    content: " "; display: block; width: 0%; height: 2px; 
+    background-color: ${({ $textColor }) => $textColor}; 
+    transition: width 0.3s ease; 
+  }
   &:hover::after { width: 100%; }
 `;
 
@@ -63,16 +98,75 @@ const HamburgerButton = styled.button`
 `;
 
 const HamburgerIcon = styled.div`
-  width: 28px; height: 2px; background-color: ${({ theme, $iconColor }) => $iconColor || theme.text};
+  width: 28px; height: 2px; background-color: ${({ $iconColor }) => $iconColor};
   position: relative; transition: all 0.3s ease;
   ${(props) => props.$isOpen && css` background-color: transparent; `}
   &::before, &::after {
     content: ''; position: absolute; left: 0; width: 28px; height: 2px;
-    background-color: ${({ theme, $iconColor }) => $iconColor || theme.text};
+    background-color: ${({ $iconColor }) => $iconColor};
     transition: transform 0.3s ease;
   }
   &::before { top: -8px; ${(props) => props.$isOpen && css` top: 0; transform: rotate(45deg); `} }
   &::after { top: 8px; ${(props) => props.$isOpen && css` top: 0; transform: rotate(-45deg); `} }
+`;
+
+// --- Shop Identity Components ---
+const LogoSwapContainer = styled.div`
+  position: relative;
+  height: 40px;
+  width: 200px;
+  display: flex;
+  align-items: center;
+`;
+
+const HanuutLogoWrapper = styled.div`
+  position: absolute;
+  top: 50%; left: 0; transform: translateY(-50%);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  opacity: ${(props) => (props.$visible ? 1 : 0)};
+  pointer-events: ${(props) => (props.$visible ? "all" : "none")};
+  ${props => !props.$visible && css` transform: translateY(-30%); `}
+`;
+
+const ShopIdentityWrapper = styled.div`
+  position: absolute;
+  top: 50%; left: 0; transform: translateY(-50%);
+  display: flex; align-items: center; gap: 0.75rem;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  opacity: ${(props) => (props.$visible ? 1 : 0)};
+  pointer-events: ${(props) => (props.$visible ? "all" : "none")};
+  ${props => !props.$visible && css` transform: translateY(-20%); `}
+`;
+
+const NavShopLogo = styled.img`
+  width: 32px; height: 32px; border-radius: 8px; object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.1);
+`;
+
+const NavShopName = styled.span`
+  font-size: 1rem; font-weight: 700; color: #FFF; font-family: 'Tajawal', sans-serif;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;
+  @media (max-width: 600px) { display: none; }
+`;
+
+const CartButton = styled.button`
+  position: relative;
+  background: transparent; border: none; cursor: pointer;
+  color: ${({ $color }) => $color};
+  font-size: 1.4rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s ease;
+  
+  &:hover { transform: scale(1.1); }
+`;
+
+const CartBadge = styled.span`
+  position: absolute; top: -5px; right: -8px;
+  background-color: #EF4444; color: white;
+  font-size: 0.7rem; font-weight: 700;
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid #1C1C1E;
 `;
 
 const SidePanel = styled.nav`
@@ -84,132 +178,138 @@ const SidePanel = styled.nav`
   display: flex; flex-direction: column; padding: 6rem 2rem;
   align-items: ${(props) => (props.$isArabic ? "flex-end" : "flex-start")};
 `;
-
 const SidePanelMenu = styled.ul` list-style: none; display: flex; flex-direction: column; gap: 2.5rem; width: 100%; `;
-const SidePanelItem = styled.li` font-size: ${(props) => props.theme.fontxl}; font-weight: 500; a { color: ${(props) => props.theme.text}; text-decoration: none; } `;
+const SidePanelItem = styled.li` font-size: 1.2rem; font-weight: 500; a { color: ${(props) => props.theme.text}; text-decoration: none; } `;
 
-const ShopLogo = styled.img`
-  width: 45px;
-  height: 45px;
-  border-radius: 8px;
-  object-fit: cover;
-`;
-
-const TitleContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
-`;
-
-const SmallHanuutLogo = styled.img`
-  height: 20px;
-  width: auto;
-`;
-
-const MenuTitle = styled.h2`
-  font-size: ${(props) => props.theme.fontlg};
-  font-weight: 600;
-  color: ${({ $textColor }) => $textColor || 'inherit'};
-`;
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [brandColor, setBrandColor] = useState(null);
-  const [textColor, setTextColor] = useState(null);
-
+  const [isScrolled, setIsScrolled] = useState(false);
+  
   const selectedShop = useSelector(selectShop); 
   const selectedShopImage = useSelector(selectSelectedShopImage);
+  const { cart } = useSelector(selectCart);
 
-  const isMenuPage = /^\/(@[^/]+|shop\/[^/]+)$/.test(location.pathname);
-  const isSubscribed = isMenuPage && selectedShop && selectedShop.subscriptionPlanId !== null;
-  
+  const path = location.pathname;
+  const isShopMode = /^(@[^/]+|shop\/[^/]+)/.test(path.substring(1));
+
+  // --- FIXED CART FILTERING LOGIC ---
+  const cartQuantity = useMemo(() => {
+    // 1. Must be in Shop Mode
+    if (!isShopMode) return 0;
+
+    // 2. Must have a selected shop loaded
+    if (!selectedShop || !selectedShop._id) return 0;
+
+    const currentShopId = String(selectedShop._id);
+
+    const shopItems = cart.filter(item => {
+        // Safe string comparison
+        return item.shopId && String(item.shopId) === currentShopId;
+    });
+
+    return shopItems.reduce((acc, item) => acc + item.quantity, 0);
+  }, [cart, isShopMode, selectedShop]);
+
   const shopImageUrl = useMemo(() => bufferToUrl(selectedShopImage), [selectedShopImage]);
-
-  const { data: logoPalette } = usePalette(shopImageUrl, 2, 'hex', {
-    crossOrigin: 'Anonymous',
-    quality: 10,
-  });
-
-  useEffect(() => {
-    if (isSubscribed) {
-      const mainColor = selectedShop.styles?.mainColor || (logoPalette && logoPalette[0]);
-      if (mainColor) {
-        setBrandColor(mainColor);
-        // FIX: Replaced 'main' with 'mainColor' to resolve the undefined error.
-        const isDark = (parseInt(mainColor.substr(1, 2), 16) * 0.299 + parseInt(mainColor.substr(3, 2), 16) * 0.587 + parseInt(mainColor.substr(5, 2), 16) * 0.114) < 186;
-        setTextColor(isDark ? '#FFFFFF' : '#1E1E1E');
-      }
-    } else {
-      setBrandColor(null);
-      setTextColor(null);
-    }
-  }, [isSubscribed, selectedShop, logoPalette, shopImageUrl]);
-  
-  const menuTitleKey = useMemo(() => {
-    if (!isSubscribed) return null;
-
-    const domainKeyWord = selectedShop?.domainId?.keyword;
-    
-    switch (domainKeyWord) {
-      case 'global':
-        return 'landing_page_title';
-      case 'grocery':
-        return 'live_shopping_title';
-      case 'food':
-      default:
-        return 'digital_menu_title';
-    }
-  }, [isSubscribed, selectedShop]);
-
   const currentLogo = i18n.language === "ar" ? logoAr : logoEn;
   const isArabic = i18n.language === "ar";
 
+  const getTextColor = () => {
+    if (isScrolled) return "#FFFFFF";
+    if (path.includes("/onboarding")) return "#111217";
+    if (path.includes("/partners") || path.includes("/blog") || isShopMode) {
+      return "#FFFFFF";
+    }
+    return "#111217";
+  };
+  
+  const textColor = getTextColor();
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); 
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const handleCartClick = () => dispatch(toggleCart());
+
+  const renderGlobalNav = () => (
+    <>
+      <NavGroup>
+        <Link to="/"><Logo image={currentLogo} /></Link>
+      </NavGroup>
+      <NavGroup>
+        <DesktopMenu>
+          <MenuItem $textColor={textColor}>
+            <Link to="/" style={{ color: textColor }}>{t("navHome")}</Link>
+          </MenuItem>
+          <MenuItem $textColor={textColor}>
+            <Link to="/partners" style={{ color: textColor }}>{t("navPartners")}</Link>
+          </MenuItem>
+          <MenuItem $textColor={textColor}>
+            <Link to="/blog" style={{ color: textColor }}>{t("navBlog")}</Link>
+          </MenuItem>
+          <li><LanguagesDropDown textColor={textColor} /></li>
+        </DesktopMenu>
+        <HamburgerButton onClick={toggleMobileMenu}>
+          <HamburgerIcon $isOpen={isMobileMenuOpen} $iconColor={textColor} />
+        </HamburgerButton>
+      </NavGroup>
+    </>
+  );
+
+  const renderShopNav = () => (
+    <>
+      <NavGroup>
+        <LogoSwapContainer>
+          <HanuutLogoWrapper $visible={!isScrolled}>
+            <Link to="/"><Logo image={currentLogo} /></Link>
+          </HanuutLogoWrapper>
+
+          <ShopIdentityWrapper $visible={isScrolled}>
+             {shopImageUrl && <NavShopLogo src={shopImageUrl} alt="Shop Logo" />}
+             <NavShopName>{selectedShop?.name}</NavShopName>
+          </ShopIdentityWrapper>
+        </LogoSwapContainer>
+      </NavGroup>
+
+      <NavGroup>
+        {/* Only show Cart if items exist for THIS shop */}
+        {cartQuantity > 0 && (
+            <CartButton onClick={handleCartClick} $color={textColor}>
+            <FaShoppingCart />
+            <CartBadge>{cartQuantity}</CartBadge>
+            </CartButton>
+        )}
+        <LanguagesDropDown textColor={textColor} />
+      </NavGroup>
+    </>
+  );
 
   return (
-    <Section $brandColor={brandColor}>
+    <Section $isScrolled={isScrolled}>
       <Navigation $isArabic={isArabic}>
-        <NavGroup>
-          {isSubscribed && menuTitleKey ? (
-            <NavGroup>
-              {shopImageUrl && <ShopLogo src={shopImageUrl} alt={selectedShop.name ? `${selectedShop.name} logo` : 'Shop logo'} />}
-              <TitleContainer $isArabic={isArabic}>
-                <SmallHanuutLogo src={currentLogo} alt="Hanuut Logo" />
-                <MenuTitle $textColor={textColor}>{t(menuTitleKey)}</MenuTitle>
-              </TitleContainer>
-            </NavGroup>
-          ) : (
-            <Link to="/"><Logo image={currentLogo} /></Link>
-          )}
-        </NavGroup>
-
-        <NavGroup>
-          <DesktopMenu>
-            <MenuItem $textColor={textColor}><Link to="/">{t("navHome")}</Link></MenuItem>
-            <MenuItem $textColor={textColor}><Link to="/partners">{t("navPartners")}</Link></MenuItem>
-             <MenuItem $textColor={textColor}><Link to="/blog">{t("navBlog")}</Link></MenuItem>
-            <li><LanguagesDropDown textColor={textColor} /></li>
-          </DesktopMenu>
-
-          <HamburgerButton onClick={toggleMobileMenu}>
-            <HamburgerIcon $isOpen={isMobileMenuOpen} $iconColor={textColor} />
-          </HamburgerButton>
-        </NavGroup>
+        {isShopMode ? renderShopNav() : renderGlobalNav()}
       </Navigation>
-      
-      <SidePanel $isOpen={isMobileMenuOpen} $isArabic={isArabic}>
-        <SidePanelMenu>
-          <SidePanelItem><Link to="/" onClick={closeMobileMenu}>{t("navHome")}</Link></SidePanelItem>
-          <SidePanelItem><Link to="/partners" onClick={closeMobileMenu}>{t("navPartners")}</Link></SidePanelItem>
-           <MenuItem $textColor={textColor}><Link to="/blog">{t("navBlog")}</Link></MenuItem>
-          <SidePanelItem><LanguagesDropDown handleChooseLanguage={closeMobileMenu} /></SidePanelItem>
-        </SidePanelMenu>
-      </SidePanel>
+
+      {!isShopMode && (
+        <SidePanel $isOpen={isMobileMenuOpen} $isArabic={isArabic}>
+          <SidePanelMenu>
+            <SidePanelItem><Link to="/" onClick={closeMobileMenu}>{t("navHome")}</Link></SidePanelItem>
+            <SidePanelItem><Link to="/partners" onClick={closeMobileMenu}>{t("navPartners")}</Link></SidePanelItem>
+            <SidePanelItem><Link to="/blog" onClick={closeMobileMenu}>{t("navBlog")}</Link></SidePanelItem>
+            <SidePanelItem><LanguagesDropDown handleChooseLanguage={closeMobileMenu} /></SidePanelItem>
+          </SidePanelMenu>
+        </SidePanel>
+      )}
     </Section>
   );
 };

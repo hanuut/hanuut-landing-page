@@ -5,10 +5,9 @@ import { motion } from "framer-motion";
 import BorderBeamButton from "../../../components/BorderBeamButton";
 import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.webp";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; 
 import { FaMagic } from "react-icons/fa";
-// --- NEW IMPORT: Make sure to save your image here ---
-import AppLogo3D from "../../../assets/logos/myHanuut/logo_ar.png"; // <--- 3D Logo Image
+import AppLogo3D from "../../../assets/logos/myHanuut/logo_ar.png"; 
 
 // --- 1. Animations ---
 
@@ -20,7 +19,7 @@ const pulseGlow = keyframes`
 
 const float = keyframes`
   0% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); } /* Increased range for the logo */
+  50% { transform: translateY(-15px); } 
   100% { transform: translateY(0px); }
 `;
 
@@ -28,7 +27,7 @@ const float = keyframes`
 
 const Section = styled.section`
   width: 100%;
-  min-height: 90vh; /* Slightly taller to accommodate the logo */
+  min-height: 100vh; /* Full screen height */
   background-color: #050505;
   color: white;
   display: flex;
@@ -37,9 +36,11 @@ const Section = styled.section`
   justify-content: center;
   position: relative;
   overflow: hidden;
+  
+  /* Ensure it starts at the top of the viewport */
+  top: 0;
 `;
 
-// ... (Keep OrangeAmbient and GridPattern exactly as they were) ...
 const OrangeAmbient = styled.div`
   position: absolute;
   width: 100%;
@@ -79,11 +80,20 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 2rem; /* Reduced slightly to fit everything */
-  padding-top: 2rem;
+  gap: 2rem;
+  
+  /* 
+     FIX: Add padding-top here to push content down 
+     below the fixed navbar 
+  */
+  padding-top: calc(${(props) => props.theme.navHeight} + 2rem);
+  padding-bottom: 4rem;
+
+  @media (max-width: 768px) {
+    padding-top: calc(${(props) => props.theme.navHeightMobile} + 2rem);
+  }
 `;
 
-// --- NEW: 3D Logo Container ---
 const LogoContainer = styled(motion.div)`
   position: relative;
   width: 60px; 
@@ -91,9 +101,7 @@ const LogoContainer = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: -1rem; /* Pull the badge closer */
-  
-  /* The Physics Animation */
+  margin-bottom: -1rem; 
   animation: ${float} 8s ease-in-out infinite;
 
   img {
@@ -102,13 +110,10 @@ const LogoContainer = styled(motion.div)`
     object-fit: contain;
     position: relative;
     z-index: 2;
-    /* Enhance the 3D look */
     filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
   }
 `;
 
-// --- NEW: Logo Glow ---
-// This makes the logo look like it's glowing from behind
 const LogoBacklight = styled.div`
   position: absolute;
   top: 50%;
@@ -231,8 +236,8 @@ const PartnersHero = () => {
 
   const handleDownloadPlay = () => window.open(process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY, "_blank");
   const handleDownloadWindows = () => window.open(process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK, "_blank");
- const handleWizardClick = () => {
-    navigate("/partners/onboarding"); // The route we will define next
+  const handleWizardClick = () => {
+    navigate("/partners/onboarding");
     window.scrollTo(0, 0);
   };
 
@@ -243,14 +248,12 @@ const PartnersHero = () => {
 
       <Container as={motion.div} variants={containerVars} initial="hidden" animate="visible">
         
-        {/* --- NEW: The Floating Logo --- */}
         <LogoContainer variants={itemVars}>
           <LogoBacklight />
           <img src={AppLogo3D} alt="My Hanuut App" />
         </LogoContainer>
 
         <Badge variants={itemVars}>
-          {/* Removed emoji as per previous request if you prefer clean look */}
            {t("partnerHeadingBoost")} {t("myHanuutTitle")}
         </Badge>
 

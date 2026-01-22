@@ -24,7 +24,8 @@ const saveCartToStorage = (cart) => {
 };
 
 const initialState = {
-  cart: loadCartFromStorage(), // <--- LOADS SAVED DATA ON STARTUP
+  cart: loadCartFromStorage(),
+  isCartOpen: false, // <--- NEW: Controls the modal visibility globally
   loading: false,
   error: null,
 };
@@ -33,24 +34,30 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    toggleCart: (state) => {
+      state.isCartOpen = !state.isCartOpen;
+    },
+    openCart: (state) => {
+      state.isCartOpen = true;
+    },
+    closeCart: (state) => {
+      state.isCartOpen = false;
+    },
     addToCart: (state, action) => {
       const { variantId, quantity } = action.payload;
-
-      // Check if item exists
       const existingIndex = state.cart.findIndex(
         (item) => item.variantId === variantId
       );
 
       if (existingIndex >= 0) {
-        // Update quantity if exists
         state.cart[existingIndex].quantity += quantity;
       } else {
-        // Add new item
         state.cart.push(action.payload);
       }
       
-      // Save immediately
       saveCartToStorage(state.cart);
+      // Optional: Auto-open cart on add
+      //state.isCartOpen = true; 
     },
 
     updateCartQuantity: (state, action) => {
@@ -64,7 +71,6 @@ const cartSlice = createSlice({
           state.cart[index].quantity = quantity;
         }
       }
-      // Save immediately
       saveCartToStorage(state.cart);
     },
 
@@ -73,7 +79,6 @@ const cartSlice = createSlice({
       saveCartToStorage([]);
     },
     
-    // Add specific removal action if needed
     removeFromCart: (state, action) => {
        const variantId = action.payload;
        state.cart = state.cart.filter((item) => item.variantId !== variantId);
@@ -82,6 +87,7 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, updateCartQuantity, clearCart, removeFromCart } = cartSlice.actions;
+export const { addToCart, updateCartQuantity, clearCart, removeFromCart, toggleCart, openCart, closeCart } = cartSlice.actions;
 export const reducer = cartSlice.reducer;
 export const selectCart = (state) => state.cart;
+export const selectIsCartOpen = (state) => state.cart.isCartOpen;

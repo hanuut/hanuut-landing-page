@@ -6,20 +6,24 @@ import { getImageUrl } from "../../../../utils/imageUtils";
 import { getImage } from "../../../Images/services/imageServices";
 
 const CardWrapper = styled(motion.div)`
-  background-color: #18181B; 
-  border: 1px solid #27272A;
-  border-radius: 16px;
+  /* Use theme surface (Apple Dark Grey #2C2C2E) */
+  background-color: ${(props) => props.theme.surface}; 
+  border-radius: 12px; /* Consistent with new inputs */
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
   position: relative;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
+  
+  /* Remove explicit border for cleaner look */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 
   &:hover {
     transform: translateY(-4px);
-    border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
+    /* Subtle highlight on hover */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
   }
 `;
 
@@ -28,7 +32,7 @@ const ImageContainer = styled.div`
   aspect-ratio: 1 / 1;
   position: relative;
   overflow: hidden;
-  background-color: #09090b;
+  background-color: #1C1C1E; /* Darker than card */
 
   img {
     width: 100%;
@@ -43,7 +47,8 @@ const ImageContainer = styled.div`
 `;
 
 const Content = styled.div`
-  padding: 0.75rem;
+  /* Tighter padding */
+  padding: 0.6rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -51,21 +56,23 @@ const Content = styled.div`
 `;
 
 const Brand = styled.p`
-  font-size: 0.7rem;
-  color: #71717a; 
+  font-size: 0.65rem;
+  color: ${(props) => props.theme.secondaryText || "#8E8E93"}; 
   text-transform: uppercase;
   font-weight: 700;
   margin: 0;
+  letter-spacing: 0.5px;
 `;
 
 const ProductName = styled.h3`
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #FFFFFF;
+  color: ${(props) => props.theme.text};
   margin: 0;
   line-height: 1.3;
   font-family: 'Tajawal', sans-serif;
   
+  /* Limit to 2 lines */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -81,7 +88,7 @@ const PriceRow = styled.div`
 `;
 
 const Price = styled.span`
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: white;
 `;
@@ -89,14 +96,14 @@ const Price = styled.span`
 const LoadingSkeleton = styled.div`
   width: 100%;
   height: 100%;
-  background: #27272a;
+  background: #3A3A3C;
   opacity: 0.5;
 `;
 
 const PremiumProductCard = ({ 
   product, 
   onCardClick, 
-  isOrderingEnabled // <--- New Prop
+  isOrderingEnabled 
 }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
@@ -139,9 +146,7 @@ const PremiumProductCard = ({
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
-      // --- VISUAL CUE ---
-      // Dim the card if ordering is disabled, but keep it clickable
-      style={{ opacity: isOrderingEnabled ? 1 : 0.75, filter: isOrderingEnabled ? 'none' : 'grayscale(30%)' }}
+      style={{ opacity: isOrderingEnabled ? 1 : 0.6 }}
     >
       <ImageContainer>
         {imageUrl ? (

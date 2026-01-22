@@ -6,13 +6,13 @@ import { getImage } from '../../../Images/services/imageServices';
 import { getImageUrl } from '../../../../utils/imageUtils';
 import { FaTimes, FaMinus, FaPlus } from 'react-icons/fa';
 
-// --- 1. LAYOUT & ANIMATION COMPONENTS ---
+// --- LAYOUT & ANIMATION COMPONENTS ---
 
 const ModalBackdrop = styled(motion.div)`
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(0, 0, 0, 0.75); /* Darker backdrop for focus */
-  backdrop-filter: blur(15px); /* Strong blur */
+  background-color: rgba(0, 0, 0, 0.75); 
+  backdrop-filter: blur(15px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -23,22 +23,18 @@ const ModalBackdrop = styled(motion.div)`
 
 const ModalContent = styled(motion.div)`
   width: 100%;
-  max-width: 950px; /* Spacious width for split view */
+  max-width: 950px; 
   height: auto;
-  max-height: 85vh; /* Keep it off the edges */
-  
-  /* Premium Dark Theme */
-  background-color: #18181B; /* Zinc 900 */
+  max-height: 85vh; 
+  background-color: #18181B; 
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 28px; /* Smooth corners */
+  border-radius: 28px; 
   box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
-  
   position: relative;
-  overflow: hidden; /* Contains the spotlight */
+  overflow: hidden; 
   display: flex;
   flex-direction: column;
 
-  /* Spotlight Effect Overlay */
   &::before {
     content: '';
     position: absolute;
@@ -59,28 +55,24 @@ const ContentLayout = styled.div`
   flex-direction: row;
   height: 100%;
   width: 100%;
-  z-index: 1; /* Above spotlight */
+  z-index: 1; 
   overflow: hidden;
 
-  /* Mobile Stack */
   @media (max-width: 768px) {
     flex-direction: column;
     overflow-y: auto;
   }
 `;
 
-// --- 2. LEFT SECTION: IMAGE ---
-
 const ImageSection = styled.div`
   flex: 1.2;
-  background-color: #09090b; /* Darker than content */
+  background-color: #09090b; 
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   
-  /* On Mobile, it becomes a header image */
   @media (max-width: 768px) {
     flex: none;
     width: 100%;
@@ -98,17 +90,14 @@ const ImageSection = styled.div`
   }
 `;
 
-// --- 3. RIGHT SECTION: DETAILS ---
-
 const InfoSection = styled.div`
   flex: 1;
   padding: 3rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  overflow-y: auto; /* Only scroll text on desktop */
+  overflow-y: auto; 
   
-  /* Scrollbar hiding */
   &::-webkit-scrollbar { display: none; }
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -116,17 +105,15 @@ const InfoSection = styled.div`
   @media (max-width: 768px) {
     padding: 1.5rem;
     gap: 1.5rem;
-    overflow-y: visible; /* Let container scroll on mobile */
+    overflow-y: visible;
   }
 `;
 
 const CloseButton = styled.button`
   position: absolute;
   top: 1.5rem;
-  /* Flip position based on language */
   ${props => props.isArabic ? 'left: 1.5rem;' : 'right: 1.5rem;'}
   z-index: 10;
-  
   width: 42px; height: 42px;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(8px);
@@ -144,8 +131,6 @@ const CloseButton = styled.button`
   }
 `;
 
-// --- 4. TYPOGRAPHY ---
-
 const HeaderGroup = styled.div`
   display: flex;
   flex-direction: column;
@@ -157,7 +142,7 @@ const BrandLabel = styled.span`
   text-transform: uppercase;
   letter-spacing: 0.15em;
   font-weight: 700;
-  color: #71717a; /* Zinc 500 */
+  color: #71717a; 
   display: block;
 `;
 
@@ -181,8 +166,6 @@ const PriceTag = styled.div`
   color: ${(props) => props.theme.primaryColor || '#F07A48'};
   margin-top: 0.5rem;
 `;
-
-// --- 5. OPTIONS (Colors & Sizes) ---
 
 const OptionGroup = styled.div`
   display: flex;
@@ -211,12 +194,10 @@ const OptionPill = styled.button`
   transition: all 0.2s ease;
   font-family: 'Tajawal', sans-serif;
   
-  /* Unselected */
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #d4d4d8;
 
-  /* Selected */
   ${props => props.$active && css`
     background: #FFFFFF;
     color: #000000;
@@ -245,8 +226,6 @@ const ColorCircle = styled.button`
   &:hover { transform: scale(1.1); }
 `;
 
-// --- 6. ACTIONS FOOTER ---
-
 const Footer = styled.div`
   margin-top: auto;
   padding-top: 2rem;
@@ -255,7 +234,6 @@ const Footer = styled.div`
   gap: 1rem;
 `;
 
-// "Add to Cart" Button
 const MainButton = styled.button`
   width: 100%;
   padding: 1.1rem;
@@ -269,7 +247,7 @@ const MainButton = styled.button`
   font-family: 'Tajawal', sans-serif;
 
   background: ${(props) => props.$disabled ? '#27272a' : props.theme.primaryColor};
-  color: ${(props) => props.$disabled ? '#52525b' : '#111'}; // Black text on bright button
+  color: ${(props) => props.$disabled ? '#52525b' : '#111'}; 
   
   ${props => !props.$disabled && css`
     box-shadow: 0 4px 20px ${(props) => `${props.theme.primaryColor}40`};
@@ -278,7 +256,6 @@ const MainButton = styled.button`
   `}
 `;
 
-// Quantity Control Bar
 const QuantityWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -351,12 +328,23 @@ const ProductDetailsModal = ({
     const isArabic = i18n.language === 'ar';
     const modalRef = useRef(null);
     
-    // -- State --
-    const [selectedColor, setSelectedColor] = useState(product?.availabilities[0]?.color || '');
-    const [selectedSize, setSelectedSize] = useState('');
+    // -- 1. FIXED STATE INITIALIZATION --
+    const initialColor = product?.availabilities?.[0]?.color || '';
+    
+    // Function to calculate initial size
+    const getInitialSize = (color) => {
+        const availability = product?.availabilities?.find(av => av.color === color);
+        if (availability && availability.sizes?.length > 0) {
+            return availability.sizes[0].size;
+        }
+        return '';
+    };
+
+    // Initialize state with correct size immediately
+    const [selectedColor, setSelectedColor] = useState(initialColor);
+    const [selectedSize, setSelectedSize] = useState(() => getInitialSize(initialColor)); 
     const [imageBuffer, setImageBuffer] = useState(null);
     
-    // -- Spotlight Effect --
     const handleMouseMove = (e) => {
         if (!modalRef.current) return;
         const rect = modalRef.current.getBoundingClientRect();
@@ -377,11 +365,10 @@ const ProductDetailsModal = ({
         [currentAvailability, selectedSize]
     );
 
-    // -- Check Cart --
-    // Create unique ID for this specific combination
+    // -- 2. Variant ID Logic --
     const currentVariantId = `${product._id}_${selectedColor}_${selectedSize}`;
     
-    // Check if this item is in the Redux cart
+    // Check if this item is in the Redux cart using the matched ID
     const existingCartItem = useMemo(() => {
        if(!cartItems || !currentSizeDetails) return null;
        return cartItems.find(item => item.variantId === currentVariantId);
@@ -389,7 +376,7 @@ const ProductDetailsModal = ({
 
     // -- Effects --
 
-    // Auto-select size if current selection is invalid for new color
+    // Auto-select size only if current size is invalid for new color
     useEffect(() => {
         if (currentAvailability && currentAvailability.sizes.length > 0) {
              const sizeExists = currentAvailability.sizes.some(s => s.size === selectedSize);
@@ -397,9 +384,8 @@ const ProductDetailsModal = ({
                  setSelectedSize(currentAvailability.sizes[0].size);
              }
         }
-    }, [currentAvailability]);
+    }, [currentAvailability, selectedSize]);
 
-    // Fetch Image for the selected color
     useEffect(() => {
         let isMounted = true;
         if (currentAvailability?.imageId) {
@@ -418,7 +404,7 @@ const ProductDetailsModal = ({
         if (!currentSizeDetails) return;
         const cartVariant = {
             product: product,
-            variantId: currentVariantId,
+            variantId: currentVariantId, // Use consistent ID
             color: selectedColor,
             size: selectedSize,
             sellingPrice: currentSizeDetails.sellingPrice,
@@ -426,7 +412,6 @@ const ProductDetailsModal = ({
             quantity: 1
         };
         onAddToCart(cartVariant);
-        // We do NOT close the modal, allowing user to see the change to quantity controls
     };
 
     return (
@@ -448,11 +433,10 @@ const ProductDetailsModal = ({
                     <CloseButton onClick={onClose} isArabic={isArabic}><FaTimes /></CloseButton>
 
                     <ContentLayout>
-                        {/* LEFT: Product Image */}
                         <ImageSection>
                            {imageUrl ? (
                                <motion.img 
-                                   key={imageUrl} // Animate when image changes
+                                   key={imageUrl}
                                    initial={{ opacity: 0, scale: 1.1 }}
                                    animate={{ opacity: 1, scale: 1 }}
                                    transition={{ duration: 0.5 }}
@@ -464,9 +448,7 @@ const ProductDetailsModal = ({
                            )}
                         </ImageSection>
 
-                        {/* RIGHT: Product Information */}
                         <InfoSection isArabic={isArabic}>
-                            
                             <HeaderGroup>
                                 {product.brand && <BrandLabel>{product.brand}</BrandLabel>}
                                 <ProductTitle>{productName}</ProductTitle>
@@ -480,23 +462,14 @@ const ProductDetailsModal = ({
                                 <OptionLabel>{t('color', 'Color')}</OptionLabel>
                                 <PillsContainer>
                                     {product.availabilities.map(av => (
-                                        CSS.supports('color', av.color) ? (
-                                            <ColorCircle 
-                                                key={av.color} 
-                                                $color={av.color} 
-                                                $active={selectedColor === av.color} 
-                                                onClick={() => setSelectedColor(av.color)} 
-                                                title={av.color}
-                                            />
-                                        ) : (
-                                            <OptionPill 
-                                                key={av.color} 
-                                                $active={selectedColor === av.color} 
-                                                onClick={() => setSelectedColor(av.color)}
-                                            >
-                                                {av.color}
-                                            </OptionPill>
-                                        )
+                                        // Simplified pills
+                                        <OptionPill 
+                                            key={av.color} 
+                                            $active={selectedColor === av.color} 
+                                            onClick={() => setSelectedColor(av.color)}
+                                        >
+                                            {av.color}
+                                        </OptionPill>
                                     ))}
                                 </PillsContainer>
                             </OptionGroup>
@@ -519,11 +492,10 @@ const ProductDetailsModal = ({
                                 </OptionGroup>
                             )}
 
-                            {/* Sticky Footer for Actions */}
                             <Footer>
                                 {isOrderingEnabled ? (
                                     existingCartItem ? (
-                                        // ITEM EXISTS: Show Quantity Controls
+                                        // Show Counter logic based on consistent ID check
                                         <QuantityWrapper>
                                             <QtyBtn onClick={() => onUpdateQuantity(currentVariantId, existingCartItem.quantity - 1)}>
                                                 <FaMinus size={14} />
@@ -534,7 +506,6 @@ const ProductDetailsModal = ({
                                             </QtyBtn>
                                         </QuantityWrapper>
                                     ) : (
-                                        // NEW ITEM: Show Add Button
                                         <MainButton 
                                             onClick={handleAddToCartClick}
                                             disabled={!currentSizeDetails}
@@ -544,7 +515,6 @@ const ProductDetailsModal = ({
                                         </MainButton>
                                     )
                                 ) : (
-                                    // ORDERING DISABLED: Show Warning
                                     <WarningBadge>
                                         {t(orderingStatusKey)}
                                     </WarningBadge>

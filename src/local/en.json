@@ -44,7 +44,7 @@
   "loginAndOnline": "Log in to our driver app and set your availability status to 'online.'",
   "startReceivingMission": "You'll start receiving mission requests from our system,  matching you with suitable tasks.",
   "AcceptMissionToWork": "Accept missions and provide excellent service to our customers.",
-  "footerAllRightsReserved": "© 2025 hanuut Express. All rights reserved | ",
+  "footerAllRightsReserved": "© 2026 hanuut Express. All rights reserved | ",
   "footerPrivacyAndPolicy": "Privacy Policy | ",
   "footerTermsOfUse": "Terms of Use  ",
   "thankYouForPurchase": "Thank you for your purchase!",
@@ -795,5 +795,80 @@
   "wiz_type_grocery": "Grocery / Supermarket",
   "wiz_select_type_label": "Choose your shop type:",
   "shop_not_validated": "Shop Under Review",
-  "sales_disabled": "Online Sales Currently Disabled"
+  "sales_disabled": "Online Sales Currently Disabled",
+  "legal": {
+    "privacy_title": "Privacy Policy",
+    "terms_title": "Terms of Use",
+    "last_updated": "Last updated: June 1, 2026",
+    "contact_us": "Contact Us",
+    "contact_text": "If you have any questions about these terms, please contact us at:",
+    
+    "terms_sec1_title": "1. Legal Information",
+    "terms_sec1_text": "Platform Operator: Hanuut Express SARL.\nHeadquarters: Rue Ahmed Benabderezzak, Arris, Batna.\nCommercial Register (RC): 22b0226566-00/05.\nHosting: The platform and databases are hosted in Algiers, Algeria.",
+    
+    "terms_sec2_title": "2. Preamble & Object",
+    "terms_sec2_text": "The Hanuut Express application is a technical intermediary platform. These Terms govern the relationship between The Company (Hanuut Express), The User (Consumer/C2C Seller), and The Partner (Merchants). By using the App, you acknowledge that Hanuut Express is not the seller of goods (unless explicitly marked) but acts as a facilitator.",
+    
+    "terms_sec3_title": "3. Description of Services",
+    "terms_sec3_1_title": "3.1 B2C Marketplace",
+    "terms_sec3_1_text": "Hanuut transmits orders from Users to Partners. The Partner is solely responsible for product quality, safety, and hygiene. Hanuut does not inspect food preparation. Complaints must be directed to the Partner, though Hanuut assists in mediation.",
+    "terms_sec3_2_title": "3.2 C2C Classifieds",
+    "terms_sec3_2_text": "Hanuut acts strictly as a Hosting Provider. We are not a party to C2C transactions and do not handle C2C payments. Users transact at their own risk.",
+    
+    "terms_sec4_title": "4. Ordering & Electronic Contracts",
+    "terms_sec4_text": "Clicking 'Confirm Order' constitutes a binding electronic signature (Law 18-05).",
+    "terms_sec4_sub_title": "Right of Withdrawal (Exclusions)",
+    "terms_sec4_sub_text": "Pursuant to Art. 15 of Law 18-05, the Right of Withdrawal DOES NOT apply to perishable goods (food, groceries) or unsealed hygiene items once preparation has started.",
+    
+    "terms_sec5_title": "5. User Obligations",
+    "terms_sec5_text": "Users agree NOT to post: Weapons, drugs, counterfeit goods, or content offensive to Algerian values. Hanuut reserves the right to delete accounts without notice.",
+    
+    "terms_sec6_title": "6. Limitation of Liability",
+    "terms_sec6_text": "Hanuut does not guarantee 100% uptime. We are not liable for third-party delivery actions or GPS inaccuracies.",
+    
+    "terms_sec7_title": "7. Disputes & Jurisdiction",
+    "terms_sec7_text": "Governed by Algerian Law. Disputes fall under the exclusive jurisdiction of the courts of Batna.",
+
+    "privacy_delete_account_pre": "You can request to delete your account ",
+    "privacy_delete_account_link": "here",
+
+    "privacy_sec1_title": "1. Data Controller",
+    "privacy_sec1_text": "The entity responsible for processing your data is Hanuut Express SARL.",
+
+    "privacy_sec2_title": "2. Data Collection",
+    "privacy_sec2_text": "We collect: Identity (Name, Phone), Precise Geolocation (Critical for service), Device Data, and Transaction History.",
+
+    "privacy_sec3_title": "3. Purpose of Processing",
+    "privacy_sec3_text": "To execute orders, track delivery, provide support, and send status notifications.",
+
+    "privacy_sec4_title": "4. Personal Data & Security",
+    "privacy_sec4_text": "The Hanuut app stores and processes personal data that you have provided to us, in order to provide our Service. It is your responsibility to keep your phone and access to the app secure. We therefore recommend that you do not jailbreak or root your phone, which is the process of removing software restrictions and limitations imposed by the official operating system of your device. It could make your phone vulnerable to malware/viruses/malicious programs, compromise your phone’s security features and it could mean that the Hanuut app won’t work properly or at all.",
+
+    "privacy_sec5_title": "5. Third Party Services",
+    "privacy_sec5_text": "The app does use third party services that declare their own Terms and Conditions.",
+    "privacy_google_play": "Google Play Services",
+
+    "privacy_sec6_title": "6. Data Sharing",
+    "privacy_sec6_text": "We share Name/Address with Partners only for active orders. We may disclose data to Algerian security services upon judicial request.",
+
+    "privacy_sec7_title": "7. Your Rights (Law 18-07)",
+    "privacy_sec7_text": "You have the right to Access, Rectify, Delete, or Object to data processing."
+  },
+  "footer": {
+    "col_about": "Hanuut Express",
+    "col_customers": "For Customers",
+    "col_partners": "For Partners",
+    "col_legal": "Legal & Support",
+    "link_home": "Home / Marketplace",
+    "link_download_customer": "Download App",
+    "link_my_hanuut": "My Hanuut Solution",
+    "link_join": "Open a Shop",
+    "link_download_partner": "Partner App (Windows)",
+    "link_blog": "Resources & Blog",
+    "link_privacy": "Privacy Policy",
+    "link_terms": "Terms of Use",
+    "link_delete": "Delete Account",
+    "contact_title": "Contact Us",
+    "copyright": "© 2026 Hanuut Express. All rights reserved."
+  }
 }

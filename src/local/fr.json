@@ -46,7 +46,7 @@
   "loginAndOnline": "Connectez-vous à notre application pour chauffeurs et définissez votre statut de disponibilité comme 'en ligne'.",
   "startReceivingMission": "Vous commencerez à recevoir des demandes de mission de notre système, qui vous proposera des tâches adaptées.",
   "AcceptMissionToWork": "Acceptez les missions et fournissez un excellent service à nos clients.",
-  "footerAllRightsReserved": "© 2025 hanuut Express. Tous droits réservés | ",
+  "footerAllRightsReserved": "© 2026 hanuut Express. Tous droits réservés | ",
   "footerPrivacyAndPolicy": "Politique de confidentialité | ",
   "footerTermsOfUse": "Conditions d'utilisation",
   "thankYouForPurchase": "Merci pour votre achat !",
@@ -799,5 +799,81 @@
   "wiz_type_grocery": "Épicerie / Supérette",
   "wiz_select_type_label": "Choisissez votre type de boutique :",
   "shop_not_validated": "Boutique en cours d'examen",
-  "sales_disabled": "Vente en ligne désactivée"
+  "sales_disabled": "Vente en ligne désactivée",
+  "legal": {
+    "privacy_title": "Politique de Confidentialité",
+    "terms_title": "Conditions Générales d'Utilisation (CGU)",
+    "last_updated": "Dernière mise à jour : 1 Juin 2026",
+    "contact_us": "Contactez-nous",
+    "contact_text": "Pour toute question concernant ces conditions, veuillez nous contacter à :",
+    
+    "terms_sec1_title": "1. Mentions Légales",
+    "terms_sec1_text": "Opérateur de la plateforme : Hanuut Express SARL.\nSiège social : Rue Ahmed Benabderezzak, Arris, Batna.\nRegistre de Commerce (RC) : 22b0226566-00/05.\nHébergement : Alger, Algérie.",
+    
+    "terms_sec2_title": "2. Objet",
+    "terms_sec2_text": "Hanuut Express est une plateforme d'intermédiation technique. En utilisant l'application, vous reconnaissez que Hanuut n'est pas le vendeur des biens (sauf indication contraire) mais agit comme un facilitateur entre Utilisateurs et Partenaires.",
+    
+    "terms_sec3_title": "3. Description des Services",
+    "terms_sec3_1_title": "3.1 Marketplace B2C",
+    "terms_sec3_1_text": "Le Partenaire est seul responsable de la qualité, de la sécurité et de l'hygiène des produits. Hanuut n'inspecte pas la préparation des aliments. Les réclamations doivent être adressées au Partenaire.",
+    "terms_sec3_2_title": "3.2 Annonces C2C (Particuliers)",
+    "terms_sec3_2_text": "Hanuut agit strictement en tant qu'Hébergeur. Nous ne sommes pas partie aux transactions entre utilisateurs et ne gérons pas les paiements C2C.",
+    
+    "terms_sec4_title": "4. Commandes & Contrats Électroniques",
+    "terms_sec4_text": "La validation de la commande constitue une signature électronique contraignante (Loi 18-05).",
+    "terms_sec4_sub_title": "Droit de Rétractation (Exclusions)",
+    "terms_sec4_sub_text": "Conformément à l'Art. 15 de la Loi 18-05, le droit de rétractation NE S'APPLIQUE PAS aux produits périssables (nourriture, courses) une fois la préparation commencée.",
+    
+    "terms_sec5_title": "5. Obligations de l'Utilisateur",
+    "terms_sec5_text": "Interdiction de publier : Armes, drogues, contrefaçons ou contenu offensant. Hanuut se réserve le droit de supprimer tout compte en infraction.",
+    
+    "terms_sec6_title": "6. Limitation de Responsabilité",
+    "terms_sec6_text": "Hanuut ne garantit pas une disponibilité à 100%. Nous ne sommes pas responsables des actions des tiers ou des inexactitudes GPS.",
+    
+    "terms_sec7_title": "7. Litiges & Juridiction",
+    "terms_sec7_text": "Régis par la loi algérienne. Compétence exclusive des tribunaux de Batna.",
+
+    "privacy_delete_account_pre": "Vous pouvez demander la suppression de votre compte ",
+    "privacy_delete_account_link": "ici",
+
+    "privacy_sec1_title": "1. Responsable du Traitement",
+    "privacy_sec1_text": "L'entité responsable est Hanuut Express SARL.",
+
+    "privacy_sec2_title": "2. Collecte de Données",
+    "privacy_sec2_text": "Nous collectons : Identité (Nom, Tél), Géolocalisation précise, Données de l'appareil et Historique des transactions.",
+
+    "privacy_sec3_title": "3. Finalité du Traitement",
+    "privacy_sec3_text": "Exécution des commandes, suivi de livraison, support client et notifications.",
+
+    "privacy_sec4_title": "4. Données Personnelles et Sécurité",
+    "privacy_sec4_text": "L'application Hanuut stocke et traite les données personnelles que vous nous avez fournies afin de fournir notre service. Il est de votre responsabilité de garder votre téléphone et l'accès à l'application sécurisés. Nous vous recommandons donc de ne pas jailbreaker ou rooter votre téléphone (suppression des restrictions logicielles du système d'exploitation). Cela pourrait rendre votre téléphone vulnérable aux logiciels malveillants/virus, compromettre les fonctionnalités de sécurité et empêcher l'application Hanuut de fonctionner correctement.",
+
+    "privacy_sec5_title": "5. Services Tiers",
+    "privacy_sec5_text": "L'application utilise des services tiers qui déclarent leurs propres conditions générales.",
+    "privacy_google_play": "Services Google Play",
+
+    "privacy_sec6_title": "6. Partage des Données",
+    "privacy_sec6_text": "Partage avec les Partenaires uniquement pour les commandes actives. Divulgation aux autorités sur requête judiciaire.",
+
+    "privacy_sec7_title": "7. Vos Droits (Loi 18-07)",
+    "privacy_sec7_text": "Vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition."
+  
+  },
+  "footer": {
+    "col_about": "Hanuut Express",
+    "col_customers": "Pour les Clients",
+    "col_partners": "Pour les Partenaires",
+    "col_legal": "Légal & Support",
+    "link_home": "Accueil / Marché",
+    "link_download_customer": "Télécharger l'App",
+    "link_my_hanuut": "Solution My Hanuut",
+    "link_join": "Ouvrir une boutique",
+    "link_download_partner": "App Partenaire (Windows)",
+    "link_blog": "Blog & Ressources",
+    "link_privacy": "Politique de Confidentialité",
+    "link_terms": "Conditions d'Utilisation",
+    "link_delete": "Supprimer le compte",
+    "contact_title": "Contactez-nous",
+    "copyright": "© 2026 Hanuut Express. Tous droits réservés."
+  }
 }

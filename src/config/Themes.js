@@ -8,6 +8,8 @@ const commonSettings = {
   fontmd: "0.8rem",
   fontsm: "0.75rem",
   fontxs: "0.65rem",
+  navSpacer: "5rem", // Should match navHeight
+  navSpacerMobile: "4rem",
   
   // Layout
   navHeight: "5rem",
@@ -29,8 +31,7 @@ const commonSettings = {
 export const light = {
   ...commonSettings,
   
-  // --- EXISTING VARIABLES (DO NOT DELETE) ---
-  body: "#FDF4E3",              // Soft Ivory
+  // --- EXISTING VARIABLES (DO NOT DELETE) ---\n  body: "#FDF4E3",              // Soft Ivory
   text: "#111217",              // Deep Charcoal
   textColor: "#111217",         
   textRgba: "17, 18, 23",
@@ -52,8 +53,6 @@ export const light = {
   surfaceBorder: "rgba(0, 0, 0, 0.1)",
 
   // --- NEW GEMINI VARIABLES (Mapped for Light Mode) ---
-  // We keep these dark because the "SpotlightCard" component is designed to be dark
-  // even on a light website (for contrast).
   zinc950: "#09090b", 
   zinc900: "#18181b",
   zinc800: "#27272a",
@@ -66,44 +65,48 @@ export const light = {
 };
 
 // ---------------------------------------------------------
-// 2. PARTNER THEME (The "Dark" Theme - Orange Dominant)
+// 2. PARTNER THEME (The "Apple Dark" Theme)
 // ---------------------------------------------------------
-// Use this theme specifically for the /partners route
+// Use this theme specifically for the /partners and Shop Landing Routes
 export const partnerTheme = {
   ...commonSettings,
 
-  // Backgrounds
-  body: "#050505",              // Deepest Black for "Cosmic" feel
-  text: "#FAFAFA",              // White text
-  textColor: "#FAFAFA",
-  textRgba: "250, 250, 250",
+  // Backgrounds - Apple System Grey 6 (#1C1C1E) instead of #000000
+  body: "#1C1C1E",              
+  text: "#F2F2F7",              // System Grey 6 Text (Off-White)
+  textColor: "#F2F2F7",
+  textRgba: "242, 242, 247",
+  secondaryText: "#8E8E93",     // System Grey
 
   // Brand Colors (Orange Dominant)
   primary: "#F07A48",           // Hanuut Orange
   primaryColor: "#F07A48",      
-  darkGreen: "#0F0F0F",         // Replaced with dark for header backgrounds
+  darkGreen: "#1C1C1E",         // Replaced with background color
   primaryRgba: "240, 122, 72",
-  primaryLight: "#FDBA74",      // Lighter orange
+  primaryLight: "#FDBA74",      
 
   secondary: "#39A170",         // Green becomes the secondary accent
   secondaryColor: "#39A170",
 
   accent: "#397FF9",            // Blue accent
   accentRgba: "57, 127, 249",
-  error: "#D9404D",
+  error: "#FF453A",             // Apple Red
 
-  // Surface (Dark Glass)
-  surface: "#101012", 
-  surfaceBorder: "rgba(255, 255, 255, 0.08)", 
+  // Surface - System Grey 5 (#2C2C2E) for Cards
+  surface: "#2C2C2E", 
+  surfaceBorder: "rgba(255, 255, 255, 0.1)", 
 
-  // Gemini Specifics
-  zinc950: "#050505", 
-  zinc900: "#121212",
-  zinc800: "#27272a",
-  zinc500: "#71717a",
-  zinc100: "#f4f4f5",
+  // Specific Variables for the "Premium" Look
+  appleGlass: "backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); background-color: rgba(28, 28, 30, 0.75);",
+  
+  // Gemini Specifics (Updated for Apple Dark)
+  zinc950: "#1C1C1E", 
+  zinc900: "#2C2C2E",
+  zinc800: "#3A3A3C",
+  zinc500: "#8E8E93",
+  zinc100: "#F2F2F7",
 
-  beamColor: "#F07A48", // Orange beam for partners
-  glassSurface: "rgba(255, 255, 255, 0.03)", // Very subtle dark glass
-  glassBorder: "rgba(255, 255, 255, 0.08)",  // Subtle border
+  beamColor: "#F07A48", 
+  glassSurface: "rgba(44, 44, 46, 0.6)", 
+  glassBorder: "rgba(255, 255, 255, 0.1)",  
 };
