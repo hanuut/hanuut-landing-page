@@ -7,7 +7,8 @@ import { useTranslation } from "react-i18next";
 import PartnersHero from "./components/PartnersHero";
 import PartnersValues from "./components/PartnersValues";
 import CtaSection from "./components/CtaSection";
-import FeaturesBento from "./components/FeaturesBento";
+// --- REPLACE THIS LINE ---
+import FeaturesBento from "./components/FeaturesBento"; 
 
 // --- Main Page Container ---
 const PageWrapper = styled.main`
@@ -42,7 +43,7 @@ const PartnersPage = () => {
 
       <PageWrapper>
         <PartnersHero />
-        <FeaturesBento />
+        <FeaturesBento /> 
         <PartnersValues />
         <CtaSection />
       </PageWrapper>

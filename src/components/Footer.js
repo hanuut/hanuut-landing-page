@@ -167,8 +167,8 @@ const Footer = () => {
     partnerWindows: process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK || "#",
     facebook: process.env.REACT_APP_FACBOOK_SOCIAL_MEDIA || "#",
     instagram: process.env.REACT_APP_INSTAGRAM_SOCIAL_MEDIA || "#",
-    email: "contact@hanuut.com",
-    phone: "0552 93 15 81"
+    email: "contact.hanuut@gmail.com",
+    phone: "0557713440"
   };
 
   return (

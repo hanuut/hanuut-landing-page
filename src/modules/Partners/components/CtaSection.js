@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.webp";
 import BorderBeamButton from "../../../components/BorderBeamButton";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; 
 import { FaMagic } from "react-icons/fa";
 
 // --- Styled Components ---
@@ -21,7 +21,6 @@ const Section = styled.section`
   border-top: 1px solid #18181b;
 `;
 
-// Bottom Glow
 const Glow = styled.div`
   position: absolute;
   bottom: -50%;
@@ -45,7 +44,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 2.5rem;
   z-index: 2;
 `;
 
@@ -66,6 +65,7 @@ const Description = styled.p`
   color: #a1a1aa;
   line-height: 1.6;
   max-width: 600px;
+  font-family: 'Cairo', sans-serif;
 `;
 
 const ButtonsRow = styled.div`
@@ -78,9 +78,7 @@ const ButtonsRow = styled.div`
   justify-content: center;
 `;
 
-
 const WizardButton = styled.button`
-  margin-top: 2rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1rem 2rem;
@@ -114,7 +112,7 @@ const SubText = styled.p`
 
 const CtaSection = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate(); 
 
   const handleDownloadPlay = () => {
     const link = process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
@@ -127,7 +125,7 @@ const CtaSection = () => {
   };
 
   const handleWizardClick = () => {
-    navigate("/partners/onboarding"); // The route we will define next
+    navigate("/partners/onboarding"); 
     window.scrollTo(0, 0);
   };
 
@@ -141,9 +139,9 @@ const CtaSection = () => {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
+          {/* Using dangerouslySetInnerHTML to allow span styling if needed in translation, or simple string */}
           <Title>
-            {t("cta_section_title") || "Ready to"} <br/>
-            <span>{t("partnersCtaBusiness") || "Scale?"}</span>
+             {t("cta_final_title")}
           </Title>
         </motion.div>
 
@@ -153,33 +151,35 @@ const CtaSection = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           viewport={{ once: true }}
         >
-          <Description>{t("cta_section_description")}</Description>
+          <Description>{t("cta_final_desc")}</Description>
         </motion.div>
-<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
+        {/* Wizard Link (Onboarding) */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <WizardButton onClick={handleWizardClick}>
-            <FaMagic /> {/* Magic Icon */}
+            <FaMagic /> 
             {t("cta_wizard_button")}
           </WizardButton>
           <SubText>{t("cta_wizard_sub")}</SubText>
         </div>
+
+        {/* Downloads */}
         <ButtonsRow>
-          {/* Principal */}
           <BorderBeamButton 
             onClick={handleDownloadPlay}
             beamColor="#F07A48"
           >
-              <img src={Playstore} alt="Google Play" style={{ height: '1.5rem' }} />
-              <span>Google Play</span>
+              <img src={Playstore} alt="Google Play" style={{ height: '1.5rem', filter: 'invert(1)' }} />
+              <span>{t("cta_mobile_button")}</span>
           </BorderBeamButton>
           
-          {/* Secondary */}
           <BorderBeamButton 
             onClick={handleDownloadWindows}
             secondary={true}
-            beamColor="#F07A48"
+            beamColor="#397FF9"
           >
               <img src={Windows} alt="Windows" style={{ height: '1.5rem' }} />
-              <span>Windows</span>
+              <span>{t("cta_download_button")}</span>
           </BorderBeamButton>
         </ButtonsRow>
          

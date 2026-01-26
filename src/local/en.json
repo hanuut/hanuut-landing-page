@@ -236,14 +236,6 @@
   "partnersPage_seo_title": "My Hanuut | Your Business, Online",
   "partnersPage_seo_description": "Digitize your shop with My Hanuut. Manage inventory, process orders, and grow your customer base with our powerful and easy-to-use tools.",
   "partnersPage_seo_keywords": "my hanuut, online store, ecommerce algeria, sell online, digital storefront, small business tools",
-  "features_section_title": "Features Built For You",
-  "supermarkets_tab_label": "Grocery",
-  "foodShops_tab_label": "Restaurants",
-  "globalShops_tab_label": "E-Commerce",
-  "features_supermarkets_3_title": "Smart Warehouse Alerts",
-  "features_supermarkets_3_desc": "Get automatic alerts for low-stock, near-expiry, and expired items, so you can make profitable decisions before it's too late.",
-  "features_food_3_title": "Seamless Order Processing",
-  "features_food_3_desc": "Receive and manage online orders directly in the app. Keep your kitchen efficient and your customers happy with real-time updates.",
   "cta_section_title": "Ready to Grow Your Business?",
   "cta_section_description": "Join the community of merchants who trust My Hanuut to bring their business online. Download the app and start your digital journey today.",
   "myHanuutFeatures": {
@@ -694,7 +686,6 @@
   "partnersHero_heading_part2": "With Pen and Paper.",
   "partnersHero_subheading": "Get a professional Digital Menu and Cash Register on your phone in minutes. Reduce mistakes, serve customers faster, and never lose track of your stock again.",
   "partnerInputButton": "Get My Free Digital Tools",
-  "partnersValues_sectionTitle": "Built for Speed & Scale",
   "home_vision_title": "The Digital Mall for Everyone",
   "home_vision_desc": "Why download ten apps when you need just one? Buy fresh groceries from trusted shops, order dinner from local restaurants, or find great deals on used items from your neighbors. Safe, verified, and local.",
   
@@ -713,21 +704,6 @@
   "partnersValue3_title": "Professionalize Your Brand",
   "partnersValue3_description": "Give your customers a modern experience with a digital menu and professional receipts. Stand out from the competition.",
 
-  "features_supermarkets_1_title": "Instant Barcode Scanner",
-  "features_supermarkets_1_desc": "Stock your shelves in seconds. Scan any barcode to auto-fill product details. No typing required.",
-  "features_supermarkets_2_title": "Expiry Date Tracker",
-  "features_supermarkets_2_desc": "Never throw away food again. The app alerts you when products are close to expiring so you can put them on sale.",
-  
-  "features_food_1_title": "QR Menu & Ordering",
-  "features_food_1_desc": "Let customers scan a QR code at their table to view your menu and order. Faster service, fewer waiter errors.",
-  "features_food_2_title": "Kitchen Display System",
-  "features_food_2_desc": "Orders go straight to the kitchen. No shouting, no lost paper tickets. Just organized, timely preparation.",
-   "features_ecom_1_title": "Professional Storefront",
-  "features_ecom_1_desc": "Get a sleek, professional web page for your brand. Upload high-quality images and tell your story without writing a single line of code.",
-  "features_ecom_2_title": "Sell Variants Easily",
-  "features_ecom_2_desc": "Selling clothes or gadgets? Easily manage different sizes, colors, and models. Inventory updates automatically as you sell.",
-  "features_ecom_3_title": "Nationwide Reach",
-  "features_ecom_3_desc": "Don't just sell to your neighborhood. Accept orders from anywhere and manage shipping logistics directly from the dashboard.",
   "appleStore": "App Store",
   "homeSmallerParagraph": "Available on iOS & Android.",
   "market_section_badge": "Marketplace 2.0",
@@ -870,5 +846,78 @@
     "link_delete": "Delete Account",
     "contact_title": "Contact Us",
     "copyright": "© 2026 Hanuut Express. All rights reserved."
-  }
+  },
+  "features_section_title": "Features Built For You",
+  "supermarkets_tab_label": "Grocery",
+  "foodShops_tab_label": "Restaurants",
+  "globalShops_tab_label": "E-Commerce",
+
+  "features_supermarkets_1_title": "Instant Barcode Scanner",
+  "features_supermarkets_1_desc": "Stock your shelves in seconds. Scan any barcode to auto-fill product details. No typing required.",
+  "features_supermarkets_2_title": "Expiry Date Tracker",
+  "features_supermarkets_2_desc": "Never throw away food again. The app alerts you when products are close to expiring so you can put them on sale.",
+  "features_supermarkets_3_title": "Smart Warehouse Alerts",
+  "features_supermarkets_3_desc": "Get automatic alerts for low-stock, near-expiry, and expired items, so you can make profitable decisions before it's too late.",
+
+  "features_food_1_title": "QR Menu & Ordering",
+  "features_food_1_desc": "Let customers scan a QR code at their table to view your menu and order. Faster service, fewer waiter errors.",
+  "features_food_2_title": "Kitchen Display System",
+  "features_food_2_desc": "Orders go straight to the kitchen. No shouting, no lost paper tickets. Just organized, timely preparation.",
+  "features_food_3_title": "Seamless Order Processing",
+  "features_food_3_desc": "Receive and manage online orders directly in the app. Keep your kitchen efficient and your customers happy with real-time updates.",
+
+  "features_ecom_1_title": "Professional Storefront",
+  "features_ecom_1_desc": "Get a sleek, professional web page for your brand. Upload high-quality images and tell your story without writing a single line of code.",
+  "features_ecom_2_title": "Sell Variants Easily",
+  "features_ecom_2_desc": "Selling clothes or gadgets? Easily manage different sizes, colors, and models. Inventory updates automatically as you sell.",
+  "features_ecom_3_title": "Nationwide Reach",
+  "features_ecom_3_desc": "Don't just sell to your neighborhood. Accept orders from anywhere and manage shipping logistics directly from the dashboard.",
+  "partnersValues_sectionTitle": "Built for Reality",
+  "partnersValues_subtitle": "Technology that works as hard as you do.",
+  
+  "value_offline_title": "No Internet? No Problem.",
+  "value_offline_desc": "Built with an 'Offline-First' architecture. Keep selling and printing receipts even if the connection drops. We sync everything when you're back online.",
+  
+  "value_marketing_title": "Instant Marketing Studio",
+  "value_marketing_desc": "Stop paying for designers. Select 3 products, click 'Generate', and get a professional flyer ready for Instagram & Facebook in seconds.",
+  
+  "value_analytics_title": "Know Your Numbers",
+  "value_analytics_desc": "Track daily income, best-selling items, and worker performance. Turn data into decisions without complex spreadsheets.",
+  "cta_final_title": "Ready to Stop Using Pen & Paper?",
+  "cta_final_desc": "Join hundreds of Algerian merchants digitizing their business today. It takes less than 2 minutes to create your shop.",
+  "cta_download_button": "Download for Windows",
+  "cta_mobile_button": "Get Android App",
+  
+  "features_section_subtitle": "Select your business type to see how My Hanuut solves your daily problems.",
+  
+  "tab_grocery": "Grocery",
+  "tab_food": "Restaurant",
+  "tab_global": "E-Commerce",
+
+  "qna_gro_1_q": "Adding products takes too long.",
+  "qna_gro_1_a": "Use the **Instant Barcode Scanner**. We have a database of 4,000+ Algerian products. Just scan, and the name/price fills automatically.",
+  
+  "qna_gro_2_q": "I lose money on expired goods.",
+  "qna_gro_2_a": "The **Expiry Tracker** alerts you before items spoil, so you can discount them or return them to suppliers.",
+  
+  "qna_gro_3_q": "What if the internet cuts off?",
+  "qna_gro_3_a": "Business continues. Our **Offline-First** tech lets you sell and manage stock without Wi-Fi. It syncs when you reconnect.",
+
+  "qna_food_1_q": "My menu changes daily.",
+  "qna_food_1_a": "Update your **QR Menu** instantly. Hide out-of-stock ingredients (like Mozzarella) or toggle entire categories with one tap.",
+  
+  "qna_food_2_q": "Kitchen communication errors.",
+  "qna_food_2_a": "Orders from the **Table QR** or waiter's phone go straight to the kitchen display. Sizes (L/XL) and extras are clear.",
+  
+  "qna_food_3_q": "I can't design marketing posts.",
+  "qna_food_3_a": "Use the **Flyer Studio**. Select your best Pizza, click generate, and get a stunning design ready for Instagram Stories in seconds.",
+
+  "qna_ecom_1_q": "I sell sizes and colors.",
+  "qna_ecom_1_a": "The **Global Product** system lets you manage complex variants (Red/Blue, S/M/L) with specific prices and stock levels.",
+  
+  "qna_ecom_2_q": "I want to sell nationwide.",
+  "qna_ecom_2_a": "Scale up. Your shop gets a **Web Landing Page**. Customers from all 58 Wilayas can order, and you manage fulfillment easily.",
+  
+  "qna_ecom_3_q": "What is my real profit?",
+  "qna_ecom_3_a": "Input your **Buying Price** vs. **Selling Price**. The analytics dashboard calculates your net profit automatically."
 }
