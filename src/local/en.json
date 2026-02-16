@@ -919,5 +919,28 @@
   "qna_ecom_2_a": "Scale up. Your shop gets a **Web Landing Page**. Customers from all 58 Wilayas can order, and you manage fulfillment easily.",
   
   "qna_ecom_3_q": "What is my real profit?",
-  "qna_ecom_3_a": "Input your **Buying Price** vs. **Selling Price**. The analytics dashboard calculates your net profit automatically."
+  "qna_ecom_3_a": "Input your **Buying Price** vs. **Selling Price**. The analytics dashboard calculates your net profit automatically.",
+  "navTrack": "Order Tracking",
+  
+  "// --- BRANDING & HUB ---": "",
+  "companyName": "Hanuut Express",
+  "hub_headline": "A world for e-commerce.",
+  "hub_subheadline": "We connect shops and customers, all online.",
+  "card_consumer_pre": "Looking to buy or sell?",
+  "card_consumer_desc": "The market is in your hands. Shop from trusted stores, post an ad to sell something, or search for what you need.",
+  "card_consumer_btn": "Discover eSUUQ",
+  "card_business_pre": "Have a shop?",
+  "card_business_desc": "Bring your shop online and enjoy VIP services. Open up a new, potentially huge, revenue stream.",
+  "card_business_btn": "Discover My Hanuut",
+  "nav_esuuq": "The eSUUQ App",
+  "nav_ecosystem": "Home",
+  "// --- E'SUUQ PAGE ---": "",
+  "esuuq_hero_title": "The market... in your hands",
+  "esuuq_hero_sub": "Bringing together delivery-based shops and the secondhand market in one trusted place.",
+  "pain_trust_title": "Why all this trouble?",
+  "pain_trust_text": "Why search through 10 pages to find an original phone? On eSUUQ, shops that deliver are verified, the goods are authentic, and the price is right.",
+  "pain_clutter_title": "Is your house cluttered? Sell and get some peace of mind.",
+  "pain_clutter_text": "Take a picture, set the price, and sell to people in your area. The transaction is easy, and the buyer comes to your doorstep.",
+  "pain_delivery_title": "Track your order",
+  "pain_delivery_text": "Know where your order is at all times. You can track every stage from preparation until it reaches you."
 }

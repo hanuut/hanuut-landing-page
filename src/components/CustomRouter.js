@@ -22,7 +22,7 @@ const ShopPageWithUsername = lazy(() =>
 const ShopCategoryPage = lazy(() =>
   import("../modules/Product/components/landing/ShopCategoryPage")
 );
-
+const EsuuqPage = lazy(() => import("../modules/Esuuq/EsuuqPage"));
 const Tawsila = lazy(() => import("../modules/Tawsila/Tawsila"));
 const GetStarted = lazy(() => import("../modules/Tawsila/GetStarted"));
 const LinksPage = lazy(() => import("../modules/LinksPage"));
@@ -44,6 +44,8 @@ const BlogPostPage = lazy(() => import("../modules/Blog/BlogPostPage"));
 const MarketplaceAdRedirectPage = lazy(() =>
   import("../modules/Marketplace/MarketplaceAdRedirectPage")
 );
+
+const TrackingPage = lazy(() => import("../modules/Partners/components/TrackingPage"));
 
 const ShopRedirector = () => {
   const { username } = useParams();
@@ -114,8 +116,9 @@ const CustomRouter = ({ appConfig, location }) => {
           {deepLinkRoutes}
 
           {/* Main routes */}
-          <Route path="/" element={<HomePage />} />
-
+          <Route path="/" element={<HomePage />} /> {/* Now the HUB */}
+          <Route path="/esuuq" element={<EsuuqPage />} /> {/* New Consumer Page */}
+          
            {/* --- Payment Routes --- */}
           <Route path="/payment/process" element={<PaymentProcessingPage />} />
           <Route path="/payment/result" element={<PaymentResultPage />} />
@@ -147,6 +150,8 @@ const CustomRouter = ({ appConfig, location }) => {
 
           {/* 3. The redirect route. This will catch /shop/some-name... */}
           <Route path="/shop/:username" element={<ShopRedirector />} />
+
+        <Route path="/track" element={<TrackingPage />} />
 
           {/* Tawsila related routes
           <Route path="/tawsila" element={<Tawsila />} />

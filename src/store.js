@@ -9,6 +9,7 @@ import { reducer as productsReducer } from "./modules/Product/state/reducers";
 import { reducer as familiesReducer } from "./modules/Families/state/reducers";
 import blogReducer from './modules/Blog/state/reducers';
 import marketplaceReducer from "./modules/Marketplace/state/reducers"; 
+import { reducer as locationReducer } from "./modules/Location/state/reducers";
 
 const rootReducer = combineReducers({
   shops: shopsReducer,
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   families: familiesReducer,
   blog: blogReducer,
   marketplace: marketplaceReducer,
+  location: locationReducer, 
 });
 
 const store = configureStore({

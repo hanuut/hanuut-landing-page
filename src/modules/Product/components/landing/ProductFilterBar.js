@@ -8,22 +8,16 @@ const Wrapper = styled.div`
     width: 100%;
     margin-bottom: 1rem; 
     margin-top: 0.5rem;
-    display: flex;
-    flex-direction: column;
+    display: flex;   flex-direction: column;
     gap: 1rem; 
     position: relative;
     z-index: 10;
 `;
 
-// --- Search Input Styling ---
 const SearchContainer = styled.div`
     position: relative;
     width: 100%;
     max-width: 500px;
-    /* 
-       FIX: Removed 'margin: 0 auto' to stop centering.
-       It will now obey the parent's text direction (RTL/LTR).
-    */
     margin: 0; 
 `;
 
@@ -44,10 +38,7 @@ const SearchInput = styled.input`
         border-color: ${(props) => props.theme.primaryColor || '#F07A48'};
         background-color: #3A3A3C;
     }
-
-    &::placeholder {
-        color: #8E8E93;
-    }
+    &::placeholder { color: #8E8E93; }
 `;
 
 const SearchIcon = styled.div`
@@ -71,38 +62,18 @@ const ClearButton = styled.button`
     border: none;
     color: #D1D1D6;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 0.7rem;
-
-    &:hover {
-        background-color: rgba(255,255,255,0.2);
-        color: white;
-    }
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px; border-radius: 50%;
+    width: 20px; height: 20px; font-size: 0.7rem;
+    &:hover { background-color: rgba(255,255,255,0.2); color: white; }
 `;
 
-// --- Category Pills Styling ---
 const CategoryList = styled.div`
     display: flex;
     gap: 0.6rem; 
     overflow-x: auto;
-    /* 
-       FIX: Added padding to ensure the first chip isn't cut off 
-       and shadows render correctly.
-    */
     padding: 4px 4px 12px 4px; 
-    
-    /* 
-       FIX: Always flex-start. 'center' breaks scrolling when content overflows. 
-    */
     justify-content: flex-start;
-    
-    /* Hide scrollbar */
     -ms-overflow-style: none; 
     scrollbar-width: none; 
     &::-webkit-scrollbar { display: none; }
@@ -122,10 +93,7 @@ const CategoryPill = styled(motion.button)`
     background-color: ${(props) => props.$isActive ? 'rgba(240, 122, 72, 0.15)' : '#2C2C2E'};
     color: ${(props) => props.$isActive ? props.theme.primaryColor : '#D1D1D6'};
 
-    &:hover {
-        background-color: #3A3A3C;
-        color: white;
-    }
+    &:hover { background-color: #3A3A3C; color: white; }
 `;
 
 const ProductFilterBar = ({ 
@@ -140,11 +108,8 @@ const ProductFilterBar = ({
 
     return (
         <Wrapper>
-            {/* 1. Search Input */}
             <SearchContainer>
-                <SearchIcon isArabic={isArabic}>
-                    <FaSearch />
-                </SearchIcon>
+                <SearchIcon isArabic={isArabic}><FaSearch /></SearchIcon>
                 <SearchInput
                     type="text"
                     placeholder={t('search_products', 'Search products...')}
@@ -153,16 +118,10 @@ const ProductFilterBar = ({
                     dir={isArabic ? 'rtl' : 'ltr'}
                 />
                 {searchQuery && (
-                    <ClearButton 
-                        isArabic={isArabic} 
-                        onClick={() => setSearchQuery('')}
-                    >
-                        <FaTimes />
-                    </ClearButton>
+                    <ClearButton isArabic={isArabic} onClick={() => setSearchQuery('')}><FaTimes /></ClearButton>
                 )}
             </SearchContainer>
 
-            {/* 2. Category Pills */}
             {categories && categories.length > 0 && (
                 <CategoryList>
                     <CategoryPill

@@ -1,30 +1,59 @@
+// src/modules/Product/components/landing/PremiumProductCard.js
+
 import React, { useState, useEffect, useMemo } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { getImageUrl } from "../../../../utils/imageUtils";
 import { getImage } from "../../../Images/services/imageServices";
 
 const CardWrapper = styled(motion.div)`
-  /* Use theme surface (Apple Dark Grey #2C2C2E) */
-  background-color: ${(props) => props.theme.surface}; 
-  border-radius: 12px; /* Consistent with new inputs */
+  background-color: ${(props) => props.theme.surface};
+  border-radius: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
   position: relative;
   cursor: pointer;
-  transition: transform 0.2s ease;
-  
-  /* Remove explicit border for cleaner look */
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  /* --- STEP 2.3: Active State Border --- */
+  border: 1px solid
+    ${(props) => (props.$hasItems ? props.theme.primaryColor : "transparent")};
+
+  box-shadow: ${(props) =>
+    props.$hasItems
+      ? `0 4px 15px ${props.theme.primaryColor}30`
+      : "0 4px 6px rgba(0,0,0,0.1)"};
 
   &:hover {
     transform: translateY(-4px);
-    /* Subtle highlight on hover */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   }
+`;
+
+// --- STEP 2.3: Quantity Badge ---
+const QuantityBadge = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: ${(props) => props.theme.primaryColor || "#39A170"};
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  font-family: "Tajawal", sans-serif;
 `;
 
 const ImageContainer = styled.div`
@@ -32,7 +61,7 @@ const ImageContainer = styled.div`
   aspect-ratio: 1 / 1;
   position: relative;
   overflow: hidden;
-  background-color: #1C1C1E; /* Darker than card */
+  background-color: #1c1c1e;
 
   img {
     width: 100%;
@@ -47,7 +76,6 @@ const ImageContainer = styled.div`
 `;
 
 const Content = styled.div`
-  /* Tighter padding */
   padding: 0.6rem;
   display: flex;
   flex-direction: column;
@@ -57,7 +85,7 @@ const Content = styled.div`
 
 const Brand = styled.p`
   font-size: 0.65rem;
-  color: ${(props) => props.theme.secondaryText || "#8E8E93"}; 
+  color: ${(props) => props.theme.secondaryText || "#8E8E93"};
   text-transform: uppercase;
   font-weight: 700;
   margin: 0;
@@ -70,9 +98,8 @@ const ProductName = styled.h3`
   color: ${(props) => props.theme.text};
   margin: 0;
   line-height: 1.3;
-  font-family: 'Tajawal', sans-serif;
-  
-  /* Limit to 2 lines */
+  font-family: "Tajawal", sans-serif;
+
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -96,17 +123,18 @@ const Price = styled.span`
 const LoadingSkeleton = styled.div`
   width: 100%;
   height: 100%;
-  background: #3A3A3C;
+  background: #3a3a3c;
   opacity: 0.5;
 `;
 
-const PremiumProductCard = ({ 
-  product, 
-  onCardClick, 
-  isOrderingEnabled 
+const PremiumProductCard = ({
+  product,
+  onCardClick,
+  isOrderingEnabled,
+  quantityInCart = 0, // Received from Showcase
 }) => {
   const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === 'ar';
+  const isArabic = i18n.language === "ar";
 
   // Image Logic
   const [imageBuffer, setImageBuffer] = useState(null);
@@ -121,33 +149,44 @@ const PremiumProductCard = ({
         })
         .catch((err) => console.error(err));
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [imageId]);
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
 
-  // Price Logic
+  // Price Logic (Get min price)
   const displayPrice = useMemo(() => {
     if (!product?.availabilities?.length) return 0;
     let min = Infinity;
-    product.availabilities.forEach(av => {
-        av.sizes.forEach(size => {
-            if (size.sellingPrice < min) min = size.sellingPrice;
-        });
+    product.availabilities.forEach((av) => {
+      av.sizes.forEach((size) => {
+        if (size.sellingPrice < min) min = size.sellingPrice;
+      });
     });
     return min === Infinity ? 0 : min;
   }, [product]);
 
-  const productName = !isArabic && product.nameFr ? product.nameFr : product.name;
+  const productName =
+    !isArabic && product.nameFr ? product.nameFr : product.name;
 
   return (
     <CardWrapper
-      onClick={() => onCardClick(product)}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onCardClick(product);
+      }}
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       style={{ opacity: isOrderingEnabled ? 1 : 0.6 }}
+      $hasItems={quantityInCart > 0}
     >
+      {/* Badge Logic */}
+      {quantityInCart > 0 && <QuantityBadge>{quantityInCart}</QuantityBadge>}
+
       <ImageContainer>
         {imageUrl ? (
           <img src={imageUrl} alt={productName} loading="lazy" />
@@ -159,9 +198,10 @@ const PremiumProductCard = ({
       <Content>
         {product.brand && <Brand>{product.brand}</Brand>}
         <ProductName>{productName}</ProductName>
-        
         <PriceRow>
-          <Price>{parseInt(displayPrice)} {t("dzd")}</Price>
+          <Price>
+            {parseInt(displayPrice)} {t("dzd")}
+          </Price>
         </PriceRow>
       </Content>
     </CardWrapper>

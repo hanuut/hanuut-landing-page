@@ -2,21 +2,18 @@ import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-// 1. Import the Apple Icon
-import { FaApple } from "react-icons/fa"; 
-import BorderBeamButton from "../../../components/BorderBeamButton";
-import Playstore from "../../../assets/playstore.webp";
-import HanuutIllustration from "../../../assets/illustrations/home_animation_en.gif";
-import HanuutIllustrationAr from "../../../assets/illustrations/home_animation_ar.gif";
+import { useNavigate } from "react-router-dom";
+import { FaStore, FaShoppingBag, FaArrowRight, FaArrowLeft } from "react-icons/fa";
 
-// --- 2. PASTE YOUR COPIED LINK HERE ---
-const IOS_LINK = "https://apps.apple.com/us/app/hanuut/id6752300426"; 
+import BorderBeamButton from "../../../components/BorderBeamButton";
+// --- REPLACE THIS WITH YOUR NEW 3D IMAGE ---
+import HubIllustration from "../../../assets/hub_illustration.png"; 
 
 // --- Animations ---
 const float = keyframes`
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(1deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
 `;
 
 const blobMove = keyframes`
@@ -30,13 +27,15 @@ const blobMove = keyframes`
 
 const Section = styled.section`
   width: 100%;
-  min-height: calc(100vh - 5rem);
-  background-color: #fdf4e3;
+  /* Ensure it fills height minus navbar */
+  min-height: calc(100vh - 5rem); 
+  background-color: #fdf4e3; /* Ivory Background */
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
+  padding: 2rem 0;
 `;
 
 const Blob = styled.div`
@@ -45,7 +44,7 @@ const Blob = styled.div`
   height: 600px;
   border-radius: 50%;
   background: ${(props) => props.color};
-  filter: blur(100px);
+  filter: blur(80px);
   opacity: 0.4;
   z-index: 0;
   animation: ${blobMove} 20s infinite alternate;
@@ -57,19 +56,19 @@ const Blob = styled.div`
 
 const Container = styled.div`
   width: 90%;
-  max-width: 1200px;
+  max-width: 1250px;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 3rem;
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 
-  @media (max-width: 900px) {
+  @media (max-width: 960px) {
     flex-direction: column-reverse;
     text-align: center;
+    gap: 4rem;
     padding-top: 2rem;
-    padding-bottom: 4rem;
   }
 `;
 
@@ -81,15 +80,15 @@ const TextContent = styled(motion.div)`
   gap: 1.5rem;
   z-index: 10;
 
-  @media (max-width: 900px) {
+  @media (max-width: 960px) {
     align-items: center;
   }
 `;
 
 const Title = styled(motion.h1)`
-  font-size: clamp(3rem, 6vw, 3.2rem);
-  font-weight: 800;
-  line-height: 1.2;
+  font-size: clamp(2.8rem, 5vw, 4rem);
+  font-weight: 900;
+  line-height: 1.15;
   color: #111217;
   font-family: "Tajawal", sans-serif;
   margin: 0;
@@ -102,143 +101,120 @@ const Title = styled(motion.h1)`
 `;
 
 const Subtitle = styled(motion.p)`
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   color: #52525b;
-  line-height: 1.7;
-  max-width: 550px;
-  font-family: "Cairo Variable", sans-serif;
+  line-height: 1.6;
+  max-width: 600px;
+  font-family: "Cairo", sans-serif;
+  font-weight: 500;
 `;
 
 const ImageContent = styled(motion.div)`
-  flex: 1;
+  flex: 1.2; /* Give image slightly more space */
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  height: 600px;
-
-  @media (max-width: 900px) {
-    height: auto;
-    width: 100%;
-  }
+  /* Allow image to overlap blobs */
+  z-index: 2; 
 `;
 
-const PhoneWrapper = styled.div`
+// --- New Illustration Wrapper (Replaces PhoneWrapper) ---
+const IsometricWrapper = styled.div`
   position: relative;
-  width: 300px;
-  border-radius: 45px;
-  border: 12px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 30px 60px rgba(57, 161, 112, 0.25),
-    inset 0 0 0 2px rgba(255, 255, 255, 0.5);
-  overflow: hidden;
+  width: 100%;
+  max-width: 750px; /* Larger max-width for the building scene */
+  
+  /* Floating Animation */
   animation: ${float} 6s ease-in-out infinite;
-  background: white;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-  &:hover {
-    transform: scale(1.02) translateY(-5px);
-  }
-
+  
+  /* Ensure image fits well */
   img {
     width: 100%;
     height: auto;
     display: block;
-    object-fit: cover;
+    object-fit: contain;
+    /* Soft drop shadow instead of box-shadow for transparent PNG */
+    filter: drop-shadow(0 30px 40px rgba(0,0,0,0.15));
+    
+    /* Slight scale on hover for interactivity */
+    transition: transform 0.3s ease;
   }
 
-  @media (max-width: 500px) {
-    width: 260px;
-  }
-`;
-
-const FloatingBadge = styled(motion.div)`
-  position: absolute;
-  padding: 0.8rem 1.5rem;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  color: #111217;
-  font-size: 0.9rem;
-  z-index: 3;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  font-family: "Tajawal", sans-serif;
-
-  top: ${(props) => props.top};
-  bottom: ${(props) => props.bottom};
-  left: ${(props) => props.left};
-  right: ${(props) => props.right};
-
-  span {
-    width: 12px;
-    height: 12px;
-    background: ${(props) => props.color || "#39A170"};
-    border-radius: 50%;
-    box-shadow: 0 0 10px ${(props) => props.color || "#39A170"};
-  }
-
-  @media (max-width: 900px) {
-    display: none;
+  &:hover img {
+    transform: scale(1.02);
   }
 `;
 
-// 3. Buttons Row Container
+// --- Updated Button Styling ---
 const ButtonsRow = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
+  margin-top: 1rem;
   flex-wrap: wrap;
+  align-items: center;
   
-  @media (max-width: 900px) {
+  @media (max-width: 960px) {
     justify-content: center;
   }
 `;
 
-const Icon = styled.img`
-  height: 1.5rem;
-  margin-right: 10px;
-  filter: invert(1);
+// Wrapper to override BorderBeamButton styles locally
+const ButtonOverride = styled.div`
+  /* Override width/padding logic here */
+  button {
+    /* Make buttons wider */
+    min-width: 240px !important; 
+    padding: 0 2.5rem !important; 
+  }
+
+  /* Specific overrides for the Secondary (My Hanuut) button */
+  &.secondary-btn {
+    button {
+      /* Force border to match text */
+      border: 2px solid #111217 !important; 
+      /* Force background to be transparent */
+      background: transparent !important;
+      
+      /* Force TEXT and ICON to be Black */
+      div {
+        color: #111217 !important;
+      }
+      span, p, svg {
+        color: #111217 !important;
+        fill: #111217 !important;
+      }
+      
+      /* Hover state for secondary */
+      &:hover {
+        background: rgba(17, 18, 23, 0.05) !important;
+      }
+    }
+  }
+`;
+
+const ArrowIcon = styled.span`
+  display: flex;
+  align-items: center;
+  /* Flip margins based on language */
+  margin-left: ${props => props.isArabic ? 0 : '12px'};
+  margin-right: ${props => props.isArabic ? '12px' : 0};
+  font-size: 0.9rem;
 `;
 
 const ConsumerHero = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const isArabic = i18n.language === "ar";
-  const [gifKey, setGifKey] = useState(0);
-  const [replayCount, setReplayCount] = useState(0);
-
-  // Link Handlers
-  const handleAndroidDownload = () =>
-    window.open(process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK, "_blank");
-
-  // 4. iOS Link Handler
-  const handleIOSDownload = () => {
-    if (IOS_LINK.includes("YOUR_APP_ID_HERE")) {
-      alert("Please add the correct iOS link in the code!");
-      return;
-    }
-    window.open(IOS_LINK, "_blank");
-  };
-
-  const handleReplayGif = () => {
-    setReplayCount((prev) => prev + 1);
-  };
-
-  const gifSource = isArabic ? HanuutIllustrationAr : HanuutIllustration;
 
   const itemVars = {
     hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: "easeOut" },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
   };
 
   return (
     <Section>
+      {/* Background Blobs */}
       <Blob color="rgba(57, 161, 112, 0.25)" top="-10%" left="-10%" />
       <Blob color="rgba(240, 122, 72, 0.2)" bottom="10%" right="-5%" />
 
@@ -248,104 +224,78 @@ const ConsumerHero = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          variants={{
-            visible: { transition: { staggerChildren: 0.2 } },
-          }}
+          variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
         >
+          {/* Ecosystem Badge */}
           <motion.div variants={itemVars}>
             <span
               style={{
-                background: "rgba(57, 161, 112, 0.1)",
-                color: "#39A170",
+                background: "rgba(17, 18, 23, 0.05)",
+                color: "#111217",
                 padding: "8px 16px",
                 borderRadius: "30px",
                 fontWeight: "700",
-                fontSize: "0.85rem",
-                letterSpacing: "0.5px",
-                border: "1px solid rgba(57, 161, 112, 0.2)",
+                fontSize: "0.9rem",
+                border: "1px solid rgba(17, 18, 23, 0.1)",
+                fontFamily: "Tajawal, sans-serif"
               }}
             >
-              ✨ {t("appTitle")} Customer App
+              {t("companyName") || "Hanuut Express"} Ecosystem
             </span>
           </motion.div>
 
           <Title as={motion.h1} variants={itemVars}>
-            {t("homeHeading")} <br />
-            <span>{t("homeSubHeading")}</span>
+            {t("hub_headline") || "The Digital Infrastructure for Commerce"}
           </Title>
 
           <Subtitle as={motion.p} variants={itemVars}>
-            {t("homeParagraph")}
+            {t("hub_subheadline") || "Connecting shops, customers, and delivery in one trusted system."}
           </Subtitle>
 
           <motion.div variants={itemVars}>
-            {/* 5. Updated Buttons Row */}
             <ButtonsRow>
-              <BorderBeamButton onClick={handleAndroidDownload} beamColor="#39A170">
-                <Icon src={Playstore} alt="Play Store" />
-                <span>{t("googlePlay")}</span>
-              </BorderBeamButton>
+              {/* 1. E'SUUQ Button (Black Background, White Text) */}
+              <ButtonOverride>
+                <BorderBeamButton onClick={() => navigate("/esuuq")} beamColor="#39A170">
+                  <FaShoppingBag style={{ fontSize: '1.2rem' }} />
+                  <span>{t("nav_esuuq") || "E'SUUQ"}</span>
+                  <ArrowIcon isArabic={isArabic}>
+                    {isArabic ? <FaArrowLeft/> : <FaArrowRight/>}
+                  </ArrowIcon>
+                </BorderBeamButton>
+              </ButtonOverride>
 
-              <BorderBeamButton onClick={handleIOSDownload} beamColor="#111217">
-                <FaApple 
-                  size={24} 
-                  style={{ 
-                    // Flip margins for Arabic layout
-                    marginRight: isArabic ? "0" : "10px", 
-                    marginLeft: isArabic ? "10px" : "0" 
-                  }} 
-                />
-                <span>{t("appleStore")}</span>
-              </BorderBeamButton>
+              {/* 2. My Hanuut Button (Transparent, Black Text) */}
+              {/* Added 'secondary-btn' class to force black colors */}
+              <ButtonOverride className="secondary-btn">
+                <BorderBeamButton 
+                  onClick={() => navigate("/partners")} 
+                  beamColor="#F07A48" 
+                  secondary={true}
+                >
+                  <FaStore style={{ fontSize: '1.2rem' }} />
+                  <span>{t("navPartners") || "My Hanuut"}</span>
+                  <ArrowIcon isArabic={isArabic}>
+                    {isArabic ? <FaArrowLeft/> : <FaArrowRight/>}
+                  </ArrowIcon>
+                </BorderBeamButton>
+              </ButtonOverride>
             </ButtonsRow>
-
-            <p
-              style={{
-                marginTop: "15px",
-                fontSize: "0.9rem",
-                color: "#888",
-                fontFamily: "Cairo Variable",
-              }}
-            >
-              {t("homeSmallerParagraph")}
-            </p>
           </motion.div>
         </TextContent>
 
+        {/* 3D Illustration Side */}
         <ImageContent
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <FloatingBadge
-            top="15%"
-            left={isArabic ? "-40px" : "auto"}
-            right={isArabic ? "auto" : "20px"}
-            color="#39A170"
-            animate={{ y: [0, -15, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <span></span> {t("live_shopping_title") || "Live Shopping"}
-          </FloatingBadge>
-
-          <FloatingBadge
-            bottom="20%"
-            right={isArabic ? "-30px" : "auto"}
-            left={isArabic ? "auto" : "-20px"}
-            color="#397FF9"
-            animate={{ y: [0, 15, 0] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <span></span> {t("home_market_title") || "Community Market"}
-          </FloatingBadge>
-
-          <PhoneWrapper onClick={handleReplayGif} title="Hanuut - حانووت">
+          <IsometricWrapper>
             <img
-              key={gifKey}
-              src={`${gifSource}?t=${replayCount}`}
-              alt="Hanuut App"
+              src={HubIllustration}
+              alt="Hanuut Express Digital Ecosystem"
             />
-          </PhoneWrapper>
+          </IsometricWrapper>
         </ImageContent>
       </Container>
     </Section>

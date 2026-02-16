@@ -232,19 +232,17 @@ const Cart = ({ shopId }) => {
 
   useEffect(() => {
     const filteredCartItemsPerShop = cart.filter((cartItem) => {
-      return cartItem.shopId === shopId;
+      return (cartItem.shopId || item.product?.shopId) === shopId;
     });
     setFilteredCartItems(filteredCartItemsPerShop);
   }, [shopId, cart]);
 
   useEffect(() => {
-    console.log();
     const totalPriceInstance = filteredCartItems.reduce(
       (total, cartItem) => total + cartItem.sellingPrice * cartItem.quantity,
-      0
+      0,
     );
     setTotalPrice(totalPriceInstance);
-    console.log(filteredCartItems);
   }, [filteredCartItems]);
 
   const onProceedClick = (e) => {

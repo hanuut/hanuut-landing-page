@@ -1,7 +1,7 @@
-import React from 'react';
-import styled from 'styled-components';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import React from "react";
+import styled from "styled-components";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const BadgeWrapper = styled(motion.div)`
   position: fixed;
@@ -26,8 +26,10 @@ const GlassPill = styled(Link)`
   display: flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease, background 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 
   &:hover {
     transform: scale(1.05);
@@ -37,10 +39,12 @@ const GlassPill = styled(Link)`
 
 const Text = styled.span`
   font-size: 0.75rem;
-  color: #8E8E93; /* System Grey */
+  color: #8e8e93; /* System Grey */
   font-weight: 500;
   letter-spacing: 0.5px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
 `;
 
 const Heart = styled.span`
@@ -49,25 +53,25 @@ const Heart = styled.span`
 `;
 
 const BrandName = styled.span`
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 700;
 `;
 
 const PoweredByHanuut = () => {
   // Optional: Hide badge when at the very top to let Hero shine, or keep always visible
   const { scrollY } = useScroll();
-  const opacity = useTransform(scrollY, [0, 100], [0, 1]); 
+  const opacity = useTransform(scrollY, [0, 100], [0, 1]);
   // For this design, let's keep it visible but fade in slightly after scroll
   // OR just keep it static. Let's make it static for utility.
-  
+
   return (
     <BadgeWrapper
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1, duration: 0.8 }}
     >
-      <GlassPill to="/">
-        <Text>Powered by</Text> 
+      <GlassPill to="/partners">
+        <Text>Powered by</Text>
         <BrandName>Hanuut</BrandName>
         <Heart>💚</Heart>
       </GlassPill>

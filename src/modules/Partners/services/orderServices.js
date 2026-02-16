@@ -26,3 +26,18 @@ export const createGlobalOrder = (orderData) => {
   // We will post to the '/order/global' endpoint we planned
   return axios.post(`${prodUrl}/order/global`, orderData, { headers });
 };
+
+export const trackOrder = async (phone, orderId) => {
+  // We assume the backend has this endpoint, or we map to findByOrderId and verify phone client-side
+  // For security, a dedicated endpoint is better: GET /order/track/:phone/:orderId
+  try {
+    const response = await axios.get(`${prodUrl}/order/track/${phone}/${orderId}`, { headers });
+    return response.data;
+  } catch (error) {
+    // If dedicated endpoint doesn't exist yet, fallback to findByOrderId logic (Optional safety net)
+    if (error.response?.status === 404) {
+       throw new Error("Order not found or phone number does not match.");
+    }
+    throw error;
+  }
+};

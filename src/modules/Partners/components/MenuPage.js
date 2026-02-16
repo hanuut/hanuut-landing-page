@@ -24,12 +24,12 @@ import {
     updateCartQuantity, 
     closeCart, 
     selectCart 
-} from "../../Cart/state/reducers"; // Import Actions
+} from "../../Cart/state/reducers"; 
 
 // --- Themes ---
 import { partnerTheme } from "../../../config/Themes"; 
 
-// --- Styled Components (Kept same) ---
+// --- Styled Components ---
 const PageWrapper = styled.main`
   width: 100%;
   min-height: 100vh;
@@ -73,7 +73,7 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
   // --- Redux Data ---
   const { categories, loading: categoriesLoading } = useSelector(selectCategories);
   const { dishes, loading: dishesLoading } = useSelector(selectDishes);
-  const { cart } = useSelector(selectCart); // Get Global Cart
+  const { cart } = useSelector(selectCart); 
 
   // --- Filter Cart for CURRENT SHOP ---
   const shopCartItems = useMemo(() => {
@@ -84,6 +84,9 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
   const [activeCategory, setActiveCategory] = useState(null); 
   const [isSubmitting, setIsSubmitting] = useState(null);
   const [fetchedCategories, setFetchedCategories] = useState(new Set());
+  
+  // --- NEW STATE: Order Success Data ---
+  const [orderSuccessData, setOrderSuccessData] = useState(null);
 
   // --- 1. Initial Data Fetching ---
   useEffect(() => {
@@ -109,7 +112,22 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     }
   }, [dispatch, categories, selectedShop, fetchedCategories]);
 
-  // --- 2. Branding ---
+  // --- 2. Dynamic Filtering Logic (Phase 2.1) ---
+  const categoriesWithDishes = useMemo(() => {
+      if (categoriesLoading || dishesLoading) return [];
+      return categories.filter(category => {
+          if (category.isHidden) return false;
+          if (selectedShop.hiddenCategories?.includes(category.id)) return false;
+          const hasDishes = dishes.some(d => 
+              d.categoryId === category.id && 
+              d.shopId === selectedShop._id && 
+              d.dish && d.dish.isHidden !== true 
+          );
+          return hasDishes;
+      });
+  }, [categories, dishes, selectedShop, categoriesLoading, dishesLoading]);
+
+  // --- 3. Branding ---
   const imageUrl = useMemo(() => getImageUrl(selectedShopImage), [selectedShopImage]);
   const { data: logoPalette } = usePalette(imageUrl, 2, "hex", { crossOrigin: "Anonymous", quality: 10 });
 
@@ -118,17 +136,16 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     accent: selectedShop.styles?.secondaryColor || logoPalette?.[1] || "#39A170",
   }), [selectedShop, logoPalette]);
 
-  // --- 3. Cart Logic (Redux Based) ---
-  
+  // --- 4. Cart Logic ---
   const handleAddToCart = (dish) => {
     const cartItemPayload = {
         shopId: selectedShop._id,
         productId: dish._id,
-        variantId: dish._id, // Food dishes usually don't have complex variants in this view
+        variantId: dish._id, 
         title: dish.name,
         sellingPrice: dish.sellingPrice,
         quantity: 1,
-        dish: dish // Store full object for UI rendering if needed
+        dish: dish
     };
     dispatch(addToCart(cartItemPayload));
   };
@@ -147,12 +164,16 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
        return;
     }
 
+    // Determine Delivery Price (for local, usually 0 if dine-in, or calc)
+    // Note: createPosOrder payload structure usually takes products + header info
     const orderPayload = {
       shopId: selectedShop._id,
       customerName: customerDetails.customerName,
+      customerPhone: customerDetails.customerPhone, // Ensure this is passed
       tableNumber: customerDetails.tableNumber,
       note: customerDetails.note,
-      // Use filtered shopItems, not global cart
+      deliveryPricing: customerDetails.deliveryOption?.price || 0, 
+      deliveryOptionKeyword: customerDetails.deliveryOption?.type === 'dine_in' ? 'digitalMenu' : 'byShop', // Metadata logic
       products: shopCartItems.map((item) => ({
         productId: item.productId,
         title: item.title,
@@ -163,22 +184,32 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     };
 
     try {
-      await createPosOrder(orderPayload);
+      // API CALL
+      const response = await createPosOrder(orderPayload);
+      const orderResult = response.data; // Axios wrapper
+
+      // SET SUCCESS DATA FOR MODAL
+      setOrderSuccessData({
+          orderId: orderResult.orderId,
+          customerPhone: customerDetails.customerPhone,
+          shopName: selectedShop.name
+      });
+
       setIsSubmitting("success");
-      setTimeout(() => {
-        dispatch(closeCart()); 
-        // We might want to clear ONLY this shop's items, but for now assuming clearCart is acceptable behavior on success
-        // Ideally: dispatch(clearShopCart(selectedShop._id))
-        // For simplicity based on existing reducers:
-        shopCartItems.forEach(item => dispatch(updateCartQuantity({ variantId: item.variantId, quantity: 0 })));
-        
-        setIsSubmitting(null);
-      }, 2500);
+      
+      // Clear items immediately to prevent re-submission
+      shopCartItems.forEach(item => dispatch(updateCartQuantity({ variantId: item.variantId, quantity: 0 })));
+      
     } catch (error) {
       console.error("Order Failed:", error);
       setIsSubmitting("error");
       setTimeout(() => setIsSubmitting(null), 3000);
     }
+  };
+
+  const handleClearSuccess = () => {
+      setIsSubmitting(null);
+      setOrderSuccessData(null);
   };
 
   const handleScrollToCategory = (catId) => {
@@ -199,8 +230,6 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     return <Loader fullscreen={true} />;
   }
 
-  const visibleCategories = categories.filter(c => !c.isHidden);
-
   return (
     <ThemeProvider theme={partnerTheme}>
       <PageWrapper>
@@ -214,19 +243,19 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
           />
 
           <StickyCategoryNav 
-            categories={visibleCategories} 
+            categories={categoriesWithDishes} 
             activeCategory={activeCategory} 
             onSelect={handleScrollToCategory} 
           />
 
           <ContentContainer>
-            {visibleCategories.length > 0 ? (
-              visibleCategories.map((category) => {
+            {categoriesWithDishes.length > 0 ? (
+              categoriesWithDishes.map((category) => {
                 const categoryDishes = dishes.filter(
                   (d) => d.categoryId === category.id && d.dish.isHidden !== true
                 );
 
-                if (categoryDishes.length === 0) return null;
+                if (categoryDishes.length === 0) return null; 
 
                 return (
                   <CategorySection key={category.id} id={`category-${category.id}`}>
@@ -237,7 +266,6 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
                     <DishesGrid>
                       {categoryDishes.map((dishWrapper) => {
                         const currentDish = dishWrapper.dish;
-                        // Find this specific item in the Redux store
                         const cartItem = shopCartItems.find(
                           (item) => item.variantId === currentDish._id
                         );
@@ -259,19 +287,23 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
                 );
               })
             ) : (
-              <EmptyState>{t("noCategories")}</EmptyState>
+              !dishesLoading && <EmptyState>{t("noDishesAvailable")}</EmptyState>
             )}
           </ContentContainer>
 
         </MainContainer>
 
-        {/* 4. Cart Modal */}
         <Cart 
-          items={shopCartItems} // Pass only shop items
+          items={shopCartItems} 
           onUpdateQuantity={handleUpdateQuantity}
           onSubmitOrder={handlePlaceOrder}
           isSubmitting={isSubmitting}
           shopDomain={shopDomain}
+          shopId={selectedShop._id}
+          
+          // --- NEW PROPS FOR TRACKING ---
+          orderSuccessData={orderSuccessData}
+          onClearSuccess={handleClearSuccess}
         />
 
         <PoweredByHanuut />

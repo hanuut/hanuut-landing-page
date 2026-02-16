@@ -1,20 +1,34 @@
-// ... (imports remain the same)
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import BackgroundImage from "../../../assets/background.webp";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchShopWithUsername, selectShop, selectShops } from "../state/reducers";
-import { fetchImage, selectSelectedShopImage } from "../../Images/state/reducers";
-import { addToCart, updateCartQuantity, clearCart, selectCart } from "../../Cart/state/reducers"; 
+import {
+  fetchShopWithUsername,
+  selectShop,
+  selectShops,
+} from "../state/reducers";
+import {
+  fetchImage,
+  selectSelectedShopImage,
+} from "../../Images/state/reducers";
+import {
+  addToCart,
+  updateCartQuantity,
+  clearCart,
+  selectCart,
+} from "../../Cart/state/reducers";
+import {
+  fetchProductById,
+  selectSelectedProduct,
+} from "../../Product/state/reducers";
+
 import Loader from "../../../components/Loader";
 import NotFoundPage from "../../NotFoundPage";
 import MenuPage from "./MenuPage";
 import GroceryShopPage from "./GroceryShopPage";
 import { useTranslation } from "react-i18next";
-import Cart from "./Cart";
 import ProductDetailsModal from "../../Product/components/landing/ProductDetailsModal";
-import { createPosOrder, createGlobalOrder } from "../services/orderServices";
 import GlobalShopLandingPage from "./GlobalShopLandingPage";
 import { Helmet } from "react-helmet";
 
@@ -30,39 +44,44 @@ const Section = styled.div`
   padding: 0;
   width: 100%;
   position: relative;
-  @media (max-width: 768px) { justify-content: flex-start; width: 100%; }
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+    width: 100%;
+  }
 `;
 
 const MAX_RETRIES = 2;
 
 const ShopPageWithUsername = () => {
   const { username } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
   const { loading, error } = useSelector(selectShops);
   const selectedShop = useSelector(selectShop);
   const selectedShopImage = useSelector(selectSelectedShopImage);
-  const { cart: cartItems } = useSelector(selectCart); 
+  const { cart: cartItems } = useSelector(selectCart);
 
   const [domainKeyWord, setDomainKeyWord] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
   const [selectedProductForModal, setSelectedProductForModal] = useState(null);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(null);
 
   const getPublicImageUrl = (imageId) => {
     if (!imageId) return "";
     return `${process.env.REACT_APP_API_PROD_URL}/image/${imageId}`;
   };
 
-  useEffect(() => { if (username) dispatch(fetchShopWithUsername(username)); }, [dispatch, username]);
+  useEffect(() => {
+    if (username) dispatch(fetchShopWithUsername(username));
+  }, [dispatch, username]);
 
   useEffect(() => {
     if (error && !loading && retryCount < MAX_RETRIES) {
       const timer = setTimeout(() => {
         setRetryCount((prev) => prev + 1);
-        if (username?.startsWith("@")) dispatch(fetchShopWithUsername(username));
+        if (username?.startsWith("@"))
+          dispatch(fetchShopWithUsername(username));
       }, 2000);
       return () => clearTimeout(timer);
     }
@@ -70,9 +89,10 @@ const ShopPageWithUsername = () => {
 
   useEffect(() => {
     if (selectedShop) {
-      if (selectedShop.domainId?.keyword) setDomainKeyWord(selectedShop.domainId.keyword);
+      if (selectedShop.domainId?.keyword)
+        setDomainKeyWord(selectedShop.domainId.keyword);
       else if (selectedShop.isHyperLocal === false) setDomainKeyWord("global");
-      else setDomainKeyWord("food"); 
+      else setDomainKeyWord("food");
     }
   }, [selectedShop]);
 
@@ -80,97 +100,37 @@ const ShopPageWithUsername = () => {
     if (selectedShop?.imageId) dispatch(fetchImage(selectedShop.imageId));
   }, [dispatch, selectedShop]);
 
-  const handleCardClick = (product) => setSelectedProductForModal(product);
-  const handleCloseModal = () => setSelectedProductForModal(null);
-  const handleAddToCart = (variant) => dispatch(addToCart(variant));
-  const handleUpdateQuantity = (variantId, newQuantity) => dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
-
-  const handlePlaceOrder = async (customerDetails) => {
-    if (isSubmitting === "submitting") return;
-
-    if (!customerDetails.customerName || !customerDetails.customerPhone) {
-      alert(t("form_validation_alert")); 
-      return;
-    }
-    if (domainKeyWord === "global" && (!customerDetails.address?.wilaya || !customerDetails.address?.commune)) {
-      alert(t("errorFillAllFields")); 
-      return;
-    }
-
-    setIsSubmitting("submitting");
-
-    const { address, gpsLocation } = customerDetails;
-    const deliveryInfoString = address ? `${address.addressLine || ''}, ${address.commune}, ${address.wilaya}` : "";
-
-    let orderPayload;
-    let submissionService;
-
-    // --- ROBUST PAYLOAD CONSTRUCTION (FIX FOR 400 ERROR) ---
-    // 1. Filter out items that are missing critical IDs
-    const validItems = cartItems.filter(item => (item.productId || item.product?._id) && (item.title || item.product?.name));
-    
-    // 2. Map safely
-    const productsPayload = validItems.map((item) => ({
-        productId: item.productId || item.product._id, // Fallback if top-level productId missing
-        title: item.title || item.product.name,        // Fallback if top-level title missing
-        quantity: Number(item.quantity),
-        sellingPrice: Number(item.sellingPrice),
-        categoryId: item.product?.categoryId, 
-        supplementary: `${item.size || 'Default'},${item.color || 'Default'}`, 
-    }));
-
-    if(productsPayload.length === 0) {
-        alert("Cart is invalid or empty. Please clear cart and try again.");
-        setIsSubmitting(null);
-        return;
-    }
-
-    if (domainKeyWord === "global") {
-      submissionService = createGlobalOrder;
-      orderPayload = {
-        shopId: selectedShop._id,
-        customerName: customerDetails.customerName,
-        customerPhone: customerDetails.customerPhone,
-        deliveryInfo: deliveryInfoString,
-        note: customerDetails.note || "",
-        deliveryPricing: 0, 
-        city: address?.commune,
-        state: address?.wilaya,
-        addressLine: address?.addressLine || "",
-        ...(gpsLocation && { gpsLocation: { lat: Number(gpsLocation.lat), lng: Number(gpsLocation.lng) } }),
-        products: productsPayload,
-      };
+  // Deep Link Logic
+  const productIdFromUrl = searchParams.get("product");
+  useEffect(() => {
+    if (productIdFromUrl) {
+      if (selectedProductForModal?._id === productIdFromUrl) return;
+      dispatch(fetchProductById(productIdFromUrl))
+        .unwrap()
+        .then((product) => {
+          setSelectedProductForModal(product);
+        })
+        .catch((err) => {
+          setSearchParams({});
+        });
     } else {
-      submissionService = createPosOrder;
-      orderPayload = {
-        shopId: selectedShop._id,
-        customerName: customerDetails.customerName,
-        tableNumber: customerDetails.tableNumber,
-        note: customerDetails.note,
-        products: productsPayload,
-      };
+      if (selectedProductForModal) {
+        setSelectedProductForModal(null);
+      }
     }
+  }, [productIdFromUrl, dispatch, setSearchParams]);
 
-    try {
-      await submissionService(orderPayload);
-      setIsSubmitting("success");
-      setTimeout(() => {
-        setIsCartOpen(false);
-        dispatch(clearCart()); 
-        setIsSubmitting(null);
-      }, 2000);
-    } catch (error) {
-      console.error("Failed to submit order:", error);
-      if (error.response && error.response.data) console.error("Server Error Details:", error.response.data);
-      setIsSubmitting("error");
-      setTimeout(() => setIsSubmitting(null), 3000);
-    }
+  const handleCardClick = (product) => {
+    setSearchParams({ product: product._id });
   };
 
-  const handleCloseCart = () => {
-    setIsCartOpen(false);
-    if (isSubmitting === "success" || isSubmitting === "error") setIsSubmitting(null);
+  const handleCloseModal = () => {
+    setSearchParams({});
   };
+
+  const handleAddToCart = (variant) => dispatch(addToCart(variant));
+  const handleUpdateQuantity = (variantId, newQuantity) =>
+    dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
 
   let isOrderingEnabled = false;
   let orderingStatusKey = "";
@@ -192,40 +152,57 @@ const ShopPageWithUsername = () => {
     }
   }
 
-  if (loading || (error && retryCount < MAX_RETRIES)) return <Section><Loader fullscreen={false} /></Section>;
+  if (loading || (error && retryCount < MAX_RETRIES))
+    return (
+      <Section>
+        <Loader fullscreen={false} />
+      </Section>
+    );
   if (error && retryCount >= MAX_RETRIES) return <NotFoundPage />;
 
-  if (selectedShop && Object.keys(selectedShop).length > 0 && selectedShopImage && domainKeyWord) {
+  if (
+    selectedShop &&
+    Object.keys(selectedShop).length > 0 &&
+    selectedShopImage &&
+    domainKeyWord
+  ) {
     const pageProps = { onCardClick: handleCardClick };
-    const cartProps = {
-      items: cartItems, 
-      isOpen: isCartOpen,
-      onOpen: () => setIsCartOpen(true),
-      onClose: handleCloseCart,
-      onUpdateQuantity: handleUpdateQuantity,
-      onSubmitOrder: handlePlaceOrder,
-      isPremium: selectedShop.subscriptionPlanId !== null,
-      isSubmitting: isSubmitting,
-      shopDomain: domainKeyWord, 
-    };
 
     const shopTitle = selectedShop.name || "Hanuut Shop";
-    const shopDesc = selectedShop.description || t("partnersPage_seo_description");
+    const shopDesc =
+      selectedShop.description || t("partnersPage_seo_description");
     const shopImage = getPublicImageUrl(selectedShop.imageId);
+
+    const metaTitle = selectedProductForModal
+      ? `${selectedProductForModal.name} | ${shopTitle}`
+      : `${shopTitle} | Hanuut`;
+
+    const metaDesc = selectedProductForModal
+      ? selectedProductForModal.shortDescription || shopDesc
+      : shopDesc;
 
     return (
       <Section>
         <Helmet>
-          <title>{shopTitle} | Hanuut</title>
-          <meta name="description" content={shopDesc} />
-          <meta property="og:title" content={shopTitle} />
+          <title>{metaTitle}</title>
+          <meta name="description" content={metaDesc} />
+          <meta property="og:title" content={metaTitle} />
+          <meta property="og:description" content={metaDesc} />
           <meta property="og:image" content={shopImage} />
         </Helmet>
-        
+
         {(() => {
           switch (domainKeyWord) {
-            case "food": return <MenuPage selectedShop={selectedShop} selectedShopImage={selectedShopImage} shopDomain={domainKeyWord} />;
-            case "global": return (
+            case "food":
+              return (
+                <MenuPage
+                  selectedShop={selectedShop}
+                  selectedShopImage={selectedShopImage}
+                  shopDomain={domainKeyWord}
+                />
+              );
+            case "global":
+              return (
                 <Section>
                   <GlobalShopLandingPage
                     shop={selectedShop}
@@ -234,12 +211,14 @@ const ShopPageWithUsername = () => {
                     orderingStatusKey={orderingStatusKey}
                     {...pageProps}
                   />
-                  <Cart {...cartProps} />
+                  {/* FIX: REMOVED <Cart /> FROM HERE. The GlobalShopLandingPage handles it. */}
+
+                  {/* MODAL IS RENDERED HERE, CONTROLLED BY STATE SYNCED WITH URL */}
                   {selectedProductForModal && (
                     <ProductDetailsModal
                       product={selectedProductForModal}
                       onClose={handleCloseModal}
-                      cartItems={cartItems} 
+                      cartItems={cartItems}
                       onAddToCart={handleAddToCart}
                       onUpdateQuantity={handleUpdateQuantity}
                       isOrderingEnabled={isOrderingEnabled}
@@ -248,14 +227,25 @@ const ShopPageWithUsername = () => {
                   )}
                 </Section>
               );
-            case "grocery": return <GroceryShopPage shop={selectedShop} image={selectedShopImage} />;
-            default: return <NotFoundPage />;
+            case "grocery":
+              return (
+                <GroceryShopPage
+                  shop={selectedShop}
+                  image={selectedShopImage}
+                />
+              );
+            default:
+              return <NotFoundPage />;
           }
         })()}
       </Section>
     );
   }
-  return <Section><Loader fullscreen={false} /></Section>;
+  return (
+    <Section>
+      <Loader fullscreen={false} />
+    </Section>
+  );
 };
 
 export default ShopPageWithUsername;
