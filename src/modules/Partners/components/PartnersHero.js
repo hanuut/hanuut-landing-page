@@ -146,7 +146,7 @@ const Badge = styled(motion.div)`
 `;
 
 const HeroTitle = styled(motion.h1)`
-  font-size: clamp(2.5rem, 5vw, 2.5rem);
+  font-size: clamp(2rem, 5vw, 2.5rem);
   font-weight: 800;
   line-height: 1.3;
   color: white;

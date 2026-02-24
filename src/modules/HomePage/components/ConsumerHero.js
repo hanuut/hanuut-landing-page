@@ -29,7 +29,7 @@ const Section = styled.section`
   width: 100%;
   /* Ensure it fills height minus navbar */
   min-height: calc(100vh - 5rem); 
-  background-color: #fdf4e3; /* Ivory Background */
+  background-color: #ffffffff; /* Ivory Background */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,7 +86,7 @@ const TextContent = styled(motion.div)`
 `;
 
 const Title = styled(motion.h1)`
-  font-size: clamp(2.8rem, 5vw, 4rem);
+  font-size: clamp(2 rem, 5vw, 4rem);
   font-weight: 900;
   line-height: 1.15;
   color: #111217;

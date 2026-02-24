@@ -81,8 +81,9 @@ const InnerContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 6px;
   z-index: 1;
+  padding: 0 1rem;
 
   /* Typography Force */
   font-family: 'Ubuntu', sans-serif;
@@ -95,6 +96,8 @@ const InnerContent = styled.div`
   
   /* Icon handling inside */
   img, svg {
+  color: inherit !important;
+   /* Ensure icons are visible in both modes */
     filter: ${(props) => props.$secondary ? 'brightness(0) invert(1)' : 'none'};
   }
 `;

@@ -12,8 +12,8 @@ import { selectCart, toggleCart } from "../modules/Cart/state/reducers";
 
 import LanguagesDropDown from "./LanguagesDropDown";
 import Logo from "./Logo";
-import logoAr from "../assets/logo-ar.png";
-import logoEn from "../assets/logo-en.png";
+import logoAr from "../assets/logo_ar.webp";
+import logoEn from "../assets/logo_en.webp";
 import btoa from "btoa";
 
 const bufferToUrl = (imageObject) => {
@@ -398,7 +398,7 @@ const Navbar = () => {
     if (path.includes("/partners")) return "#FFFFFF";
     // Shop Mode (Dark Headers) gets white text
     if (isShopMode) return "#FFFFFF";
-    
+
     // Home (Hub) & E'SUUQ (Ivory Background) get Dark Text
     return "#111217";
   };
@@ -534,13 +534,6 @@ const Navbar = () => {
           <NavGroup>
             {!isShopMode && (
               <DesktopMenu>
-                {/* 1. Home / Ecosystem */}
-                <MenuItem $textColor={textColor}>
-                  <Link to="/" style={{ color: textColor }}>
-                    {t("nav_ecosystem") || "Home"}
-                  </Link>
-                </MenuItem>
-                
                 {/* 2. E'SUUQ (Consumer) */}
                 <MenuItem $textColor={textColor}>
                   <Link to="/esuuq" style={{ color: textColor }}>
@@ -671,11 +664,6 @@ const Navbar = () => {
                 animate="visible"
                 exit="hidden"
               >
-                <SidePanelItem variants={itemVariants}>
-                  <Link to="/" onClick={closeMobileMenu}>
-                    {t("nav_ecosystem") || "Home"}
-                  </Link>
-                </SidePanelItem>
                 <SidePanelItem variants={itemVariants}>
                   <Link to="/esuuq" onClick={closeMobileMenu}>
                     {t("nav_esuuq") || "E'SUUQ"}

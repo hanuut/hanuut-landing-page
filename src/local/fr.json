@@ -684,7 +684,7 @@
   "homeSubHeading": "Tout au même endroit.",
   "homeParagraph": "Le marché numérique complet. Commandez chez des commerçants vérifiés et des restaurants, ou achetez et vendez des articles d'occasion avec vos voisins. Du repas chaud aux bonnes affaires, tout est là.",
   "toOrder": "Explorer le Marché",
-  "partnersHero_heading_part1": "Gérez votre commerce",
+  "partnersHero_heading_part1": "Gérez votre commerce, Sans papier ni stylo.",
   "partnersHero_heading_part2": "Sans papier ni stylo.",
   "partnersHero_subheading": "Obtenez une caisse enregistreuse et un menu numérique professionnel sur votre téléphone en quelques minutes. Réduisez les erreurs, servez vos clients plus vite et gardez un œil sur votre stock.",
   "partnerInputButton": "Obtenir mes outils gratuits",
@@ -888,7 +888,7 @@
   "card_business_pre": "Vous avez une boutique ?",
   "card_business_desc": "Mettez votre boutique en ligne et profitez de services VIP. Ouvrez une nouvelle source de revenus qui peut être énorme.",
   "card_business_btn": "Découvrez My Hanuut",
-  "nav_esuuq": "L'application eSUUQ",
+  "nav_esuuq": "eSUUQ",
   "nav_ecosystem": "Accueil",
   "// --- E'SUUQ PAGE ---": "",
   "esuuq_hero_title": "Le marché... entre vos mains",
@@ -899,5 +899,4 @@
   "pain_clutter_text": "Prenez une photo, fixez le prix et vendez aux gens de votre région. La transaction est simple et l'acheteur vient à votre porte.",
   "pain_delivery_title": "Suivez votre commande",
   "pain_delivery_text": "Sachez où en est votre commande à tout moment. Vous pouvez suivre chaque étape, de la préparation à la livraison."
-
 }

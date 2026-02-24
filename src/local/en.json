@@ -612,7 +612,7 @@
       }
     ]
   },
-    "payment_processing_title": "Confirm Your Payment",
+  "payment_processing_title": "Confirm Your Payment",
   "payment_amount_label": "Total Amount",
   "payment_proceed_button": "Proceed to Secure Payment",
   "payment_processing_error_url": "Could not get payment URL. Please try again.",
@@ -630,12 +630,12 @@
   "place_order_button": "Place Order",
   "form_validation_alert": "Please fill in your name and phone number.",
   "form_preparation_note": "Preparation Note",
- "placing_order": "Placing Order...",
-"order_success_title": "Order Placed!",
-"order_success_message": "The shop has received your order and will begin preparing it shortly.",
-"order_error_title": "Submission Failed",
-"order_error_message": "We couldn't submit your order at this time. Please try again.",
-"try_again_button": "Try Again",
+  "placing_order": "Placing Order...",
+  "order_success_title": "Order Placed!",
+  "order_success_message": "The shop has received your order and will begin preparing it shortly.",
+  "order_error_title": "Submission Failed",
+  "order_error_message": "We couldn't submit your order at this time. Please try again.",
+  "try_again_button": "Try Again",
   "navBlog": "Blog",
   "blogSeoTitle": "Hanuut Blog & Resources",
   "blogSeoDescription": "Tips, guides, and resources for local shop owners to grow their business with Hanuut.",
@@ -667,7 +667,7 @@
   "search_products": "Search products...",
   "all_products": "All",
   "search_results_for": "Results for",
-    "home_section_title": "One App. <span>Everything Local.</span>",
+  "home_section_title": "One App. <span>Everything Local.</span>",
   "home_shops_title": "Verified Shops",
   "home_shops_desc": "Order groceries and food from trusted local businesses. Real-time stock, fast delivery.",
   "home_delivery_title": "Tawsila Delivery",
@@ -682,13 +682,12 @@
   "homeSubHeading": "Everything in One Place.",
   "homeParagraph": "The complete digital market. Order from local restaurants and verified shops, or browse ads to buy and sell goods with people nearby. From fresh food to second-hand deals, find it all here.",
   "toOrder": "Explore the Market",
-  "partnersHero_heading_part1": "Stop Running Your Shop",
+  "partnersHero_heading_part1": "Run Your Shop Like a Pro",
   "partnersHero_heading_part2": "With Pen and Paper.",
   "partnersHero_subheading": "Get a professional Digital Menu and Cash Register on your phone in minutes. Reduce mistakes, serve customers faster, and never lose track of your stock again.",
   "partnerInputButton": "Get My Free Digital Tools",
   "home_vision_title": "The Digital Mall for Everyone",
   "home_vision_desc": "Why download ten apps when you need just one? Buy fresh groceries from trusted shops, order dinner from local restaurants, or find great deals on used items from your neighbors. Safe, verified, and local.",
-  
   "howItWorksTitle": "Shopping Made Simple",
   "howItWorksStep1_title": "Find Anything Local",
   "howItWorksStep1_text": "Browse verified shops for new products or check the marketplace for second-hand deals nearby.",
@@ -696,56 +695,46 @@
   "howItWorksStep2_text": "Add to cart for instant delivery, or chat directly with sellers to negotiate prices.",
   "howItWorksStep3_title": "Fast Delivery",
   "howItWorksStep3_text": "Track your driver in real-time. Pay cash on delivery or online—it’s your choice.",
-
   "partnersValue1_title": "Your Shop, Open 24/7",
   "partnersValue1_description": "Don't limit your sales to opening hours. Give customers a link to browse your products and order even when your doors are closed.",
   "partnersValue2_title": "Stop Losing Money",
   "partnersValue2_description": "Track every item. Get alerts before products expire. Know exactly what is selling and what is sitting on the shelf.",
   "partnersValue3_title": "Professionalize Your Brand",
   "partnersValue3_description": "Give your customers a modern experience with a digital menu and professional receipts. Stand out from the competition.",
-
   "appleStore": "App Store",
   "homeSmallerParagraph": "Available on iOS & Android.",
   "market_section_badge": "Marketplace 2.0",
   "market_section_title": "Your Neighborhood. <span>Your Market.</span>",
   "market_section_desc": "Hanuut Market redefines peer-to-peer commerce. It's a powerful tool to sell unused items to verified neighbors or find local deals without the hassle. Secure, smart, and hyper-local.",
-  
   "market_feat_1_title": "Smart Bidding System",
   "market_feat_1_desc": "Don't guess the price. Let buyers send you their 'Best Offer' and sell to the one that matches your expectations.",
-  
   "market_feat_2_title": "Hyper-Local Selling",
   "market_feat_2_desc": "Don't want to ship? Toggle 'Local Only' to hide your ad from distant buyers and deal only with people in your city.",
-  
   "market_feat_3_title": "Secure Chat & Deals",
   "market_feat_3_desc": "Negotiate privately and set meeting points without exposing your phone number to strangers.",
-  
   "market_cta": "Post Your First Ad",
   "// --- Onboarding Wizard ---": "",
   "onboarding_step_contact": "Contact",
   "onboarding_step_shop": "Shop Info",
   "onboarding_step_location": "Location",
   "onboarding_step_menu": "Products",
-  
   "wiz_step1_title": "Let's start with you",
   "wiz_step1_subtitle": "Who will manage this shop?",
   "wiz_label_firstname": "First Name",
   "wiz_label_lastname": "Last Name",
   "wiz_label_phone": "Business Phone",
   "wiz_label_email": "Email (Optional)",
-  
   "wiz_step2_title": "Tell us about your business",
   "wiz_step2_subtitle": "What will customers see?",
   "wiz_label_shopname": "Shop Name",
   "wiz_label_domain": "Business Type",
   "wiz_label_desc": "Short Description (Optional)",
   "wiz_placeholder_desc": "Ex: Best pizza in town, open late...",
-  
   "wiz_step3_title": "Where are you located?",
   "wiz_step3_subtitle": "We'll help customers find you.",
   "wiz_label_wilaya": "State (Wilaya)",
   "wiz_label_commune": "City (Commune)",
   "wiz_label_district": "District / Street",
-  
   "wiz_step4_title": "What do you sell?",
   "wiz_step4_subtitle": "Add a few categories and products to get started.",
   "wiz_label_category": "Category",
@@ -754,17 +743,15 @@
   "wiz_placeholder_cat": "Category Name",
   "wiz_placeholder_prod": "Product Name",
   "onboarding_page_title": "Create Your Shop - My Hanuut",
-  
   "wiz_btn_next": "Next",
   "wiz_btn_back": "Back",
   "wiz_btn_finish": "Submit Request",
-  
   "wiz_success_title": "Request Received!",
   "wiz_success_desc": "Thank you! Our team will create your shop and send you the login details soon.",
   "wiz_btn_home": "Back to Home",
   "cta_wizard_button": "Let us build your shop",
-"cta_wizard_sub": "Not tech-savvy? Our team will set it up for free.",
-"wiz_label_activity": "Business Activity (Optional)",
+  "cta_wizard_sub": "Not tech-savvy? Our team will set it up for free.",
+  "wiz_label_activity": "Business Activity (Optional)",
   "wiz_placeholder_activity": "Ex: Handmade crafts, Electronics, Bakery...",
   "wiz_type_general": "General / E-commerce",
   "wiz_type_food": "Restaurant / Food",
@@ -778,55 +765,40 @@
     "last_updated": "Last updated: June 1, 2026",
     "contact_us": "Contact Us",
     "contact_text": "If you have any questions about these terms, please contact us at:",
-    
     "terms_sec1_title": "1. Legal Information",
     "terms_sec1_text": "Platform Operator: Hanuut Express SARL.\nHeadquarters: Rue Ahmed Benabderezzak, Arris, Batna.\nCommercial Register (RC): 22b0226566-00/05.\nHosting: The platform and databases are hosted in Algiers, Algeria.",
-    
     "terms_sec2_title": "2. Preamble & Object",
     "terms_sec2_text": "The Hanuut Express application is a technical intermediary platform. These Terms govern the relationship between The Company (Hanuut Express), The User (Consumer/C2C Seller), and The Partner (Merchants). By using the App, you acknowledge that Hanuut Express is not the seller of goods (unless explicitly marked) but acts as a facilitator.",
-    
     "terms_sec3_title": "3. Description of Services",
     "terms_sec3_1_title": "3.1 B2C Marketplace",
     "terms_sec3_1_text": "Hanuut transmits orders from Users to Partners. The Partner is solely responsible for product quality, safety, and hygiene. Hanuut does not inspect food preparation. Complaints must be directed to the Partner, though Hanuut assists in mediation.",
     "terms_sec3_2_title": "3.2 C2C Classifieds",
     "terms_sec3_2_text": "Hanuut acts strictly as a Hosting Provider. We are not a party to C2C transactions and do not handle C2C payments. Users transact at their own risk.",
-    
     "terms_sec4_title": "4. Ordering & Electronic Contracts",
     "terms_sec4_text": "Clicking 'Confirm Order' constitutes a binding electronic signature (Law 18-05).",
     "terms_sec4_sub_title": "Right of Withdrawal (Exclusions)",
     "terms_sec4_sub_text": "Pursuant to Art. 15 of Law 18-05, the Right of Withdrawal DOES NOT apply to perishable goods (food, groceries) or unsealed hygiene items once preparation has started.",
-    
     "terms_sec5_title": "5. User Obligations",
     "terms_sec5_text": "Users agree NOT to post: Weapons, drugs, counterfeit goods, or content offensive to Algerian values. Hanuut reserves the right to delete accounts without notice.",
-    
     "terms_sec6_title": "6. Limitation of Liability",
     "terms_sec6_text": "Hanuut does not guarantee 100% uptime. We are not liable for third-party delivery actions or GPS inaccuracies.",
-    
     "terms_sec7_title": "7. Disputes & Jurisdiction",
     "terms_sec7_text": "Governed by Algerian Law. Disputes fall under the exclusive jurisdiction of the courts of Batna.",
-
     "privacy_delete_account_pre": "You can request to delete your account ",
     "privacy_delete_account_link": "here",
-
     "privacy_sec1_title": "1. Data Controller",
     "privacy_sec1_text": "The entity responsible for processing your data is Hanuut Express SARL.",
-
     "privacy_sec2_title": "2. Data Collection",
     "privacy_sec2_text": "We collect: Identity (Name, Phone), Precise Geolocation (Critical for service), Device Data, and Transaction History.",
-
     "privacy_sec3_title": "3. Purpose of Processing",
     "privacy_sec3_text": "To execute orders, track delivery, provide support, and send status notifications.",
-
     "privacy_sec4_title": "4. Personal Data & Security",
     "privacy_sec4_text": "The Hanuut app stores and processes personal data that you have provided to us, in order to provide our Service. It is your responsibility to keep your phone and access to the app secure. We therefore recommend that you do not jailbreak or root your phone, which is the process of removing software restrictions and limitations imposed by the official operating system of your device. It could make your phone vulnerable to malware/viruses/malicious programs, compromise your phone’s security features and it could mean that the Hanuut app won’t work properly or at all.",
-
     "privacy_sec5_title": "5. Third Party Services",
     "privacy_sec5_text": "The app does use third party services that declare their own Terms and Conditions.",
     "privacy_google_play": "Google Play Services",
-
     "privacy_sec6_title": "6. Data Sharing",
     "privacy_sec6_text": "We share Name/Address with Partners only for active orders. We may disclose data to Algerian security services upon judicial request.",
-
     "privacy_sec7_title": "7. Your Rights (Law 18-07)",
     "privacy_sec7_text": "You have the right to Access, Rectify, Delete, or Object to data processing."
   },
@@ -851,21 +823,18 @@
   "supermarkets_tab_label": "Grocery",
   "foodShops_tab_label": "Restaurants",
   "globalShops_tab_label": "E-Commerce",
-
   "features_supermarkets_1_title": "Instant Barcode Scanner",
   "features_supermarkets_1_desc": "Stock your shelves in seconds. Scan any barcode to auto-fill product details. No typing required.",
   "features_supermarkets_2_title": "Expiry Date Tracker",
   "features_supermarkets_2_desc": "Never throw away food again. The app alerts you when products are close to expiring so you can put them on sale.",
   "features_supermarkets_3_title": "Smart Warehouse Alerts",
   "features_supermarkets_3_desc": "Get automatic alerts for low-stock, near-expiry, and expired items, so you can make profitable decisions before it's too late.",
-
   "features_food_1_title": "QR Menu & Ordering",
   "features_food_1_desc": "Let customers scan a QR code at their table to view your menu and order. Faster service, fewer waiter errors.",
   "features_food_2_title": "Kitchen Display System",
   "features_food_2_desc": "Orders go straight to the kitchen. No shouting, no lost paper tickets. Just organized, timely preparation.",
   "features_food_3_title": "Seamless Order Processing",
   "features_food_3_desc": "Receive and manage online orders directly in the app. Keep your kitchen efficient and your customers happy with real-time updates.",
-
   "features_ecom_1_title": "Professional Storefront",
   "features_ecom_1_desc": "Get a sleek, professional web page for your brand. Upload high-quality images and tell your story without writing a single line of code.",
   "features_ecom_2_title": "Sell Variants Easily",
@@ -874,54 +843,39 @@
   "features_ecom_3_desc": "Don't just sell to your neighborhood. Accept orders from anywhere and manage shipping logistics directly from the dashboard.",
   "partnersValues_sectionTitle": "Built for Reality",
   "partnersValues_subtitle": "Technology that works as hard as you do.",
-  
   "value_offline_title": "No Internet? No Problem.",
   "value_offline_desc": "Built with an 'Offline-First' architecture. Keep selling and printing receipts even if the connection drops. We sync everything when you're back online.",
-  
   "value_marketing_title": "Instant Marketing Studio",
   "value_marketing_desc": "Stop paying for designers. Select 3 products, click 'Generate', and get a professional flyer ready for Instagram & Facebook in seconds.",
-  
   "value_analytics_title": "Know Your Numbers",
   "value_analytics_desc": "Track daily income, best-selling items, and worker performance. Turn data into decisions without complex spreadsheets.",
   "cta_final_title": "Ready to Stop Using Pen & Paper?",
   "cta_final_desc": "Join hundreds of Algerian merchants digitizing their business today. It takes less than 2 minutes to create your shop.",
   "cta_download_button": "Download for Windows",
   "cta_mobile_button": "Get Android App",
-  
   "features_section_subtitle": "Select your business type to see how My Hanuut solves your daily problems.",
-  
   "tab_grocery": "Grocery",
   "tab_food": "Restaurant",
   "tab_global": "E-Commerce",
-
   "qna_gro_1_q": "Adding products takes too long.",
   "qna_gro_1_a": "Use the **Instant Barcode Scanner**. We have a database of 4,000+ Algerian products. Just scan, and the name/price fills automatically.",
-  
   "qna_gro_2_q": "I lose money on expired goods.",
   "qna_gro_2_a": "The **Expiry Tracker** alerts you before items spoil, so you can discount them or return them to suppliers.",
-  
   "qna_gro_3_q": "What if the internet cuts off?",
   "qna_gro_3_a": "Business continues. Our **Offline-First** tech lets you sell and manage stock without Wi-Fi. It syncs when you reconnect.",
-
   "qna_food_1_q": "My menu changes daily.",
   "qna_food_1_a": "Update your **QR Menu** instantly. Hide out-of-stock ingredients (like Mozzarella) or toggle entire categories with one tap.",
-  
   "qna_food_2_q": "Kitchen communication errors.",
   "qna_food_2_a": "Orders from the **Table QR** or waiter's phone go straight to the kitchen display. Sizes (L/XL) and extras are clear.",
-  
   "qna_food_3_q": "I can't design marketing posts.",
   "qna_food_3_a": "Use the **Flyer Studio**. Select your best Pizza, click generate, and get a stunning design ready for Instagram Stories in seconds.",
-
   "qna_ecom_1_q": "I sell sizes and colors.",
   "qna_ecom_1_a": "The **Global Product** system lets you manage complex variants (Red/Blue, S/M/L) with specific prices and stock levels.",
-  
   "qna_ecom_2_q": "I want to sell nationwide.",
   "qna_ecom_2_a": "Scale up. Your shop gets a **Web Landing Page**. Customers from all 58 Wilayas can order, and you manage fulfillment easily.",
-  
   "qna_ecom_3_q": "What is my real profit?",
   "qna_ecom_3_a": "Input your **Buying Price** vs. **Selling Price**. The analytics dashboard calculates your net profit automatically.",
   "navTrack": "Order Tracking",
-  
   "// --- BRANDING & HUB ---": "",
   "companyName": "Hanuut Express",
   "hub_headline": "A world for e-commerce.",
@@ -932,7 +886,7 @@
   "card_business_pre": "Have a shop?",
   "card_business_desc": "Bring your shop online and enjoy VIP services. Open up a new, potentially huge, revenue stream.",
   "card_business_btn": "Discover My Hanuut",
-  "nav_esuuq": "The eSUUQ App",
+  "nav_esuuq": "eSUUQ",
   "nav_ecosystem": "Home",
   "// --- E'SUUQ PAGE ---": "",
   "esuuq_hero_title": "The market... in your hands",

@@ -12,8 +12,8 @@ import {
   FaTruck, // Added FaTruck
 } from "react-icons/fa";
 
-import logoAr from "../assets/logo-ar.png";
-import logoEn from "../assets/logo-en.png";
+import logoAr from "../assets/logo_ar.webp";
+import logoEn from "../assets/logo_en.webp";
 
 const FooterWrapper = styled.footer`
   background-color: #09090b;
