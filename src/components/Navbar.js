@@ -375,7 +375,7 @@ const Navbar = () => {
   const { cart } = useSelector(selectCart);
   const path = location.pathname;
   const isShopMode = /^(@[^/]+|shop\/[^/]+)/.test(path.substring(1));
-  const isTawsilaMode = path.startsWith("/abridh");
+  const isTawsilaMode = path.startsWith("/abrid");
   const cartQuantity = useMemo(() => {
     if (!isShopMode) return 0;
     const currentShopId = (selectedShop?._id || selectedShop?.id)?.toString();
