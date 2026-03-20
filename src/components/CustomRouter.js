@@ -47,6 +47,9 @@ const MarketplaceAdRedirectPage = lazy(() =>
 
 const TrackingPage = lazy(() => import("../modules/Partners/components/TrackingPage"));
 
+const TawsilaLanding = lazy(() => import("../modules/Tawsila/TawsilaLanding"));
+const DriverOnboarding = lazy(() => import("../modules/Tawsila/DriverOnboarding"));
+
 const ShopRedirector = () => {
   const { username } = useParams();
   // Permanently redirect to the clean URL
@@ -132,6 +135,11 @@ const CustomRouter = ({ appConfig, location }) => {
           <Route path="/links" element={<LinksPage />} />
           <Route path="/partners/onboarding" element={<OnboardingWizard />} />
          
+          {/* Tawsila related routes */}
+          <Route path="/abridh" element={<TawsilaLanding />} />
+          <Route path="/abridh/drive" element={<DriverOnboarding />} />
+
+
           {/* Legal pages */}
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route

@@ -14,6 +14,9 @@ import LanguagesDropDown from "./LanguagesDropDown";
 import Logo from "./Logo";
 import logoAr from "../assets/logo_ar.webp";
 import logoEn from "../assets/logo_en.webp";
+
+import abridhLogoAr from "../assets/abridh_ar.webp";
+import abridhLogoEn  from "../assets/abridh_en.webp";
 import btoa from "btoa";
 
 const bufferToUrl = (imageObject) => {
@@ -372,7 +375,7 @@ const Navbar = () => {
   const { cart } = useSelector(selectCart);
   const path = location.pathname;
   const isShopMode = /^(@[^/]+|shop\/[^/]+)/.test(path.substring(1));
-
+  const isTawsilaMode = path.startsWith("/abridh");
   const cartQuantity = useMemo(() => {
     if (!isShopMode) return 0;
     const currentShopId = (selectedShop?._id || selectedShop?.id)?.toString();
@@ -389,10 +392,12 @@ const Navbar = () => {
     [selectedShopImage],
   );
   const currentLogo = i18n.language === "ar" ? logoAr : logoEn;
+  const tawsilaLogo = i18n.language === "ar" ? abridhLogoAr : abridhLogoEn;
   const isArabic = i18n.language === "ar";
 
   const getTextColor = () => {
     if (isScrolled) return "#FFFFFF";
+    if (isTawsilaMode) return "#FFFFFF";
     if (path.includes("/onboarding")) return "#111217";
     // Partners (Dark Theme) gets white text
     if (path.includes("/partners")) return "#FFFFFF";
@@ -524,9 +529,18 @@ const Navbar = () => {
               </LogoSwapContainer>
             ) : (
               <motion.div layoutId="hanuut-logo-mobile">
-                <Link to="/">
+              
+                {!isTawsilaMode && (
+                 <Link to="/">
                   <Logo image={currentLogo} />
                 </Link>
+                )}
+                {isTawsilaMode && (
+                 <Link to="/abridh">
+                  <Logo image={tawsilaLogo} />
+                </Link>
+                )}
+
               </motion.div>
             )}
           </NavGroup>
@@ -534,65 +548,50 @@ const Navbar = () => {
           <NavGroup>
             {!isShopMode && (
               <DesktopMenu>
-                {/* 2. E'SUUQ (Consumer) */}
-                <MenuItem $textColor={textColor}>
-                  <Link to="/esuuq" style={{ color: textColor }}>
-                    {t("nav_esuuq") || "E'SUUQ"}
-                  </Link>
-                </MenuItem>
+                {isTawsilaMode ? (
+                  /* --- TAWSILA MENU --- */
+                  <>
+                   <li>
+                      <Link to="/tawsila/drive">
+                        <button style={{ 
+                          background: '#397FF9', color: '#FFF', padding: '10px 20px', 
+                          borderRadius: '50px', border: 'none', fontWeight: '700', 
+                          cursor: 'pointer', fontFamily: 'Tajawal', transition: '0.2s',
+                          boxShadow: '0 4px 15px rgba(57, 127, 249, 0.3)'
+                        }} onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'} onMouseOut={(e) => e.target.style.transform = 'scale(1)'}>
+                          {t("tawsila_btn_drive", "Apply to Drive")}
+                        </button>
+                      </Link>
+                    </li>
 
-                {/* 3. My Hanuut (Business) */}
-                <MenuItem $textColor={textColor}>
-                  <Link to="/partners" style={{ color: textColor }}>
-                    {t("navPartners")}
-                  </Link>
-                </MenuItem>
-
-                {/* 4. Blog */}
-                <MenuItem $textColor={textColor}>
-                  <Link to="/blog" style={{ color: textColor }}>
-                    {t("navBlog")}
-                  </Link>
-                </MenuItem>
-
-                {/* 5. Track Order */}
-                <MenuItem $textColor={textColor}>
-                  <Link
-                    to="/track"
-                    style={{
-                      color: textColor,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <FaTruck size={14} /> {t("navTrack")}
-                  </Link>
-                </MenuItem>
-                <li>
-                  <LanguagesDropDown textColor={textColor} />
-                </li>
+                    <li>
+                      <LanguagesDropDown textColor={textColor} />
+                    </li>
+                   
+                  </>
+                ) : (
+                  /* --- EXISTING HANUUT MENU --- */
+                  <>
+                    <MenuItem $textColor={textColor}>
+                      <Link to="/esuuq" style={{ color: textColor }}>{t("nav_esuuq") || "E'SUUQ"}</Link>
+                    </MenuItem>
+                    <MenuItem $textColor={textColor}>
+                      <Link to="/partners" style={{ color: textColor }}>{t("navPartners")}</Link>
+                    </MenuItem>
+                    <MenuItem $textColor={textColor}>
+                      <Link to="/blog" style={{ color: textColor }}>{t("navBlog")}</Link>
+                    </MenuItem>
+                    <MenuItem $textColor={textColor}>
+                      <Link to="/track" style={{ color: textColor, display: "flex", alignItems: "center", gap: "8px" }}>
+                        <FaTruck size={14} /> {t("navTrack")}
+                      </Link>
+                    </MenuItem>
+                    <li><LanguagesDropDown textColor={textColor} /></li>
+                  </>
+                )}
               </DesktopMenu>
             )}
-
-            {isShopMode && cartQuantity > 0 && (
-              <CartButton onClick={handleCartClick} $color={textColor}>
-                <FaShoppingCart />
-                <CartBadge>{cartQuantity}</CartBadge>
-              </CartButton>
-            )}
-
-            {!isShopMode && (
-              <HamburgerButton onClick={toggleMobileMenu}>
-                <HamburgerIcon
-                  $isOpen={isMobileMenuOpen}
-                  $iconColor={textColor}
-                />
-              </HamburgerButton>
-            )}
-
-            {isShopMode && <LanguagesDropDown textColor={textColor} />}
-          </NavGroup>
+            </NavGroup>
         </Navigation>
       </Section>
 
@@ -658,36 +657,27 @@ const Navbar = () => {
                 />
               </PanelHeader>
 
-              <SidePanelMenu
-                variants={menuVariants}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-              >
-                <SidePanelItem variants={itemVariants}>
-                  <Link to="/esuuq" onClick={closeMobileMenu}>
-                    {t("nav_esuuq") || "E'SUUQ"}
-                  </Link>
-                </SidePanelItem>
-                <SidePanelItem variants={itemVariants}>
-                  <Link to="/partners" onClick={closeMobileMenu}>
-                    {t("navPartners")}
-                  </Link>
-                </SidePanelItem>
-                <SidePanelItem variants={itemVariants}>
-                  <Link to="/blog" onClick={closeMobileMenu}>
-                    {t("navBlog")}
-                  </Link>
-                </SidePanelItem>
-                <SidePanelItem variants={itemVariants}>
-                  <Link to="/track" onClick={closeMobileMenu}>
-                    {t("navTrack")}
-                  </Link>
-                </SidePanelItem>
+             <SidePanelMenu variants={menuVariants} initial="hidden" animate="visible" exit="hidden">
+                {isTawsilaMode ? (
+                  <>
+                    <SidePanelItem variants={itemVariants}>
+                      <Link to="/tawsila/drive" onClick={closeMobileMenu} style={{ color: '#397FF9' }}>{t("tawsila_btn_drive", "Drive")}</Link>
+                    </SidePanelItem>
+                  </>
+                ) : (
+                  /* Existing Hanuut Mobile Links */
+                  <>
+                    <SidePanelItem variants={itemVariants}><Link to="/esuuq" onClick={closeMobileMenu}>{t("nav_esuuq") || "E'SUUQ"}</Link></SidePanelItem>
+                    <SidePanelItem variants={itemVariants}><Link to="/partners" onClick={closeMobileMenu}>{t("navPartners")}</Link></SidePanelItem>
+                    <SidePanelItem variants={itemVariants}><Link to="/blog" onClick={closeMobileMenu}>{t("navBlog")}</Link></SidePanelItem>
+                    <SidePanelItem variants={itemVariants}><Link to="/track" onClick={closeMobileMenu}>{t("navTrack")}</Link></SidePanelItem>
+                  </>
+                )}
                 <SidePanelItem variants={itemVariants}>
                   <LanguagesDropDown handleChooseLanguage={closeMobileMenu} />
                 </SidePanelItem>
               </SidePanelMenu>
+
             </SidePanel>
           </>
         )}

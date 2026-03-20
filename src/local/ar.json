@@ -17,7 +17,7 @@
   "navPartners": "ماي حانووت",
   "navSolution": "حلولنا",
   "navContact": "تواصل معنا",
-  "navTawsila": " توصــيلة",
+  "navTawsila": "أبريذ",
   "getStarted": "ابدأ الآن",
   "footerFindUs": "إلتحقوا بنا",
   "footerAllRightsReserved": " ©حانوت إكبريس 2026 كل الحقوق محفوظة ",
@@ -943,7 +943,25 @@
   "pain_clutter_title": "دارك معمرة؟ بيع وتهنى.",
   "pain_clutter_text": "صور، حط السومة، وبيع للناس لي في بلاصتك. البيع والشرا ساهل، والشاري يجيك حتى لباب الدار.",
   "pain_delivery_title": "تبع الكوموند ديالك",
-  "pain_delivery_text": "أعرف وين راهي الكوموند تاعك في كل وقت. تقدر تبع كل مرحلة من التجهيز حتى توصلك."
+  "pain_delivery_text": "أعرف وين راهي الكوموند تاعك في كل وقت. تقدر تبع كل مرحلة من التجهيز حتى توصلك.",
+  "tawsila_hero_title": "تحرك بطموح.",
+  "tawsila_hero_subtitle": "قد مستقبلك. انضم إلى الجيل القادم من التنقل واكسب بشروطك الخاصة.",
+  "tawsila_btn_drive": "سجل كسائق",
+  "tawsila_btn_ride": "اطلب توصيلة",
+  "tawsila_bento_1_title": "بدون تعقيدات",
+  "tawsila_bento_1_desc": "سجل في دقائق. انطلق على الطريق اليوم مع نظام الانضمام السلس الخاص بنا.",
+  "tawsila_bento_2_title": "أرباح واضحة",
+  "tawsila_bento_2_desc": "احتفظ بما تكسبه. مدفوعات شفافة بدون رسوم خفية.",
+  "tawsila_bento_3_title": "المجتمع أولاً",
+  "tawsila_bento_3_desc": "اربط بين الناس. كن القلب النابض لمدينتك.",
+  "tawsila_sticky_1_title": "حدد جدولك الزمني",
+  "tawsila_sticky_1_desc": "أنت المدير. اعمل وقتما تشاء وأينما تشاء.",
+  "tawsila_sticky_2_title": "توزيع ذكي",
+  "tawsila_sticky_2_desc": "خوارزميتنا تقلل وقت انتظارك وتزيد من إمكانيات كسبك.",
+  "tawsila_sticky_3_title": "دعم على مدار الساعة",
+  "tawsila_sticky_3_desc": "فريق دعم حقيقي جاهز لمساعدتك في أي وقت، ليلاً أو نهاراً.",
+  "tawsila_wizard_title": "كن كابتن",
+  "tawsila_wizard_subtitle": "انضم إلى الأسطول. أدخل بياناتك للبدء."
 
 
 }

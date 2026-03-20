@@ -114,3 +114,44 @@ export const partnerTheme = {
   glassSurface: "rgba(44, 44, 46, 0.6)",
   glassBorder: "rgba(255, 255, 255, 0.1)",
 };
+
+// ---------------------------------------------------------
+// 3. TAWSILA THEME (The "Premium Mobility" Dark Theme)
+// ---------------------------------------------------------
+export const tawsilaTheme = {
+  ...commonSettings,
+
+  // Deep black background for the 3D Canvas to pop
+  body: "#050505", 
+  text: "#FFFFFF",
+  textColor: "#FFFFFF",
+  textRgba: "255, 255, 255",
+  secondaryText: "#A1A1AA", 
+
+  // Tawsila Electric Blue as Primary
+  primary: "#397FF9", 
+  primaryColor: "#397FF9",
+  primaryRgba: "57, 127, 249",
+  primaryLight: "#60A5FA",
+
+  secondary: "#FFFFFF", 
+  secondaryColor: "#FFFFFF",
+
+  accent: "#39A170", 
+  error: "#EF4444", 
+
+  // Glassmorphism surfaces
+  surface: "#18181B", // Zinc 900
+  surfaceBorder: "rgba(255, 255, 255, 0.08)",
+
+  // Gemini / Premium Specs
+  zinc950: "#09090B",
+  zinc900: "#18181B",
+  zinc800: "#27272A",
+  zinc500: "#71717A",
+  zinc100: "#F4F4F5",
+
+  beamColor: "#397FF9", // Blue beam for Tawsila buttons
+  glassSurface: "rgba(24, 24, 27, 0.6)",
+  glassBorder: "rgba(255, 255, 255, 0.1)",
+};
