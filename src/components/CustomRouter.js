@@ -137,7 +137,9 @@ const CustomRouter = ({ appConfig, location }) => {
          
           {/* Tawsila related routes */}
           <Route path="/abridh" element={<TawsilaLanding />} />
+          <Route path="/abrid" element={<TawsilaLanding />} />
           <Route path="/abridh/drive" element={<DriverOnboarding />} />
+          <Route path="/abrid/drive" element={<DriverOnboarding />} />
 
 
           {/* Legal pages */}

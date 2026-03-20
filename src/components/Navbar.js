@@ -552,7 +552,7 @@ const Navbar = () => {
                   /* --- TAWSILA MENU --- */
                   <>
                    <li>
-                      <Link to="/tawsila/drive">
+                      <Link to="/abridh/drive">
                         <button style={{ 
                           background: '#397FF9', color: '#FFF', padding: '10px 20px', 
                           borderRadius: '50px', border: 'none', fontWeight: '700', 
@@ -661,7 +661,7 @@ const Navbar = () => {
                 {isTawsilaMode ? (
                   <>
                     <SidePanelItem variants={itemVariants}>
-                      <Link to="/tawsila/drive" onClick={closeMobileMenu} style={{ color: '#397FF9' }}>{t("tawsila_btn_drive", "Drive")}</Link>
+                      <Link to="/abridh/drive" onClick={closeMobileMenu} style={{ color: '#397FF9' }}>{t("tawsila_btn_drive", "Drive")}</Link>
                     </SidePanelItem>
                   </>
                 ) : (

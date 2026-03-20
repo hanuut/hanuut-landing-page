@@ -74,7 +74,7 @@ const TawsilaPreFooter = () => {
           <span>Join the fleet today.</span>
         </Title>
         <BorderBeamButton 
-          onClick={() => navigate("/tawsila/drive")} 
+          onClick={() => navigate("/abridh/drive")} 
           beamColor="#397FF9"
         >
           {t("tawsila_btn_drive", "Apply to Drive")}

@@ -358,7 +358,7 @@ const TawsilaLanding = () => {
           <Subtitle>{t("tawsila_hero_subtitle", "Drive your future. Join the next generation of mobility and earn on your own terms.")}</Subtitle>
           
           <CtaGroup>
-            <BorderBeamButton onClick={() => navigate("/tawsila/drive")} beamColor="#397FF9">
+            <BorderBeamButton onClick={() => navigate("/abridh/drive")} beamColor="#397FF9">
               {t("tawsila_btn_drive", "Apply to Drive")} {isArabic ? <FaArrowLeft style={{marginRight:'8px'}}/> : <FaArrowRight style={{marginLeft:'8px'}}/>}
             </BorderBeamButton>
             <BorderBeamButton secondary onClick={() => window.open(tawsilaAppUrl, "_blank")} beamColor="#FFFFFF">
