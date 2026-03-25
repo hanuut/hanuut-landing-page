@@ -3,12 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
-import { FaShoppingCart, FaTruck } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { selectShop } from "../modules/Partners/state/reducers";
 import { selectSelectedShopImage } from "../modules/Images/state/reducers";
-import { selectCart, toggleCart } from "../modules/Cart/state/reducers";
+import { FaTruck } from "react-icons/fa";
 
 import LanguagesDropDown from "./LanguagesDropDown";
 import Logo from "./Logo";
@@ -225,44 +224,6 @@ const NavShopName = styled.span`
   }
 `;
 
-const CartButton = styled.button`
-  position: relative;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: ${({ $color }) => $color};
-  font-size: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
-  padding: 0.5rem;
-  height: 48px;
-
-  &:hover {
-    transform: scale(1.1);
-  }
-`;
-
-const CartBadge = styled.span`
-  position: absolute;
-  top: 2px;
-  right: 0;
-  background-color: #ef4444;
-  color: white;
-  font-size: 0.7rem;
-  font-weight: 700;
-  min-width: 20px;
-  height: 20px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-  border: 2px solid #1c1c1e;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-`;
-
 // --- MOBILE MENU COMPONENTS ---
 
 const Backdrop = styled(motion.div)`
@@ -372,21 +333,13 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const selectedShop = useSelector(selectShop);
   const selectedShopImage = useSelector(selectSelectedShopImage);
-  const { cart } = useSelector(selectCart);
+
   const path = location.pathname;
   const isShopMode = /^(@[^/]+|shop\/[^/]+)/.test(path.substring(1));
   const isTawsilaMode = path.startsWith("/abrid");
-  const cartQuantity = useMemo(() => {
-    if (!isShopMode) return 0;
-    const currentShopId = (selectedShop?._id || selectedShop?.id)?.toString();
-    if (!currentShopId) return 0;
-    const shopItems = cart.filter(
-      (item) =>
-        (item.shopId || item.product?.shopId)?.toString() === currentShopId,
-    );
-    return shopItems.reduce((acc, item) => acc + item.quantity, 0);
-  }, [cart, isShopMode, selectedShop]);
 
+
+  
   const shopImageUrl = useMemo(
     () => bufferToUrl(selectedShopImage),
     [selectedShopImage],
@@ -436,7 +389,7 @@ const Navbar = () => {
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
-  const handleCartClick = () => dispatch(toggleCart());
+
 
   const panelVariants = {
     hidden: {
@@ -486,6 +439,8 @@ const Navbar = () => {
       transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] },
     },
   };
+
+  if (isShopMode) return null;
 
   return (
     <>

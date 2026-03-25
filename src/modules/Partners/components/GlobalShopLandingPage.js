@@ -41,9 +41,11 @@ import {
   addToCart,
   updateCartQuantity,
   closeCart,
+    openCart,
 } from "../../Cart/state/reducers";
 import { createGlobalOrder } from "../services/orderServices";
 import { partnerTheme } from "../../../config/Themes";
+import { FaShoppingCart } from "react-icons/fa";
 
 const PageWrapper = styled.main`
   width: 100%;
@@ -55,17 +57,19 @@ const PageWrapper = styled.main`
   position: relative;
   z-index: 1;
 `;
+
 const Container = styled(motion.div)`
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
-  padding: calc(${(props) => props.theme.navHeight} + 1rem) 1rem 1rem 1rem;
+  padding: 2rem 1rem 6rem 1rem; /* Adjusted for no-navbar and floating cart */
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   box-sizing: border-box;
   @media (max-width: 768px) {
-    padding-top: calc(${(props) => props.theme.navHeightMobile} + 1.5rem);
+    padding-top: 1.5rem; /* Mobile top padding */
   }
 `;
+
 const LoadMoreTrigger = styled.div`
   height: 20px;
   width: 100%;
@@ -86,6 +90,49 @@ const SpinnerSmall = styled.div`
     }
   }
 `;
+
+const FloatingCartWrap = styled(motion.div)`
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  width: 90%;
+  max-width: 400px;
+  background-color: ${(props) => props.theme.primaryColor || '#F07A48'};
+  color: #fff;
+  border-radius: 50px;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  z-index: 995; /* Above content, below standard Modals */
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+`;
+
+const Badge = styled.div`
+  background: rgba(0,0,0,0.2);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1rem;
+`;
+
+const ViewCartText = styled.div`
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const TotalPrice = styled.div`
+  font-weight: 800;
+  font-size: 1.1rem;
+`;
+
+
+
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -374,6 +421,29 @@ const GlobalShopLandingPage = ({
             </motion.div>
           </AnimatePresence>
         </Container>
+
+        <AnimatePresence>
+          {shopCartItems.length > 0 && (
+            <FloatingCartWrap
+              initial={{ y: 100, opacity: 0, x: "-50%" }}
+              animate={{ y: 0, opacity: 1, x: "-50%" }}
+              exit={{ y: 100, opacity: 0, x: "-50%" }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => dispatch(openCart())}
+            >
+              <Badge>
+                {shopCartItems.reduce((acc, item) => acc + item.quantity, 0)}
+              </Badge>
+              <ViewCartText>
+                {t("view_cart", "View Cart")}
+              </ViewCartText>
+              <TotalPrice>
+                {shopCartItems.reduce((acc, item) => acc + (parseInt(item.sellingPrice) * item.quantity), 0)} {t("dzd")}
+              </TotalPrice>
+            </FloatingCartWrap>
+          )}
+        </AnimatePresence>
 
         {/* RESTORED: Product Modal logic */}
         {selectedProductForModal && (

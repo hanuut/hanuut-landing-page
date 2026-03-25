@@ -3,12 +3,12 @@ import styled, { ThemeProvider } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { usePalette } from "color-thief-react";
-
+import { AnimatePresence, motion } from "framer-motion";
 // --- Components ---
 import Loader from "../../../components/Loader";
 import ShopHeader from "./ShopHeader";
-import StickyCategoryNav from "../../Categories/components/StickyCategoryNav"; 
-import PremiumDishCard from "../../Dish/components/PremiumDishCard"; 
+import StickyCategoryNav from "../../Categories/components/StickyCategoryNav";
+import PremiumDishCard from "../../Dish/components/PremiumDishCard";
 import Cart from "./Cart";
 import PoweredByHanuut from "../../../components/PoweredByHanuut";
 
@@ -17,23 +17,28 @@ import { createPosOrder } from "../services/orderServices";
 import { getImageUrl } from "../../../utils/imageUtils";
 
 // --- Redux State ---
-import { fetchCategories, selectCategories } from "../../Categories/state/reducers";
+import {
+  fetchCategories,
+  selectCategories,
+} from "../../Categories/state/reducers";
 import { fetchDishesByCategory, selectDishes } from "../../Dish/state/reducers";
-import { 
-    addToCart, 
-    updateCartQuantity, 
-    closeCart, 
-    selectCart 
-} from "../../Cart/state/reducers"; 
+import {
+  addToCart,
+  updateCartQuantity,
+  closeCart,
+  openCart,
+  selectCart,
+} from "../../Cart/state/reducers";
 
 // --- Themes ---
-import { partnerTheme } from "../../../config/Themes"; 
+import { partnerTheme } from "../../../config/Themes";
+import { FaShoppingCart } from "react-icons/fa";
 
 // --- Styled Components ---
 const PageWrapper = styled.main`
   width: 100%;
   min-height: 100vh;
-  background-color: ${(props) => props.theme.body}; 
+  background-color: ${(props) => props.theme.body};
   color: ${(props) => props.theme.text};
   padding-bottom: 6rem;
   padding-top: 0;
@@ -45,46 +50,110 @@ const MainContainer = styled.div`
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: calc(${(props) => props.theme.navHeight} + 1rem) 1rem 1rem 1rem;
+  padding: 2rem 1rem 6rem 1rem; /* Replaced navHeight with 2rem, added 6rem bottom for cart */
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
   box-sizing: border-box;
 
   @media (max-width: 768px) {
-    padding-top: calc(${(props) => props.theme.navHeightMobile} + 1rem);
+    padding-top: 1.5rem; /* Mobile top padding */
   }
 `;
 
-const ContentContainer = styled.div` width: 100%; margin-top: 1rem; `;
-const CategorySection = styled.div` margin-bottom: 3rem; scroll-margin-top: 180px; `;
+const ContentContainer = styled.div`
+  width: 100%;
+  margin-top: 1rem;
+`;
+const CategorySection = styled.div`
+  margin-bottom: 3rem;
+  scroll-margin-top: 180px;
+`;
 const SectionTitle = styled.h2`
-  font-size: 1.5rem; margin-bottom: 1.5rem; color: white; font-family: 'Tajawal', sans-serif; font-weight: 700;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.5rem;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: white;
+  font-family: "Tajawal", sans-serif;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
 `;
 const DishesGrid = styled.div`
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;
-  @media (max-width: 768px) { grid-template-columns: 1fr; }
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
-const EmptyState = styled.div` padding: 4rem; text-align: center; color: #8E8E93; font-size: 1.2rem; `;
+const EmptyState = styled.div`
+  padding: 4rem;
+  text-align: center;
+  color: #8e8e93;
+  font-size: 1.2rem;
+`;
+
+const FloatingCartWrap = styled(motion.div)`
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  width: 90%;
+  max-width: 400px;
+  background-color: ${(props) => props.theme.secondaryColor || "#F07A48"};
+  color: #fff;
+  border-radius: 50px;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  z-index: 995; /* Above content, below standard Modals */
+  cursor: pointer;
+  font-family: "Tajawal", sans-serif;
+`;
+
+const Badge = styled.div`
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1.2rem;
+  display: flex;
+  gap: 0.3rem;
+  font-size: 1rem;
+`;
+
+const ViewCartText = styled.div`
+  font-weight: 700;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const TotalPrice = styled.div`
+  font-weight: 800;
+  font-size: 1.1rem;
+`;
 
 const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
 
   // --- Redux Data ---
-  const { categories, loading: categoriesLoading } = useSelector(selectCategories);
+  const { categories, loading: categoriesLoading } =
+    useSelector(selectCategories);
   const { dishes, loading: dishesLoading } = useSelector(selectDishes);
-  const { cart } = useSelector(selectCart); 
+  const { cart } = useSelector(selectCart);
 
   // --- Filter Cart for CURRENT SHOP ---
   const shopCartItems = useMemo(() => {
-      if (!selectedShop?._id) return [];
-      return cart.filter(item => item.shopId === selectedShop._id);
+    if (!selectedShop?._id) return [];
+    return cart.filter((item) => item.shopId === selectedShop._id);
   }, [cart, selectedShop]);
 
-  const [activeCategory, setActiveCategory] = useState(null); 
+  const [activeCategory, setActiveCategory] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(null);
   const [fetchedCategories, setFetchedCategories] = useState(new Set());
-  
+
   // --- NEW STATE: Order Success Data ---
   const [orderSuccessData, setOrderSuccessData] = useState(null);
 
@@ -92,7 +161,7 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
   useEffect(() => {
     if (selectedShop && selectedShop.categories) {
       const validCategories = selectedShop.categories.filter(
-        (catId) => !selectedShop.hiddenCategories?.includes(catId)
+        (catId) => !selectedShop.hiddenCategories?.includes(catId),
       );
       dispatch(fetchCategories(validCategories));
     }
@@ -102,11 +171,13 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     if (categories.length > 0 && selectedShop._id) {
       categories.forEach((cat) => {
         if (!fetchedCategories.has(cat.id)) {
-          dispatch(fetchDishesByCategory({ 
-            shopId: selectedShop._id, 
-            categoryId: cat.id 
-          }));
-          setFetchedCategories(prev => new Set(prev).add(cat.id));
+          dispatch(
+            fetchDishesByCategory({
+              shopId: selectedShop._id,
+              categoryId: cat.id,
+            }),
+          );
+          setFetchedCategories((prev) => new Set(prev).add(cat.id));
         }
       });
     }
@@ -114,38 +185,50 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
 
   // --- 2. Dynamic Filtering Logic (Phase 2.1) ---
   const categoriesWithDishes = useMemo(() => {
-      if (categoriesLoading || dishesLoading) return [];
-      return categories.filter(category => {
-          if (category.isHidden) return false;
-          if (selectedShop.hiddenCategories?.includes(category.id)) return false;
-          const hasDishes = dishes.some(d => 
-              d.categoryId === category.id && 
-              d.shopId === selectedShop._id && 
-              d.dish && d.dish.isHidden !== true 
-          );
-          return hasDishes;
-      });
+    if (categoriesLoading || dishesLoading) return [];
+    return categories.filter((category) => {
+      if (category.isHidden) return false;
+      if (selectedShop.hiddenCategories?.includes(category.id)) return false;
+      const hasDishes = dishes.some(
+        (d) =>
+          d.categoryId === category.id &&
+          d.shopId === selectedShop._id &&
+          d.dish &&
+          d.dish.isHidden !== true,
+      );
+      return hasDishes;
+    });
   }, [categories, dishes, selectedShop, categoriesLoading, dishesLoading]);
 
   // --- 3. Branding ---
-  const imageUrl = useMemo(() => getImageUrl(selectedShopImage), [selectedShopImage]);
-  const { data: logoPalette } = usePalette(imageUrl, 2, "hex", { crossOrigin: "Anonymous", quality: 10 });
+  const imageUrl = useMemo(
+    () => getImageUrl(selectedShopImage),
+    [selectedShopImage],
+  );
+  const { data: logoPalette } = usePalette(imageUrl, 2, "hex", {
+    crossOrigin: "Anonymous",
+    quality: 10,
+  });
 
-  const brandColors = useMemo(() => ({
-    main: selectedShop.styles?.mainColor || logoPalette?.[0] || "#F07A48",
-    accent: selectedShop.styles?.secondaryColor || logoPalette?.[1] || "#39A170",
-  }), [selectedShop, logoPalette]);
+  const brandColors = useMemo(
+    () => ({
+      main: selectedShop.styles?.mainColor || logoPalette?.[0] || "#F07A48",
+      accent:
+        selectedShop.styles?.secondaryColor || logoPalette?.[1] || "#39A170",
+    }),
+    [selectedShop, logoPalette],
+  );
 
   // --- 4. Cart Logic ---
   const handleAddToCart = (dish) => {
     const cartItemPayload = {
-        shopId: selectedShop._id,
-        productId: dish._id,
-        variantId: dish._id, 
-        title: dish.name,
-        sellingPrice: dish.sellingPrice,
-        quantity: 1,
-        dish: dish
+      shopId: selectedShop._id,
+      productId: dish._id,
+      variantId: dish._id,
+      title: dish.name,
+      sellingPrice: dish.sellingPrice,
+      quantity: 1,
+      dish: dish,
     };
     dispatch(addToCart(cartItemPayload));
   };
@@ -159,9 +242,9 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
     setIsSubmitting("submitting");
 
     if (!customerDetails.customerName) {
-       alert(t("form_validation_alert"));
-       setIsSubmitting(null);
-       return;
+      alert(t("form_validation_alert"));
+      setIsSubmitting(null);
+      return;
     }
 
     // Determine Delivery Price (for local, usually 0 if dine-in, or calc)
@@ -172,14 +255,17 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
       customerPhone: customerDetails.customerPhone, // Ensure this is passed
       tableNumber: customerDetails.tableNumber,
       note: customerDetails.note,
-      deliveryPricing: customerDetails.deliveryOption?.price || 0, 
-      deliveryOptionKeyword: customerDetails.deliveryOption?.type === 'dine_in' ? 'digitalMenu' : 'byShop', // Metadata logic
+      deliveryPricing: customerDetails.deliveryOption?.price || 0,
+      deliveryOptionKeyword:
+        customerDetails.deliveryOption?.type === "dine_in"
+          ? "digitalMenu"
+          : "byShop", // Metadata logic
       products: shopCartItems.map((item) => ({
         productId: item.productId,
         title: item.title,
         quantity: item.quantity,
         sellingPrice: item.sellingPrice,
-        categoryId: item.dish?.categoryId, 
+        categoryId: item.dish?.categoryId,
       })),
     };
 
@@ -190,16 +276,19 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
 
       // SET SUCCESS DATA FOR MODAL
       setOrderSuccessData({
-          orderId: orderResult.orderId,
-          customerPhone: customerDetails.customerPhone,
-          shopName: selectedShop.name
+        orderId: orderResult.orderId,
+        customerPhone: customerDetails.customerPhone,
+        shopName: selectedShop.name,
       });
 
       setIsSubmitting("success");
-      
+
       // Clear items immediately to prevent re-submission
-      shopCartItems.forEach(item => dispatch(updateCartQuantity({ variantId: item.variantId, quantity: 0 })));
-      
+      shopCartItems.forEach((item) =>
+        dispatch(
+          updateCartQuantity({ variantId: item.variantId, quantity: 0 }),
+        ),
+      );
     } catch (error) {
       console.error("Order Failed:", error);
       setIsSubmitting("error");
@@ -208,21 +297,22 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
   };
 
   const handleClearSuccess = () => {
-      setIsSubmitting(null);
-      setOrderSuccessData(null);
+    setIsSubmitting(null);
+    setOrderSuccessData(null);
   };
 
   const handleScrollToCategory = (catId) => {
     setActiveCategory(catId);
     if (!catId) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     const element = document.getElementById(`category-${catId}`);
     if (element) {
-      const yOffset = -180; 
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      const yOffset = -180;
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
 
@@ -233,81 +323,110 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
   return (
     <ThemeProvider theme={partnerTheme}>
       <PageWrapper>
-        <MainContainer isArabic={i18n.language === 'ar'}>
-          
-          <ShopHeader 
-            shop={selectedShop} 
-            imageData={imageUrl} 
-            isSubscribed={true} 
-            brandColors={brandColors} 
+        <MainContainer isArabic={i18n.language === "ar"}>
+          <ShopHeader
+            shop={selectedShop}
+            imageData={imageUrl}
+            isSubscribed={true}
+            brandColors={brandColors}
           />
 
-          <StickyCategoryNav 
-            categories={categoriesWithDishes} 
-            activeCategory={activeCategory} 
-            onSelect={handleScrollToCategory} 
+          <StickyCategoryNav
+            categories={categoriesWithDishes}
+            activeCategory={activeCategory}
+            onSelect={handleScrollToCategory}
           />
 
           <ContentContainer>
-            {categoriesWithDishes.length > 0 ? (
-              categoriesWithDishes.map((category) => {
-                const categoryDishes = dishes.filter(
-                  (d) => d.categoryId === category.id && d.dish.isHidden !== true
-                );
+            {categoriesWithDishes.length > 0
+              ? categoriesWithDishes.map((category) => {
+                  const categoryDishes = dishes.filter(
+                    (d) =>
+                      d.categoryId === category.id && d.dish.isHidden !== true,
+                  );
 
-                if (categoryDishes.length === 0) return null; 
+                  if (categoryDishes.length === 0) return null;
 
-                return (
-                  <CategorySection key={category.id} id={`category-${category.id}`}>
-                    <SectionTitle>
-                      {i18n.language === 'ar' ? category.name : (category.nameFr || category.name)}
-                    </SectionTitle>
-                    
-                    <DishesGrid>
-                      {categoryDishes.map((dishWrapper) => {
-                        const currentDish = dishWrapper.dish;
-                        const cartItem = shopCartItems.find(
-                          (item) => item.variantId === currentDish._id
-                        );
+                  return (
+                    <CategorySection
+                      key={category.id}
+                      id={`category-${category.id}`}
+                    >
+                      <SectionTitle>
+                        {i18n.language === "ar"
+                          ? category.name
+                          : category.nameFr || category.name}
+                      </SectionTitle>
 
-                        return (
-                          <PremiumDishCard
-                            key={currentDish._id}
-                            dish={currentDish}
-                            brandColors={brandColors}
-                            isShopOpen={selectedShop.isOpen}
-                            onAddToCart={() => handleAddToCart(currentDish)}
-                            onUpdateQuantity={handleUpdateQuantity}
-                            cartItem={cartItem}
-                          />
-                        );
-                      })}
-                    </DishesGrid>
-                  </CategorySection>
-                );
-              })
-            ) : (
-              !dishesLoading && <EmptyState>{t("noDishesAvailable")}</EmptyState>
-            )}
+                      <DishesGrid>
+                        {categoryDishes.map((dishWrapper) => {
+                          const currentDish = dishWrapper.dish;
+                          const cartItem = shopCartItems.find(
+                            (item) => item.variantId === currentDish._id,
+                          );
+
+                          return (
+                            <PremiumDishCard
+                              key={currentDish._id}
+                              dish={currentDish}
+                              brandColors={brandColors}
+                              isShopOpen={selectedShop.isOpen}
+                              onAddToCart={() => handleAddToCart(currentDish)}
+                              onUpdateQuantity={handleUpdateQuantity}
+                              cartItem={cartItem}
+                            />
+                          );
+                        })}
+                      </DishesGrid>
+                    </CategorySection>
+                  );
+                })
+              : !dishesLoading && (
+                  <EmptyState>{t("noDishesAvailable")}</EmptyState>
+                )}
           </ContentContainer>
-
         </MainContainer>
 
-        <Cart 
-          items={shopCartItems} 
+        <AnimatePresence>
+          {shopCartItems.length > 0 && (
+            <FloatingCartWrap
+              initial={{ y: 100, opacity: 0, x: "-50%" }}
+              animate={{ y: 0, opacity: 1, x: "-50%" }}
+              exit={{ y: 100, opacity: 0, x: "-50%" }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => dispatch(openCart())}
+            >
+              <Badge>
+                {shopCartItems.reduce((acc, item) => acc + item.quantity, 0)}
+                <FaShoppingCart size={14} />
+              </Badge>
+              <ViewCartText>{t("view_cart", "View Cart")}</ViewCartText>
+              <TotalPrice>
+                {shopCartItems.reduce(
+                  (acc, item) =>
+                    acc + parseInt(item.sellingPrice) * item.quantity,
+                  0,
+                )}{" "}
+                {t("dzd")}
+              </TotalPrice>
+            </FloatingCartWrap>
+          )}
+        </AnimatePresence>
+
+        <Cart
+          items={shopCartItems}
           onUpdateQuantity={handleUpdateQuantity}
           onSubmitOrder={handlePlaceOrder}
           isSubmitting={isSubmitting}
           shopDomain={shopDomain}
           shopId={selectedShop._id}
-          
           // --- NEW PROPS FOR TRACKING ---
           orderSuccessData={orderSuccessData}
           onClearSuccess={handleClearSuccess}
         />
 
         <PoweredByHanuut />
-
       </PageWrapper>
     </ThemeProvider>
   );
