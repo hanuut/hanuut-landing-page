@@ -916,5 +916,22 @@
   "tawsila_sticky_3_title": "Support 24/7",
   "tawsila_sticky_3_desc": "Des humains prêts à vous aider à tout moment, de jour comme de nuit.",
   "tawsila_wizard_title": "Devenez Capitaine",
-  "tawsila_wizard_subtitle": "Rejoignez la flotte. Entrez vos coordonnées pour commencer."
+  "tawsila_wizard_subtitle": "Rejoignez la flotte. Entrez vos coordonnées pour commencer.",
+  "support_title": "Aide & Support",
+  "support_subtitle": "Nous sommes là pour vous aider. Envoyez-nous un message via le formulaire ou contactez-nous directement par e-mail.",
+  "support_form_title": "Envoyer un message",
+  "support_user_type": "Je suis un...",
+  "support_type_customer": "Client",
+  "support_type_driver": "Chauffeur (Abridh)",
+  "support_type_partner": "Commerçant / Partenaire",
+  "support_type_other": "Autre",
+  "support_name_input": "Votre Nom",
+  "support_contact_input": "Email ou Téléphone",
+  "support_title_input": "Sujet / Titre",
+  "support_title_placeholder": "ex: Problème avec ma commande",
+  "support_message_input": "Comment pouvons-nous vous aider ?",
+  "support_message_placeholder": "Décrivez votre problème en détail...",
+  "support_success_title": "Message envoyé !",
+  "support_success_desc": "Merci de nous avoir contactés. Notre équipe vous répondra sous peu.",
+  "support_send_another": "Envoyer un autre message"
 }

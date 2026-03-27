@@ -10,6 +10,7 @@ import Loader from "./Loader";
 import HomePage from "../modules/HomePage";
 import NotFoundPage from "../modules/NotFoundPage";
 
+const SupportPage = lazy(() => import("../modules/SupportPage"));
 const PaymentReturnPage = lazy(() => import("../modules/payment/PaymentReturnPage"));
 // Lazy-loaded page components for better performance
 const PrivacyPolicy = lazy(() => import("../modules/PrivacyPolicy"));
@@ -144,6 +145,7 @@ const CustomRouter = ({ appConfig, location }) => {
 
           {/* Legal pages */}
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/support" element={<SupportPage />} />
           <Route
             path="/terms_and_conditions"
             element={<TermsAndConditions />}

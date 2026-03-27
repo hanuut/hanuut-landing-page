@@ -5,8 +5,8 @@ import { Link } from "react-router-dom";
 
 const BadgeWrapper = styled(motion.div)`
   position: fixed;
-  bottom: 20px;
-  left: 50%;
+  bottom: 5px;
+  left: 1%;
   transform: translateX(-50%);
   z-index: 900; /* Below Modals (1000), Above Content */
   pointer-events: none; /* Let clicks pass through wrapper area */
@@ -38,22 +38,23 @@ const GlassPill = styled(Link)`
 `;
 
 const Text = styled.span`
-  font-size: 0.75rem;
+  font-size: 0.5rem;
   color: #8e8e93; /* System Grey */
   font-weight: 500;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
 `;
 
 const Heart = styled.span`
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   filter: grayscale(0.5);
 `;
 
 const BrandName = styled.span`
   color: #ffffff;
+  font-size: 0.5rem;
   font-weight: 700;
 `;
 

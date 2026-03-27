@@ -914,6 +914,23 @@
   "tawsila_sticky_3_title": "24/7 Support",
   "tawsila_sticky_3_desc": "Real humans ready to help you at any time, day or night.",
   "tawsila_wizard_title": "Become a Captain",
-  "tawsila_wizard_subtitle": "Join the fleet. Enter your details below to get started."
+  "tawsila_wizard_subtitle": "Join the fleet. Enter your details below to get started.",
+  "support_title": "Help & Support",
+  "support_subtitle": "We're here to help. Send us a message using the form, or reach out to us directly via email.",
+  "support_form_title": "Send a Message",
+  "support_user_type": "I am a...",
+  "support_type_customer": "Customer",
+  "support_type_driver": "Driver (Abridh)",
+  "support_type_partner": "Merchant / Shop Owner",
+  "support_type_other": "Other",
+  "support_name_input": "Your Name",
+  "support_contact_input": "Email or Phone",
+  "support_title_input": "Subject / Title",
+  "support_title_placeholder": "e.g., Issue with my recent order",
+  "support_message_input": "How can we help you?",
+  "support_message_placeholder": "Describe your issue in detail...",
+  "support_success_title": "Message Sent!",
+  "support_success_desc": "Thank you for reaching out. Our support team will get back to you shortly.",
+  "support_send_another": "Send another message"
 
 }

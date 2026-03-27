@@ -961,7 +961,24 @@
   "tawsila_sticky_3_title": "دعم على مدار الساعة",
   "tawsila_sticky_3_desc": "فريق دعم حقيقي جاهز لمساعدتك في أي وقت، ليلاً أو نهاراً.",
   "tawsila_wizard_title": "كن كابتن",
-  "tawsila_wizard_subtitle": "انضم إلى الأسطول. أدخل بياناتك للبدء."
+  "tawsila_wizard_subtitle": "انضم إلى الأسطول. أدخل بياناتك للبدء.",
+   "support_title": "المساعدة والدعم",
+  "support_subtitle": "نحن هنا لمساعدتك. أرسل لنا رسالة عبر النموذج، أو تواصل معنا مباشرة عبر البريد الإلكتروني.",
+  "support_form_title": "أرسل رسالة",
+  "support_user_type": "أنا...",
+  "support_type_customer": "زبون",
+  "support_type_driver": "سائق (أبريض)",
+  "support_type_partner": "تاجر / صاحب محل",
+  "support_type_other": "آخر",
+  "support_name_input": "الاسم الكامل",
+  "support_contact_input": "البريد أو الهاتف",
+  "support_title_input": "الموضوع / عنوان المشكلة",
+  "support_title_placeholder": "مثال: مشكلة في طلبي الأخير",
+  "support_message_input": "كيف يمكننا مساعدتك؟",
+  "support_message_placeholder": "اشرح مشكلتك بالتفصيل...",
+  "support_success_title": "تم إرسال الرسالة!",
+  "support_success_desc": "شكراً لتواصلك معنا. سيقوم فريق الدعم بالرد عليك في أقرب وقت ممكن.",
+  "support_send_another": "إرسال رسالة أخرى"
 
 
 }
