@@ -933,5 +933,7 @@
   "support_message_placeholder": "Décrivez votre problème en détail...",
   "support_success_title": "Message envoyé !",
   "support_success_desc": "Merci de nous avoir contactés. Notre équipe vous répondra sous peu.",
-  "support_send_another": "Envoyer un autre message"
+  "support_send_another": "Envoyer un autre message",
+  "ride_with_us": "Réserver un trajet",
+  "captain_app": "App Capitaine"
 }

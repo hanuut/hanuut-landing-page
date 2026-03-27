@@ -18,6 +18,7 @@ import LogoSrc from "../assets/hanuutLogo.webp";
 const DeepLinkRedirect = ({
   appScheme = "hanuut://",
   storeUrl = "https://play.google.com/store/apps/details?id=com.hanuut.shop",
+   storeUrlIos = "https://apps.apple.com/dz/app/esuuq/id6752300426?l=fr-FR",
   appName = "Hanuut",
   redirectDelay = 3000,
   transformPath = (path) => path,
@@ -48,7 +49,7 @@ const DeepLinkRedirect = ({
   useEffect(() => {
     const deepLinkUrl = processPath();
     const { isIOS } = detectPlatform();
-    const platformSpecificStoreUrl = isIOS ? storeUrl : storeUrl;
+    const platformSpecificStoreUrl = isIOS ? storeUrlIos : storeUrl;
 
     setIsRedirecting(true);
     // console.log(`Attempting to open deep link: ${deepLinkUrl}`);

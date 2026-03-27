@@ -9,12 +9,15 @@ import {
   FaWindows,
   FaEnvelope,
   FaPhoneAlt,
-  FaTruck, // Added FaTruck
+  FaTruck,
+  FaCar, // For Abridh
+  FaQuestionCircle, // For Support
 } from "react-icons/fa";
 
 import logoAr from "../assets/logo_ar.webp";
 import logoEn from "../assets/logo_en.webp";
 
+// --- STYLED COMPONENTS (No changes here) ---
 const FooterWrapper = styled.footer`
   background-color: #09090b;
   color: #f4f4f5;
@@ -34,16 +37,20 @@ const Container = styled.div`
   gap: 3rem;
 `;
 
+// --- GRID FIX: Update to 5 columns for the new Tawsila section ---
 const TopSection = styled.div`
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  gap: 2rem;
-  @media (max-width: 900px) {
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr; /* 5 columns */
+  gap: 2.5rem;
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 768px) {
     grid-template-columns: 1fr 1fr;
   }
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
+    gap: 3rem;
   }
 `;
 
@@ -68,10 +75,15 @@ const LinkList = styled.div`
   flex-direction: column;
   gap: 0.8rem;
 `;
+
+// --- RTL/LTR HOVER FIX ---
 const linkStyles = `
   color: #A1A1AA; text-decoration: none; font-size: 0.95rem; transition: all 0.2s ease;
   display: flex; align-items: center; gap: 8px;
-  &:hover { color: #F07A48; transform: translateX(5px); }
+  &:hover { 
+    color: #F07A48; 
+    transform: translateX(${props => props.isArabic ? '-5px' : '5px'});
+  }
 `;
 const StyledLink = styled(Link)`
   ${linkStyles}
@@ -79,6 +91,7 @@ const StyledLink = styled(Link)`
 const ExternalLink = styled.a`
   ${linkStyles}
 `;
+
 const ContactItem = styled.div`
   display: flex;
   align-items: center;
@@ -129,6 +142,8 @@ const CopyrightText = styled.p`
   margin: 0;
 `;
 
+// --- UPDATED FOOTER COMPONENT ---
+
 const Footer = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
@@ -136,6 +151,7 @@ const Footer = () => {
 
   const links = {
     customerApp: process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK || "#",
+    abridhApp: process.env.REACT_APP_TAWSILA_DOWNLOAD_LINK || "#",
     partnerWindows:
       process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK || "#",
     facebook: process.env.REACT_APP_FACBOOK_SOCIAL_MEDIA || "#",
@@ -145,34 +161,22 @@ const Footer = () => {
   };
 
   return (
-    <FooterWrapper isArabic={isArabic}>
+    // --- 1. LANGUAGE BUG FIX: Added 'key' prop to force re-render on language change ---
+    <FooterWrapper isArabic={isArabic} key={`footer-${i18n.language}`}>
       <Container>
         <TopSection>
+          {/* Column 1: Main Info (No changes) */}
           <Column>
             <Link to="/">
               <LogoImage src={currentLogo} alt="Hanuut Logo" />
             </Link>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.8rem",
-              }}
-            >
-              <ContactItem>
-                <FaEnvelope /> {links.email}
-              </ContactItem>
-              <ContactItem>
-                <FaPhoneAlt /> {links.phone}
-              </ContactItem>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
+              <ContactItem><FaEnvelope /> {links.email}</ContactItem>
+              <ContactItem><FaPhoneAlt /> {links.phone}</ContactItem>
             </div>
             <SocialRow>
-              <SocialIcon href={links.facebook} target="_blank">
-                <FaFacebook />
-              </SocialIcon>
-              <SocialIcon href={links.instagram} target="_blank">
-                <FaInstagram />
-              </SocialIcon>
+              <SocialIcon href={links.facebook} target="_blank"><FaFacebook /></SocialIcon>
+              <SocialIcon href={links.instagram} target="_blank"><FaInstagram /></SocialIcon>
             </SocialRow>
           </Column>
 
@@ -180,45 +184,46 @@ const Footer = () => {
           <Column>
             <ColumnTitle>{t("footer.col_customers")}</ColumnTitle>
             <LinkList>
-              <StyledLink to="/">{t("footer.link_home")}</StyledLink>
-              {/* --- NEW: Track Order Link in Footer --- */}
-              <StyledLink to="/track">
-                <FaTruck size={14} /> {t("navTrack")}
-              </StyledLink>
-              <ExternalLink href={links.customerApp} target="_blank">
+              <StyledLink to="/esuuq" isArabic={isArabic}>{t("nav_esuuq")}</StyledLink>
+              <StyledLink to="/track" isArabic={isArabic}><FaTruck size={14} /> {t("navTrack")}</StyledLink>
+              <ExternalLink href={links.customerApp} target="_blank" isArabic={isArabic}>
                 <FaGooglePlay size={14} /> {t("footer.link_download_customer")}
               </ExternalLink>
             </LinkList>
           </Column>
 
-          {/* Column 3: Partners */}
+          {/* --- 2. NEW COLUMN: Abridh/Tawsila --- */}
+          <Column>
+            <ColumnTitle>{t("navTawsila", "Abridh")}</ColumnTitle>
+            <LinkList>
+              <StyledLink to="/abridh" isArabic={isArabic}><FaCar size={14} /> {t("ride_with_us", "Ride with us")}</StyledLink>
+              <StyledLink to="/abridh/drive" isArabic={isArabic}>{t("becomeDriver", "Become a Captain")}</StyledLink>
+              <ExternalLink href={links.abridhApp} target="_blank" isArabic={isArabic}>
+                <FaGooglePlay size={14} /> {t("captain_app", "Captain App")}
+              </ExternalLink>
+            </LinkList>
+          </Column>
+
+          {/* Column 4: Partners */}
           <Column>
             <ColumnTitle>{t("footer.col_partners")}</ColumnTitle>
             <LinkList>
-              <StyledLink to="/partners">
-                {t("footer.link_my_hanuut")}
-              </StyledLink>
-              <StyledLink to="/partners/onboarding">
-                {t("footer.link_join")}
-              </StyledLink>
-              <ExternalLink href={links.partnerWindows} target="_blank">
+              <StyledLink to="/partners" isArabic={isArabic}>{t("footer.link_my_hanuut")}</StyledLink>
+              <StyledLink to="/partners/onboarding" isArabic={isArabic}>{t("footer.link_join")}</StyledLink>
+              <ExternalLink href={links.partnerWindows} target="_blank" isArabic={isArabic}>
                 <FaWindows size={14} /> {t("footer.link_download_partner")}
               </ExternalLink>
             </LinkList>
           </Column>
 
-          {/* Column 4: Legal & Resources */}
+          {/* Column 5: Legal & Support (Added Support Link) */}
           <Column>
             <ColumnTitle>{t("footer.col_legal")}</ColumnTitle>
             <LinkList>
-              <StyledLink to="/blog">{t("footer.link_blog")}</StyledLink>
-              <StyledLink to="/privacy">{t("footer.link_privacy")}</StyledLink>
-              <StyledLink to="/terms_and_conditions">
-                {t("footer.link_terms")}
-              </StyledLink>
-              <StyledLink to="/delete_account">
-                {t("footer.link_delete")}
-              </StyledLink>
+              <StyledLink to="/blog" isArabic={isArabic}>{t("footer.link_blog")}</StyledLink>
+              <StyledLink to="/support" isArabic={isArabic}><FaQuestionCircle size={14} /> {t("support_title", "Support")}</StyledLink>
+              <StyledLink to="/privacy" isArabic={isArabic}>{t("footer.link_privacy")}</StyledLink>
+              <StyledLink to="/terms_and_conditions" isArabic={isArabic}>{t("footer.link_terms")}</StyledLink>
             </LinkList>
           </Column>
         </TopSection>

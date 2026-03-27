@@ -931,6 +931,8 @@
   "support_message_placeholder": "Describe your issue in detail...",
   "support_success_title": "Message Sent!",
   "support_success_desc": "Thank you for reaching out. Our support team will get back to you shortly.",
-  "support_send_another": "Send another message"
+  "support_send_another": "Send another message",
+  "ride_with_us": "Ride with us",
+  "captain_app": "Captain App"
 
 }

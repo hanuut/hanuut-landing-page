@@ -978,7 +978,9 @@
   "support_message_placeholder": "اشرح مشكلتك بالتفصيل...",
   "support_success_title": "تم إرسال الرسالة!",
   "support_success_desc": "شكراً لتواصلك معنا. سيقوم فريق الدعم بالرد عليك في أقرب وقت ممكن.",
-  "support_send_another": "إرسال رسالة أخرى"
+  "support_send_another": "إرسال رسالة أخرى",
+  "ride_with_us": "اطلب توصيلة",
+  "captain_app": "تطبيق الكابتن"
 
 
 }

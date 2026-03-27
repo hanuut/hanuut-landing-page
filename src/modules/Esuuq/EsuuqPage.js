@@ -1,261 +1,320 @@
-import React, { useRef } from "react";
-import styled, { ThemeProvider, keyframes } from "styled-components";
+import React, { useRef, useEffect } from "react";
+import styled, { ThemeProvider } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FaApple, FaArrowLeft, FaArrowRight, FaGooglePlay, FaQuoteRight } from "react-icons/fa";
 
-// --- Components ---
-import BorderBeamButton from "../../components/BorderBeamButton";
-
-// --- ASSETS (Update paths to your WebP files) ---
+// --- ASSETS ---
 import TechStoreImg from "../../assets/3d_shops/tech_store.webp";
 import FashionImg from "../../assets/3d_shops/fashion_store.webp";
 import ArtStoreImg from "../../assets/3d_shops/art_store.webp";
 
 // --- THEME ---
 const esuuqTheme = {
-  primaryColor: "#39A170", // Emerald
-  body: "#FDF4E3", // Soft Ivory
-  text: "#111217", // Navy
+  primaryColor: "#39A170",
+  body: "#FDF4E3",
+  text: "#111217",
   navHeight: "5rem",
 };
 
-// --- ANIMATIONS ---
-const float = keyframes`
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-`;
-
-// --- STYLED COMPONENTS ---
-
-const PageWrapper = styled.div`
-  background-color: ${props => props.theme.body};
-  width: 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
-  color: ${props => props.theme.text};
-  position: relative;
-`;
-
-/* 
-   NOISE TEXTURE:
-   Adds a high-quality grain to the background to fix the contrast issue 
-   and make the 3D assets pop.
-*/
-const NoiseTexture = styled.div`
-  position: fixed;
+// --- 1. DIGITAL GRASS CANVAS (Low Hardware Usage) ---
+const CanvasBackground = styled.canvas`
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
   z-index: 0;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  pointer-events: auto;
 `;
 
-const Container = styled.div`
-  max-width: 1400px; /* Wider container for the grid */
-  width: 92%;
-  margin: 0 auto;
-  position: relative;
-  z-index: 2;
-  direction: ${props => props.$isArabic ? "rtl" : "ltr"};
+const DigitalGrass = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let w, h;
+    let blades = [];
+    const mouse = { x: -1000, y: -1000, radius: 150 };
+
+    const resize = () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+      init();
+    };
+
+    class Blade {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.length = Math.random() * 15 + 10; // Shorter grass
+        this.angle = Math.random() * Math.PI * 2;
+        this.speed = 0.01 + Math.random() * 0.02; // Slower swaying
+        this.opacity = 0.1; // Default low opacity
+      }
+
+      draw(time) {
+        // Natural swaying logic (smaller movement)
+        const sway = Math.sin(time * this.speed + this.x) * 2;
+
+        // Interaction logic for both opacity and movement
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        let moveX = 0;
+        let targetOpacity = 0.1;
+
+        if (dist < mouse.radius) {
+          const force = (mouse.radius - dist) / mouse.radius;
+          moveX = (dx / dist) * force * -20; // Gentler push
+          targetOpacity = 0.1 + force * 0.5; // Ramp up to 0.6
+        }
+        
+        // Smoothly interpolate opacity towards the target
+        this.opacity += (targetOpacity - this.opacity) * 0.1;
+
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x + sway + moveX, this.y - this.length);
+        ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`; // Use dynamic opacity
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+
+    const init = () => {
+      blades = [];
+      const spacing = 20; // Denser grid
+      for (let x = -spacing; x < w + spacing; x += spacing) {
+        for (let y = h + 10; y > -20; y -= spacing) {
+          blades.push(new Blade(x, y));
+        }
+      }
+    };
+
+    let animationFrame;
+    const render = (time) => {
+      ctx.clearRect(0, 0, w, h);
+      const t = time * 0.001;
+      blades.forEach((b) => b.draw(t));
+      animationFrame = requestAnimationFrame(render);
+    };
+
+    const handleMouseMove = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+
+    window.addEventListener("resize", resize);
+    canvas.addEventListener("mousemove", handleMouseMove); // Listen on canvas
+    resize();
+    render();
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      canvas.removeEventListener("mousemove", handleMouseMove);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
+  return <CanvasBackground ref={canvasRef} />;
+};
+
+
+// --- STYLED COMPONENTS ---
+
+const PageWrapper = styled.div`
+  background-color: ${(props) => props.theme.body};
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: ${(props) => props.theme.text};
 `;
 
-// --- HERO SECTION ---
 const HeroSection = styled.section`
-  min-height: 80vh; 
-  padding-top: 8rem;
+  min-height: 85vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   position: relative;
-  margin-bottom: 4rem;
+  background: ${(props) => props.theme.primaryColor};
+`;
+
+const HeroContent = styled(motion.div)`
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 `;
 
 const Badge = styled(motion.span)`
-  background-color: #111217;
+  background-color: #000;
   color: #fff;
-  padding: 0.6rem 1.5rem;
+  padding: 0.5rem 1.2rem;
   border-radius: 50px;
   font-weight: 700;
   font-family: 'Tajawal', sans-serif;
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 `;
 
 const HeroTitle = styled(motion.h1)`
-  font-size: clamp(3rem, 6vw, 5rem);
-  font-weight: 900;
-  color: #111217;
-  line-height: 1.1;
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.2;
   font-family: 'Tajawal', sans-serif;
-  margin-bottom: 1.5rem;
-  max-width: 900px;
-
-  span {
-    color: #39A170;
-    display: inline-block;
-    position: relative;
-    /* Sketchy underline */
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 5px;
-      left: 0;
-      width: 100%;
-      height: 0.2em;
-      background-color: rgba(57, 161, 112, 0.15);
-      z-index: -1;
-      border-radius: 4px;
-    }
-  }
+  margin: 0;
+  max-width: 800px;
 `;
 
 const HeroSub = styled(motion.p)`
-  font-size: 1.3rem;
-  color: #52525b;
-  max-width: 600px;
-  line-height: 1.7;
+  font-size: 1.2rem;
+  color: #fdf4e3; /* Light Ivory text for better contrast on green */
+  opacity: 0.9;
+  max-width: 550px;
+  line-height: 1.6;
   font-family: 'Cairo', sans-serif;
   font-weight: 500;
-  margin-bottom: 2.5rem;
 `;
 
-// --- BUTTON FIX ---
 const ButtonRow = styled(motion.div)`
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 1rem;
 `;
 
-const ButtonOverride = styled.div`
-  button {
-    min-width: 220px !important; 
-    padding: 0 2rem !important;
-    height: 56px !important;
+const StoreButton = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.8rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-family: 'Tajawal', sans-serif;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+  &.primary {
+    background: #000000;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+    &:hover { transform: scale(1.03); }
   }
-  
-  /* FORCE BLACK STYLE FOR SECONDARY */
-  &.secondary-btn button {
-    border: 2px solid #111217 !important; 
-    background: transparent !important;
-    backdrop-filter: none !important;
-    
-    /* Inner text/icon color */
-    div, span, p, svg {
-      color: #111217 !important;
-      fill: #111217 !important;
-    }
-    
-    &:hover {
-      background: rgba(17, 18, 23, 0.05) !important;
-      transform: translateY(-2px);
-    }
+
+  &.secondary {
+    background: rgba(255, 255, 255, 0.9);
+    color: #000000;
+    border: 1px solid #E5E5E5;
+    &:hover { background: #FFFFFF; transform: scale(1.03); }
   }
+
+  svg { font-size: 1.5rem; }
 `;
 
-// --- THE MOVING GRID (BENTO PARALLAX) ---
 const GridSection = styled.section`
-  padding: 2rem 0 8rem 0;
+  padding: 8rem 0;
   position: relative;
-  overflow: hidden;
+  background: #FDF4E3;
 `;
+
+const Container = styled.div`
+  max-width: 1200px;
+  width: 90%;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+`;
+// ... (The rest of your styled-components: MasonryGrid, Column, TextCard etc. remain unchanged)
 
 const MasonryGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   width: 100%;
-  
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
   }
   @media (max-width: 768px) {
-    grid-template-columns: 1fr; /* Single column on mobile */
+    grid-template-columns: 1fr;
   }
 `;
-
 const Column = styled(motion.div)`
   display: flex;
   flex-direction: column;
   gap: 2rem;
 `;
 
-// --- CARDS ---
-
-// 1. Text Card (Integrated into grid)
 const TextCard = styled(motion.div)`
   background: #FFFFFF;
   padding: 2.5rem;
   border-radius: 32px;
-  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  min-height: 300px;
+  min-height: 280px;
   border: 1px solid rgba(0,0,0,0.03);
   position: relative;
   overflow: hidden;
-
-  /* Decorative accent */
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 6px;
     height: 100%;
-    background: ${props => props.$accent || "#39A170"};
+    background: ${(props) => props.$accent || "#39A170"};
   }
 `;
 
 const CardIcon = styled.div`
-  font-size: 2rem;
+  font-size: 1.8rem;
   margin-bottom: 1.5rem;
-  color: ${props => props.$accent || "#39A170"};
-  background: ${props => props.$bg || "rgba(57, 161, 112, 0.1)"};
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
+  color: ${(props) => props.$accent || "#39A170"};
+  background: ${(props) => props.$bg || "rgba(57, 161, 112, 0.1)"};
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
 `;
-
 const CardTitle = styled.h3`
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   margin-bottom: 1rem;
   color: #111217;
   line-height: 1.2;
 `;
-
 const CardDesc = styled.p`
-  font-size: 1.1rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: #52525b;
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
 `;
-
-// 2. Image Card (The 3D Illustrations)
 const ImageCard = styled(motion.div)`
   border-radius: 32px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 30px 60px -15px rgba(0,0,0,0.15);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.1);
   background: transparent;
-  
   img {
     width: 100%;
     height: auto;
@@ -263,33 +322,26 @@ const ImageCard = styled(motion.div)`
     object-fit: cover;
     transition: transform 0.5s ease;
   }
-
   &:hover img {
     transform: scale(1.03);
   }
 `;
 
-// --- ESUUQ PAGE COMPONENT ---
+// --- COMPONENT ---
 
 const EsuuqPage = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
   
-  // --- PARALLAX LOGIC ---
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"]
   });
 
-  // Different speeds for columns to create the "Moving Grid" feel
-  const y1 = useTransform(scrollYProgress, [0, 1], [0, -150]); // Slow Up
-  const y2 = useTransform(scrollYProgress, [0, 1], [-100, 100]); // Down
-  const y3 = useTransform(scrollYProgress, [0, 1], [50, -200]); // Fast Up
-
-  const handleDownload = () => {
-    window.open(process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK, "_blank");
-  };
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [-100, 100]);
+  const y3 = useTransform(scrollYProgress, [0, 1], [50, -200]);
 
   return (
     <ThemeProvider theme={esuuqTheme}>
@@ -298,79 +350,62 @@ const EsuuqPage = () => {
           <title>{t("nav_esuuq")} | {t("companyName")}</title>
         </Helmet>
         
-        <NoiseTexture />
+        {/* --- HERO SECTION WITH CANVAS --- */}
+        <HeroSection>
+          <DigitalGrass />
+          <HeroContent>
+            <Badge initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+              ✨ {t("nav_esuuq")}
+            </Badge>
+            <HeroTitle initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+              {t("esuuq_hero_title")}
+            </HeroTitle>
+            <HeroSub initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+              {t("esuuq_hero_sub")}
+            </HeroSub>
 
-        <Container $isArabic={isArabic}>
+            <ButtonRow initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
+              <StoreButton href={process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK} target="_blank" className="primary">
+                <FaGooglePlay /> Google Play
+              </StoreButton>
+              <StoreButton href="https://apps.apple.com/dz/app/esuuq/id6752300426?l=fr-FR" target="_blank" className="secondary">
+                <FaApple /> App Store
+              </StoreButton>
+            </ButtonRow>
+          </HeroContent>
+        </HeroSection>
 
-          {/* --- MOVING GRID SECTION --- */}
-          <GridSection ref={containerRef}>
+        {/* --- MOVING GRID SECTION --- */}
+        <GridSection ref={containerRef}>
+          <Container $isArabic={isArabic}>
             <MasonryGrid>
-              
-              {/* COLUMN 1: TECH + TRUST */}
               <Column style={{ y: y1 }}>
-                <ImageCard
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
+                <ImageCard initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
                   <img src={TechStoreImg} alt="Tech Store" />
                 </ImageCard>
-
-                <TextCard 
-                  $accent="#39A170"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <CardIcon $bg="rgba(57, 161, 112, 0.1)">
-                    <FaQuoteRight />
-                  </CardIcon>
+                <TextCard $accent="#39A170" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+                  <CardIcon $bg="rgba(57, 161, 112, 0.1)"><FaQuoteRight /></CardIcon>
                   <CardTitle>{t("pain_trust_title")}</CardTitle>
                   <CardDesc>{t("pain_trust_text")}</CardDesc>
                 </TextCard>
               </Column>
-
-              {/* COLUMN 2: C2C + HOME */}
               <Column style={{ y: y2 }}>
-                <TextCard 
-                  $accent="#F07A48"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                >
+                <TextCard $accent="#F07A48" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}>
                   <CardIcon $accent="#F07A48" $bg="rgba(240, 122, 72, 0.1)">
                     <FaArrowRight style={{ transform: isArabic ? "rotate(180deg)" : "rotate(0deg)" }} />
                   </CardIcon>
                   <CardTitle>{t("pain_clutter_title")}</CardTitle>
                   <CardDesc>{t("pain_clutter_text")}</CardDesc>
                 </TextCard>
-
-                <ImageCard
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6 }}
-                >
+                <ImageCard initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }}>
                   <img src={ArtStoreImg} alt="Home Decor" />
                 </ImageCard>
-                
-                {/* Extra spacer or decorative block could go here */}
               </Column>
-
-              {/* COLUMN 3: FASHION + DELIVERY */}
               <Column style={{ y: y3 }}>
-                <ImageCard
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
+                <ImageCard initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
                   <img src={FashionImg} alt="Fashion Store" />
                 </ImageCard>
-
-                <TextCard 
-                  $accent="#397FF9"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
+                <TextCard $accent="#397FF9" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ delay: 0.2 }}>
                   <CardIcon $accent="#397FF9" $bg="rgba(57, 127, 249, 0.1)">
                     <FaArrowLeft style={{ transform: isArabic ? "rotate(180deg)" : "rotate(0deg)" }}/>
                   </CardIcon>
@@ -378,60 +413,9 @@ const EsuuqPage = () => {
                   <CardDesc>{t("pain_delivery_text")}</CardDesc>
                 </TextCard>
               </Column>
-
             </MasonryGrid>
-          </GridSection>
-
-          {/* --- HERO --- */}
-          <HeroSection>
-            <Badge 
-              initial={{ y: -20, opacity: 0 }} 
-              animate={{ y: 0, opacity: 1 }} 
-              transition={{ delay: 0.2 }}
-            >
-              ✨ {t("nav_esuuq")}
-            </Badge>
-            
-            <HeroTitle
-              initial={{ y: 20, opacity: 0 }} 
-              animate={{ y: 0, opacity: 1 }} 
-              transition={{ delay: 0.3 }}
-            >
-              {t("esuuq_hero_title")}
-            </HeroTitle>
-            
-            <HeroSub
-              initial={{ y: 20, opacity: 0 }} 
-              animate={{ y: 0, opacity: 1 }} 
-              transition={{ delay: 0.4 }}
-            >
-              {t("esuuq_hero_sub")}
-            </HeroSub>
-
-            <ButtonRow
-              initial={{ y: 20, opacity: 0 }} 
-              animate={{ y: 0, opacity: 1 }} 
-              transition={{ delay: 0.5 }}
-            >
-              {/* Play Store */}
-              <ButtonOverride>
-                <BorderBeamButton onClick={handleDownload} beamColor="#39A170">
-                  <FaGooglePlay size={20} style={{ margin: isArabic ? "0 0 0 10px" : "0 10px 0 0" }}/>
-                  <span>Google Play</span>
-                </BorderBeamButton>
-              </ButtonOverride>
-
-              {/* App Store (Fixed Contrast) */}
-              <ButtonOverride className="secondary-btn">
-                <BorderBeamButton onClick={handleDownload} beamColor="#111217" secondary>
-                  <FaApple size={24} style={{ margin: isArabic ? "0 0 0 10px" : "0 10px 0 0" }}/>
-                  <span>App Store</span>
-                </BorderBeamButton>
-              </ButtonOverride>
-            </ButtonRow>
-          </HeroSection>
-
-        </Container>
+          </Container>
+        </GridSection>
       </PageWrapper>
     </ThemeProvider>
   );
