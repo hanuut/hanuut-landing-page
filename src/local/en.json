@@ -933,6 +933,18 @@
   "support_success_desc": "Thank you for reaching out. Our support team will get back to you shortly.",
   "support_send_another": "Send another message",
   "ride_with_us": "Ride with us",
-  "captain_app": "Captain App"
+  "captain_app": "Captain App",
+  "success_cta_subtitle": "Your shop is live. Download the My Hanuut app to add your products and start selling.",
+  "success_features_title": "You've unlocked:",
+  "feature_food_1": "Digital QR Menu & Table Orders",
+  "feature_food_2": "Kitchen Display System",
+  "feature_grocery_1": "Barcode-based Inventory Management",
+  "feature_grocery_2": "Expiry Date & Stock Alerts",
+  "feature_global_1": "Nationwide E-commerce Storefront",
+  "feature_global_2": "Product Variant Management (Size/Color)",
+  "download_android": "Continue on Android",
+  "download_windows": "Manage on Desktop",
+  "errorPasswordTooShort": "Password must be at least 6 characters.",
+  "wiz_type_global": "General / E-commerce"
 
 }

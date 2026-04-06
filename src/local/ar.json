@@ -980,7 +980,19 @@
   "support_success_desc": "شكراً لتواصلك معنا. سيقوم فريق الدعم بالرد عليك في أقرب وقت ممكن.",
   "support_send_another": "إرسال رسالة أخرى",
   "ride_with_us": "اطلب توصيلة",
-  "captain_app": "تطبيق الكابتن"
+  "captain_app": "تطبيق الكابتن",
+  "success_cta_subtitle": "تم إنشاء متجرك. قم بتنزيل تطبيق My Hanuut لإضافة منتجاتك والبدء في البيع.",
+  "success_features_title": "لقد قمت بتفعيل:",
+  "feature_food_1": "قائمة طعام رقمية (QR) وطلبات الطاولة",
+  "feature_food_2": "نظام عرض للمطبخ",
+  "feature_grocery_1": "إدارة المخزون عبر الباركود",
+  "feature_grocery_2": "تنبيهات المخزون وتاريخ انتهاء الصلاحية",
+  "feature_global_1": "متجر إلكتروني للتوصيل الوطني",
+  "feature_global_2": "إدارة متغيرات المنتج (الحجم/اللون)",
+  "download_android": "المتابعة على أندرويد",
+  "download_windows": "الإدارة على الكمبيوتر",
+  "errorPasswordTooShort": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.",
+  "wiz_type_global": "تجارة إلكترونية"
 
 
 }

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { Helmet } from "react-helmet"; // <--- IMPORT THIS
+import { Helmet } from "react-helmet";
 
 import { 
   WizardWrapper, 
@@ -12,16 +12,21 @@ import {
   NavButton
 } from "./WizardComponents";
 
-// Ensure these files exist and have 'export default'
 import Step1Contact from "./steps/Step1Contact";
 import Step2Shop from "./steps/Step2Shop";
 import Step3Location from "./steps/Step3Location";
-import Step4Menu from "./steps/Step4Menu";
 import SuccessView from "./steps/SuccessView";
 
-import { sendJoinRequest } from "../../services/feedbackService";
+// --- NEW IMPORTS FOR AUTOMATED FLOW ---
+import { trackFunnelStep, trackEvent } from "../../../../utils/analytics";
+import { 
+  authenticateShopOwner, 
+  uploadShopLogo, 
+  createAddress, 
+  createShop 
+} from "../../services/onboardingServices";
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 3; // Reduced to 3 steps: Identity -> Shop -> Location
 
 const OnboardingWizard = () => {
   const { t, i18n } = useTranslation();
@@ -30,39 +35,45 @@ const OnboardingWizard = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // --- UPDATED STATE SCHEMA ---
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     phone: "",
     email: "",
+    password: "",       
     shopName: "",
-    customActivity: "",
-    domain: "",
+    domainId: "",       
+    domainKeyword: "",  
     description: "",
+    logo: null,        
     wilaya: "",
     commune: "",
     district: "",
-    categories: [{ name: "", products: [""] }] 
+    lat: null,
+    lng: null
   });
 
   const handleNext = () => {
     // --- VALIDATION LOGIC ---
     if (step === 1) {
-      if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email) {
+      if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email || !formData.password) {
         alert(t("errorFillAllFields")); 
+        return;
+      }
+      if (formData.password.length < 6) {
+        alert(t("errorPasswordTooShort", "Password must be at least 6 characters."));
         return;
       }
     }
     
-    // Step 2 Validation (Shop Info)
     if (step === 2) {
-      if (!formData.shopName || !formData.domain) {
+      if (!formData.shopName || !formData.domainId) {
         alert(t("errorFillAllFields"));
         return;
       }
     }
 
-    // Step 3 Validation (Location)
     if (step === 3) {
       if (!formData.wilaya || !formData.commune || !formData.district) {
         alert(t("errorFillAllFields"));
@@ -71,6 +82,7 @@ const OnboardingWizard = () => {
     }
 
     if (step < TOTAL_STEPS) {
+      trackFunnelStep("Merchant_Onboarding", "Step_Completed", step);
       setDirection(1);
       setStep(prev => prev + 1);
     } else {
@@ -89,16 +101,43 @@ const OnboardingWizard = () => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
+  // --- NEW AUTOMATED SUBMISSION LOGIC ---
   const handleSubmit = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
-      await sendJoinRequest(formData);
+      // 1. Authenticate / Login Fallback
+      const authResponse = await authenticateShopOwner(formData);
+      const token = authResponse.accessToken;
+      const ownerId = authResponse.user.id || authResponse.user._id;
+
+      // 2. Upload Logo
+      let imageId = null;
+      if (formData.logo) {
+        imageId = await uploadShopLogo(formData.logo, token);
+      }
+
+      // 3. Create Address
+      const addressId = await createAddress(formData, token);
+
+      // 4. Create Shop
+      const shopPayload = {
+        name: formData.shopName,
+        description: formData.description,
+        domainId: formData.domainId,
+        domainKeyword: formData.domainKeyword,
+        ownerId: ownerId,
+        addressId: addressId,
+        imageId: imageId,
+      };
+      
+      await createShop(shopPayload, token);
+
       setIsSuccess(true);
     } catch (error) {
       console.error("Onboarding Error:", error);
-      alert(t("errorCouldNotSubscribe") || "Error.");
+      alert(error.message || t("errorCouldNotSubscribe"));
     } finally {
       setIsSubmitting(false);
     }
@@ -111,19 +150,13 @@ const OnboardingWizard = () => {
   };
 
   const renderStep = () => {
-    if (isSuccess) return <SuccessView />;
+    if (isSuccess) return <SuccessView data={formData} />;
 
     switch (step) {
-      case 1:
-        return <Step1Contact data={formData} update={updateData} />;
-      case 2:
-        return <Step2Shop data={formData} update={updateData} />;
-      case 3:
-        return <Step3Location data={formData} update={updateData} />;
-      case 4:
-        return <Step4Menu data={formData} update={updateData} />;
-      default:
-        return <div>Unknown Step</div>;
+      case 1: return <Step1Contact data={formData} update={updateData} />;
+      case 2: return <Step2Shop data={formData} update={updateData} />;
+      case 3: return <Step3Location data={formData} update={updateData} />;
+      default: return <div>Unknown Step</div>;
     }
   };
 
@@ -131,15 +164,13 @@ const OnboardingWizard = () => {
 
   return (
     <WizardWrapper dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
-      
-      {/* --- ADDED HELMET HERE --- */}
       <Helmet>
         <title>{t("onboarding_page_title")}</title>
         <meta name="description" content={t("cta_wizard_sub")} />
       </Helmet>
 
       {!isSuccess && (
-        <ProgressContainer>
+        <ProgressContainer style={{ marginTop: "6rem" }}> {/* Added space for Navbar */}
           <ProgressFill 
             initial={{ width: 0 }}
             animate={{ width: `${progressPercentage}%` }}
@@ -184,7 +215,6 @@ const OnboardingWizard = () => {
           </NavContainer>
         )}
       </StepContainer>
-
     </WizardWrapper>
   );
 };
