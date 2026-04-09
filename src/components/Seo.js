@@ -16,14 +16,14 @@ const Seo = ({ title, description, url, image, shop, product, customSchema }) =>
     const isFood = domainKeyword === 'food';
     const isGlobal = domainKeyword === 'global';
     
-    const wilaya = shop.addressId?.wilaya || "Algeria";
+    // --- UPDATED LOGIC TO HANDLE FULL ADDRESS OBJECT ---
     const commune = shop.addressId?.commune || "";
+    const wilaya = shop.addressId?.wilaya || "Algeria";
+    const streetAddress = shop.addressId?.neighborhood || commune;
+    const postalCode = shop.addressId?.postCode || "05000"; // Fallback to Batna's postal code
     
-    // 1. Determine the best Schema.org type
     let schemaType = "LocalBusiness";
     if (isFood) schemaType = "Restaurant";
-    // For global e-commerce, 'Store' or 'Organization' is better than LocalBusiness
-    // because physical location is secondary to nationwide shipping.
     if (isGlobal) schemaType = "Store"; 
 
     structuredData = {
@@ -33,15 +33,17 @@ const Seo = ({ title, description, url, image, shop, product, customSchema }) =>
       "image": image,
       "@id": url,
       "url": url,
+      // --- UPDATED TELEPHONE LOGIC ---
       "telephone": shop.ownerId?.phoneNumber || "",
-      // Address is still relevant for trust, even for global shops
+      "priceRange": "$$",
       "address": {
         "@type": "PostalAddress",
+        "streetAddress": streetAddress, // <-- NEW
         "addressLocality": commune,
+        "postalCode": postalCode,     // <-- NEW
         "addressRegion": wilaya,
         "addressCountry": "DZ"
       },
-      // Geo is highly relevant for local delivery (Food/Grocery)
       "geo": (!isGlobal && shop.addressId?.latitude) ? {
         "@type": "GeoCoordinates",
         "latitude": shop.addressId.latitude,
@@ -53,7 +55,6 @@ const Seo = ({ title, description, url, image, shop, product, customSchema }) =>
         "ratingValue": shop.rating > 0 ? shop.rating : 4.5,
         "reviewCount": shop.numReviews
       } : undefined,
-      // NEW: Tell Google this store offers nationwide shipping
       "areaServed": isGlobal ? {
         "@type": "Country",
         "name": "Algeria"

@@ -190,18 +190,19 @@ const LocationDirectory = () => {
             </EmptyState>
           ) : (
             <Grid>
-              {shops.map((shop) => (
-                <ShopLink to={`/@${shop.username}`} key={shop._id}>
-                  {/* Reuse your existing ShopCart component. 
-                      You will need to pass the image object as it expects it. */}
-                  <ShopCart 
-                    shop={shop} 
-                    imageData={shop.imageId} // Ensure your backend populates this or returns the URL
-                    className="headingShopCart" 
-                    style={{ background: currentTheme.surface, border: `1px solid ${currentTheme.surfaceBorder}`, padding: '1rem', borderRadius: '16px' }}
-                  />
-                </ShopLink>
-              ))}
+              {shops.map((shop) => {
+                const cleanUsername = shop.username?.startsWith('@') ? shop.username : `@${shop.username}`;
+                return (
+                  <ShopLink to={`/${cleanUsername}`} key={shop._id}>
+                    <ShopCart 
+                      shop={shop} 
+                      imageData={shop.imageId} 
+                      className="headingShopCart" 
+                      style={{ background: currentTheme.surface, border: `1px solid ${currentTheme.surfaceBorder}`, padding: '1rem', borderRadius: '16px' }}
+                    />
+                  </ShopLink>
+                );
+              })}
             </Grid>
           )}
         </Container>

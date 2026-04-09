@@ -163,7 +163,11 @@ const ShopPageWithUsername = () => {
  if (selectedShop && Object.keys(selectedShop).length > 0 && selectedShopImage && domainKeyWord) {
     const shopTitle = selectedShop.name || "Hanuut Shop";
     const shopImage = getPublicImageUrl(selectedShop.imageId);
-    const currentUrl = `https://hanuut.com/@${selectedShop.username}`;
+    const cleanUsername = selectedShop.username?.startsWith('@') 
+  ? selectedShop.username 
+  : `@${selectedShop.username}`;
+  
+const currentUrl = `https://hanuut.com/${cleanUsername}`;
     
     const commune = selectedShop.addressId?.commune || "Algeria";
     const wilaya = selectedShop.addressId?.wilaya || "Algeria";
