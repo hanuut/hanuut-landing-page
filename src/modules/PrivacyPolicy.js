@@ -10,7 +10,7 @@ import {
   ContactBox,
   SubTitle 
 } from '../components/LegalPageLayout';
-
+import Seo from "../components/Seo";
 // Styled Components
 const InlineLink = styled(Link)`
   color: ${props => props.theme.primaryColor};
@@ -41,10 +41,12 @@ const PrivacyPolicy = () => {
   const { t } = useTranslation();
 
   return (
+    
     <LegalPageLayout 
       title={t("privacy_policy.title")} 
       lastUpdated={t("privacy_policy.last_updated")}
     >
+      <Seo title={`${t("privacy_policy.title")} | Hanuut`} description="Hanuut Express Privacy Policy and Data Protection." url="https://hanuut.com/privacy" />
       {/* Account Deletion Link */}
       <DeleteAccountBox>
         {t("privacy_policy.delete_account_pre")}

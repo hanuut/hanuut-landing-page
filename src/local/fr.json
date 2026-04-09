@@ -981,7 +981,25 @@
     "sec9_title": "9. Vos droits (Loi 18-07)",
     "sec9_text": "En vertu de la loi 18-07, vous disposez d'un droit d'accès, de rectification, d'opposition et de suppression de vos données. Vous pouvez exercer ces droits via la section 'Compte' de nos applications ou en contactant notre équipe de support.",
     "contact_title": "10. Nous contacter",
-    "contact_text": "Pour toute question concernant cette politique, veuillez nous contacter à :"
+    "contact_text": "Pour toute question concernant cette politique, veuillez nous contacter à :",
+  "seo": {
+    "shop_title_food": "{{shopName}} | Restaurant & Livraison à {{commune}}, {{wilaya}}",
+    "shop_desc_food": "Commandez de délicieux repas chez {{shopName}} à {{commune}}. Consultez notre menu et profitez d'une livraison rapide avec Hanuut Express.",
+    "shop_title_grocery": "{{shopName}} | Supermarché & Livraison à {{commune}}",
+    "shop_desc_grocery": "Faites vos courses quotidiennes chez {{shopName}} à {{commune}}. Livraison locale rapide avec Hanuut.",
+    "shop_title_global": "{{shopName}} | Boutique en Ligne Algérie - Livraison 58 Wilayas",
+    "shop_desc_global": "Découvrez les produits de {{shopName}}. Achetez en ligne en toute sécurité avec une livraison partout en Algérie via la plateforme Hanuut.",
+    "explore_title": "Meilleurs {{category}} à {{location}} | Hanuut",
+    "explore_desc": "Découvrez et commandez parmi les meilleurs {{category}} à {{location}}. Livraison rapide et commerces locaux vérifiés."
   }
+  },
+  "seo_home_title": "Hanuut | L'écosystème numérique du e-commerce et de la mobilité en Algérie",
+  "seo_home_desc": "Hanuut relie commerces, clients et chauffeurs. Achetez local avec eSUUQ, gérez votre boutique avec My Hanuut, ou conduisez avec Abridh.",
+  "seo_esuuq_title": "eSUUQ | Achat, Vente et Livraison en Algérie",
+  "seo_esuuq_desc": "La marketplace n°1 en Algérie. Commandez vos repas, faites vos courses ou vendez vos objets d'occasion en toute sécurité dans votre quartier.",
+  "seo_partners_title": "My Hanuut | Logiciel de Caisse & Création de Boutique en Ligne Gratuit",
+  "seo_partners_desc": "Numérisez votre commerce gratuitement. Menu digital, gestion de stock par code-barres et site e-commerce. Disponible sur Windows et Android.",
+  "seo_tawsila_title": "Abridh | L'Application VTC et Livraison de référence en Algérie",
+  "seo_tawsila_desc": "Déplacez-vous intelligemment avec Abridh. Commandez un VTC, une livraison, ou devenez Capitaine pour gagner de l'argent à votre rythme."
 
 }

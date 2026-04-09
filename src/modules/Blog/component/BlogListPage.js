@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { ThemeProvider } from 'styled-components';
-import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -11,8 +10,10 @@ import Loader from '../../../components/Loader';
 import SpotlightCard from '../../../components/SpotlightCard'; 
 import { partnerTheme } from '../../../config/Themes'; 
 
-// --- Styled Components ---
+// --- NEW SEO IMPORT ---
+import Seo from '../../../components/Seo';
 
+// --- Styled Components ---
 const PageWrapper = styled.div`
   background-color: #050505;
   min-height: 100vh;
@@ -64,7 +65,6 @@ const Grid = styled.div`
   }
 `;
 
-// --- Custom Article Card ---
 const ArticleImage = styled.div`
   width: 100%;
   height: 240px;
@@ -179,11 +179,12 @@ const BlogListPage = () => {
   return (
     <ThemeProvider theme={partnerTheme}>
       <PageWrapper>
-        <Helmet>
-          <html lang={i18n.language} />
-          <title>{seo.title}</title>
-          <meta name="description" content={seo.description} />
-        </Helmet>
+        {/* --- INJECT NEW SEO COMPONENT HERE --- */}
+        <Seo 
+          title={seo.title} 
+          description={seo.description} 
+          url="https://hanuut.com/blog" 
+        />
 
         <Container>
           <Header>
@@ -197,7 +198,6 @@ const BlogListPage = () => {
                 <SpotlightCard>
                    <FeaturedPost>
                       <ArticleImage style={{ height: '400px', marginBottom: 0 }}>
-                         {/* DIRECT CLOUDINARY URL */}
                          <img src={heroPost.sourceId} alt={heroPost.title} />
                          <Tag>Featured</Tag>
                       </ArticleImage>
@@ -222,7 +222,6 @@ const BlogListPage = () => {
               <ReadLink to={`/blog/${post.slug}`} key={post._id}>
                 <SpotlightCard>
                   <ArticleImage>
-                    {/* DIRECT CLOUDINARY URL */}
                     <img src={post.sourceId} alt={post.title} loading="lazy" />
                     <Tag>Guide</Tag>
                   </ArticleImage>

@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaEnvelope, FaPaperPlane, FaCheckCircle, FaSpinner } from "react-icons/fa";
 import axios from "axios";
-import { Helmet } from "react-helmet";
 
+import Seo from "../components/Seo";
 // --- Styled Components ---
 
 const PageWrapper = styled.main`
@@ -256,9 +256,7 @@ const SupportPage = () => {
 
   return (
     <PageWrapper $isArabic={isArabic}>
-      <Helmet>
-        <title>{t("support_title")} | Hanuut</title>
-      </Helmet>
+      <Seo title={`${t("support_title")} | Hanuut`} description={t("support_subtitle")} url="https://hanuut.com/support" />
 
       <Container
         initial={{ opacity: 0, y: 30 }}

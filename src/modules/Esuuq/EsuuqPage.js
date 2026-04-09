@@ -1,9 +1,10 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet";
+
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FaApple, FaArrowLeft, FaArrowRight, FaGooglePlay, FaQuoteRight } from "react-icons/fa";
+import Seo from "../../components/Seo";
 
 // --- ASSETS ---
 import TechStoreImg from "../../assets/3d_shops/tech_store.webp";
@@ -346,9 +347,11 @@ const EsuuqPage = () => {
   return (
     <ThemeProvider theme={esuuqTheme}>
       <PageWrapper>
-        <Helmet>
-          <title>{t("nav_esuuq")} | {t("companyName")}</title>
-        </Helmet>
+        <Seo 
+          title={t("seo_esuuq_title")}
+          description={t("seo_esuuq_desc")}
+          url="https://hanuut.com/esuuq"
+        />
         
         {/* --- HERO SECTION WITH CANVAS --- */}
         <HeroSection>

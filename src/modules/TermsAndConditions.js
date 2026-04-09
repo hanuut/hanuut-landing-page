@@ -8,6 +8,7 @@ import {
   Text, 
   ContactBox 
 } from '../components/LegalPageLayout';
+import Seo from "../components/Seo";
 
 const TermsAndConditions = () => {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ const TermsAndConditions = () => {
       title={t("legal.terms_title")} 
       lastUpdated={t("legal.last_updated")}
     >
+      <Seo title={`${t("legal.terms_title")} | Hanuut`} description="Hanuut Express Terms of Service." url="https://hanuut.com/terms_and_conditions" />
       {/* 1. Legal Info */}
       <Section>
         <SectionTitle>{t("legal.terms_sec1_title")}</SectionTitle>

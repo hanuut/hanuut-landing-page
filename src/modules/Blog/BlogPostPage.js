@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import styled, { ThemeProvider } from "styled-components";
-import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
 import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import parse from 'html-react-parser'; 
@@ -10,6 +9,9 @@ import parse from 'html-react-parser';
 import { fetchBlogPostBySlug, clearSelectedPost, selectBlog } from "./state/reducers";
 import Loader from "../../components/Loader";
 import { partnerTheme } from "../../config/Themes";
+
+// --- NEW SEO IMPORT ---
+import Seo from "../../components/Seo";
 
 // --- STYLED COMPONENTS ---
 
@@ -147,7 +149,6 @@ const InteractiveCarousel = ({ images }) => {
 
   return (
     <CarouselWrapper>
-      {/* Thumbnails Overlay */}
       {images.length > 1 && (
         <ThumbnailsOverlay>
           {images.map((img, idx) => (
@@ -162,7 +163,6 @@ const InteractiveCarousel = ({ images }) => {
         </ThumbnailsOverlay>
       )}
 
-      {/* Main Image */}
       <AnimatePresence mode="wait">
         <MainImageDisplay
           key={activeIdx}
@@ -201,8 +201,6 @@ const ContentContainer = styled.div`
     border-radius: 0 12px 12px 0;
   }
 
-  /* --- Standalone Images (Not inside carousel) --- */
-  /* Global safe rule */
   > img {
     display: block; margin: 2.5rem auto; 
     max-width: 100%; height: auto;
@@ -211,7 +209,6 @@ const ContentContainer = styled.div`
     border: 1px solid #27272a;
   }
 
-  /* Limit width of portrait images so they don't fill the screen vertically */
   > img.ratio-9-16, > img.ratio-3-4 {
     max-width: 320px; 
     width: 100%;
@@ -221,7 +218,6 @@ const ContentContainer = styled.div`
 
   @media (max-width: 768px) {
     font-size: 1.1rem;
-    /* On mobile, allow portrait images to be wider if needed */
     > img.ratio-9-16 { max-width: 80%; }
   }
 `;
@@ -253,24 +249,37 @@ const BlogPostPage = () => {
 
   const { title, content, createdAt, sourceId } = selectedPost;
 
-  // --- HTML PARSER CONFIG ---
+  // SEO Preparation
+  // Strip HTML from the content to create a clean meta description for Google
+  const cleanDescription = content ? content.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...' : '';
+  const postUrl = `https://hanuut.com/blog/${slug}`;
+
+  // Article Structured Data for Google Rich Snippets
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": title,
+    "image": sourceId,
+    "author": {
+      "@type": "Organization", // Or "Person"
+      "name": selectedPost.author || "Hanuut Team"
+    },
+    "datePublished": createdAt,
+    "url": postUrl,
+    "description": cleanDescription
+  };
+
   const options = {
     replace: (domNode) => {
-      // Detect the Dashboard-generated Carousel Div
       if (domNode.attribs && domNode.attribs.class && domNode.attribs.class.includes('blog-carousel')) {
         const images = [];
-        
-        // Extract all <img> srcs inside this div
         if (domNode.children) {
           domNode.children.forEach(child => {
-            // Remove text nodes (newlines) and check for img tags
             if (child.type === 'tag' && child.name === 'img' && child.attribs && child.attribs.src) {
               images.push(child.attribs.src);
             }
           });
         }
-
-        // Render the React Component instead of the div
         return <InteractiveCarousel images={images} />;
       }
     }
@@ -279,9 +288,14 @@ const BlogPostPage = () => {
   return (
     <ThemeProvider theme={partnerTheme}>
       <PageWrapper>
-        <Helmet>
-          <title>{title} | Hanuut</title>
-        </Helmet>
+        {/* --- INJECT NEW SEO COMPONENT HERE --- */}
+        <Seo 
+          title={`${title} | Hanuut`} 
+          description={cleanDescription} 
+          url={postUrl} 
+          image={sourceId} 
+          customSchema={articleSchema} 
+        />
 
         <ProgressBar style={{ scaleX }} />
 
@@ -296,7 +310,6 @@ const BlogPostPage = () => {
            </HeaderContent>
         </HeaderSection>
 
-        {/* Use the parser to render content + components */}
         <ContentContainer>
           {parse(content, options)}
         </ContentContainer>

@@ -1,8 +1,6 @@
-import React from "react";
 import styled from "styled-components";
-import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
-
+import Seo from "../../components/Seo";
 // Import the new components
 import PartnersHero from "./components/PartnersHero";
 import PartnersValues from "./components/PartnersValues";
@@ -25,21 +23,26 @@ const PageWrapper = styled.main`
 const PartnersPage = () => {
   const { t, i18n } = useTranslation();
 
-  const seoContent = {
-    title: t("partnersPage_seo_title"),
-    description: t("partnersPage_seo_description"),
-    keywords: t("partnersPage_seo_keywords"),
-  };
-
   return (
     <>
-      <Helmet>
-        <html lang={i18n.language} />
-        <title>{seoContent.title}</title>
-        <meta name="description" content={seoContent.description} />
-        <meta name="keywords" content={seoContent.keywords} />
-        <link rel="canonical" href="https://www.hanuut.com/partners" />
-      </Helmet>
+      <Seo 
+        title={t("seo_partners_title")}
+        description={t("seo_partners_desc")}
+        url="https://hanuut.com/partners"
+        customSchema={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "My Hanuut",
+          "operatingSystem": "Android, Windows",
+          "applicationCategory": "BusinessApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "DZD"
+          },
+          "description": t("seo_partners_desc")
+        }}
+      />
 
       <PageWrapper>
         <PartnersHero />

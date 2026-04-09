@@ -1,10 +1,9 @@
-import React from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet";
 import ConsumerHero from "./HomePage/components/ConsumerHero";
 import ServicesGrid from "./HomePage/components/ServicesGrid";
 import { light } from "../config/Themes";
+import Seo from "../components/Seo";
 
 // Reuse existing styled components to maintain the "Old Look"
 const PageWrapper = styled.main`
@@ -15,21 +14,25 @@ const PageWrapper = styled.main`
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();
-  const currentLanguage = i18n.language;
-
-  // SEO Updated for "Hanuut Express" (The Company)
-  const seoContent = {
-    title: t("companyName") + " | " + t("hub_headline"),
-    description: t("hub_subheadline"),
-  };
 
   return (
     <>
-      <Helmet>
-        <html lang={currentLanguage} />
-        <title>{seoContent.title}</title>
-        <meta name="description" content={seoContent.description} />
-      </Helmet>
+      <Seo 
+        title={t("seo_home_title")}
+        description={t("seo_home_desc")}
+        url="https://hanuut.com/"
+        customSchema={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Hanuut",
+          "url": "https://hanuut.com/",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://hanuut.com/esuuq?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }}
+      />
 
       <ThemeProvider theme={light}>
         <PageWrapper>

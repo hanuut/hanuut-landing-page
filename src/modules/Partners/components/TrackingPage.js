@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaSearch, FaCheck, FaBox, FaMotorcycle, FaHome, FaArrowLeft, FaTimesCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
-
+import Seo from "../../../components/Seo";
 // --- Imports ---
 import { partnerTheme } from "../../../config/Themes";
 import { trackOrder } from "../services/orderServices";
@@ -282,6 +282,7 @@ const TrackingPage = () => {
   return (
     <ThemeProvider theme={partnerTheme}>
       <PageWrapper isArabic={isArabic}>
+        <Seo title={`${t("track_order_title")} | Hanuut`} description={t("track_order_subtitle")} url="https://hanuut.com/track" />
         <Container>
           
           <Header>

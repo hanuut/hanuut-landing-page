@@ -30,7 +30,7 @@ const LinksPage = lazy(() => import("../modules/LinksPage"));
 const MyHanuutGuide = lazy(() => import("../modules/MyHanuutGuide"));
 const ProductPage = lazy(() => import("../modules/Product/ProductPage"));
 const DeepLinkRedirect = lazy(() => import("./DeepLinkRedirect"));
-
+const LocationDirectory = lazy(() => import("../modules/Marketplace/LocationDirectory"));
 const PaymentResultPage = lazy(() =>
   import("../modules/payment/PaymentResultPage")
 );
@@ -122,7 +122,7 @@ const CustomRouter = ({ appConfig, location }) => {
           {/* Main routes */}
           <Route path="/" element={<HomePage />} /> {/* Now the HUB */}
           <Route path="/esuuq" element={<EsuuqPage />} /> {/* New Consumer Page */}
-          
+          <Route path="/explore/:domain/:wilaya" element={<LocationDirectory />} />
            {/* --- Payment Routes --- */}
           <Route path="/payment/process" element={<PaymentProcessingPage />} />
           <Route path="/payment/result" element={<PaymentResultPage />} />

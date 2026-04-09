@@ -979,7 +979,25 @@
     "sec9_title": "9. Your Rights (Law 18-07)",
     "sec9_text": "Under Law 18-07, you have the right to access, rectify, oppose, and delete your personal data. You can exercise these rights through the 'Account' section of our apps or by contacting our support team.",
     "contact_title": "10. Contact Us",
-    "contact_text": "For any questions regarding this policy, please contact us at:"
+    "contact_text": "For any questions regarding this policy, please contact us at:",
+    "seo": {
+    "shop_title_food": "{{shopName}} | Best Restaurant & Delivery in {{commune}}, {{wilaya}}",
+    "shop_desc_food": "Order delicious food from {{shopName}} in {{commune}}. View our menu, prices, and enjoy fast delivery via Hanuut Express.",
+    "shop_title_grocery": "{{shopName}} | Grocery Delivery in {{commune}}",
+    "shop_desc_grocery": "Shop daily groceries and fresh produce from {{shopName}} in {{commune}}. Fast local delivery with Hanuut.",
+    "shop_title_global": "{{shopName}} | Shop Online in Algeria - Delivery to 58 Wilayas",
+    "shop_desc_global": "Discover products from {{shopName}}. Shop securely online with nationwide delivery across Algeria on the Hanuut platform.",
+     "explore_title": "Best {{category}} in {{location}} | Hanuut",
+    "explore_desc": "Discover and order from the best {{category}} in {{location}}. Fast delivery and trusted local shops."
+  },
+  "seo_home_title": "Hanuut | The Digital Ecosystem for E-commerce & Mobility in Algeria",
+  "seo_home_desc": "Hanuut connects shops, customers, and drivers. Shop local with eSUUQ, manage your business with My Hanuut, or drive with Abridh.",
+  "seo_esuuq_title": "eSUUQ | Buy, Sell & Order Delivery in Algeria",
+  "seo_esuuq_desc": "The ultimate marketplace in Algeria. Order food, shop from local supermarkets, or buy and sell used items securely in your neighborhood.",
+  "seo_partners_title": "My Hanuut | Free POS & Online Store Builder for Algerian Merchants",
+  "seo_partners_desc": "Digitize your shop for free. Get a digital menu, barcode inventory management, and a custom e-commerce website. Available on Windows & Android.",
+  "seo_tawsila_title": "Abridh | The Premier Ride-Hailing & Delivery App in Algeria",
+  "seo_tawsila_desc": "Move smarter with Abridh. Request a fast ride, order a delivery, or sign up as a Captain to earn money on your own schedule."
   }
 
 }

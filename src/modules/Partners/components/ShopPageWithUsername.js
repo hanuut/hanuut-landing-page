@@ -30,7 +30,7 @@ import GroceryShopPage from "./GroceryShopPage";
 import { useTranslation } from "react-i18next";
 import ProductDetailsModal from "../../Product/components/landing/ProductDetailsModal";
 import GlobalShopLandingPage from "./GlobalShopLandingPage";
-import { Helmet } from "react-helmet";
+import Seo from "../../../components/Seo";
 
 const Section = styled.div`
   min-height: ${(props) => `calc(100vh - ${props.theme.navHeight})`};
@@ -160,36 +160,42 @@ const ShopPageWithUsername = () => {
     );
   if (error && retryCount >= MAX_RETRIES) return <NotFoundPage />;
 
-  if (
-    selectedShop &&
-    Object.keys(selectedShop).length > 0 &&
-    selectedShopImage &&
-    domainKeyWord
-  ) {
-    const pageProps = { onCardClick: handleCardClick };
-
+ if (selectedShop && Object.keys(selectedShop).length > 0 && selectedShopImage && domainKeyWord) {
     const shopTitle = selectedShop.name || "Hanuut Shop";
-    const shopDesc =
-      selectedShop.description || t("partnersPage_seo_description");
     const shopImage = getPublicImageUrl(selectedShop.imageId);
+    const currentUrl = `https://hanuut.com/@${selectedShop.username}`;
+    
+    const commune = selectedShop.addressId?.commune || "Algeria";
+    const wilaya = selectedShop.addressId?.wilaya || "Algeria";
 
-    const metaTitle = selectedProductForModal
-      ? `${selectedProductForModal.name} | ${shopTitle}`
-      : `${shopTitle} | Hanuut`;
+    // This dynamically pulls from the i18n JSON based on the domain!
+    // E.g., if domainKeyWord === 'global', it pulls "shop_title_global"
+    const metaTitle = t(`seo.shop_title_${domainKeyWord}`, {
+      shopName: shopTitle,
+      commune: commune,
+      wilaya: wilaya,
+      defaultValue: `${shopTitle} | Hanuut`
+    });
 
-    const metaDesc = selectedProductForModal
-      ? selectedProductForModal.shortDescription || shopDesc
-      : shopDesc;
+    const metaDesc = t(`seo.shop_desc_${domainKeyWord}`, {
+      shopName: shopTitle,
+      commune: commune,
+      wilaya: wilaya,
+      defaultValue: selectedShop.description || t("partnersPage_seo_description")
+    });
+
+    const pageProps = { onCardClick: handleCardClick };
 
     return (
       <Section>
-        <Helmet>
-          <title>{metaTitle}</title>
-          <meta name="description" content={metaDesc} />
-          <meta property="og:title" content={metaTitle} />
-          <meta property="og:description" content={metaDesc} />
-          <meta property="og:image" content={shopImage} />
-        </Helmet>
+        {/* The new SEO Engine */}
+        <Seo 
+          title={metaTitle}
+          description={metaDesc}
+          url={currentUrl}
+          image={shopImage}
+          shop={selectedShop} 
+        />
 
         {(() => {
           switch (domainKeyWord) {

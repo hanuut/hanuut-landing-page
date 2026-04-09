@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -14,7 +13,7 @@ import {
   FaMapMarkedAlt, 
   FaHeadset 
 } from "react-icons/fa";
-
+import Seo from "../../components/Seo";
 // --- Components ---
 import TawsilaLayout from "./components/TawsilaLayout";
 import BorderBeamButton from "../../components/BorderBeamButton";
@@ -341,9 +340,22 @@ const TawsilaLanding = () => {
 
   return (
     <TawsilaLayout>
-      <Helmet>
-        <title>Abridh | {t("companyName", "Hanuut")}</title>
-      </Helmet>
+      <Seo 
+        title={t("seo_tawsila_title")}
+        description={t("seo_tawsila_desc")}
+        url="https://hanuut.com/tawsila"
+        customSchema={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Abridh by Hanuut",
+          "url": "https://hanuut.com/abridh",
+          "logo": "https://hanuut.com/static/abridh-logo.webp", // Update with actual path if you have one
+          "sameAs": [
+            process.env.REACT_APP_FACBOOK_SOCIAL_MEDIA,
+            process.env.REACT_APP_INSTAGRAM_SOCIAL_MEDIA
+          ]
+        }}
+      />
 
       {/* --- HERO SECTION --- */}
       <HeroSection>

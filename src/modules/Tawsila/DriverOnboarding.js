@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { Helmet } from "react-helmet";
+
 import { FaMotorcycle, FaCar, FaTruck, FaCheck, FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import Seo from "../../components/Seo";
 
 // --- Custom Components & Services ---
 import TawsilaLayout from "./components/TawsilaLayout";
@@ -279,9 +280,7 @@ const DriverOnboarding = () => {
 
   return (
     <TawsilaLayout>
-      <Helmet>
-        <title>{t("tawsila_btn_drive", "Apply to Drive")} | Abridh</title>
-      </Helmet>
+      <Seo title={`${t("tawsila_btn_drive")} | Abridh`} description={t("tawsila_wizard_subtitle")} url="https://hanuut.com/abridh/drive" />
 
       <WizardContainer dir={isArabic ? 'rtl' : 'ltr'}>
         {!isSuccess && (

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /payment/
+Disallow: /delete_account
+Disallow: /*?*
+
+Sitemap: https://api.hanuut.com/sitemap.xml
