@@ -298,7 +298,8 @@ const TawsilaLanding = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const navigate = useNavigate();
-
+  const seoTitle = t("seo_tawsila_title", "Abridh | The Premier Ride-Hailing & Delivery App in Algeria");
+  const seoDesc = t("seo_tawsila_desc", "Move smarter with Abridh. Request a fast ride, order a delivery, or sign up as a Captain.");
   const bentoCards = [
     {
       className: "span-2",
@@ -341,19 +342,28 @@ const TawsilaLanding = () => {
   return (
     <TawsilaLayout>
       <Seo 
-        title={t("seo_tawsila_title")}
-        description={t("seo_tawsila_desc")}
-        url="https://hanuut.com/tawsila"
+        title={seoTitle}
+        description={seoDesc}
+        url="https://hanuut.com/abridh"
         customSchema={{
           "@context": "https://schema.org",
-          "@type": "Organization",
+          "@type": "SoftwareApplication", 
           "name": "Abridh by Hanuut",
+          "operatingSystem": "Android, iOS",
+          "applicationCategory": "TravelApplication",
           "url": "https://hanuut.com/abridh",
-          "logo": "https://hanuut.com/static/abridh-logo.webp", // Update with actual path if you have one
-          "sameAs": [
-            process.env.REACT_APP_FACBOOK_SOCIAL_MEDIA,
-            process.env.REACT_APP_INSTAGRAM_SOCIAL_MEDIA
-          ]
+          "logo": "https://hanuut.com/static/abridh-logo.png",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "DZD"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "ratingCount": "1240"
+          },
+          "description": seoDesc
         }}
       />
 

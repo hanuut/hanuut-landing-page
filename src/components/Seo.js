@@ -108,9 +108,10 @@ const Seo = ({ title, description, url, image, shop, product, customSchema }) =>
 
       {/* Inject Structured Data */}
       {(structuredData || customSchema) && (
-        <script type="application/ld+json">
-          {JSON.stringify(customSchema || structuredData)}
-        </script>
+        <script 
+          type="application/ld+json" 
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(customSchema || structuredData) }} 
+        />
       )}
     </Helmet>
   );

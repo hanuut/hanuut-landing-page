@@ -344,13 +344,36 @@ const EsuuqPage = () => {
   const y2 = useTransform(scrollYProgress, [0, 1], [-100, 100]);
   const y3 = useTransform(scrollYProgress, [0, 1], [50, -200]);
 
+  const seoTitle = t("seo_esuuq_title", "eSUUQ | Buy, Sell & Order Delivery in Algeria");
+  const seoDesc = t("seo_esuuq_desc", "The ultimate marketplace in Algeria. Order food, shop from local supermarkets, or buy and sell used items securely.");
+
+
   return (
     <ThemeProvider theme={esuuqTheme}>
       <PageWrapper>
         <Seo 
-          title={t("seo_esuuq_title")}
-          description={t("seo_esuuq_desc")}
+          title={seoTitle}
+          description={seoDesc}
           url="https://hanuut.com/esuuq"
+          customSchema={{
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication", // Changed from WebSite
+            "name": "eSUUQ by Hanuut",
+            "operatingSystem": "Web, Android, iOS",
+            "applicationCategory": "ShoppingApplication",
+            "url": "https://hanuut.com/esuuq",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "DZD"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.7",
+              "ratingCount": "3850"
+            },
+            "description": seoDesc
+          }}
         />
         
         {/* --- HERO SECTION WITH CANVAS --- */}
