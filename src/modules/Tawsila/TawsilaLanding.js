@@ -352,7 +352,7 @@ const TawsilaLanding = () => {
           "operatingSystem": "Android, iOS",
           "applicationCategory": "TravelApplication",
           "url": "https://hanuut.com/abridh",
-          "logo": "https://hanuut.com/static/abridh-logo.png",
+          "logo": "https://hanuut.com/static/abridh.png",
           "offers": {
             "@type": "Offer",
             "price": "0",

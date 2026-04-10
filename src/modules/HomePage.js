@@ -25,6 +25,7 @@ const HomePage = () => {
           "@context": "https://schema.org",
           "@type": "WebSite",
           "name": "Hanuut",
+          "logo": "https://hanuut.com/static/hanuut.png",
           "url": "https://hanuut.com/",
           "potentialAction": {
             "@type": "SearchAction",

@@ -361,6 +361,7 @@ const EsuuqPage = () => {
             "name": "eSUUQ by Hanuut",
             "operatingSystem": "Web, Android, iOS",
             "applicationCategory": "ShoppingApplication",
+            "logo": "https://hanuut.com/static/esuuq.png",
             "url": "https://hanuut.com/esuuq",
             "offers": {
               "@type": "Offer",

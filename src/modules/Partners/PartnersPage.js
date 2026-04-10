@@ -38,6 +38,7 @@ const seoTitle = t("seo_partners_title", "My Hanuut | Free POS & Online Store Bu
           "name": "My Hanuut",
           "operatingSystem": "Android, Windows",
           "applicationCategory": "BusinessApplication",
+          "logo": "https://hanuut.com/static/my-hanuut.png",
           "offers": {
             "@type": "Offer",
             "price": "0",
