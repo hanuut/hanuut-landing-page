@@ -18,8 +18,9 @@ import LogoSrc from "../assets/hanuutLogo.webp";
 const DeepLinkRedirect = ({
   appScheme = "hanuut://",
   storeUrl = "https://play.google.com/store/apps/details?id=com.hanuut.shop",
-   storeUrlIos = "https://apps.apple.com/dz/app/esuuq/id6752300426?l=fr-FR",
-  appName = "Hanuut",
+  storeUrlIos = "https://apps.apple.com/dz/app/esuuq/id6752300426?l=fr-FR",
+  appName = "eSUUQ", // Changed to eSUUQ
+  finalPath = "",    // Added to support MarketplaceAdRedirectPage
   redirectDelay = 3000,
   transformPath = (path) => path,
   showUI = true,
@@ -40,11 +41,13 @@ const DeepLinkRedirect = ({
   }, []);
 
   const processPath = useCallback(() => {
+    // If a direct finalPath is provided (e.g. from Marketplace Ads), use it.
+    if (finalPath) return `${appScheme}${finalPath}`;
+
     const { pathname, search } = location;
-    // Pass the full pathname to transformPath
     const transformedPath = transformPath(pathname);
     return `${appScheme}${transformedPath}${search}`;
-  }, [location, appScheme, transformPath]);
+  }, [location, appScheme, transformPath, finalPath]);
 
   useEffect(() => {
     const deepLinkUrl = processPath();
@@ -52,8 +55,25 @@ const DeepLinkRedirect = ({
     const platformSpecificStoreUrl = isIOS ? storeUrlIos : storeUrl;
 
     setIsRedirecting(true);
-    // console.log(`Attempting to open deep link: ${deepLinkUrl}`);
-    window.location.href = deepLinkUrl;
+
+    let fallbackTimer;
+
+    if (isIOS) {
+      // iOS SAFARI FIX: Use replace() to avoid history stack corruption and infinite loops
+      fallbackTimer = setTimeout(() => {
+        window.location.replace(platformSpecificStoreUrl);
+      }, redirectDelay);
+      
+      // Attempt to open the app
+      window.location.href = deepLinkUrl;
+    } else {
+      // Android / Web
+      window.location.href = deepLinkUrl;
+      
+      fallbackTimer = setTimeout(() => {
+        window.location.replace(platformSpecificStoreUrl);
+      }, redirectDelay);
+    }
 
     const timer = setInterval(() => {
       setCountdown((prev) => {
@@ -66,18 +86,18 @@ const DeepLinkRedirect = ({
       });
     }, 1000);
 
-    const fallbackTimer = setTimeout(() => {
-      // console.log(`Redirecting to app store: ${platformSpecificStoreUrl}`);
-      window.location.href = platformSpecificStoreUrl;
-    }, redirectDelay);
-
     return () => {
       clearInterval(timer);
       clearTimeout(fallbackTimer);
     };
-  }, [processPath, redirectDelay, storeUrl, detectPlatform]);
+  }, [processPath, redirectDelay, storeUrl, storeUrlIos, detectPlatform]);
 
   if (!showUI || !isRedirecting) return null;
+
+  // Determine button text based on platform
+  const { isIOS } = detectPlatform();
+  const platformSpecificStoreUrl = isIOS ? storeUrlIos : storeUrl;
+  const storeName = isIOS ? "App Store" : "Google Play";
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -124,9 +144,9 @@ const DeepLinkRedirect = ({
           initial="hidden"
           animate="visible"
           exit="exit"
-          isArabic={isArabic}
+          $isArabic={isArabic}
         >
-          <Card variants={cardVariants} isArabic={isArabic}>
+          <Card variants={cardVariants} $isArabic={isArabic}>
             <Logo variants={itemVariants}>
               {logoSrc ? (
                 <LogoImage src={logoSrc} alt={appName} />
@@ -151,13 +171,13 @@ const DeepLinkRedirect = ({
             </SpinnerContainer>
             <ButtonContainer variants={itemVariants}>
               <StoreButton
-                href={storeUrl}
+                href={platformSpecificStoreUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {t("deepLinkOpenStore") || "Get it on Google Play"}
+                {t("deepLinkOpenStore", `Get it on ${storeName}`)}
               </StoreButton>
             </ButtonContainer>
           </Card>
@@ -168,25 +188,14 @@ const DeepLinkRedirect = ({
 };
 
 DeepLinkRedirect.propTypes = {
-  /** The URI scheme for your app (e.g., 'hanuut://') */
   appScheme: PropTypes.string,
-
-  /** URL to redirect users when the app isn't installed */
   storeUrl: PropTypes.string,
-
-  /** Your app's name to display in the UI */
+  storeUrlIos: PropTypes.string,
   appName: PropTypes.string,
-
-  /** Delay in milliseconds before redirecting to store */
+  finalPath: PropTypes.string,
   redirectDelay: PropTypes.number,
-
-  /** Optional path transformation function */
   transformPath: PropTypes.func,
-
-  /** Whether to show the redirection UI */
   showUI: PropTypes.bool,
-
-  /** Optional logo source URL */
   logoSrc: PropTypes.string,
 };
 
@@ -204,7 +213,7 @@ const Container = styled(motion.div)`
   z-index: 9999;
   padding: 20px;
   backdrop-filter: blur(8px);
-  direction: ${({ isArabic }) => (isArabic ? "rtl" : "ltr")};
+  direction: ${({ $isArabic }) => ($isArabic ? "rtl" : "ltr")};
   @media (max-width: 768px) {
     padding: 0;
   }
