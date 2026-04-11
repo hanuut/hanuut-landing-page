@@ -68,16 +68,17 @@ const TawsilaPreFooter = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
+        dir={t.language === 'ar' ? 'rtl' : 'ltr'}
       >
         <Title>
-          Ready to hit the road? <br />
-          <span>Join the fleet today.</span>
+          {t("prefooter_title", "Ready to hit the road?")} <br />
+          <span>{t("prefooter_subtitle", "Join the private network today.")}</span>
         </Title>
         <BorderBeamButton 
-          onClick={() => navigate("/abridh/drive")} 
+          onClick={() => navigate("/abridh/drive")} // <-- FIXED ROUTE
           beamColor="#397FF9"
         >
-          {t("tawsila_btn_drive", "Apply to Drive")}
+          {t("tawsila_btn_drive", "Join as a Driving Member")}
         </BorderBeamButton>
       </Container>
     </Section>

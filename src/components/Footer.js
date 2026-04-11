@@ -10,6 +10,7 @@ import {
   FaEnvelope,
   FaPhoneAlt,
   FaTruck,
+  FaRoute,
   FaCar, // For Abridh
   FaQuestionCircle, // For Support
 } from "react-icons/fa";
@@ -162,7 +163,7 @@ const Footer = () => {
 
   return (
     // --- 1. LANGUAGE BUG FIX: Added 'key' prop to force re-render on language change ---
-    <FooterWrapper isArabic={isArabic} key={`footer-${i18n.language}`}>
+    <FooterWrapper dir={isArabic ? "rtl" : "ltr"} key={`footer-${i18n.language}`}>
       <Container>
         <TopSection>
           {/* Column 1: Main Info (No changes) */}
@@ -192,17 +193,17 @@ const Footer = () => {
             </LinkList>
           </Column>
 
-          {/* --- 2. NEW COLUMN: Abridh/Tawsila --- */}
-           <Column>
+          {/* --- 2. NEW COLUMN: Abridh --- */}
+          <Column>
             <ColumnTitle>{t("nav_abridh_beta", "Abridh (Beta)")}</ColumnTitle>
             <LinkList>
-              <StyledLink to="/tawsila" isArabic={isArabic}>
+              <StyledLink to="/abridh">
                  <FaRoute size={14} /> {t("tawsila_btn_ride", "Request a trip")}
               </StyledLink>
-              <StyledLink to="/tawsila/drive" isArabic={isArabic}>
+              <StyledLink to="/abridh/drive">
                  {t("tawsila_btn_drive", "Join as a Driving Member")}
               </StyledLink>
-              <ExternalLink href={links.abridhApp} target="_blank" isArabic={isArabic}>
+              <ExternalLink href={links.abridhApp} target="_blank">
                 <FaGooglePlay size={14} /> {t("abridh_member_portal", "Driving Member Portal")}
               </ExternalLink>
             </LinkList>

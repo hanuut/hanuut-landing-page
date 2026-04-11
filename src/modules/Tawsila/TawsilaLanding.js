@@ -17,7 +17,7 @@ import {
 
 // --- Components ---
 import TawsilaLayout from "./components/TawsilaLayout";
-import BorderBeamButton from "../../../components/BorderBeamButton";
+import BorderBeamButton from "../../components/BorderBeamButton";
 import Seo from "../../components/Seo";
 
 // --- 1. THE 3D MOBILITY CANVAS BACKGROUND ---
