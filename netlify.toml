@@ -1,29 +1,24 @@
 # This file tells Netlify how to build your site.
 
 [build]
-  # This command now handles EVERYTHING. Netlify will not run its
-  # own "yarn install" or "npm install" before this.
   command = "npm install --legacy-peer-deps && CI=false npm run build"
-  
   publish = "build"
 
-# This section tells Netlify which tools to use.
 [build.environment]
   NODE_VERSION = "22"
   NPM_VERSION = "10.9.3"
   
-# --- THIS IS THE FINAL, CRITICAL FIX ---
-# This tells Netlify to use the command from this file instead of its default behavior.
 [build.processing]
   skip_install = true
 
+# --- EDGE FUNCTIONS ---
 
 # 1. Short Username Links
 [[edge_functions]]
   function = "bot-proxy"
   path = "/@*"
 
-#  Long Shop Links (for the Redirect)
+# Long Shop Links (for the Redirect)
 [[edge_functions]]
   function = "bot-proxy"
   path = "/shop/*"
@@ -38,6 +33,7 @@
   function = "bot-proxy"
   path = "/deeplink/*"
 
+# --- ROUTING & HEADERS ---
 
 [[redirects]]
   from = "/*"
@@ -47,4 +43,4 @@
 [[headers]]
   for = "/.well-known/apple-app-site-association"
   [headers.values]
-  Content-Type = "application/json"
+    Content-Type = "application/json"

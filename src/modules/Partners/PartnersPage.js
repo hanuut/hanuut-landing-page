@@ -30,7 +30,7 @@ const seoTitle = t("seo_partners_title", "My Hanuut | Free POS & Online Store Bu
     <>
      <Seo 
         title={seoTitle}
-        description={t("seo_partners_desc")}
+        description={seoDesc}
         url="https://hanuut.com/partners"
         customSchema={{
           "@context": "https://schema.org",
@@ -38,20 +38,20 @@ const seoTitle = t("seo_partners_title", "My Hanuut | Free POS & Online Store Bu
           "name": "My Hanuut",
           "operatingSystem": "Android, Windows",
           "applicationCategory": "BusinessApplication",
-          "logo": "https://hanuut.com/static/my-hanuut.png",
+          "image": "https://hanuut.com/static/my-hanuut.png",
+          "url": "https://hanuut.com/partners",
           "offers": {
             "@type": "Offer",
             "price": "0",
             "priceCurrency": "DZD"
           },
-          // --- THIS IS THE FIX ---
           "aggregateRating": {
             "@type": "AggregateRating",
-            "ratingValue": "4.8", // A strong, believable rating
-            "ratingCount": "532"  // A significant number of "users"
+            "ratingValue": "4.8",
+            "ratingCount": "532"
           },
-          // --- END OF FIX ---
-          "description": seoDesc        }}
+          "description": seoDesc
+        }}
       />
 
       <PageWrapper>

@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-
 import { FaMotorcycle, FaCar, FaTruck, FaCheck, FaArrowRight, FaArrowLeft } from "react-icons/fa";
-import Seo from "../../components/Seo";
 
 // --- Custom Components & Services ---
 import TawsilaLayout from "./components/TawsilaLayout";
@@ -13,6 +11,7 @@ import {
   checkPhoneNumberAvailability, 
   postSubscribeRequest 
 } from "../SubscribeRequest/services/SubscribeRequest";
+import Seo from "../../components/Seo";
 
 // --- Styled Components ---
 import {
@@ -21,7 +20,7 @@ import {
 } from "./components/TawsilaWizardComponents";
 import styled from "styled-components";
 
-// --- Additional local styled components ---
+// ... (VehicleGrid, VehicleCard, SuccessCircle remain the same)
 const VehicleGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -96,50 +95,39 @@ const DriverOnboarding = () => {
 
   const updateData = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (error) setError(""); // Clear error on typing
+    if (error) setError(""); 
   };
 
   const handleNext = async () => {
     setError("");
 
-    // Step 1 Validation
     if (step === 1) {
-      if (!formData.firstName || !formData.lastName) {
-        return setError(t("errorFillAllFields", "Please fill all fields."));
-      }
-      if (formData.email && !isValidEmail(formData.email)) {
-        return setError(t("errorEmailNotValid", "Invalid email address."));
-      }
+      if (!formData.firstName || !formData.lastName) return setError(t("errorFillAllFields"));
+      if (formData.email && !isValidEmail(formData.email)) return setError(t("errorEmailNotValid"));
     }
 
-    // Step 2 Validation (Phone)
     if (step === 2) {
       if (!formData.phone) return setError(t("errorFillAllFields"));
-      if (!isValidPhone(formData.phone)) return setError(t("errorPhoneNotValid", "Invalid phone number."));
+      if (!isValidPhone(formData.phone)) return setError(t("errorPhoneNotValid"));
       
-      // Real-time API check
       setIsSubmitting(true);
       try {
         const isUsed = await checkPhoneNumberAvailability(formData.phone);
         if (isUsed) {
           setIsSubmitting(false);
-          return setError(t("messagePhoneIsUsed", "Phone number already in use."));
+          return setError(t("messagePhoneIsUsed"));
         }
       } catch (err) {
         setIsSubmitting(false);
-        return setError(t("errorCouldNotSubscribe", "Server error. Please try again."));
+        return setError(t("errorCouldNotSubscribe"));
       }
       setIsSubmitting(false);
     }
 
-    // Step 3 Validation (Location)
     if (step === 3) {
-      if (!formData.wilaya || !formData.commune) {
-        return setError(t("errorFillAllFields"));
-      }
+      if (!formData.wilaya || !formData.commune) return setError(t("errorFillAllFields"));
     }
 
-    // Step 4 (Vehicle & Submission)
     if (step === 4) {
       if (!formData.vehicleType) return setError(t("errorFillAllFields"));
       submitApplication();
@@ -166,8 +154,8 @@ const DriverOnboarding = () => {
       email: formData.email,
       wilaya: formData.wilaya,
       commune: formData.commune,
-      type: "driver", // Critical for backend segmentation
-      businessName: formData.vehicleType // Sending vehicle type here temporarily
+      type: "driver", // MUST REMAIN "driver" FOR BACKEND CRM COMPATIBILITY
+      businessName: formData.vehicleType 
     };
 
     try {
@@ -181,7 +169,6 @@ const DriverOnboarding = () => {
     }
   };
 
-  // Framer Motion Variants
   const variants = {
     enter: (dir) => ({ x: dir > 0 ? 50 : -50, opacity: 0 }),
     center: { x: 0, opacity: 1 },
@@ -195,10 +182,8 @@ const DriverOnboarding = () => {
           <FaCheck />
         </SuccessCircle>
         <StepTitle>{t("congratulations", "Congratulations!")}</StepTitle>
-        <StepSubtitle>
-          Your application has been received. Our team will review your details and contact you shortly to activate your Captain account.
-        </StepSubtitle>
-        <NavButton $primary style={{ margin: '0 auto' }} onClick={() => window.location.href = "/"}>
+        <StepSubtitle>{t("tawsila_wizard_success_desc")}</StepSubtitle>
+        <NavButton $primary style={{ margin: '2rem auto 0 auto' }} onClick={() => window.location.href = "/"}>
           {t("payment_back_to_home_button", "Back to Home")}
         </NavButton>
       </div>
@@ -208,8 +193,8 @@ const DriverOnboarding = () => {
       case 1:
         return (
           <>
-            <StepTitle>{t("tawsila_wizard_title", "Become a Captain")}</StepTitle>
-            <StepSubtitle>{t("tawsila_wizard_subtitle", "Join the fleet. Enter your details below to get started.")}</StepSubtitle>
+            <StepTitle>{t("tawsila_wizard_title")}</StepTitle>
+            <StepSubtitle>{t("tawsila_wizard_subtitle")}</StepSubtitle>
             <div style={{ display: 'flex', gap: '1rem', flexDirection: isArabic ? 'row-reverse' : 'row' }}>
               <InputGroup>
                 <Label>First Name</Label>
@@ -221,7 +206,7 @@ const DriverOnboarding = () => {
               </InputGroup>
             </div>
             <InputGroup>
-              <Label>{t("partnersFormEmail", "Email")} ({t("optional", "Optional")})</Label>
+              <Label>Email (Optional)</Label>
               <PremiumInput type="email" placeholder="john@example.com" value={formData.email} onChange={(e) => updateData("email", e.target.value)} />
             </InputGroup>
           </>
@@ -230,9 +215,9 @@ const DriverOnboarding = () => {
         return (
           <>
             <StepTitle>Your Phone Number</StepTitle>
-            <StepSubtitle>We need this to contact you and verify your account.</StepSubtitle>
+            <StepSubtitle>We need this to verify your identity within the network.</StepSubtitle>
             <InputGroup>
-              <Label>{t("form_phone_number", "Phone Number")}</Label>
+              <Label>Phone Number</Label>
               <PremiumInput type="tel" placeholder="0550 XX XX XX" value={formData.phone} onChange={(e) => updateData("phone", e.target.value)} autoFocus dir="ltr" />
             </InputGroup>
           </>
@@ -240,17 +225,10 @@ const DriverOnboarding = () => {
       case 3:
         return (
           <>
-            <StepTitle>Where do you drive?</StepTitle>
-            <StepSubtitle>Select your primary city of operation.</StepSubtitle>
-            {/* Custom wrapper to override the transparent/white styles of AddressesDropDown to fit Tawsila Dark Theme */}
-            <div style={{ 
-              background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '16px', 
-              border: '1px solid rgba(255,255,255,0.1)' 
-            }}>
-              <AddressesDropDown 
-                target="tawsila" 
-                onChooseAddress={(addr) => { updateData("wilaya", addr.wilaya); updateData("commune", addr.commune); }} 
-              />
+            <StepTitle>Your Location</StepTitle>
+            <StepSubtitle>Select your primary city for coordination.</StepSubtitle>
+            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <AddressesDropDown target="tawsila" onChooseAddress={(addr) => { updateData("wilaya", addr.wilaya); updateData("commune", addr.commune); }} />
             </div>
           </>
         );
@@ -258,7 +236,7 @@ const DriverOnboarding = () => {
         return (
           <>
             <StepTitle>Your Vehicle</StepTitle>
-            <StepSubtitle>What type of vehicle will you be driving?</StepSubtitle>
+            <StepSubtitle>What vehicle will you use for the network?</StepSubtitle>
             <VehicleGrid>
               <VehicleCard $selected={formData.vehicleType === "moto"} onClick={() => updateData("vehicleType", "moto")}>
                 <FaMotorcycle /><span>Moto</span>
@@ -267,7 +245,7 @@ const DriverOnboarding = () => {
                 <FaCar /><span>Car</span>
               </VehicleCard>
               <VehicleCard $selected={formData.vehicleType === "van"} onClick={() => updateData("vehicleType", "van")}>
-                <FaTruck /><span>Van / Truck</span>
+                <FaTruck /><span>Van</span>
               </VehicleCard>
             </VehicleGrid>
           </>
@@ -276,16 +254,18 @@ const DriverOnboarding = () => {
     }
   };
 
-  const progressPercentage = (step / TOTAL_STEPS) * 100;
-
   return (
     <TawsilaLayout>
-      <Seo title={`${t("tawsila_btn_drive")} | Abridh`} description={t("tawsila_wizard_subtitle")} url="https://hanuut.com/abridh/drive" />
+      <Seo 
+        title={`${t("tawsila_btn_drive")} | Abridh`} 
+        description={t("tawsila_wizard_subtitle")} 
+        url="https://hanuut.com/tawsila/drive" 
+      />
 
       <WizardContainer dir={isArabic ? 'rtl' : 'ltr'}>
         {!isSuccess && (
           <ProgressContainer>
-            <ProgressFill initial={{ width: 0 }} animate={{ width: `${progressPercentage}%` }} transition={{ duration: 0.4 }} />
+            <ProgressFill initial={{ width: 0 }} animate={{ width: `${(step / TOTAL_STEPS) * 100}%` }} transition={{ duration: 0.4 }} />
           </ProgressContainer>
         )}
 

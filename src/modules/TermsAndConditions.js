@@ -69,6 +69,11 @@ const TermsAndConditions = () => {
         <Text>{t("legal.terms_sec7_text")}</Text>
       </Section>
 
+      <Section>
+        <SectionTitle>{t("legal.terms_abridh_title")}</SectionTitle>
+        <Text>{t("legal.terms_abridh_text")}</Text>
+      </Section>
+
       <ContactBox>
         <SubTitle>{t("legal.contact_us")}</SubTitle>
         <Text>

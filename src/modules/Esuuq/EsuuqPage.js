@@ -357,11 +357,11 @@ const EsuuqPage = () => {
           url="https://hanuut.com/esuuq"
           customSchema={{
             "@context": "https://schema.org",
-            "@type": "SoftwareApplication", // Changed from WebSite
+            "@type": "SoftwareApplication",
             "name": "eSUUQ by Hanuut",
             "operatingSystem": "Web, Android, iOS",
             "applicationCategory": "ShoppingApplication",
-            "logo": "https://hanuut.com/static/esuuq.png",
+            "image": "https://hanuut.com/static/esuuq.png", // <-- ADDED LOGO
             "url": "https://hanuut.com/esuuq",
             "offers": {
               "@type": "Offer",

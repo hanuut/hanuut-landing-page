@@ -193,13 +193,17 @@ const Footer = () => {
           </Column>
 
           {/* --- 2. NEW COLUMN: Abridh/Tawsila --- */}
-          <Column>
-            <ColumnTitle>{t("navTawsila", "Abridh")}</ColumnTitle>
+           <Column>
+            <ColumnTitle>{t("nav_abridh_beta", "Abridh (Beta)")}</ColumnTitle>
             <LinkList>
-              <StyledLink to="/abridh" isArabic={isArabic}><FaCar size={14} /> {t("ride_with_us", "Ride with us")}</StyledLink>
-              <StyledLink to="/abridh/drive" isArabic={isArabic}>{t("becomeDriver", "Become a Captain")}</StyledLink>
+              <StyledLink to="/tawsila" isArabic={isArabic}>
+                 <FaRoute size={14} /> {t("tawsila_btn_ride", "Request a trip")}
+              </StyledLink>
+              <StyledLink to="/tawsila/drive" isArabic={isArabic}>
+                 {t("tawsila_btn_drive", "Join as a Driving Member")}
+              </StyledLink>
               <ExternalLink href={links.abridhApp} target="_blank" isArabic={isArabic}>
-                <FaGooglePlay size={14} /> {t("captain_app", "Captain App")}
+                <FaGooglePlay size={14} /> {t("abridh_member_portal", "Driving Member Portal")}
               </ExternalLink>
             </LinkList>
           </Column>

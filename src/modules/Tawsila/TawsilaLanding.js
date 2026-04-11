@@ -1,22 +1,24 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { Helmet } from "react-helmet";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
   FaArrowRight, 
   FaArrowLeft, 
-  FaCarAlt, 
+  FaUsers, 
   FaWallet, 
   FaGlobe, 
   FaClock, 
-  FaMapMarkedAlt, 
+  FaRoute, 
   FaHeadset 
 } from "react-icons/fa";
-import Seo from "../../components/Seo";
+
 // --- Components ---
 import TawsilaLayout from "./components/TawsilaLayout";
-import BorderBeamButton from "../../components/BorderBeamButton";
+import BorderBeamButton from "../../../components/BorderBeamButton";
+import Seo from "../../components/Seo";
 
 // --- 1. THE 3D MOBILITY CANVAS BACKGROUND ---
 const CanvasContainer = styled.canvas`
@@ -291,68 +293,209 @@ const BentoCard = styled(motion.div)`
   }
 `;
 
-const tawsilaAppUrl = process.env.REACT_APP_Tawsila_DOWNLOAD_LINK || "https://play.google.com/store/apps/details?id=com.hanuut.tawsila";
+const ScrollSection = styled.section`
+  height: 300vh;
+  position: relative;
+  background-color: #050505;
+`;
+
+const StickyContainer = styled.div`
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+`;
+
+const SplitLayout = styled.div`
+  width: 90%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  direction: ${props => props.$isArabic ? 'rtl' : 'ltr'};
+
+  @media (max-width: 900px) {
+    flex-direction: column-reverse;
+    justify-content: center;
+  }
+`;
+
+const TextColumn = styled.div`
+  flex: 1;
+  position: relative;
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  @media (max-width: 900px) {
+    height: 30vh;
+    text-align: center;
+  }
+`;
+
+const TextBlock = styled(motion.div)`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  will-change: transform, opacity;
+  
+  h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: white;
+    font-family: 'Tajawal', sans-serif;
+  }
+  p {
+    font-size: 1.2rem;
+    color: #A1A1AA;
+    line-height: 1.6;
+    font-family: 'Cairo', sans-serif;
+  }
+`;
+
+const PhoneColumn = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const PhoneMockup = styled.div`
+  width: 320px;
+  height: 650px;
+  background: #18181B;
+  border-radius: 40px;
+  border: 8px solid #27272A;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 25px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 10;
+  }
+
+  @media (max-width: 900px) {
+    width: 260px;
+    height: 530px;
+  }
+`;
+
+const PhoneScreen = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+  background: ${props => props.$bg || "#09090B"};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+  text-align: center;
+  position: absolute;
+  top: 0; left: 0;
+  will-change: transform, opacity;
+
+  svg {
+    font-size: 4rem;
+    color: #397FF9;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 { color: white; font-size: 1.5rem; margin-bottom: 0.5rem; }
+  p { color: #A1A1AA; font-size: 0.9rem; }
+`;
 
 // --- 3. MAIN COMPONENT ---
 const TawsilaLanding = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const navigate = useNavigate();
-  const seoTitle = t("seo_tawsila_title", "Abridh | The Premier Ride-Hailing & Delivery App in Algeria");
-  const seoDesc = t("seo_tawsila_desc", "Move smarter with Abridh. Request a fast ride, order a delivery, or sign up as a Captain.");
+
+  const scrollRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start start", "end end"]
+  });
+
+  const opacity1 = useTransform(scrollYProgress, [0, 0.25, 0.35], [1, 1, 0]);
+  const opacity2 = useTransform(scrollYProgress, [0.25, 0.35, 0.6, 0.7], [0, 1, 1, 0]);
+  const opacity3 = useTransform(scrollYProgress, [0.6, 0.7, 1], [0, 1, 1]);
+
+  const y1 = useTransform(scrollYProgress, [0, 0.35], [0, -50]);
+  const y2 = useTransform(scrollYProgress, [0.25, 0.35, 0.6, 0.7], [50, 0, 0, -50]);
+  const y3 = useTransform(scrollYProgress, [0.6, 0.7, 1], [50, 0, 0]);
+
   const bentoCards = [
     {
       className: "span-2",
-      icon: FaClock,
-      title: t("tawsila_sticky_1_title", "Set your own schedule"),
-      desc: t("tawsila_sticky_1_desc", "You're the boss. Drive when you want, where you want.")
+      icon: FaClock, // Time/Schedule
+      title: t("tawsila_sticky_1_title"),
+      desc: t("tawsila_sticky_1_desc")
     },
     {
       className: "span-1",
-      icon: FaCarAlt,
-      title: t("tawsila_bento_1_title", "Zero Friction"),
-      desc: t("tawsila_bento_1_desc", "Sign up in minutes. Hit the road today.")
+      icon: FaUsers, // Replaced Car with Users (Community)
+      title: t("tawsila_bento_1_title"),
+      desc: t("tawsila_bento_1_desc")
     },
     {
       className: "span-1",
-      icon: FaMapMarkedAlt,
-      title: t("tawsila_sticky_2_title", "Smart dispatching"),
-      desc: t("tawsila_sticky_2_desc", "Our algorithm minimizes your downtime.")
+      icon: FaRoute, // Replaced Map with Route (Coordination)
+      title: t("tawsila_sticky_2_title"),
+      desc: t("tawsila_sticky_2_desc")
     },
     {
       className: "span-2",
-      icon: FaWallet,
-      title: t("tawsila_bento_2_title", "Clear Earnings"),
-      desc: t("tawsila_bento_2_desc", "Keep what you earn. Transparent payouts with no hidden fees.")
+      icon: FaWallet, // Cost sharing
+      title: t("tawsila_bento_2_title"),
+      desc: t("tawsila_bento_2_desc")
     },
     {
       className: "span-1",
       icon: FaHeadset,
-      title: t("tawsila_sticky_3_title", "24/7 Support"),
-      desc: t("tawsila_sticky_3_desc", "Real humans ready to help you at any time.")
+      title: t("tawsila_sticky_3_title"),
+      desc: t("tawsila_sticky_3_desc")
     },
     {
       className: "span-2",
-      icon: FaGlobe,
-      title: t("tawsila_bento_3_title", "Community First"),
-      desc: t("tawsila_bento_3_desc", "Connect people. Deliver moments. Be the heartbeat of your city.")
+      icon: FaGlobe, // Network
+      title: t("tawsila_bento_3_title"),
+      desc: t("tawsila_bento_3_desc")
     }
   ];
+
+  const seoTitle = t("seo_tawsila_title");
+  const seoDesc = t("seo_tawsila_desc");
 
   return (
     <TawsilaLayout>
       <Seo 
         title={seoTitle}
         description={seoDesc}
-        url="https://hanuut.com/abridh"
+        url="https://hanuut.com/abridh" 
         customSchema={{
           "@context": "https://schema.org",
-          "@type": "SoftwareApplication", 
+          "@type": "SoftwareApplication",
           "name": "Abridh by Hanuut",
           "operatingSystem": "Android, iOS",
           "applicationCategory": "TravelApplication",
+          "image": "https://hanuut.com/static/abridh.png", // <-- ADDED LOGO
           "url": "https://hanuut.com/abridh",
-          "logo": "https://hanuut.com/static/abridh.png",
           "offers": {
             "@type": "Offer",
             "price": "0",
@@ -375,22 +518,66 @@ const TawsilaLanding = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
-          <Badge>Abridh by Hanuut</Badge>
-          <Title>{t("tawsila_hero_title", "Move with purpose.")}</Title>
-          <Subtitle>{t("tawsila_hero_subtitle", "Drive your future. Join the next generation of mobility and earn on your own terms.")}</Subtitle>
+          <Badge>Abridh | Phase Expérimentale</Badge>
+          <Title>{t("tawsila_hero_title")}</Title>
+          <Subtitle>{t("tawsila_hero_subtitle")}</Subtitle>
           
           <CtaGroup>
-            <BorderBeamButton onClick={() => navigate("/abridh/drive")} beamColor="#397FF9">
-              {t("tawsila_btn_drive", "Apply to Drive")} {isArabic ? <FaArrowLeft style={{marginRight:'8px'}}/> : <FaArrowRight style={{marginLeft:'8px'}}/>}
+            <BorderBeamButton onClick={() => navigate("/tawsila/drive")} beamColor="#397FF9">
+              {t("tawsila_btn_drive")} {isArabic ? <FaArrowLeft style={{marginRight:'8px'}}/> : <FaArrowRight style={{marginLeft:'8px'}}/>}
             </BorderBeamButton>
-            <BorderBeamButton secondary onClick={() => window.open(tawsilaAppUrl, "_blank")} beamColor="#FFFFFF">
-              {t("tawsila_btn_ride", "Request a Ride")}
+            <BorderBeamButton secondary onClick={() => window.open(process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK, "_blank")} beamColor="#FFFFFF">
+              {t("tawsila_btn_ride")}
             </BorderBeamButton>
           </CtaGroup>
         </HeroContent>
       </HeroSection>
 
-      {/* --- NEW LAG-FREE BENTO GRID SECTION --- */}
+      {/* --- STICKY SCROLL SECTION --- */}
+      <ScrollSection ref={scrollRef}>
+        <StickyContainer>
+          <SplitLayout $isArabic={isArabic}>
+            
+            <TextColumn>
+              <TextBlock style={{ opacity: opacity1, y: y1, zIndex: 3 }}>
+                <h2>{t("tawsila_sticky_1_title")}</h2>
+                <p>{t("tawsila_sticky_1_desc")}</p>
+              </TextBlock>
+              <TextBlock style={{ opacity: opacity2, y: y2, zIndex: 2 }}>
+                <h2>{t("tawsila_sticky_2_title")}</h2>
+                <p>{t("tawsila_sticky_2_desc")}</p>
+              </TextBlock>
+              <TextBlock style={{ opacity: opacity3, y: y3, zIndex: 1 }}>
+                <h2>{t("tawsila_sticky_3_title")}</h2>
+                <p>{t("tawsila_sticky_3_desc")}</p>
+              </TextBlock>
+            </TextColumn>
+
+            <PhoneColumn>
+              <PhoneMockup>
+                <PhoneScreen style={{ opacity: opacity1 }}>
+                  <FaUsers />
+                  <h3>Réseau Privé</h3>
+                  <p>Connexion sécurisée.</p>
+                </PhoneScreen>
+                <PhoneScreen style={{ opacity: opacity2, background: '#0e1726' }}>
+                  <FaRoute />
+                  <h3>Demande de déplacement</h3>
+                  <p>Mise en relation en cours...</p>
+                </PhoneScreen>
+                <PhoneScreen style={{ opacity: opacity3 }}>
+                  <FaWallet />
+                  <h3>Participation</h3>
+                  <p>Partage des frais équitable.</p>
+                </PhoneScreen>
+              </PhoneMockup>
+            </PhoneColumn>
+
+          </SplitLayout>
+        </StickyContainer>
+      </ScrollSection>
+
+      {/* --- BENTO GRID SECTION --- */}
       <BentoSection>
         <BentoContainer $isArabic={isArabic}>
           {bentoCards.map((card, index) => {
