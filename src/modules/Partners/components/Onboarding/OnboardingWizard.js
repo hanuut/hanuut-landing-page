@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet";
-
+import styled from 'styled-components';
 import { 
   WizardWrapper, 
   StepContainer, 
@@ -16,6 +16,7 @@ import Step1Contact from "./steps/Step1Contact";
 import Step2Shop from "./steps/Step2Shop";
 import Step3Location from "./steps/Step3Location";
 import SuccessView from "./steps/SuccessView";
+import { FaExclamationCircle } from "react-icons/fa";
 
 // --- NEW IMPORTS FOR AUTOMATED FLOW ---
 import { trackFunnelStep, trackEvent } from "../../../../utils/analytics";
@@ -26,6 +27,20 @@ import {
   createShop 
 } from "../../services/onboardingServices";
 
+const ErrorBanner = styled(motion.div)`
+  background-color: #FEE2E2;
+  color: #B91C1C;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #F87171;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+`;
+
 const TOTAL_STEPS = 3; // Reduced to 3 steps: Identity -> Shop -> Location
 
 const OnboardingWizard = () => {
@@ -34,7 +49,7 @@ const OnboardingWizard = () => {
   const [direction, setDirection] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
+  const [errorMsg, setErrorMsg] = useState("");
   // --- UPDATED STATE SCHEMA ---
   const [formData, setFormData] = useState({
     firstName: "",
@@ -43,7 +58,8 @@ const OnboardingWizard = () => {
     email: "",
     password: "",       
     shopName: "",
-    domainId: "",       
+    domainId: "",  
+    hasConsented: false,     
     domainKeyword: "",  
     description: "",
     logo: null,        
@@ -55,29 +71,29 @@ const OnboardingWizard = () => {
   });
 
   const handleNext = () => {
-    // --- VALIDATION LOGIC ---
+    setErrorMsg(""); // Clear errors on next
+
     if (step === 1) {
       if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email || !formData.password) {
-        alert(t("errorFillAllFields")); 
-        return;
+        return setErrorMsg(t("errorFillAllFields")); 
       }
       if (formData.password.length < 6) {
-        alert(t("errorPasswordTooShort", "Password must be at least 6 characters."));
-        return;
+        return setErrorMsg(t("errorPasswordTooShort", "Password must be at least 6 characters."));
+      }
+      if (!formData.hasConsented) {
+        return setErrorMsg(t("error_consent", "You must agree to the terms to continue."));
       }
     }
     
     if (step === 2) {
       if (!formData.shopName || !formData.domainId) {
-        alert(t("errorFillAllFields"));
-        return;
+        return setErrorMsg(t("errorFillAllFields"));
       }
     }
 
     if (step === 3) {
       if (!formData.wilaya || !formData.commune || !formData.district) {
-        alert(t("errorFillAllFields"));
-        return;
+        return setErrorMsg(t("errorFillAllFields"));
       }
     }
 
@@ -92,36 +108,29 @@ const OnboardingWizard = () => {
 
   const handleBack = () => {
     if (step > 1) {
+      setErrorMsg(""); // Clear errors on back
       setDirection(-1);
       setStep(prev => prev - 1);
     }
   };
 
-  const updateData = (key, value) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
-  };
-
-  // --- NEW AUTOMATED SUBMISSION LOGIC ---
   const handleSubmit = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
+    setErrorMsg("");
 
     try {
-      // 1. Authenticate / Login Fallback
       const authResponse = await authenticateShopOwner(formData);
       const token = authResponse.accessToken;
       const ownerId = authResponse.user.id || authResponse.user._id;
 
-      // 2. Upload Logo
       let imageId = null;
       if (formData.logo) {
         imageId = await uploadShopLogo(formData.logo, token);
       }
 
-      // 3. Create Address
       const addressId = await createAddress(formData, token);
 
-      // 4. Create Shop
       const shopPayload = {
         name: formData.shopName,
         description: formData.description,
@@ -133,14 +142,19 @@ const OnboardingWizard = () => {
       };
       
       await createShop(shopPayload, token);
-
       setIsSuccess(true);
     } catch (error) {
       console.error("Onboarding Error:", error);
-      alert(error.message || t("errorCouldNotSubscribe"));
+      // IN-UI ERROR DISPLAY instead of alert()
+      setErrorMsg(error.message || t("errorCouldNotSubscribe"));
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+
+  const updateData = (key, value) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
   };
 
   const variants = {
@@ -197,21 +211,36 @@ const OnboardingWizard = () => {
 
         {!isSuccess && (
           <NavContainer>
-            <NavButton 
-              onClick={handleBack} 
-              disabled={step === 1 || isSubmitting}
-              style={{ opacity: step === 1 ? 0 : 1, pointerEvents: step === 1 ? 'none' : 'auto' }}
-            >
-              {t("wiz_btn_back")}
-            </NavButton>
+            {/* INJECT ERROR BANNER JUST ABOVE BUTTONS */}
+            <AnimatePresence>
+              {errorMsg && (
+                <ErrorBanner
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                >
+                  <FaExclamationCircle /> {errorMsg}
+                </ErrorBanner>
+              )}
+            </AnimatePresence>
+            <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
+              <NavButton 
+                onClick={handleBack} 
+                disabled={step === 1 || isSubmitting}
+                style={{ opacity: step === 1 ? 0 : 1, pointerEvents: step === 1 ? 'none' : 'auto', flex: 1 }}
+              >
+                {t("wiz_btn_back")}
+              </NavButton>
 
-            <NavButton 
-              $primary 
-              onClick={handleNext}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "..." : (step === TOTAL_STEPS ? t("wiz_btn_finish") : t("wiz_btn_next"))}
-            </NavButton>
+              <NavButton 
+                $primary 
+                onClick={handleNext}
+                disabled={isSubmitting}
+                style={{ flex: 1 }}
+              >
+                {isSubmitting ? "..." : (step === TOTAL_STEPS ? t("wiz_btn_finish") : t("wiz_btn_next"))}
+              </NavButton>
+            </div>
           </NavContainer>
         )}
       </StepContainer>

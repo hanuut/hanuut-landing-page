@@ -77,15 +77,16 @@ const LinkList = styled.div`
   gap: 0.8rem;
 `;
 
-// --- RTL/LTR HOVER FIX ---
 const linkStyles = `
   color: #A1A1AA; text-decoration: none; font-size: 0.95rem; transition: all 0.2s ease;
   display: flex; align-items: center; gap: 8px;
   &:hover { 
     color: #F07A48; 
-    transform: translateX(${props => props.isArabic ? '-5px' : '5px'});
+    transform: translateX(${props => props.$isArabic ? '-5px' : '5px'}); 
   }
 `;
+
+
 const StyledLink = styled(Link)`
   ${linkStyles}
 `;
@@ -143,6 +144,27 @@ const CopyrightText = styled.p`
   margin: 0;
 `;
 
+const SeoDirectoryLinks = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  padding: 2rem 0;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  margin-top: 1rem;
+  
+  a {
+    color: #71717a;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: color 0.2s;
+    
+    &:hover {
+      color: #F07A48;
+    }
+  }
+`;
+
 // --- UPDATED FOOTER COMPONENT ---
 
 const Footer = () => {
@@ -185,9 +207,9 @@ const Footer = () => {
           <Column>
             <ColumnTitle>{t("footer.col_customers")}</ColumnTitle>
             <LinkList>
-              <StyledLink to="/esuuq" isArabic={isArabic}>{t("nav_esuuq")}</StyledLink>
-              <StyledLink to="/track" isArabic={isArabic}><FaTruck size={14} /> {t("navTrack")}</StyledLink>
-              <ExternalLink href={links.customerApp} target="_blank" isArabic={isArabic}>
+              <StyledLink to="/esuuq" $isArabic={isArabic}>{t("nav_esuuq")}</StyledLink>
+              <StyledLink to="/track" $isArabic={isArabic}><FaTruck size={14} /> {t("navTrack")}</StyledLink>
+              <ExternalLink href={links.customerApp} target="_blank" $isArabic={isArabic}>
                 <FaGooglePlay size={14} /> {t("footer.link_download_customer")}
               </ExternalLink>
             </LinkList>
@@ -197,13 +219,13 @@ const Footer = () => {
           <Column>
             <ColumnTitle>{t("nav_abridh_beta", "Abridh (Beta)")}</ColumnTitle>
             <LinkList>
-              <StyledLink to="/abridh">
+              <StyledLink to="/abridh" $isArabic={isArabic}>
                  <FaRoute size={14} /> {t("tawsila_btn_ride", "Request a trip")}
               </StyledLink>
-              <StyledLink to="/abridh/drive">
+              <StyledLink to="/abridh/drive" $isArabic={isArabic}>
                  {t("tawsila_btn_drive", "Join as a Driving Member")}
               </StyledLink>
-              <ExternalLink href={links.abridhApp} target="_blank">
+              <ExternalLink href={links.abridhApp} target="_blank" $isArabic={isArabic}>
                 <FaGooglePlay size={14} /> {t("abridh_member_portal", "Driving Member Portal")}
               </ExternalLink>
             </LinkList>
@@ -213,9 +235,9 @@ const Footer = () => {
           <Column>
             <ColumnTitle>{t("footer.col_partners")}</ColumnTitle>
             <LinkList>
-              <StyledLink to="/partners" isArabic={isArabic}>{t("footer.link_my_hanuut")}</StyledLink>
-              <StyledLink to="/partners/onboarding" isArabic={isArabic}>{t("footer.link_join")}</StyledLink>
-              <ExternalLink href={links.partnerWindows} target="_blank" isArabic={isArabic}>
+              <StyledLink to="/partners" $isArabic={isArabic}>{t("footer.link_my_hanuut")}</StyledLink>
+              <StyledLink to="/partners/onboarding" $isArabic={isArabic}>{t("footer.link_join")}</StyledLink>
+              <ExternalLink href={links.partnerWindows} target="_blank" $isArabic={isArabic}>
                 <FaWindows size={14} /> {t("footer.link_download_partner")}
               </ExternalLink>
             </LinkList>
@@ -225,13 +247,23 @@ const Footer = () => {
           <Column>
             <ColumnTitle>{t("footer.col_legal")}</ColumnTitle>
             <LinkList>
-              <StyledLink to="/blog" isArabic={isArabic}>{t("footer.link_blog")}</StyledLink>
-              <StyledLink to="/support" isArabic={isArabic}><FaQuestionCircle size={14} /> {t("support_title", "Support")}</StyledLink>
-              <StyledLink to="/privacy" isArabic={isArabic}>{t("footer.link_privacy")}</StyledLink>
-              <StyledLink to="/terms_and_conditions" isArabic={isArabic}>{t("footer.link_terms")}</StyledLink>
+              <StyledLink to="/blog" $isArabic={isArabic}>{t("footer.link_blog")}</StyledLink>
+              <StyledLink to="/support" $isArabic={isArabic}><FaQuestionCircle size={14} /> {t("support_title", "Support")}</StyledLink>
+              <StyledLink to="/privacy" $isArabic={isArabic}>{t("footer.link_privacy")}</StyledLink>
+              <StyledLink to="/terms_and_conditions" $isArabic={isArabic}>{t("footer.link_terms")}</StyledLink>
             </LinkList>
           </Column>
+
+      
         </TopSection>
+        <SeoDirectoryLinks>
+          <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.85rem' }}>{t("footer_explore")}:</span>
+          <Link to="/explore/food/alger">{t("restaurants")} {t("algiers")}</Link>
+          <Link to="/explore/grocery/oran">{t("supermarkets")} {t("oran")}</Link>
+          <Link to="/explore/food/batna">{t("restaurants")} {t("batna")}</Link>
+          <Link to="/explore/grocery/bejaia">{t("supermarkets")} {t("bejaia")}</Link>
+          <Link to="/explore/global/alger">E-commerce {t("algiers")}</Link>
+        </SeoDirectoryLinks>
 
         <BottomSection>
           <CopyrightText>{t("footer.copyright")}</CopyrightText>

@@ -1006,5 +1006,31 @@
   "seo_tawsila_title": "Abridh | Réseau Privé de Mobilité Communautaire",
   "seo_tawsila_desc": "Rejoignez la phase expérimentale d'Abridh. Un réseau privé à accès limité pour coordonner vos déplacements et partager les frais en Algérie.",
   "nav_abridh_beta": "Abridh (Bêta)",
-  "abridh_member_portal": "Espace Conducteur"
+  "abridh_member_portal": "Espace Conducteur",
+  "consent_pre": "J'accepte les ",
+  "consent_terms": "Conditions d'Utilisation",
+  "consent_and": " et la ",
+  "consent_privacy": "Politique de Confidentialité",
+  "error_consent": "Vous devez accepter les conditions pour continuer.",
+  "footer_explore": "Explorer par ville",
+  "algiers": "Alger",
+  "oran": "Oran",
+  "batna": "Batna",
+  "bejaia": "Béjaïa",
+  "esuuq_v2": {
+    "hero_badge": "Communauté eSUUQ",
+    "hero_title": "Publiez. Recevez de vraies réponses.",
+    "hero_subtitle": "Le moyen le plus simple de vendre, louer ou demander quoi que ce soit dans votre ville. Des connexions instantanées.",
+    "actions_title": "De quoi avez-vous besoin aujourd'hui ?",
+    "action_sell_title": "Vendez rapidement",
+    "action_sell_desc": "Prenez une photo, fixez un prix et recevez des offres de personnes à proximité.",
+    "action_rent_title": "Mettez en location",
+    "action_rent_desc": "Outils, équipement ou espace ? Laissez les autres les louer en toute sécurité.",
+    "action_request_title": "Demandez à la communauté",
+    "action_request_desc": "Vous cherchez quelque chose de précis ? Demandez, et laissez les vendeurs venir à vous.",
+    "trust_title": "Local & Fiable",
+    "trust_desc": "Traitez directement avec des personnes vérifiées de votre quartier via notre chat sécurisé. Sans intermédiaire.",
+    "cta_bottom_title": "Prêt à rejoindre le marché ?",
+    "home_card_desc": "Le moyen le plus simple de vendre, louer ou trouver exactement ce dont vous avez besoin dans votre ville."
+  }
 }

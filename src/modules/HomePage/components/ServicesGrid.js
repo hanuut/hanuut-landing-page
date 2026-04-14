@@ -224,9 +224,7 @@ const ServicesGrid = () => {
     {
       id: "esuuq",
       title: t("nav_esuuq") || "E'SUUQ Marketplace",
-      desc:
-        t("card_consumer_desc") ||
-        "Buy from trusted shops or sell your used items.",
+      desc: t("esuuq_v2.home_card_desc", "The easiest way to sell, rent, or find exactly what you need in your city."),
       image: VisionImg,
       icon: <FaShoppingBag />,
       accentColor: "#39A170", // Green

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
@@ -17,6 +17,7 @@ import logoEn from "../assets/logo_en.webp";
 import abridhLogoAr from "../assets/abridh_logo.webp";
 import abridhLogoEn from "../assets/abridh_logo.webp";
 import btoa from "btoa";
+
 
 const bufferToUrl = (imageObject) => {
   if (!imageObject || !imageObject.buffer?.data) return null;
@@ -337,6 +338,7 @@ const Navbar = () => {
   const path = location.pathname;
   const isShopMode = /^(@[^/]+|shop\/[^/]+)/.test(path.substring(1));
   const isTawsilaMode = path.startsWith("/abrid");
+  const navigate = useNavigate();
 
   const shopImageUrl = useMemo(
     () => bufferToUrl(selectedShopImage),
@@ -497,13 +499,14 @@ const Navbar = () => {
 
           <NavGroup>
             {!isShopMode && (
-              <DesktopMenu>
-                {isTawsilaMode ? (
-                  /* --- TAWSILA MENU --- */
-                  <>
-                    <li>
-                      <Link to="/abridh/drive">
+              <>
+                <DesktopMenu>
+                  {isTawsilaMode ? (
+                    /* --- TAWSILA MENU --- */
+                    <>
+                      <li>
                         <button
+                          onClick={() => navigate("/abridh/drive")}
                           style={{
                             background: "#397FF9",
                             color: "#FFF",
@@ -525,50 +528,54 @@ const Navbar = () => {
                         >
                           {t("tawsila_btn_drive", "Apply to Drive")}
                         </button>
-                      </Link>
-                    </li>
+                      </li>
+                      <li>
+                        <LanguagesDropDown textColor={textColor} />
+                      </li>
+                    </>
+                  ) : (
+                    /* --- EXISTING HANUUT MENU --- */
+                    <>
+                      <MenuItem $textColor={textColor}>
+                        <Link to="/esuuq" style={{ color: textColor }}>
+                          {t("nav_esuuq") || "E'SUUQ"}
+                        </Link>
+                      </MenuItem>
+                      <MenuItem $textColor={textColor}>
+                        <Link to="/partners" style={{ color: textColor }}>
+                          {t("navPartners")}
+                        </Link>
+                      </MenuItem>
+                      <MenuItem $textColor={textColor}>
+                        <Link to="/blog" style={{ color: textColor }}>
+                          {t("navBlog")}
+                        </Link>
+                      </MenuItem>
+                      <MenuItem $textColor={textColor}>
+                        <Link
+                          to="/track"
+                          style={{
+                            color: textColor,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          <FaTruck size={14} /> {t("navTrack")}
+                        </Link>
+                      </MenuItem>
+                      <li>
+                        <LanguagesDropDown textColor={textColor} />
+                      </li>
+                    </>
+                  )}
+                </DesktopMenu>
 
-                    <li>
-                      <LanguagesDropDown textColor={textColor} />
-                    </li>
-                  </>
-                ) : (
-                  /* --- EXISTING HANUUT MENU --- */
-                  <>
-                    <MenuItem $textColor={textColor}>
-                      <Link to="/esuuq" style={{ color: textColor }}>
-                        {t("nav_esuuq") || "E'SUUQ"}
-                      </Link>
-                    </MenuItem>
-                    <MenuItem $textColor={textColor}>
-                      <Link to="/partners" style={{ color: textColor }}>
-                        {t("navPartners")}
-                      </Link>
-                    </MenuItem>
-                    <MenuItem $textColor={textColor}>
-                      <Link to="/blog" style={{ color: textColor }}>
-                        {t("navBlog")}
-                      </Link>
-                    </MenuItem>
-                    <MenuItem $textColor={textColor}>
-                      <Link
-                        to="/track"
-                        style={{
-                          color: textColor,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <FaTruck size={14} /> {t("navTrack")}
-                      </Link>
-                    </MenuItem>
-                    <li>
-                      <LanguagesDropDown textColor={textColor} />
-                    </li>
-                  </>
-                )}
-              </DesktopMenu>
+                {/* --- MOBILE HAMBURGER BUTTON (RESTORED) --- */}
+                <HamburgerButton onClick={toggleMobileMenu}>
+                  <HamburgerIcon $iconColor={textColor} />
+                </HamburgerButton>
+              </>
             )}
           </NavGroup>
         </Navigation>

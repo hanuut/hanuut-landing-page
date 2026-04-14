@@ -1003,5 +1003,31 @@
   "seo_tawsila_title": "Abridh | Private Community Mobility Network",
   "seo_tawsila_desc": "Join Abridh's experimental phase. A restricted private network to coordinate trips and share costs in Algeria.",
   "nav_abridh_beta": "Abridh (Beta)",
-  "abridh_member_portal": "Driving Member Portal"
+  "abridh_member_portal": "Driving Member Portal",
+  "consent_pre": "I agree to the ",
+  "consent_terms": "Terms of Use",
+  "consent_and": " and ",
+  "consent_privacy": "Privacy Policy",
+  "error_consent": "You must agree to the terms to continue.",
+  "footer_explore": "Explore by City",
+  "algiers": "Algiers",
+  "oran": "Oran",
+  "batna": "Batna",
+  "bejaia": "Béjaïa",
+  "esuuq_v2": {
+    "hero_badge": "eSUUQ Community",
+    "hero_title": "Put it out there. Get real responses.",
+    "hero_subtitle": "The simplest way to sell, rent, or request anything in your city. Real people, instant connections.",
+    "actions_title": "What do you need today?",
+    "action_sell_title": "Sell it fast",
+    "action_sell_desc": "Snap a photo, set a price, and get offers from people nearby.",
+    "action_rent_title": "Rent it out",
+    "action_rent_desc": "Have tools, gear, or space? Let others rent it safely.",
+    "action_request_title": "Ask the community",
+    "action_request_desc": "Looking for something specific? Just ask, and let sellers come to you.",
+    "trust_title": "Local & Trusted",
+    "trust_desc": "Deal directly with verified people in your neighborhood through our secure chat. No middlemen, no hassle.",
+    "cta_bottom_title": "Ready to join the market?",
+    "home_card_desc": "The easiest way to sell, rent, or find exactly what you need in your city."
+  }
 }

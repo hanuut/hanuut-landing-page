@@ -73,7 +73,7 @@ const MinimalFooter = () => {
   const isArabic = i18n.language === "ar";
 
   return (
-    <MinimalFooterWrapper isArabic={isArabic}>
+    <MinimalFooterWrapper $isArabic={isArabic}>
       <Container>
         <LinksContainer>
           <span>© {new Date().getFullYear()} Hanuut</span>
