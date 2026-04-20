@@ -181,6 +181,7 @@ const CustomRouter = ({ appConfig, location }) => {
           {/* 4. The CANONICAL shop route. THIS MUST BE NEAR THE END. */}
           {/* This path is now more specific, starting with /@ */}
           <Route path="/:username" element={<ShopPageWithUsername />} />
+          <Route path="/:username/links" element={<ShopPageWithUsername />} />
           {/* Catch all route - must be last */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

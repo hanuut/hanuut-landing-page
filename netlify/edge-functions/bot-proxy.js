@@ -18,7 +18,12 @@ export default async (request, context) => {
 
   // === 1. Short Shop Link (/@username) ===
   if (path.startsWith("/@")) {
-    const username = path.substring(1); 
+    // Split by '/' to handle sub-routes like /links
+    // path: "/@le_cheese_arris/links" -> parts: ["", "@le_cheese_arris", "links"]
+    const parts = path.split("/"); 
+    const username = parts[1].substring(1); // Get "@le_cheese_arris", remove "@"
+    
+    // Always request the shop's share data, regardless of if they linked the menu or the bio links
     targetUrl = `${API_URL}/shop/share/${encodeURIComponent(username)}`;
   }
   // === 2. Long Shop Link (/shop/@username) ===
