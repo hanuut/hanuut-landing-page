@@ -19,7 +19,7 @@ import TawsilaLayout from "./components/TawsilaLayout";
 import BorderBeamButton from "../../components/BorderBeamButton";
 import Seo from "../../components/Seo";
 
-// --- 1. THE 3D MOBILITY CANVAS BACKGROUND ---
+// --- 1. THE MAP MOBILITY CANVAS BACKGROUND ---
 const CanvasContainer = styled.canvas`
   position: absolute;
   top: 0;
@@ -43,82 +43,127 @@ const MobilityCanvas = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    let particlesArray = [];
-    let w = (canvas.width = window.innerWidth);
-    let h = (canvas.height = window.innerHeight);
+    
+    // Cap DPR to 1.5 for extreme performance on 4K/Retina screens
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5); 
+    const isMobile = window.innerWidth < 768;
 
-    let mouse = { x: null, y: null, radius: 150 };
+    let w, h;
+    let particles = [];
+    let mouse = { x: -1000, y: -1000, radius: isMobile ? 200 : 350 };
+    let animationFrame;
 
-    const handleMouseMove = (e) => {
-      mouse.x = e.x;
-      mouse.y = e.y;
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("resize", () => {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    });
+    // Tawsila Colors
+    const COLORS = ["#397FF9", "#FFFFFF", "#1E40AF"];
 
-    class Particle {
+    class MapNode {
       constructor() {
         this.x = Math.random() * w;
         this.y = Math.random() * h;
-        this.size = Math.random() * 2.5 + 1;
-        this.speedX = Math.random() * 1 - 0.5;
-        this.speedY = Math.random() * 1 - 0.5;
-        this.color = Math.random() > 0.5 ? "#397FF9" : "#FFFFFF";
+        this.size = Math.random() * (isMobile ? 3 : 5) + 2; 
+        
+        // Very slow, deliberate movement like map tracking
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
+        
+        this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+        this.connections = 0; // Track connections to limit webbing
       }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
 
-        if (this.x > w || this.x < 0) this.speedX = -this.speedX;
-        if (this.y > h || this.y < 0) this.speedY = -this.speedY;
-
-        let dx = mouse.x - this.x;
-        let dy = mouse.y - this.y;
-        let distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < mouse.radius) {
-          const forceDirectionX = dx / distance;
-          const forceDirectionY = dy / distance;
-          const force = (mouse.radius - distance) / mouse.radius;
-          this.x -= forceDirectionX * force * 3;
-          this.y -= forceDirectionY * force * 3;
-        }
-      }
       draw() {
+        // Inner solid core
+        ctx.globalAlpha = 1;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = this.color;
+
+        // Subtle outer ring (map marker effect)
+        ctx.globalAlpha = 0.3;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = this.color === "#FFFFFF" ? "#397FF9" : this.color;
+        ctx.fill();
+      }
+
+      update() {
+        // Mouse interaction (gentle push away)
+        let dx = mouse.x - this.x;
+        let dy = mouse.y - this.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < mouse.radius * 0.5) {
+          const force = (mouse.radius * 0.5 - distance) / (mouse.radius * 0.5);
+          this.vx += (dx / distance) * force * 0.02;
+          this.vy += (dy / distance) * force * 0.02;
+        }
+
+        // Friction to keep movement steady
+        this.vx *= 0.98;
+        this.vy *= 0.98;
+
+        this.x += this.vx + (Math.random() - 0.5) * 0.1;
+        this.y += this.vy + (Math.random() - 0.5) * 0.1;
+
+        // Wrap around screen
+        if (this.x < -20) this.x = w + 20;
+        if (this.x > w + 20) this.x = -20;
+        if (this.y < -20) this.y = h + 20;
+        if (this.y > h + 20) this.y = -20;
       }
     }
 
     const init = () => {
-      particlesArray = [];
-      let numberOfParticles = (w * h) / 12000;
-      for (let i = 0; i < numberOfParticles; i++) {
-        particlesArray.push(new Particle());
+      particles = [];
+      // Higher density works now because we aren't using expensive blending modes
+      const count = isMobile ? 35 : 70; 
+      for (let i = 0; i < count; i++) {
+        particles.push(new MapNode());
       }
     };
 
-    const connect = () => {
-      let opacityValue = 1;
-      for (let a = 0; a < particlesArray.length; a++) {
-        for (let b = a; b < particlesArray.length; b++) {
-          let distance =
-            (particlesArray[a].x - particlesArray[b].x) ** 2 +
-            (particlesArray[a].y - particlesArray[b].y) ** 2;
-          if (distance < (w / 10) * (h / 10)) {
-            opacityValue = 1 - distance / 10000;
-            ctx.strokeStyle = `rgba(57, 127, 249, ${opacityValue * 0.3})`;
-            ctx.lineWidth = 1;
+    const resize = () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.scale(dpr, dpr);
+      init();
+    };
+
+    const drawMapRoutes = () => {
+      const maxDistSq = isMobile ? 15000 : 30000;
+      
+      // Reset connection counts
+      particles.forEach(p => p.connections = 0);
+
+      ctx.lineWidth = 1.5;
+
+      for (let a = 0; a < particles.length; a++) {
+        for (let b = a + 1; b < particles.length; b++) {
+          // Limit to max 2 connections per node to create map "routes" instead of stars
+          if (particles[a].connections >= 2 || particles[b].connections >= 2) continue;
+
+          const dx = particles[a].x - particles[b].x;
+          const dy = particles[a].y - particles[b].y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq < maxDistSq) {
+            particles[a].connections++;
+            particles[b].connections++;
+
+            let opacity = 1 - (distSq / maxDistSq);
+            
+            ctx.globalAlpha = opacity * 0.6;
+            ctx.strokeStyle = '#397FF9';
+            
             ctx.beginPath();
-            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+            ctx.moveTo(particles[a].x, particles[a].y);
+            ctx.lineTo(particles[b].x, particles[b].y);
             ctx.stroke();
           }
         }
@@ -126,20 +171,64 @@ const MobilityCanvas = () => {
     };
 
     const animate = () => {
+      // Clear canvas fully every frame for crisp, clean map lines (no blurry trails)
       ctx.clearRect(0, 0, w, h);
-      for (let i = 0; i < particlesArray.length; i++) {
-        particlesArray[i].update();
-        particlesArray[i].draw();
+      ctx.fillStyle = "#050505";
+      ctx.fillRect(0, 0, w, h);
+
+      // Draw map network
+      drawMapRoutes();
+      
+      // Draw map nodes
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      // --- SPOTLIGHT VIGNETTE ---
+      // This creates the perfect contrast for text and darkness where the mouse isn't
+      ctx.globalAlpha = 1;
+      let gradient;
+      
+      if (mouse.x !== -1000) {
+        // If mouse is active, create a clear window around the mouse
+        gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, mouse.radius);
+        gradient.addColorStop(0, 'rgba(5, 5, 5, 0)');     // Fully transparent at mouse
+        gradient.addColorStop(0.5, 'rgba(5, 5, 5, 0.6)'); // Starts fading to black
+        gradient.addColorStop(1, 'rgba(5, 5, 5, 0.95)');  // Nearly pitch black outside radius
+      } else {
+        // Idle state: Screen is mostly dark to keep text contrast extremely high
+        gradient = 'rgba(5, 5, 5, 0.85)';
       }
-      connect();
-      requestAnimationFrame(animate);
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, w, h);
+
+      animationFrame = requestAnimationFrame(animate);
     };
 
-    init();
+    const handleMouseMove = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+
+    const handleMouseLeave = () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    };
+
+    window.addEventListener("resize", resize);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseleave", handleMouseLeave);
+
+    resize();
     animate();
 
     return () => {
+      window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseleave", handleMouseLeave);
+      cancelAnimationFrame(animationFrame);
     };
   }, []);
 
@@ -313,25 +402,25 @@ const TawsilaLanding = () => {
   const bentoCards = [
     {
       className: "span-2",
-      icon: FaClock, // Time/Schedule
+      icon: FaClock,
       title: t("tawsila_sticky_1_title"),
       desc: t("tawsila_sticky_1_desc"),
     },
     {
       className: "span-1",
-      icon: FaUsers, // Replaced Car with Users (Community)
+      icon: FaUsers, 
       title: t("tawsila_bento_1_title"),
       desc: t("tawsila_bento_1_desc"),
     },
     {
       className: "span-1",
-      icon: FaRoute, // Replaced Map with Route (Coordination)
+      icon: FaRoute, 
       title: t("tawsila_sticky_2_title"),
       desc: t("tawsila_sticky_2_desc"),
     },
     {
       className: "span-2",
-      icon: FaWallet, // Cost sharing
+      icon: FaWallet, 
       title: t("tawsila_bento_2_title"),
       desc: t("tawsila_bento_2_desc"),
     },
@@ -343,7 +432,7 @@ const TawsilaLanding = () => {
     },
     {
       className: "span-2",
-      icon: FaGlobe, // Network
+      icon: FaGlobe, 
       title: t("tawsila_bento_3_title"),
       desc: t("tawsila_bento_3_desc"),
     },
@@ -364,7 +453,7 @@ const TawsilaLanding = () => {
           name: "Abridh by Hanuut",
           operatingSystem: "Android, iOS",
           applicationCategory: "TravelApplication",
-          image: "https://hanuut.com/static/abridh.png", // <-- ADDED LOGO
+          image: "https://hanuut.com/static/abridh.png", 
           url: "https://hanuut.com/abridh",
           offers: {
             "@type": "Offer",

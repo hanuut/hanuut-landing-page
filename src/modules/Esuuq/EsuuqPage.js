@@ -47,9 +47,201 @@ const ExchangeNetworkCanvas = () => {
 
     let w, h;
     let particles = [];
-    let mouse = { x: null, y: null };
+    let mouse = { x: null, y: null, radius: isMobile ? 120 : 250 };
     let animationFrame;
 
+    // Base RGB colors for the lights
+    const COLORS = [
+      { r: 57, g: 161, b: 112 },   // #39A170
+      { r: 110, g: 231, b: 183 },  // #6EE7B7
+      { r: 16, g: 185, b: 129 },   // #10B981
+      { r: 167, g: 243, b: 208 },  // #A7F3D0
+      { r: 5, g: 150, b: 105 }     // #059669
+    ];
+
+    const SHAPES = ["sphere", "cube", "gem", "pyramid"];
+
+    class Particle {
+      constructor() {
+        this.reset();
+        // Randomly scatter initially instead of resetting entirely
+        this.x = Math.random() * w;
+        this.y = Math.random() * h;
+      }
+
+      reset() {
+        // Extreme diversity in sizes
+        this.size = Math.random() * (isMobile ? 12 : 20) + 2; 
+        this.baseSize = this.size;
+        
+        // Slower base velocity for the ambient background
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
+        
+        // Appearance
+        const baseColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+        // Pre-calculate shading strings to save CPU cycles
+        this.colorLight = `rgb(${Math.min(255, baseColor.r * 1.5)}, ${Math.min(255, baseColor.g * 1.5)}, ${Math.min(255, baseColor.b * 1.5)})`;
+        this.colorBase = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
+        this.colorDark = `rgb(${baseColor.r * 0.5}, ${baseColor.g * 0.5}, ${baseColor.b * 0.5})`;
+        
+        this.shapeType = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.01;
+        
+        // State
+        this.isShooting = false;
+        this.targetOpacity = 0.1; // Very dim by default (fake blur/distance)
+        this.currentOpacity = Math.random() * 0.2;
+      }
+
+      triggerShoot() {
+        this.isShooting = true;
+        // Burst of speed in random direction
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 4 + 3;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        // Brighten up before fading
+        this.currentOpacity = 1;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        
+        // Use globalAlpha for opacity changes instead of recalculating rgba strings
+        ctx.globalAlpha = this.currentOpacity;
+
+        const s = this.size;
+
+        if (this.shapeType === "sphere") {
+          // Fake 3D sphere using two overlapping circles (very fast)
+          ctx.beginPath();
+          ctx.arc(0, 0, s, 0, Math.PI * 2);
+          ctx.fillStyle = this.colorDark;
+          ctx.fill();
+          
+          ctx.beginPath();
+          ctx.arc(-s * 0.2, -s * 0.2, s * 0.6, 0, Math.PI * 2);
+          ctx.fillStyle = this.colorLight;
+          ctx.fill();
+
+        } else if (this.shapeType === "cube") {
+          const r = s * 0.9;
+          // Top face
+          ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(r * 0.866, -r * 0.5); ctx.lineTo(0, 0); ctx.lineTo(-r * 0.866, -r * 0.5); ctx.closePath();
+          ctx.fillStyle = this.colorLight; ctx.fill();
+          // Left face
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-r * 0.866, -r * 0.5); ctx.lineTo(-r * 0.866, r * 0.5); ctx.lineTo(0, r); ctx.closePath();
+          ctx.fillStyle = this.colorBase; ctx.fill();
+          // Right face
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(r * 0.866, -r * 0.5); ctx.lineTo(r * 0.866, r * 0.5); ctx.lineTo(0, r); ctx.closePath();
+          ctx.fillStyle = this.colorDark; ctx.fill();
+
+        } else if (this.shapeType === "gem") {
+          const w = s * 0.8;
+          // Top half
+          ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(-w, -s * 0.2); ctx.lineTo(0, 0); ctx.closePath();
+          ctx.fillStyle = this.colorLight; ctx.fill();
+          ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(w, -s * 0.2); ctx.lineTo(0, 0); ctx.closePath();
+          ctx.fillStyle = this.colorBase; ctx.fill();
+          // Bottom half
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-w, -s * 0.2); ctx.lineTo(0, s); ctx.closePath();
+          ctx.fillStyle = this.colorDark; ctx.fill();
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w, -s * 0.2); ctx.lineTo(0, s); ctx.closePath();
+          ctx.fillStyle = this.colorBase; ctx.fill();
+
+        } else if (this.shapeType === "pyramid") {
+          const w = s * 0.9;
+          // Left face
+          ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(-w, s * 0.4); ctx.lineTo(0, s * 0.6); ctx.closePath();
+          ctx.fillStyle = this.colorLight; ctx.fill();
+          // Right face
+          ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(w, s * 0.2); ctx.lineTo(0, s * 0.6); ctx.closePath();
+          ctx.fillStyle = this.colorDark; ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      update() {
+        this.rotation += this.rotationSpeed;
+
+        if (this.isShooting) {
+          // Shrink and speed away
+          this.size *= 0.92;
+          this.currentOpacity *= 0.9;
+          this.x += this.vx;
+          this.y += this.vy;
+
+          // Once it's tiny and invisible, reset it completely
+          if (this.size < 0.5 || this.currentOpacity < 0.05) {
+            this.reset();
+            this.x = Math.random() * w;
+            this.y = Math.random() * h;
+          }
+          return; // Skip normal hover logic
+        }
+
+        this.targetOpacity = 0.05; // Base "out of focus / less light" opacity
+
+        // Interaction with mouse (Swarm/Glow effect)
+        if (mouse.x !== null) {
+          let dx = mouse.x - this.x;
+          let dy = mouse.y - this.y;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < mouse.radius) {
+            // Magnetic attraction
+            const force = (mouse.radius - distance) / mouse.radius;
+            this.vx += (dx / distance) * force * 0.02;
+            this.vy += (dy / distance) * force * 0.02;
+            
+            // Bring into focus and enlarge
+            this.targetOpacity = 0.3 + (force * 0.7);
+            this.size = this.baseSize + (force * 5);
+            this.rotationSpeed = (Math.random() - 0.5) * 0.05; // Spin faster
+          } else {
+            // Return to normal
+            if (this.size > this.baseSize) this.size -= 0.2;
+            this.rotationSpeed *= 0.98;
+          }
+        } else {
+          if (this.size > this.baseSize) this.size -= 0.2;
+          this.rotationSpeed *= 0.98;
+        }
+
+        // Smooth opacity transition
+        this.currentOpacity += (this.targetOpacity - this.currentOpacity) * 0.1;
+
+        // Apply friction to velocities
+        this.vx *= 0.97;
+        this.vy *= 0.97;
+
+        // Base drift
+        this.x += this.vx + (Math.random() - 0.5) * 0.2;
+        this.y += this.vy + (Math.random() - 0.5) * 0.2;
+
+        // Screen wrap
+        if (this.x < -20) this.x = w + 20;
+        if (this.x > w + 20) this.x = -20;
+        if (this.y < -20) this.y = h + 20;
+        if (this.y > h + 20) this.y = -20;
+      }
+    }
+
+    const init = () => {
+      particles = [];
+      // Highly optimized count. The trail effect + size diversity makes it look full.
+      const count = isMobile ? 15 : 35; 
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle());
+      }
+    };
+
+    // --- ADDED RESIZE FUNCTION BACK ---
     const resize = () => {
       w = window.innerWidth;
       h = window.innerHeight;
@@ -61,84 +253,29 @@ const ExchangeNetworkCanvas = () => {
       init();
     };
 
-    // Light green palette
-    const COLORS = ["#39A170", "#6EE7B7", "#10B981", "#A7F3D0", "#ffffff"];
+    const animate = () => {
+      // Trail effect: fill screen with semi-transparent background instead of clearing completely
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = 'rgba(10, 26, 23, 0.25)'; // Higher alpha = shorter trails, lower = longer trails
+      ctx.fillRect(0, 0, w, h);
 
-    class Particle {
-      constructor() {
-        this.reset(true);
-      }
+      // Use 'lighter' for a beautiful, performant glowing blend effect when particles overlap
+      ctx.globalCompositeOperation = 'lighter';
+      
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
 
-      reset(initial = false) {
-        this.x = Math.random() * w;
-        this.y = initial ? Math.random() * h : h + 20;
-        this.z = Math.random() * 0.8 + 0.2; // Depth factor
-        this.size = (Math.random() * 4 + 1.5) * this.z;
-        this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
-        this.opacity = (Math.random() * 0.4 + 0.1) * this.z;
-        
-        this.vx = (Math.random() - 0.5) * 0.3 * this.z;
-        this.vy = -0.2 * this.z; // Constant slow upward drift
-        
-        this.parallaxX = 0;
-        this.parallaxY = 0;
-      }
-
-      draw() {
-        ctx.beginPath();
-        // Drawing a simple circle is 100x faster than shadowBlur
-        ctx.arc(this.x + this.parallaxX, this.y + this.parallaxY, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.opacity;
-        ctx.fill();
-        
-        // Simulating glow by drawing a second larger, very faint circle
-        ctx.beginPath();
-        ctx.arc(this.x + this.parallaxX, this.y + this.parallaxY, this.size * 2, 0, Math.PI * 2);
-        ctx.globalAlpha = this.opacity * 0.3;
-        ctx.fill();
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-
-        // Wrap around logic
-        if (this.y < -20) this.reset();
-        if (this.x < -20) this.x = w + 10;
-        if (this.x > w + 20) this.x = -10;
-
-        // Optimized Parallax interaction (Swarm effect)
-        if (mouse.x !== null) {
-          const dx = mouse.x - w / 2;
-          const dy = mouse.y - h / 2;
-          // Particles move slightly towards/with the mouse based on depth (z)
-          const targetPX = dx * 0.05 * this.z;
-          const targetPY = dy * 0.05 * this.z;
-          this.parallaxX += (targetPX - this.parallaxX) * 0.05;
-          this.parallaxY += (targetPY - this.parallaxY) * 0.05;
+      // Randomly pick an idle particle to "shoot" away and disappear (approx every 2-3 seconds)
+      if (Math.random() < 0.01) {
+        const idleParticles = particles.filter(p => !p.isShooting);
+        if (idleParticles.length > 0) {
+          const randomP = idleParticles[Math.floor(Math.random() * idleParticles.length)];
+          randomP.triggerShoot();
         }
       }
-    }
 
-    const init = () => {
-      particles = [];
-      // Higher density but using simple shapes to keep it fast
-      const count = isMobile ? 40 : 120; 
-      for (let i = 0; i < count; i++) {
-        particles.push(new Particle());
-      }
-    };
-
-    const animate = () => {
-      ctx.clearRect(0, 0, w, h);
-      
-      // Batch drawing by limiting state changes
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
-        particles[i].draw();
-      }
-      
       animationFrame = requestAnimationFrame(animate);
     };
 
@@ -182,29 +319,104 @@ const PageWrapper = styled.div`
 `;
 
 const HeroSection = styled.section`
-  min-height: 85vh;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  text-align: center;\n  position: relative;\n  background: ${(props) => props.theme.primaryColor};\n`;
+  min-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  background: ${(props) => props.theme.primaryColor};
+`;
 
 const HeroContent = styled(motion.div)`
-  position: relative;\n  z-index: 2;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 1.5rem;\n  padding: 0 1rem;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 1rem;
 `;
 
 const Badge = styled(motion.span)`
-  background-color: #000;\n  color: #fff;\n  padding: 0.5rem 1.2rem;\n  border-radius: 50px;\n  font-weight: 700;\n  font-family: 'Tajawal', sans-serif;\n  font-size: 0.9rem;\n  box-shadow: 0 5px 15px rgba(0,0,0,0.2);\n`;
+  background-color: #000;
+  color: #fff;
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.9rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+`;
 
 const HeroTitle = styled(motion.h1)`
-  font-size: clamp(2.5rem, 6vw, 4.5rem);\n  font-weight: 800;\n  color: #FFFFFF;\n  line-height: 1.2;\n  font-family: 'Tajawal', sans-serif;\n  margin: 0;\n  max-width: 800px;\n`;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.2;
+  font-family: 'Tajawal', sans-serif;
+  margin: 0;
+  max-width: 800px;
+`;
 
 const HeroSub = styled(motion.p)`
-  font-size: 1.2rem;\n  color: #fdf4e3;\n  opacity: 0.9;\n  max-width: 600px;\n  line-height: 1.6;\n  font-family: 'Cairo', sans-serif;\n  font-weight: 500;\n`;
+  font-size: 1.2rem;
+  color: #fdf4e3;
+  opacity: 0.9;
+  max-width: 600px;
+  line-height: 1.6;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 500;
+`;
 
 const ButtonRow = styled(motion.div)`
-  display: flex;\n  gap: 1rem;\n  flex-wrap: wrap;\n  justify-content: center;\n  margin-top: 1rem;\n`;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
+`;
 
 const StoreButton = styled.a`
-  display: inline-flex;\n  align-items: center;\n  gap: 0.75rem;\n  padding: 0.9rem 1.8rem;\n  border-radius: 50px;\n  font-weight: 600;\n  font-size: 1rem;\n  cursor: pointer;\n  text-decoration: none;\n  transition: all 0.2s ease;\n  font-family: 'Tajawal', sans-serif;\n  box-shadow: 0 4px 15px rgba(0,0,0,0.1);\n\n  &.primary {\n    background: #000000;\n    color: #FFFFFF;\n    border: 1px solid #000000;\n    &:hover { transform: scale(1.03); }\n  }\n\n  &.secondary {\n    background: rgba(255, 255, 255, 0.9);\n    color: #000000;\n    border: 1px solid #E5E5E5;\n    &:hover { background: #FFFFFF; transform: scale(1.03); }\n  }\n\n  svg { font-size: 1.5rem; }\n`;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.8rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-family: 'Tajawal', sans-serif;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+  &.primary {
+    background: #000000;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+    &:hover { transform: scale(1.03); }
+  }
+
+  &.secondary {
+    background: rgba(255, 255, 255, 0.9);
+    color: #000000;
+    border: 1px solid #E5E5E5;
+    &:hover { background: #FFFFFF; transform: scale(1.03); }
+  }
+
+  svg { font-size: 1.5rem; }
+`;
 
 const Container = styled.div`
-  max-width: 1200px;\n  width: 90%;\n  margin: 0 auto;\n  position: relative;\n  z-index: 10;\n  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};\n`;
+  max-width: 1200px;
+  width: 90%;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+`;
 
 // --- NEW ACTION GRID SECTION ---
 const ActionsSection = styled.section`
@@ -225,45 +437,154 @@ const SectionTitle = styled.h2`
 `;
 
 const ActionGrid = styled.div`
-  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 2rem;\n  \n  @media (max-width: 900px) {\n    grid-template-columns: 1fr;\n  }\n`;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+`;
 
 const ActionCard = styled(motion.div)`
-  background: #FFFFFF;\n  border-radius: 24px;\n  padding: 3rem 2rem;\n  box-shadow: 0 10px 30px rgba(0,0,0,0.04);\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  text-align: center;\n  gap: 1rem;\n  border: 1px solid rgba(0,0,0,0.02);\n  transition: transform 0.3s ease;\n\n  &:hover {\n    transform: translateY(-5px);\n    box-shadow: 0 20px 40px rgba(57, 161, 112, 0.1);\n  }\n`;
+  background: #FFFFFF;
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  border: 1px solid rgba(0,0,0,0.02);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(57, 161, 112, 0.1);
+  }
+`;
 
 const ActionIcon = styled.div`
-  width: 70px;\n  height: 70px;\n  border-radius: 20px;\n  background: rgba(57, 161, 112, 0.1);\n  color: ${(props) => props.theme.primaryColor};\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 2rem;\n  margin-bottom: 1rem;\n`;
+  width: 70px;
+  height: 70px;
+  border-radius: 20px;
+  background: rgba(57, 161, 112, 0.1);
+  color: ${(props) => props.theme.primaryColor};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+`;
 
 const ActionTitle = styled.h3`
-  font-size: 1.5rem;\n  font-weight: 800;\n  color: #111217;\n  font-family: 'Tajawal', sans-serif;\n  margin: 0;\n`;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111217;
+  font-family: 'Tajawal', sans-serif;
+  margin: 0;
+`;
 
 const ActionDesc = styled.p`
-  font-size: 1.05rem;\n  color: #666;\n  line-height: 1.6;\n  margin: 0;\n  font-family: 'Cairo', sans-serif;\n`;
+  font-size: 1.05rem;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+  font-family: 'Cairo', sans-serif;
+`;
 
 // --- NEW TRUST SECTION ---
 const TrustSection = styled.section`
-  padding: 6rem 0;\n  background: #FFFFFF;\n  overflow: hidden;\n`;
+  padding: 6rem 0;
+  background: #FFFFFF;
+  overflow: hidden;
+`;
 
 const TrustSplit = styled.div`
-  display: flex;\n  align-items: center;\n  gap: 4rem;\n  \n  @media (max-width: 900px) {\n    flex-direction: column;\n    text-align: center;\n  }\n`;
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  
+  @media (max-width: 900px) {
+    flex-direction: column;
+    text-align: center;
+  }
+`;
 
 const TrustText = styled.div`
-  flex: 1;\n  display: flex;\n  flex-direction: column;\n  gap: 1.5rem;\n  align-items: ${(props) => (props.$isArabic ? "flex-start" : "flex-start")};\n\n  @media (max-width: 900px) {\n    align-items: center;\n  }\n`;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: ${(props) => (props.$isArabic ? "flex-start" : "flex-start")};
+
+  @media (max-width: 900px) {
+    align-items: center;
+  }
+`;
 
 const TrustIcon = styled.div`
-  color: ${(props) => props.theme.primaryColor};\n  font-size: 3rem;\n`;
+  color: ${(props) => props.theme.primaryColor};
+  font-size: 3rem;
+`;
 
 const CollageWrapper = styled.div`
-  flex: 1;\n  position: relative;\n  width: 100%;\n  height: 450px;\n  \n  @media (max-width: 900px) {\n    height: 350px;\n    margin-top: 3rem;\n  }\n`;
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 450px;
+  
+  @media (max-width: 900px) {
+    height: 350px;
+    margin-top: 3rem;
+  }
+`;
 
 const CollageImg = styled(motion.img)`
-  position: absolute;\n  border-radius: 20px;\n  box-shadow: 0 20px 40px rgba(0,0,0,0.15);\n  object-fit: cover;\n  \n  &.img1 {\n    width: 60%;\n    height: 70%;\n    top: 0;\n    left: 0;\n    z-index: 2;\n  }\n  &.img2 {\n    width: 50%;\n    height: 60%;\n    bottom: 0;\n    right: 0;\n    z-index: 3;\n  }\n  &.img3 {\n    width: 40%;\n    height: 50%;\n    top: 10%;\n    right: 5%;\n    z-index: 1;\n    opacity: 0.8;\n  }\n`;
+  position: absolute;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  object-fit: cover;
+  
+  &.img1 {
+    width: 60%;
+    height: 70%;
+    top: 0;
+    left: 0;
+    z-index: 2;
+  }
+  &.img2 {
+    width: 50%;
+    height: 60%;
+    bottom: 0;
+    right: 0;
+    z-index: 3;
+  }
+  &.img3 {
+    width: 40%;
+    height: 50%;
+    top: 10%;
+    right: 5%;
+    z-index: 1;
+    opacity: 0.8;
+  }
+`;
 
 // --- BOTTOM CTA ---
 const BottomCTA = styled.section`
-  padding: 6rem 0;\n  background: #111217;\n  text-align: center;\n`;
+  padding: 6rem 0;
+  background: #111217;
+  text-align: center;
+`;
 
 const BottomTitle = styled.h2`
-  font-size: clamp(2rem, 4vw, 3rem);\n  font-weight: 800;\n  color: #FFFFFF;\n  margin-bottom: 2rem;\n  font-family: 'Tajawal', sans-serif;\n`;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 2rem;
+  font-family: 'Tajawal', sans-serif;
+`;
 
 // --- COMPONENT ---
 
