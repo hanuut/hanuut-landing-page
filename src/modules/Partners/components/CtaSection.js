@@ -6,7 +6,7 @@ import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.webp";
 import BorderBeamButton from "../../../components/BorderBeamButton";
 import { useNavigate } from "react-router-dom"; 
-import { FaMagic } from "react-icons/fa";
+import { FaMagic, FaApple } from "react-icons/fa";
 
 // --- Styled Components ---
 
@@ -124,6 +124,10 @@ const CtaSection = () => {
     if (link) window.open(link, "_blank");
   };
 
+  const handleDownloadIOS = () => {
+  window.open("https://apps.apple.com/us/app/my-hanuut/id6762234117", "_blank");
+};
+
   const handleWizardClick = () => {
     navigate("/partners/onboarding"); 
     window.scrollTo(0, 0);
@@ -165,21 +169,30 @@ const CtaSection = () => {
 
         {/* Downloads */}
         <ButtonsRow>
-          <BorderBeamButton 
+          <BorderBeamButton
             onClick={handleDownloadPlay}
             beamColor="#F07A48"
           >
-              <img src={Playstore} alt="Google Play" style={{ height: '1.5rem', filter: 'invert(1)' }} />
-              <span>{t("cta_mobile_button")}</span>
+            <img src={Playstore} alt="Google Play" style={{ height: '1.5rem', filter: 'invert(1)' }} />
+            <span>Android</span>
           </BorderBeamButton>
-          
-          <BorderBeamButton 
+
+          <BorderBeamButton
+            onClick={handleDownloadIOS}
+            secondary={true}
+            beamColor="#F07A48"
+          >
+            <FaApple style={{ fontSize: '1.5rem' }} />
+            <span>iOS</span>
+          </BorderBeamButton>
+
+          <BorderBeamButton
             onClick={handleDownloadWindows}
             secondary={true}
             beamColor="#397FF9"
           >
-              <img src={Windows} alt="Windows" style={{ height: '1.5rem' }} />
-              <span>{t("cta_download_button")}</span>
+            <img src={Windows} alt="Windows" style={{ height: '1.5rem' }} />
+            <span>Windows</span>
           </BorderBeamButton>
         </ButtonsRow>
          

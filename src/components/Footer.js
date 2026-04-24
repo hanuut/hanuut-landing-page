@@ -11,8 +11,8 @@ import {
   FaPhoneAlt,
   FaTruck,
   FaRoute,
-  FaCar, // For Abridh
-  FaQuestionCircle, // For Support
+  FaApple,
+  FaQuestionCircle,
 } from "react-icons/fa";
 
 import logoAr from "../assets/logo_ar.webp";
@@ -205,43 +205,55 @@ const Footer = () => {
 
           {/* Column 2: Customers */}
           <Column>
-            <ColumnTitle>{t("footer.col_customers")}</ColumnTitle>
-            <LinkList>
-              <StyledLink to="/esuuq" $isArabic={isArabic}>{t("nav_esuuq")}</StyledLink>
-              <StyledLink to="/track" $isArabic={isArabic}><FaTruck size={14} /> {t("navTrack")}</StyledLink>
-              <ExternalLink href={links.customerApp} target="_blank" $isArabic={isArabic}>
-                <FaGooglePlay size={14} /> {t("footer.link_download_customer")}
-              </ExternalLink>
-            </LinkList>
-          </Column>
+  <ColumnTitle>{t("footer.col_customers")}</ColumnTitle>
+  <LinkList>
+    <StyledLink to="/esuuq" $isArabic={isArabic}>{t("nav_esuuq")}</StyledLink>
+    <StyledLink to="/track" $isArabic={isArabic}><FaTruck size={14} /> {t("navTrack")}</StyledLink>
+    <ExternalLink href={links.customerApp} target="_blank" $isArabic={isArabic}>
+      <FaGooglePlay size={14} /> eSUUQ (Android)
+    </ExternalLink>
+    <ExternalLink href="https://apps.apple.com/dz/app/esuuq/id6752300426?l=fr-FR" target="_blank" $isArabic={isArabic}>
+      <FaApple size={14} /> eSUUQ (iOS)
+    </ExternalLink>
+  </LinkList>
+</Column>
 
           {/* --- 2. NEW COLUMN: Abridh --- */}
-          <Column>
-            <ColumnTitle>{t("nav_abridh_beta", "Abridh (Beta)")}</ColumnTitle>
-            <LinkList>
-              <StyledLink to="/abridh" $isArabic={isArabic}>
-                 <FaRoute size={14} /> {t("tawsila_btn_ride", "Request a trip")}
-              </StyledLink>
-              <StyledLink to="/abridh/drive" $isArabic={isArabic}>
-                 {t("tawsila_btn_drive", "Join as a Driving Member")}
-              </StyledLink>
-              <ExternalLink href={links.abridhApp} target="_blank" $isArabic={isArabic}>
-                <FaGooglePlay size={14} /> {t("abridh_member_portal", "Driving Member Portal")}
-              </ExternalLink>
-            </LinkList>
-          </Column>
+         <Column>
+  <ColumnTitle>{t("nav_abridh_beta", "Abridh (Beta)")}</ColumnTitle>
+  <LinkList>
+    <StyledLink to="/abridh" $isArabic={isArabic}>
+      <FaRoute size={14} /> {t("tawsila_btn_ride", "Request a trip")}
+    </StyledLink>
+    <StyledLink to="/abridh/drive" $isArabic={isArabic}>
+      {t("tawsila_btn_drive", "Join as a Driving Member")}
+    </StyledLink>
+    <ExternalLink href={links.abridhApp} target="_blank" $isArabic={isArabic}>
+      <FaGooglePlay size={14} /> Abridh (Android)
+    </ExternalLink>
+    <ExternalLink href="https://apps.apple.com/dz/app/abridh/id6760981883" target="_blank" $isArabic={isArabic}>
+      <FaApple size={14} /> Abridh (iOS)
+    </ExternalLink>
+  </LinkList>
+</Column>
 
           {/* Column 4: Partners */}
           <Column>
-            <ColumnTitle>{t("footer.col_partners")}</ColumnTitle>
-            <LinkList>
-              <StyledLink to="/partners" $isArabic={isArabic}>{t("footer.link_my_hanuut")}</StyledLink>
-              <StyledLink to="/partners/onboarding" $isArabic={isArabic}>{t("footer.link_join")}</StyledLink>
-              <ExternalLink href={links.partnerWindows} target="_blank" $isArabic={isArabic}>
-                <FaWindows size={14} /> {t("footer.link_download_partner")}
-              </ExternalLink>
-            </LinkList>
-          </Column>
+  <ColumnTitle>{t("footer.col_partners")}</ColumnTitle>
+  <LinkList>
+    <StyledLink to="/partners" $isArabic={isArabic}>{t("footer.link_my_hanuut")}</StyledLink>
+    <StyledLink to="/partners/onboarding" $isArabic={isArabic}>{t("footer.link_join")}</StyledLink>
+    <ExternalLink href={links.partnerWindows} target="_blank" $isArabic={isArabic}>
+      <FaWindows size={14} /> My Hanuut (Windows)
+    </ExternalLink>
+    <ExternalLink href={process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY} target="_blank" $isArabic={isArabic}>
+      <FaGooglePlay size={14} /> My Hanuut (Android)
+    </ExternalLink>
+    <ExternalLink href="https://apps.apple.com/us/app/my-hanuut/id6762234117" target="_blank" $isArabic={isArabic}>
+      <FaApple size={14} /> My Hanuut (iOS)
+    </ExternalLink>
+  </LinkList>
+</Column>
 
           {/* Column 5: Legal & Support (Added Support Link) */}
           <Column>

@@ -155,6 +155,7 @@ const GlobalShopLandingPage = ({
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedProductForModal, setSelectedProductForModal] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(null);
+  const [orderErrorMsg, setOrderErrorMsg] = useState("");
   const [orderSuccessData, setOrderSuccessData] = useState(null);
 
   const {
@@ -330,8 +331,14 @@ const GlobalShopLandingPage = ({
       dispatch(closeCart()); // Close the cart to reveal the success modal
     } catch (error) {
       console.error("Order Failed:", error);
+      const backendMessage = error.response?.data?.message; 
+      setOrderErrorMsg(backendMessage || t("order_error_message", "We couldn't submit your order at this time. Please try again."));
+      
       setIsSubmitting("error");
-      setTimeout(() => setIsSubmitting(null), 3000);
+      setTimeout(() => {
+        setIsSubmitting(null);
+        setOrderErrorMsg(""); // Clear message on reset
+      }, 4000); 
     }
   };
 
@@ -473,6 +480,7 @@ const GlobalShopLandingPage = ({
           isSubmitting={isSubmitting}
           shopDomain="global"
           shopId={normalizedShopId}
+          orderErrorMsg={orderErrorMsg}
         />
 
         <PoweredByHanuut />

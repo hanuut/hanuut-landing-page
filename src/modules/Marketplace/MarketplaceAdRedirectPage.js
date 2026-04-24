@@ -5,8 +5,7 @@ import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
 import styled, { ThemeProvider } from "styled-components";
 import { motion } from "framer-motion";
-import { FaMapMarkerAlt, FaUserCircle, FaGavel, FaTag } from "react-icons/fa";
-
+import { FaMapMarkerAlt, FaUserCircle, FaGavel, FaTag, FaApple } from "react-icons/fa";
 // --- Imports ---
 import { fetchAdById, selectMarketplace } from "./state/reducers";
 import DeepLinkRedirect from "../../components/DeepLinkRedirect";
@@ -362,18 +361,21 @@ const MarketplaceAdRedirectPage = ({ appConfig }) => {
              </Description>
 
              <ButtonContainer>
-               <ButtonWithIcon
-                  image={Playstore}
-                  backgroundColor="#111217"
-                  text1={t("getItOn")}
-                  text2={t("googlePlay")}
-                  className="homeDownloadButton"
-                  onClick={handleDownloadApp}
-               />
-               <p style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#71717a', textAlign: 'center' }}>
-                  Download the app to chat with seller or place a bid.
-               </p>
-             </ButtonContainer>
+  <ButtonWithIcon
+    image={Playstore}
+    backgroundColor="#111217"
+    text1={t("getItOn")}
+    text2={t("googlePlay")}
+    className="homeDownloadButton"
+    onClick={() => window.open(process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK, "_blank")}
+  />
+  <button
+    style={{ flex: 1, borderRadius: '12px', background: '#111217', color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+    onClick={() => window.open("https://apps.apple.com/dz/app/esuuq/id6752300426?l=fr-FR", "_blank")}
+  >
+    <FaApple size={24} /> <span style={{ fontWeight: 700 }}>App Store</span>
+  </button>
+</ButtonContainer>
 
           </DetailsSection>
         </AdContainer>

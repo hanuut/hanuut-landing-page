@@ -25,7 +25,6 @@ const esuuqTheme = {
   navHeight: "5rem",
 };
 
-// --- 1. EXCHANGE NETWORK CANVAS (High Conversion 3D Effect) ---
 const CanvasBackground = styled.canvas`
   position: absolute;
   top: 0;
@@ -33,13 +32,7 @@ const CanvasBackground = styled.canvas`
   width: 100%;
   height: 100%;
   z-index: 0;
-  pointer-events: auto; /* Required to catch mouse movements */
-  /* Add a subtle dark gradient to make the green richer and the white text pop */
-  background: radial-gradient(
-    circle at center,
-    rgba(0, 0, 0, 0.1) 0%,
-    rgba(0, 0, 0, 0.4) 100%
-  );
+  background-color: #0a1a17;
 `;
 
 const ExchangeNetworkCanvas = () => {
@@ -49,131 +42,109 @@ const ExchangeNetworkCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const isMobile = window.innerWidth < 768;
+
     let w, h;
     let particles = [];
-
-    // Mouse object with a "pull" radius
-    const mouse = { x: null, y: null, radius: 250 };
+    let mouse = { x: null, y: null };
+    let animationFrame;
 
     const resize = () => {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.scale(dpr, dpr);
       init();
     };
 
+    // Light green palette
+    const COLORS = ["#39A170", "#6EE7B7", "#10B981", "#A7F3D0", "#ffffff"];
+
     class Particle {
       constructor() {
+        this.reset(true);
+      }
+
+      reset(initial = false) {
         this.x = Math.random() * w;
-        this.y = Math.random() * h;
-        // Z-axis simulates depth (1 is far, 3 is close)
-        this.z = Math.random() * 2 + 1;
-
-        this.baseX = this.x;
-        this.baseY = this.y;
-
-        // Slower, elegant floating movement
-        this.vx = (Math.random() - 0.5) * 0.5;
-        this.vy = (Math.random() - 0.5) * 0.5;
-
-        // Base size depends on depth
-        this.size = this.z * 1.5;
+        this.y = initial ? Math.random() * h : h + 20;
+        this.z = Math.random() * 0.8 + 0.2; // Depth factor
+        this.size = (Math.random() * 4 + 1.5) * this.z;
+        this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+        this.opacity = (Math.random() * 0.4 + 0.1) * this.z;
+        
+        this.vx = (Math.random() - 0.5) * 0.3 * this.z;
+        this.vy = -0.2 * this.z; // Constant slow upward drift
+        
+        this.parallaxX = 0;
+        this.parallaxY = 0;
       }
 
       draw() {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${0.15 + this.z * 0.1})`; // Closer = brighter
+        // Drawing a simple circle is 100x faster than shadowBlur
+        ctx.arc(this.x + this.parallaxX, this.y + this.parallaxY, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.opacity;
         ctx.fill();
-
-        // Add a subtle glow
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
+        
+        // Simulating glow by drawing a second larger, very faint circle
+        ctx.beginPath();
+        ctx.arc(this.x + this.parallaxX, this.y + this.parallaxY, this.size * 2, 0, Math.PI * 2);
+        ctx.globalAlpha = this.opacity * 0.3;
+        ctx.fill();
       }
 
       update() {
-        // Natural floating
-        this.baseX += this.vx;
-        this.baseY += this.vy;
+        this.x += this.vx;
+        this.y += this.vy;
 
-        // Bounce off screen edges smoothly
-        if (this.baseX < 0 || this.baseX > w) this.vx *= -1;
-        if (this.baseY < 0 || this.baseY > h) this.vy *= -1;
+        // Wrap around logic
+        if (this.y < -20) this.reset();
+        if (this.x < -20) this.x = w + 10;
+        if (this.x > w + 20) this.x = -10;
 
-        // --- INTERACTION: The Pull ---
-        // Instead of scattering, nodes are pulled slightly toward the mouse
-        // This guides the user's eye to wherever the mouse is (ideally the CTA)
-        if (mouse.x != null && mouse.y != null) {
-          const dx = mouse.x - this.baseX;
-          const dy = mouse.y - this.baseY;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < mouse.radius) {
-            // Calculate a gentle pull force
-            const force = (mouse.radius - distance) / mouse.radius;
-            // The closer the node (z), the more it reacts
-            const pullX = dx * force * 0.05 * this.z;
-            const pullY = dy * force * 0.05 * this.z;
-
-            this.x = this.baseX + pullX;
-            this.y = this.baseY + pullY;
-          } else {
-            // Smooth return to base position
-            this.x += (this.baseX - this.x) * 0.05;
-            this.y += (this.baseY - this.y) * 0.05;
-          }
-        } else {
-          this.x = this.baseX;
-          this.y = this.baseY;
+        // Optimized Parallax interaction (Swarm effect)
+        if (mouse.x !== null) {
+          const dx = mouse.x - w / 2;
+          const dy = mouse.y - h / 2;
+          // Particles move slightly towards/with the mouse based on depth (z)
+          const targetPX = dx * 0.05 * this.z;
+          const targetPY = dy * 0.05 * this.z;
+          this.parallaxX += (targetPX - this.parallaxX) * 0.05;
+          this.parallaxY += (targetPY - this.parallaxY) * 0.05;
         }
-
-        this.draw();
       }
     }
 
     const init = () => {
       particles = [];
-      // Number of particles based on screen size (keeps it performant)
-      const numberOfParticles = (w * h) / 15000;
-      for (let i = 0; i < numberOfParticles; i++) {
+      // Higher density but using simple shapes to keep it fast
+      const count = isMobile ? 40 : 120; 
+      for (let i = 0; i < count; i++) {
         particles.push(new Particle());
       }
     };
 
-    // Draw connecting lines between close particles
-    const connect = () => {
-      for (let a = 0; a < particles.length; a++) {
-        for (let b = a; b < particles.length; b++) {
-          const dx = particles[a].x - particles[b].x;
-          const dy = particles[a].y - particles[b].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          // If particles are close, draw a line
-          // The line opacity depends on how close they are
-          if (distance < 120) {
-            const opacity = 1 - distance / 120;
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.2})`;
-            ctx.lineWidth = 1;
-            ctx.moveTo(particles[a].x, particles[a].y);
-            ctx.lineTo(particles[b].x, particles[b].y);
-            ctx.stroke();
-          }
-        }
-      }
-    };
-
-    let animationFrame;
-    const render = () => {
+    const animate = () => {
       ctx.clearRect(0, 0, w, h);
-      particles.forEach((p) => p.update());
-      connect(); // Call the connection function after updating positions
-      animationFrame = requestAnimationFrame(render);
+      
+      // Batch drawing by limiting state changes
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+      }
+      
+      animationFrame = requestAnimationFrame(animate);
     };
 
     const handleMouseMove = (e) => {
       mouse.x = e.clientX;
-      // Adjust for scroll position so the effect stays true to the cursor
-      mouse.y = e.clientY + window.scrollY;
+      mouse.y = e.clientY;
     };
 
     const handleMouseLeave = () => {
@@ -186,7 +157,7 @@ const ExchangeNetworkCanvas = () => {
     window.addEventListener("mouseleave", handleMouseLeave);
 
     resize();
-    render();
+    animate();
 
     return () => {
       window.removeEventListener("resize", resize);
@@ -198,6 +169,7 @@ const ExchangeNetworkCanvas = () => {
 
   return <CanvasBackground ref={canvasRef} />;
 };
+
 
 // --- STYLED COMPONENTS ---
 
@@ -236,10 +208,21 @@ const Container = styled.div`
 
 // --- NEW ACTION GRID SECTION ---
 const ActionsSection = styled.section`
-  padding: 6rem 0;\n  background: ${(props) => props.theme.body};\n  text-align: center;\n`;
+  padding: 6rem 0;
+  background: ${(props) => props.theme.body};
+  text-align: center;
+  position: relative;
+  z-index: 1;
+`;
 
 const SectionTitle = styled.h2`
-  font-size: clamp(2rem, 4vw, 2.5rem);\n  font-weight: 800;\n  color: ${(props) => props.theme.text};\n  margin-bottom: 3rem;\n  font-family: 'Tajawal', sans-serif;\n`;
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: ${(props) => props.theme.text};
+  margin-bottom: 3rem;
+  padding-top: 0.5rem;
+  font-family: 'Tajawal', sans-serif;
+`;
 
 const ActionGrid = styled.div`
   display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 2rem;\n  \n  @media (max-width: 900px) {\n    grid-template-columns: 1fr;\n  }\n`;

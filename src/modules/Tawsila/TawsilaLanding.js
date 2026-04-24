@@ -1,18 +1,17 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { 
-  FaArrowRight, 
-  FaArrowLeft, 
-  FaUsers, 
-  FaWallet, 
-  FaGlobe, 
-  FaClock, 
-  FaRoute, 
-  FaHeadset 
+import {
+  FaArrowRight,
+  FaArrowLeft,
+  FaUsers,
+  FaWallet,
+  FaGlobe,
+  FaClock,
+  FaRoute,
+  FaHeadset,
 } from "react-icons/fa";
 
 // --- Components ---
@@ -31,6 +30,13 @@ const CanvasContainer = styled.canvas`
   pointer-events: auto;
   background: #050505;
 `;
+
+const getAbridhStoreLink = () => {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  return isIOS
+    ? "https://apps.apple.com/dz/app/abridh/id6760981883"
+    : process.env.REACT_APP_TAWSILA_DOWNLOAD_LINK;
+};
 
 const MobilityCanvas = () => {
   const canvasRef = useRef(null);
@@ -166,7 +172,7 @@ const Badge = styled(motion.div)`
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50px;
-  color: #397FF9;
+  color: #397ff9;
   font-weight: 700;
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
@@ -180,18 +186,18 @@ const Title = styled(motion.h1)`
   color: white;
   line-height: 1.1;
   margin: 0 0 1.5rem 0;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   letter-spacing: -1px;
-  text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 `;
 
 const Subtitle = styled(motion.p)`
   font-size: clamp(1.1rem, 2vw, 1.4rem);
-  color: #A1A1AA;
+  color: #a1a1aa;
   margin: 0 auto 3rem auto;
   max-width: 600px;
   line-height: 1.6;
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
 `;
 
 const CtaGroup = styled(motion.div)`
@@ -219,7 +225,7 @@ const BentoContainer = styled.div`
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: minmax(320px, auto);
   gap: 1.5rem;
-  direction: ${props => props.$isArabic ? 'rtl' : 'ltr'};
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
@@ -228,13 +234,13 @@ const BentoContainer = styled.div`
 `;
 
 const BentoCard = styled(motion.div)`
-  background: #18181B;
+  background: #18181b;
   border-radius: 32px;
   padding: 3rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -248,7 +254,9 @@ const BentoCard = styled(motion.div)`
 
   &.span-2 {
     grid-column: span 2;
-    @media (max-width: 900px) { grid-column: span 1; }
+    @media (max-width: 900px) {
+      grid-column: span 1;
+    }
   }
 
   .content-wrapper {
@@ -256,168 +264,44 @@ const BentoCard = styled(motion.div)`
     z-index: 2;
   }
 
-  h3 { 
-    font-size: 2rem; 
-    color: white; 
-    margin-bottom: 1rem; 
-    font-family: 'Tajawal', sans-serif;
+  h3 {
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 1rem;
+    font-family: "Tajawal", sans-serif;
   }
-  
-  p { 
-    font-size: 1.1rem; 
-    color: #A1A1AA; 
-    line-height: 1.6; 
-    font-family: 'Cairo', sans-serif;
+
+  p {
+    font-size: 1.1rem;
+    color: #a1a1aa;
+    line-height: 1.6;
+    font-family: "Cairo", sans-serif;
     margin: 0;
   }
 
   .icon-top {
     font-size: 2.5rem;
-    color: #397FF9;
+    color: #397ff9;
     margin-bottom: 2rem;
   }
-  
+
   .bg-icon {
     position: absolute;
     top: -10%;
-    ${props => props.$isArabic ? 'left: -10%;' : 'right: -10%;'}
+    ${(props) => (props.$isArabic ? "left: -10%;" : "right: -10%;")}
     font-size: 15rem;
-    color: rgba(255,255,255,0.02);
+    color: rgba(255, 255, 255, 0.02);
     z-index: 0;
-    transition: transform 0.5s ease, color 0.5s ease;
+    transition:
+      transform 0.5s ease,
+      color 0.5s ease;
   }
 
   &:hover .bg-icon {
-    transform: scale(1.1) rotate(${props => props.$isArabic ? '10deg' : '-10deg'});
+    transform: scale(1.1)
+      rotate(${(props) => (props.$isArabic ? "10deg" : "-10deg")});
     color: rgba(57, 127, 249, 0.05);
   }
-`;
-
-const ScrollSection = styled.section`
-  height: 300vh;
-  position: relative;
-  background-color: #050505;
-`;
-
-const StickyContainer = styled.div`
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-`;
-
-const SplitLayout = styled.div`
-  width: 90%;
-  max-width: 1200px;
-  display: flex;
-  align-items: center;
-  gap: 4rem;
-  direction: ${props => props.$isArabic ? 'rtl' : 'ltr'};
-
-  @media (max-width: 900px) {
-    flex-direction: column-reverse;
-    justify-content: center;
-  }
-`;
-
-const TextColumn = styled.div`
-  flex: 1;
-  position: relative;
-  height: 60vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  @media (max-width: 900px) {
-    height: 30vh;
-    text-align: center;
-  }
-`;
-
-const TextBlock = styled(motion.div)`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 100%;
-  will-change: transform, opacity;
-  
-  h2 {
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 800;
-    margin-bottom: 1rem;
-    color: white;
-    font-family: 'Tajawal', sans-serif;
-  }
-  p {
-    font-size: 1.2rem;
-    color: #A1A1AA;
-    line-height: 1.6;
-    font-family: 'Cairo', sans-serif;
-  }
-`;
-
-const PhoneColumn = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const PhoneMockup = styled.div`
-  width: 320px;
-  height: 650px;
-  background: #18181B;
-  border-radius: 40px;
-  border: 8px solid #27272A;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    height: 25px;
-    background: #000;
-    border-radius: 20px;
-    z-index: 10;
-  }
-
-  @media (max-width: 900px) {
-    width: 260px;
-    height: 530px;
-  }
-`;
-
-const PhoneScreen = styled(motion.div)`
-  width: 100%;
-  height: 100%;
-  background: ${props => props.$bg || "#09090B"};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  box-sizing: border-box;
-  text-align: center;
-  position: absolute;
-  top: 0; left: 0;
-  will-change: transform, opacity;
-
-  svg {
-    font-size: 4rem;
-    color: #397FF9;
-    margin-bottom: 1.5rem;
-  }
-
-  h3 { color: white; font-size: 1.5rem; margin-bottom: 0.5rem; }
-  p { color: #A1A1AA; font-size: 0.9rem; }
 `;
 
 // --- 3. MAIN COMPONENT ---
@@ -426,57 +310,43 @@ const TawsilaLanding = () => {
   const isArabic = i18n.language === "ar";
   const navigate = useNavigate();
 
-  const scrollRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: scrollRef,
-    offset: ["start start", "end end"]
-  });
-
-  const opacity1 = useTransform(scrollYProgress, [0, 0.25, 0.35], [1, 1, 0]);
-  const opacity2 = useTransform(scrollYProgress, [0.25, 0.35, 0.6, 0.7], [0, 1, 1, 0]);
-  const opacity3 = useTransform(scrollYProgress, [0.6, 0.7, 1], [0, 1, 1]);
-
-  const y1 = useTransform(scrollYProgress, [0, 0.35], [0, -50]);
-  const y2 = useTransform(scrollYProgress, [0.25, 0.35, 0.6, 0.7], [50, 0, 0, -50]);
-  const y3 = useTransform(scrollYProgress, [0.6, 0.7, 1], [50, 0, 0]);
-
   const bentoCards = [
     {
       className: "span-2",
       icon: FaClock, // Time/Schedule
       title: t("tawsila_sticky_1_title"),
-      desc: t("tawsila_sticky_1_desc")
+      desc: t("tawsila_sticky_1_desc"),
     },
     {
       className: "span-1",
       icon: FaUsers, // Replaced Car with Users (Community)
       title: t("tawsila_bento_1_title"),
-      desc: t("tawsila_bento_1_desc")
+      desc: t("tawsila_bento_1_desc"),
     },
     {
       className: "span-1",
       icon: FaRoute, // Replaced Map with Route (Coordination)
       title: t("tawsila_sticky_2_title"),
-      desc: t("tawsila_sticky_2_desc")
+      desc: t("tawsila_sticky_2_desc"),
     },
     {
       className: "span-2",
       icon: FaWallet, // Cost sharing
       title: t("tawsila_bento_2_title"),
-      desc: t("tawsila_bento_2_desc")
+      desc: t("tawsila_bento_2_desc"),
     },
     {
       className: "span-1",
       icon: FaHeadset,
       title: t("tawsila_sticky_3_title"),
-      desc: t("tawsila_sticky_3_desc")
+      desc: t("tawsila_sticky_3_desc"),
     },
     {
       className: "span-2",
       icon: FaGlobe, // Network
       title: t("tawsila_bento_3_title"),
-      desc: t("tawsila_bento_3_desc")
-    }
+      desc: t("tawsila_bento_3_desc"),
+    },
   ];
 
   const seoTitle = t("seo_tawsila_title");
@@ -484,29 +354,29 @@ const TawsilaLanding = () => {
 
   return (
     <TawsilaLayout>
-      <Seo 
+      <Seo
         title={seoTitle}
         description={seoDesc}
-        url="https://hanuut.com/abridh" 
+        url="https://hanuut.com/abridh"
         customSchema={{
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          "name": "Abridh by Hanuut",
-          "operatingSystem": "Android, iOS",
-          "applicationCategory": "TravelApplication",
-          "image": "https://hanuut.com/static/abridh.png", // <-- ADDED LOGO
-          "url": "https://hanuut.com/abridh",
-          "offers": {
+          name: "Abridh by Hanuut",
+          operatingSystem: "Android, iOS",
+          applicationCategory: "TravelApplication",
+          image: "https://hanuut.com/static/abridh.png", // <-- ADDED LOGO
+          url: "https://hanuut.com/abridh",
+          offers: {
             "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "DZD"
+            price: "0",
+            priceCurrency: "DZD",
           },
-          "aggregateRating": {
+          aggregateRating: {
             "@type": "AggregateRating",
-            "ratingValue": "4.9",
-            "ratingCount": "1240"
+            ratingValue: "4.9",
+            ratingCount: "1240",
           },
-          "description": seoDesc
+          description: seoDesc,
         }}
       />
 
@@ -521,61 +391,29 @@ const TawsilaLanding = () => {
           <Badge>Abridh | Phase Expérimentale</Badge>
           <Title>{t("tawsila_hero_title")}</Title>
           <Subtitle>{t("tawsila_hero_subtitle")}</Subtitle>
-          
+
           <CtaGroup>
-            <BorderBeamButton onClick={() => navigate("/tawsila/drive")} beamColor="#397FF9">
-              {t("tawsila_btn_drive")} {isArabic ? <FaArrowLeft style={{marginRight:'8px'}}/> : <FaArrowRight style={{marginLeft:'8px'}}/>}
+            <BorderBeamButton
+              onClick={() => navigate("/tawsila/drive")}
+              beamColor="#397FF9"
+            >
+              {t("tawsila_btn_drive")}{" "}
+              {isArabic ? (
+                <FaArrowLeft style={{ marginRight: "8px" }} />
+              ) : (
+                <FaArrowRight style={{ marginLeft: "8px" }} />
+              )}
             </BorderBeamButton>
-            <BorderBeamButton secondary onClick={() => window.open(process.env.REACT_APP_HANUUT_CUSTOMER_DOWNLOAD_LINK, "_blank")} beamColor="#FFFFFF">
+            <BorderBeamButton
+              secondary
+              onClick={() => window.open(getAbridhStoreLink(), "_blank")}
+              beamColor="#FFFFFF"
+            >
               {t("tawsila_btn_ride")}
             </BorderBeamButton>
           </CtaGroup>
         </HeroContent>
       </HeroSection>
-
-      {/* --- STICKY SCROLL SECTION --- */}
-      <ScrollSection ref={scrollRef}>
-        <StickyContainer>
-          <SplitLayout $isArabic={isArabic}>
-            
-            <TextColumn>
-              <TextBlock style={{ opacity: opacity1, y: y1, zIndex: 3 }}>
-                <h2>{t("tawsila_sticky_1_title")}</h2>
-                <p>{t("tawsila_sticky_1_desc")}</p>
-              </TextBlock>
-              <TextBlock style={{ opacity: opacity2, y: y2, zIndex: 2 }}>
-                <h2>{t("tawsila_sticky_2_title")}</h2>
-                <p>{t("tawsila_sticky_2_desc")}</p>
-              </TextBlock>
-              <TextBlock style={{ opacity: opacity3, y: y3, zIndex: 1 }}>
-                <h2>{t("tawsila_sticky_3_title")}</h2>
-                <p>{t("tawsila_sticky_3_desc")}</p>
-              </TextBlock>
-            </TextColumn>
-
-            <PhoneColumn>
-              <PhoneMockup>
-                <PhoneScreen style={{ opacity: opacity1 }}>
-                  <FaUsers />
-                  <h3>Réseau Privé</h3>
-                  <p>Connexion sécurisée.</p>
-                </PhoneScreen>
-                <PhoneScreen style={{ opacity: opacity2, background: '#0e1726' }}>
-                  <FaRoute />
-                  <h3>Demande de déplacement</h3>
-                  <p>Mise en relation en cours...</p>
-                </PhoneScreen>
-                <PhoneScreen style={{ opacity: opacity3 }}>
-                  <FaWallet />
-                  <h3>Participation</h3>
-                  <p>Partage des frais équitable.</p>
-                </PhoneScreen>
-              </PhoneMockup>
-            </PhoneColumn>
-
-          </SplitLayout>
-        </StickyContainer>
-      </ScrollSection>
 
       {/* --- BENTO GRID SECTION --- */}
       <BentoSection>
@@ -583,12 +421,12 @@ const TawsilaLanding = () => {
           {bentoCards.map((card, index) => {
             const IconComponent = card.icon;
             return (
-              <BentoCard 
+              <BentoCard
                 key={index}
                 className={card.className}
                 $isArabic={isArabic}
-                initial={{ opacity: 0, y: 40 }} 
-                whileInView={{ opacity: 1, y: 0 }} 
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
               >
@@ -603,7 +441,6 @@ const TawsilaLanding = () => {
           })}
         </BentoContainer>
       </BentoSection>
-
     </TawsilaLayout>
   );
 };

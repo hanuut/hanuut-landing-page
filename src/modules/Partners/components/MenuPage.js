@@ -152,6 +152,7 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
 
   const [activeCategory, setActiveCategory] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(null);
+  const [orderErrorMsg, setOrderErrorMsg] = useState("");
   const [fetchedCategories, setFetchedCategories] = useState(new Set());
 
   // --- NEW STATE: Order Success Data ---
@@ -291,8 +292,15 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
       );
     } catch (error) {
       console.error("Order Failed:", error);
+      // 👈 EXTRACT BACKEND ERROR MESSAGE
+      const backendMessage = error.response?.data?.message; 
+      setOrderErrorMsg(backendMessage || t("order_error_message", "We couldn't submit your order at this time. Please try again."));
+      
       setIsSubmitting("error");
-      setTimeout(() => setIsSubmitting(null), 3000);
+      setTimeout(() => {
+        setIsSubmitting(null);
+        setOrderErrorMsg(""); 
+      }, 4000);
     }
   };
 
@@ -424,6 +432,7 @@ const MenuPage = ({ selectedShop, selectedShopImage, shopDomain }) => {
           // --- NEW PROPS FOR TRACKING ---
           orderSuccessData={orderSuccessData}
           onClearSuccess={handleClearSuccess}
+          orderErrorMsg={orderErrorMsg}
         />
 
         <PoweredByHanuut />

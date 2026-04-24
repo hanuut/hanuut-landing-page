@@ -356,6 +356,7 @@ const Cart = ({
   isSubmitting,
   shopDomain,
   shopId,
+  orderErrorMsg,
 }) => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
@@ -633,7 +634,10 @@ const Cart = ({
       return (
         <StatusContainer>
           <StatusTitle>❌ {t("order_error_title")}</StatusTitle>
-          <StatusMessage>{t("order_error_message")}</StatusMessage>
+          {/* 👈 RENDER THE ACTUAL ERROR FROM THE BACKEND */}
+          <StatusMessage style={{ color: "#ef4444", fontSize: "1.1rem" }}>
+            {orderErrorMsg || t("order_error_message")}
+          </StatusMessage>
         </StatusContainer>
       );
 

@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { FaCheckCircle, FaUtensils, FaShoppingBasket, FaGlobe, FaWindows } from "react-icons/fa";
+import { FaCheckCircle, FaUtensils, FaShoppingBasket, FaGlobe, FaWindows, FaApple } from "react-icons/fa";
 import Playstore from "../../../../../assets/playstore.webp";
 
 // --- Styled Components ---
@@ -167,15 +167,24 @@ const SuccessView = ({ data }) => {
       </FeaturesPreview>
 
       <ButtonGroup>
-        <StoreButton href={googlePlayLink} target="_blank" className="primary">
-          <img src={Playstore} alt="Google Play" />
-          <span>{t("download_android", "Continue on Android")}</span>
-        </StoreButton>
-        <StoreButton href={windowsLink} target="_blank" className="secondary">
-          <FaWindows />
-          <span>{t("download_windows", "Manage on Desktop")}</span>
-        </StoreButton>
-      </ButtonGroup>
+  <StoreButton href={googlePlayLink} target="_blank" className="primary">
+    <img src={Playstore} alt="Google Play" />
+    <span>{t("download_android", "Continue on Android")}</span>
+  </StoreButton>
+  <StoreButton
+    href="https://apps.apple.com/us/app/my-hanuut/id6762234117"
+    target="_blank"
+    className="primary"
+    style={{ background: '#333', borderColor: '#333' }}
+  >
+    <FaApple />
+    <span>App Store (iOS)</span>
+  </StoreButton>
+  <StoreButton href={windowsLink} target="_blank" className="secondary">
+    <FaWindows />
+    <span>{t("download_windows", "Manage on Desktop")}</span>
+  </StoreButton>
+</ButtonGroup>
     </SuccessWrapper>
   );
 };

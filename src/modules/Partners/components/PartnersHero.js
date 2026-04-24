@@ -6,7 +6,7 @@ import BorderBeamButton from "../../../components/BorderBeamButton";
 import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.webp";
 import { useNavigate } from "react-router-dom"; 
-import { FaMagic } from "react-icons/fa";
+import { FaMagic, FaApple } from "react-icons/fa";
 import AppLogo3D from "../../../assets/logos/myHanuut/logo_ar.png"; 
 
 // --- 1. Animations ---
@@ -235,8 +235,9 @@ const PartnersHero = () => {
   const navigate = useNavigate(); 
 
   const handleDownloadPlay = () => window.open(process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY, "_blank");
-  const handleDownloadWindows = () => window.open(process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK, "_blank");
-  const handleWizardClick = () => {
+const handleDownloadWindows = () => window.open(process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK, "_blank");
+const handleDownloadIOS = () => window.open("https://apps.apple.com/us/app/my-hanuut/id6762234117", "_blank");
+const handleWizardClick = () => {
     navigate("/partners/onboarding");
     window.scrollTo(0, 0);
   };
@@ -267,13 +268,18 @@ const PartnersHero = () => {
 
         <ButtonGroup variants={itemVars}>
           <BorderBeamButton onClick={handleDownloadPlay} beamColor="#F07A48">
-             <Icon src={Playstore} alt="Google Play" />
-             <span>Google Play</span>
+            <Icon src={Playstore} alt="Google Play" />
+            <span>Google Play</span>
           </BorderBeamButton>
-          
+
+          <BorderBeamButton onClick={handleDownloadIOS} secondary={true} beamColor="#F07A48">
+            <FaApple style={{ fontSize: '1.6rem', marginBottom: '2px' }} />
+            <span>App Store</span>
+          </BorderBeamButton>
+
           <BorderBeamButton onClick={handleDownloadWindows} secondary={true} beamColor="#F07A48">
-             <Icon src={Windows} alt="Windows" />
-             <span>Windows</span>
+            <Icon src={Windows} alt="Windows" />
+            <span>Windows</span>
           </BorderBeamButton>
         </ButtonGroup>
 
