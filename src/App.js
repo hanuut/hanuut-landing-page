@@ -15,18 +15,31 @@ const App = () => {
   const location = useLocation(); // <-- Get location object
 
   useEffect(() => {
-    // FIX: Use the exact same key you use in LanguagesDropDown.js
-    const preferredLang = localStorage.getItem("preferredLanguage");
-    
-    if (preferredLang && i18n.language !== preferredLang) {
-      i18n.changeLanguage(preferredLang);
-    }
+    const initializeLanguage = () => {
+      // 1. Check Storage
+      const savedLang = localStorage.getItem("preferredLanguage");
+      if (savedLang) {
+        i18n.changeLanguage(savedLang);
+        return;
+      }
 
-    // Force HTML document to respect the single source of truth globally
-    document.documentElement.lang = i18n.language;
+      // 2. Fallback to Browser Language
+      const browserLang = navigator.language.split("-")[0];
+      const supported = ["ar", "en", "fr"];
+      const defaultLang = supported.includes(browserLang) ? browserLang : "ar";
+      
+      i18n.changeLanguage(defaultLang);
+      localStorage.setItem("preferredLanguage", defaultLang);
+    };
+
+    initializeLanguage();
+  }, [i18n]);
+
+  // Apply RTL/LTR to the root HTML tag so it never desyncs
+  useEffect(() => {
     document.documentElement.dir = i18n.language === "ar" ? "rtl" : "ltr";
-
-  }, [i18n, i18n.language]);
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
 
   // --- Logic to determine which footer to show ---
   const isShopPage = /^\/(@[^/]+|shop\/[^/]+)/.test(location.pathname);
