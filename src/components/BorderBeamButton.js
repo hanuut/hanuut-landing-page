@@ -7,10 +7,8 @@ const rotate = keyframes`
 
 const ButtonWrapper = styled.button`
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  display: inline-flex;
+  padding: 1.5px; /* This creates the "border" thickness */
   border: none;
   background: transparent;
   cursor: pointer;
@@ -18,8 +16,8 @@ const ButtonWrapper = styled.button`
   border-radius: 9999px;
   overflow: hidden; 
   
-  /* Fixed Size for consistency */
-  height: 56px; 
+  /* Flexible sizing */
+  min-height: 56px; 
   min-width: 180px;
 
   transition: transform 0.2s ease;
@@ -50,15 +48,16 @@ const BeamLayer = styled.div`
     transparent 100%
   );
   
-  animation: ${rotate} 4s linear infinite; /* Slightly faster for visibility */
+  animation: ${rotate} 4s linear infinite; 
   filter: blur(9px); 
   z-index: 0;
   opacity: 0.8;
 `;
 
 const InnerContent = styled.div`
-  position: absolute;
-  inset: 1.5px; /* Border width */
+  /* Crucial Fix: Changed from absolute to relative to expand parent width */
+  position: relative; 
+  width: 100%;
   border-radius: 9999px;
   
   /* --- MODE SWITCHING --- */
@@ -69,7 +68,6 @@ const InnerContent = styled.div`
           background-color: rgba(255, 255, 255, 0.15);
           backdrop-filter: blur(15px);
           -webkit-backdrop-filter: blur(15px);
-          /* Text color inherits or defaults to white for contrast on dark pages */
           color: white; 
         `
       : css`
@@ -81,14 +79,21 @@ const InnerContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px; /* Slightly increased gap for icon breathing room */
   z-index: 1;
-  padding: 0 1rem;
+  padding: 0 1.8rem; /* Horizontal padding for text */
 
   /* Typography Force */
-  font-family: 'Ubuntu', sans-serif;
-  font-weight: 600;
-  font-size: 1rem;
+  font-family: var(--font-primary), sans-serif !important; 
+  font-weight: 700;
+  font-size: 1.05rem;
+  white-space: nowrap; /* Forces text to stay on one line */
+
+  @media (max-width: 480px) {
+    white-space: normal; /* Allows safe wrapping on very tiny screens */
+    font-size: 0.95rem;
+    padding: 0.5rem 1.2rem;
+  }
 
   span, p, h1, h2, h3, h4, h5, h6 {
     color: inherit !important;
@@ -96,15 +101,15 @@ const InnerContent = styled.div`
   
   /* Icon handling inside */
   img, svg {
-  color: inherit !important;
-   /* Ensure icons are visible in both modes */
+    color: inherit !important;
     filter: ${(props) => props.$secondary ? 'brightness(0) invert(1)' : 'none'};
   }
 `;
 
-const BorderBeamButton = ({ children, onClick, secondary = false, beamColor }) => {
+const BorderBeamButton = ({ children, onClick, secondary = false, beamColor, className }) => {
   return (
-    <ButtonWrapper onClick={onClick} type="button">
+    // Passed className so styled-components overrides can target it if needed
+    <ButtonWrapper onClick={onClick} type="button" className={className}>
       <BeamLayer $beamColor={beamColor} />
       <InnerContent $secondary={secondary}>
         {children}

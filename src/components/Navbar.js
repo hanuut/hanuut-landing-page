@@ -18,7 +18,6 @@ import abridhLogoAr from "../assets/abridh_logo.webp";
 import abridhLogoEn from "../assets/abridh_logo.webp";
 import btoa from "btoa";
 
-
 const bufferToUrl = (imageObject) => {
   if (!imageObject || !imageObject.buffer?.data) return null;
   const imageData = new Uint8Array(imageObject.buffer.data);
@@ -222,6 +221,23 @@ const NavShopName = styled.span`
 
   @media (max-width: 480px) {
     max-width: 120px;
+  }
+`;
+
+const AbridhBrandWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: ${({ $textColor }) => $textColor};
+  font-family: var(
+    --font-title
+  ) !important; /* Uses KOGhorab in AR, Manrope in EN/FR */
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-decoration: none;
+
+  img {
+    margin: 0; /* Override any margin from Logo component */
   }
 `;
 
@@ -489,8 +505,11 @@ const Navbar = () => {
                   </Link>
                 )}
                 {isTawsilaMode && (
-                  <Link to="/abridh">
-                    <Logo image={tawsilaLogo} />
+                  <Link to="/abridh" style={{ textDecoration: "none" }}>
+                    <AbridhBrandWrapper $textColor={textColor}>
+                      <Logo image={tawsilaLogo} />
+                      <span>{isArabic ? "أبـريــذ" : "Abridh"}</span>
+                    </AbridhBrandWrapper>
                   </Link>
                 )}
               </motion.div>

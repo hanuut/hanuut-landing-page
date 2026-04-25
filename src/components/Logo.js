@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 // We are replacing the styled h1 with a styled img for the logo.
 const LogoImg = styled.img`
-  height: 45px;
+  height: 30px;
   width: auto; // 'auto' maintains the aspect ratio.
   
   transition: all 0.2s ease;
@@ -17,7 +17,7 @@ const LogoImg = styled.img`
   }
 
   @media (max-width: 768px) {
-    height: 40px; // A slightly smaller logo for mobile screens.
+    height: 35px; // A slightly smaller logo for mobile screens.
   }
 `;
 
