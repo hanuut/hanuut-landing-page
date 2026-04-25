@@ -1034,5 +1034,9 @@
 "tawsila_hero_title": "La mobilité communautaire, simplifiée.",
 "tawsila_hero_subtitle": "Coordonnez vos trajets et partagez les frais avec des membres vérifiés de votre réseau privé.",
 "prefooter_title": "Prêt à prendre la route ?",
-"prefooter_subtitle": "Rejoignez le réseau privé aujourd'hui."
+"view": "Voir",
+"prefooter_subtitle": "Rejoignez le réseau privé aujourd'hui.",
+"explore_desc": "Découvrez et commandez auprès des meilleurs {{category}} à {{location}}. Livraison rapide et boutiques locales vérifiées.",
+"directory_add_shop_title": "Vous avez un {{category}} ?",
+"directory_add_shop_desc": "Rejoignez-nous et ajoutez votre boutique gratuitement. Commencez à recevoir des commandes dès aujourd'hui !"
 }

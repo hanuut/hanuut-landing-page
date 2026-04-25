@@ -1031,5 +1031,9 @@
 "tawsila_hero_title": "Community mobility, simplified.",
 "tawsila_hero_subtitle": "Coordinate your trips and share costs with verified members of your private network.",
 "prefooter_title": "Ready to hit the road?",
-"prefooter_subtitle": "Join the private network today."
+"view": "View",
+"prefooter_subtitle": "Join the private network today.",
+"explore_desc": "Discover and order from the best {{category}} in {{location}}. Fast delivery from trusted local shops.",
+"directory_add_shop_title": "Own a {{category}}?",
+"directory_add_shop_desc": "Join us and add your shop to this list for free. Start receiving orders today!"
 }

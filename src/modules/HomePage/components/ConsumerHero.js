@@ -164,38 +164,21 @@ const ButtonsRow = styled.div`
   }
 `;
 
-// Wrapper to override BorderBeamButton styles locally
 const ButtonOverride = styled.div`
-  /* Override width/padding logic here */
   button {
     /* Make buttons wider */
     min-width: 240px !important;
+  }
+
+  /* Target the INNER div for padding so we don't break the border beam! */
+  .inner-content {
     padding: 0 2.5rem !important;
   }
 
-  /* Specific overrides for the Secondary (My Hanuut) button */
+  /* Specific overrides for the Secondary (My Hanuut) button hover */
   &.secondary-btn {
-    button {
-      /* Force border to match text */
-      border: 2px solid #111217 !important;
-      /* Force background to be transparent */
-      background: transparent !important;
-
-      /* Force TEXT and ICON to be Black */
-      div {
-        color: #111217 !important;
-      }
-      span,
-      p,
-      svg {
-        color: #111217 !important;
-        fill: #111217 !important;
-      }
-
-      /* Hover state for secondary */
-      &:hover {
-        background: rgba(17, 18, 23, 0.05) !important;
-      }
+    button:hover .inner-content {
+      background-color: rgba(255, 255, 255, 0.9) !important;
     }
   }
 `;

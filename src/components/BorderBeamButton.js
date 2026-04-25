@@ -1,24 +1,36 @@
 import React from "react";
 import styled, { keyframes, css } from "styled-components";
 
-const rotate = keyframes`
-  100% { transform: rotate(1turn); }
+const spinBeam = keyframes`
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 `;
 
 const ButtonWrapper = styled.button`
   position: relative;
   display: inline-flex;
-  padding: 1.5px; /* This creates the "border" thickness */
-  border: none;
+  align-items: stretch;
+  justify-content: center;
+  
+  /* Primary gets a 2px gap for the glowing border. Secondary gets 0 because we give it a solid border */
+  padding: ${(props) => (props.$secondary ? "0" : "2px")};
+  border: ${(props) => (props.$secondary ? "2px solid #111217" : "none")};
   background: transparent;
   cursor: pointer;
   outline: none;
   border-radius: 9999px;
-  overflow: hidden; 
   
-  /* Flexible sizing */
+  /* Forces perfect clipping across all browsers */
+  overflow: hidden; 
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
+  transform: translateZ(0);
+
+  /* Base Sizing */
   min-height: 56px; 
   min-width: 180px;
+  width: fit-content;
 
   transition: transform 0.2s ease;
 
@@ -33,85 +45,80 @@ const ButtonWrapper = styled.button`
 
 const BeamLayer = styled.div`
   position: absolute;
-  width: 200%; 
-  height: 200%; 
-  top: -50%;
-  left: -50%;
+  top: 50%;
+  left: 50%;
+  width: 300%;
+  aspect-ratio: 1; 
+  transform: translate(-50%, -50%);
   
-  /* Dynamic Beam Color */
+  /* A smooth conic gradient creates the glowing effect without CSS blur bugs */
   background: conic-gradient(
     from 90deg at 50% 50%,
     transparent 0%,
-    transparent 45%,
+    transparent 40%,
     ${(props) => props.$beamColor || props.theme.primaryColor || "#F07A48"} 50%,
-    transparent 55%,
+    transparent 60%,
     transparent 100%
   );
   
-  animation: ${rotate} 4s linear infinite; 
-  filter: blur(9px); 
-  z-index: 0;
-  opacity: 0.8;
+  animation: ${spinBeam} 4s linear infinite; 
+  z-index: -1;
+  /* Make the beam softer inside the frosted glass of the secondary button */
+  opacity: ${(props) => (props.$secondary ? 0.5 : 1)}; 
 `;
 
 const InnerContent = styled.div`
-  /* Crucial Fix: Changed from absolute to relative to expand parent width */
-  position: relative; 
-  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1; 
   border-radius: 9999px;
   
   /* --- MODE SWITCHING --- */
   ${(props) =>
     props.$secondary
       ? css`
-          /* Secondary: White Glass Blurry Background */
-          background-color: rgba(255, 255, 255, 0.15);
-          backdrop-filter: blur(15px);
-          -webkit-backdrop-filter: blur(15px);
-          color: white; 
+          /* Frosted Glass Effect */
+          background-color: rgba(255, 255, 255, 0.7); 
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          color: #111217; 
         `
       : css`
-          /* Principal: Solid Dark Background */
+          /* Solid Dark */
           background-color: #101012;
           color: #FFFFFF;
         `}
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px; /* Slightly increased gap for icon breathing room */
+  gap: 10px;
   z-index: 1;
-  padding: 0 1.8rem; /* Horizontal padding for text */
+  
+  /* Padding goes HERE on the text container, allowing the button to expand naturally */
+  padding: 0 2rem; 
 
-  /* Typography Force */
-  font-family: var(--font-primary), sans-serif !important; 
+  font-family: var(--font-primary, 'Ubuntu'), sans-serif !important; 
   font-weight: 700;
   font-size: 1.05rem;
-  white-space: nowrap; /* Forces text to stay on one line */
-
-  @media (max-width: 480px) {
-    white-space: normal; /* Allows safe wrapping on very tiny screens */
-    font-size: 0.95rem;
-    padding: 0.5rem 1.2rem;
-  }
+  white-space: nowrap; 
 
   span, p, h1, h2, h3, h4, h5, h6 {
     color: inherit !important;
   }
   
-  /* Icon handling inside */
   img, svg {
     color: inherit !important;
-    filter: ${(props) => props.$secondary ? 'brightness(0) invert(1)' : 'none'};
+    /* Ensure icons match text color */
+    filter: ${(props) => props.$secondary ? 'none' : 'brightness(0) invert(1)'};
   }
 `;
 
 const BorderBeamButton = ({ children, onClick, secondary = false, beamColor, className }) => {
   return (
-    // Passed className so styled-components overrides can target it if needed
-    <ButtonWrapper onClick={onClick} type="button" className={className}>
-      <BeamLayer $beamColor={beamColor} />
-      <InnerContent $secondary={secondary}>
+    <ButtonWrapper onClick={onClick} type="button" className={className} $secondary={secondary}>
+      <BeamLayer $beamColor={beamColor} $secondary={secondary} />
+      {/* We add className "inner-content" so parents can target it securely */}
+      <InnerContent className="inner-content" $secondary={secondary}>
         {children}
       </InnerContent>
     </ButtonWrapper>

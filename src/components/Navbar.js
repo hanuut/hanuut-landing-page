@@ -365,17 +365,27 @@ const Navbar = () => {
   const isArabic = i18n.language === "ar";
 
   const getTextColor = () => {
+    // 1. If scrolled, the navbar becomes dark glass, so text is always white
     if (isScrolled) return "#FFFFFF";
+    
+    // 2. Tawsila Mode (Dark Theme)
     if (isTawsilaMode) return "#FFFFFF";
+    
+    // 3. Onboarding has a white background
     if (path.includes("/onboarding")) return "#111217";
-    // Partners (Dark Theme) gets white text
+    
+    // 4. Pages with Dark Hero sections at the top (Partners, E'SUUQ, Blog)
     if (path.includes("/partners")) return "#FFFFFF";
-    // Shop Mode (Dark Headers) gets white text
+    if (path === "/esuuq") return "#FFFFFF"; // <-- THIS FIXES YOUR ISSUE
+    if (path.includes("/blog")) return "#FFFFFF"; 
+    
+    // 5. Shop Mode (Dark Headers)
     if (isShopMode) return "#FFFFFF";
 
-    // Home (Hub) & E'SUUQ (Ivory Background) get Dark Text
+    // Default for Home (Hub), Support, Privacy, etc. (Light Ivory/White Backgrounds)
     return "#111217";
   };
+  
   const textColor = getTextColor();
 
   useEffect(() => {

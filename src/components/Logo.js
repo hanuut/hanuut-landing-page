@@ -1,14 +1,9 @@
-// src/components/Logo.js
-
 import React from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
 
-// We are replacing the styled h1 with a styled img for the logo.
 const LogoImg = styled.img`
   height: 30px;
-  width: auto; // 'auto' maintains the aspect ratio.
-  
+  width: auto; 
   transition: all 0.2s ease;
 
   &:hover {
@@ -17,18 +12,13 @@ const LogoImg = styled.img`
   }
 
   @media (max-width: 768px) {
-    height: 35px; // A slightly smaller logo for mobile screens.
+    height: 25px; 
   }
 `;
 
-// The Logo component no longer needs useTranslation, as it just displays an image.
-// It now accepts an 'image' prop, which will be passed down from the Navbar.
+// Removed the <Link> wrapper since it is already wrapped in Navbar.js
 const Logo = ({ image }) => {
-  return (
-    <Link to="/">
-      <LogoImg src={image} alt="Hanuut App Logo" />
-    </Link>
-  );
+  return <LogoImg src={image} alt="Hanuut App Logo" />;
 };
 
 export default Logo;

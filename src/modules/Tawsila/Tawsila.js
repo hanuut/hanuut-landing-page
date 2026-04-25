@@ -6,19 +6,11 @@ import {
   BlueActionButton,
   BlueTextButton,
 } from "../../components/ActionButton";
-import Screenshot1 from "../../assets/illustrations/tawsila/1.gif";
-import Screenshot2 from "../../assets/illustrations/tawsila/2.gif";
-import Screenshot3 from "../../assets/illustrations/tawsila/3.gif";
-import Screenshot4 from   "../../assets/illustrations/tawsila/4.gif";
-import Screenshot5 from "../../assets/illustrations/tawsila/5.gif";
-import Screenshot6 from "../../assets/illustrations/tawsila/6.png";
-import Screenshot7 from "../../assets/illustrations/tawsila/7.png";
 import AnimationImage  from "../../assets/illustrations/tawsila/phone_animation.gif";
 import LogoImage from "../../assets/illustrations/tawsila/app-logo.png";
 import DriverImage from "../../assets/illustrations/tawsila/driver_tawsila.png";
 import Playstore from "../../assets/playstore.webp";
 import Steps from "./components/Steps";
-import ScreenshotDisplay from "./components/ScreenshotDisplay";
 import { useTranslation } from "react-i18next";
 
 const Section = styled.section`
