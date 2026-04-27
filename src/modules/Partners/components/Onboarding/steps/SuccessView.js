@@ -180,10 +180,6 @@ const SuccessView = ({ data }) => {
     <FaApple />
     <span>App Store (iOS)</span>
   </StoreButton>
-  <StoreButton href={windowsLink} target="_blank" className="secondary">
-    <FaWindows />
-    <span>{t("download_windows", "Manage on Desktop")}</span>
-  </StoreButton>
 </ButtonGroup>
     </SuccessWrapper>
   );

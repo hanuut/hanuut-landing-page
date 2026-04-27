@@ -185,7 +185,7 @@ const CtaSection = () => {
             <FaApple style={{ fontSize: '1.5rem' }} />
             <span>iOS</span>
           </BorderBeamButton>
-
+          {/* 
           <BorderBeamButton
             onClick={handleDownloadWindows}
             secondary={true}
@@ -194,6 +194,7 @@ const CtaSection = () => {
             <img src={Windows} alt="Windows" style={{ height: '1.5rem' }} />
             <span>Windows</span>
           </BorderBeamButton>
+          */}
         </ButtonsRow>
          
       </Container>

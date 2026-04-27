@@ -819,7 +819,6 @@
     "contact_title": "Contact Us",
     "copyright": "© 2026 Hanuut Express. All rights reserved."
   },
-  "features_section_title": "Features Built For You",
   "supermarkets_tab_label": "Grocery",
   "foodShops_tab_label": "Restaurants",
   "globalShops_tab_label": "E-Commerce",
@@ -853,9 +852,6 @@
   "cta_download_button": "Download for Windows",
   "cta_mobile_button": "Get Android App",
   "features_section_subtitle": "Select your business type to see how My Hanuut solves your daily problems.",
-  "tab_grocery": "Grocery",
-  "tab_food": "Restaurant",
-  "tab_global": "E-Commerce",
   "qna_gro_1_q": "Adding products takes too long.",
   "qna_gro_1_a": "Use the **Instant Barcode Scanner**. We have a database of 4,000+ Algerian products. Just scan, and the name/price fills automatically.",
   "qna_gro_2_q": "I lose money on expired goods.",
@@ -1035,5 +1031,51 @@
 "prefooter_subtitle": "Join the private network today.",
 "explore_desc": "Discover and order from the best {{category}} in {{location}}. Fast delivery from trusted local shops.",
 "directory_add_shop_title": "Own a {{category}}?",
-"directory_add_shop_desc": "Join us and add your shop to this list for free. Start receiving orders today!"
+"directory_add_shop_desc": "Join us and add your shop to this list for free. Start receiving orders today!",
+  "vision_title": "Digitize your trust. <br/><span class='highlight'>Protect your profit.</span>",
+  "vision_subtitle": "The complete Digital Brain for your shop. Powerful Offline POS, Barcode Stock Management, and a free Online Store. Zero technical skills required.",
+  
+  "features_section_title": "The Digital Brain for",
+  "tab_grocery": "Supermarkets & Retail",
+  "tab_food": "Restaurants & Cafés",
+  "tab_global": "E-commerce & Boutiques",
+  "view_all_features": "View All Features",
+
+  "pain_gro_1": "Manual counting takes hours.",
+  "sol_gro_1": "Scan 50 items a minute with our **4000+ Algerian barcode database**.",
+  "pain_gro_2": "Losing money to expired products.",
+  "sol_gro_2": "Get automated **expiry alerts** and low-stock warnings instantly.",
+  "pain_gro_3": "Calculating daily profit is confusing.",
+  "sol_gro_3": "**Offline-first POS** with exact net profit tracking at the end of the day.",
+
+  "pain_food_1": "Waiters overwhelmed, slow ordering.",
+  "sol_food_1": "Customers scan a **QR Menu** and order directly from their table.",
+  "pain_food_2": "Kitchen gets confused with paper tickets.",
+  "sol_food_2": "Digital **Kitchen Display System (KDS)** for instant order syncing.",
+  "pain_food_3": "Customers angry about out-of-stock items.",
+  "sol_food_3": "Instantly **hide out-of-stock** meals with a single tap on your phone.",
+
+  "pain_ecom_1": "Managing colors and sizes is a nightmare.",
+  "sol_ecom_1": "Advanced **Variant Matrix** for effortless tracking of clothes and gear.",
+  "pain_ecom_2": "Calculating shipping for 58 wilayas.",
+  "sol_ecom_2": "**Dynamic shipping calculator** integrated directly at checkout.",
+  "pain_ecom_3": "Building an online store costs millions.",
+  "sol_ecom_3": "Get a **Free customizable e-commerce website** in 3 minutes.",
+
+  "modal_title": "Complete Feature Directory",
+  "feat_gro_1_t": "4000+ Barcode Database", "feat_gro_1_d": "Pre-loaded with Algerian products. Just scan and sell.",
+  "feat_gro_2_t": "Expiry & Low-Stock Alerts", "feat_gro_2_d": "Never lose inventory to expiration dates again.",
+  "feat_gro_3_t": "Purchase to Receipt", "feat_gro_3_d": "Convert supplier purchase orders directly into inventory stock.",
+  "feat_gro_4_t": "Local Offline POS", "feat_gro_4_d": "Works without internet. Syncs automatically when connected.",
+  
+  "feat_food_1_t": "QR Table Ordering", "feat_food_1_d": "Generate custom QR codes for each table to speed up service.",
+  "feat_food_2_t": "Kitchen Display System", "feat_food_2_d": "Send orders straight to the chef's tablet or phone.",
+  "feat_food_3_t": "Instant Menu Toggling", "feat_food_3_d": "Hide or show dishes in real-time to avoid customer frustration.",
+  "feat_food_4_t": "Flyer Design Studio", "feat_food_4_d": "Generate beautiful promotional flyers directly from the app.",
+
+  "feat_ecom_1_t": "Variant Matrix", "feat_ecom_1_d": "Easily manage stock for different sizes, colors, and models.",
+  "feat_ecom_2_t": "58 Wilayas Shipping", "feat_ecom_2_d": "Automated delivery fee calculation across all of Algeria.",
+  "feat_ecom_3_t": "Landing Page Builder", "feat_ecom_3_d": "Your own hanuut.com/@yourshop link with customizable branding.",
+  "feat_ecom_4_t": "Net Profit Calculator", "feat_ecom_4_d": "Track exact profit margins after shipping and product costs."
+
 }

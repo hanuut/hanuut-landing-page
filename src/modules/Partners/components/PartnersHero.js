@@ -377,12 +377,10 @@ const PartnersHero = () => {
            {t("partnerHeadingBoost")} {t("myHanuutTitle")}
         </Badge>
 
-        <HeroTitle variants={itemVars} lang={i18n.language}>
-          <span className="highlight">{t("partnersHero_heading_part1")}</span>
-        </HeroTitle>
+        <HeroTitle variants={itemVars} lang={i18n.language} dangerouslySetInnerHTML={{ __html: t("vision_title") }} />
         
         <SubHeading variants={itemVars}>
-          {t("partnersHero_subheading")}
+          {t("vision_subtitle")}
         </SubHeading>
 
         <ButtonGroup variants={itemVars}>
@@ -394,11 +392,6 @@ const PartnersHero = () => {
           <BorderBeamButton onClick={handleDownloadIOS} secondary={true} beamColor="#F07A48">
             <FaApple style={{ fontSize: '1.5rem' }} />
             <span>App Store</span>
-          </BorderBeamButton>
-
-          <BorderBeamButton onClick={handleDownloadWindows} secondary={true} beamColor="#F07A48">
-            <Icon src={Windows} alt="Windows" />
-            <span>Windows</span>
           </BorderBeamButton>
         </ButtonGroup>
 

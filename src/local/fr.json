@@ -853,11 +853,7 @@
   "cta_final_desc": "Rejoignez des centaines de commerçants algériens qui numérisent leur activité. Créer votre boutique prend moins de 2 minutes.",
   "cta_download_button": "Télécharger pour Windows",
   "cta_mobile_button": "Obtenir l'App Android",
-  "features_section_title": "Tout Ce Dont Vous Avez Besoin.",
   "features_section_subtitle": "Sélectionnez votre type d'activité pour voir comment My Hanuut résout vos défis quotidiens.",
-  "tab_grocery": "Épicerie",
-  "tab_food": "Restauration",
-  "tab_global": "E-Commerce",
   "qna_gro_1_q": "L'ajout de produits prend trop de temps.",
   "qna_gro_1_a": "Plus maintenant. Utilisez le **Scanner Code-Barres**. Notre base de données contient plus de 4000 produits algériens. Scannez, et le nom/prix se remplit automatiquement.",
   "qna_gro_2_q": "Je perds de l'argent avec les produits périmés.",
@@ -1038,5 +1034,50 @@
 "prefooter_subtitle": "Rejoignez le réseau privé aujourd'hui.",
 "explore_desc": "Découvrez et commandez auprès des meilleurs {{category}} à {{location}}. Livraison rapide et boutiques locales vérifiées.",
 "directory_add_shop_title": "Vous avez un {{category}} ?",
-"directory_add_shop_desc": "Rejoignez-nous et ajoutez votre boutique gratuitement. Commencez à recevoir des commandes dès aujourd'hui !"
+"directory_add_shop_desc": "Rejoignez-nous et ajoutez votre boutique gratuitement. Commencez à recevoir des commandes dès aujourd'hui !",
+"vision_title": "Digitalisez votre commerce. <br/><span class='highlight'>Protégez vos bénéfices.</span>",
+  "vision_subtitle": "Le Cerveau Digital complet pour votre boutique. Logiciel POS hors-ligne, gestion de stock par code-barres et boutique en ligne gratuite.",
+  
+  "features_section_title": "Le Cerveau Digital pour",
+  "tab_grocery": "Supérettes & Détail",
+  "tab_food": "Restaurants & Cafés",
+  "tab_global": "E-commerce & Boutiques",
+  "view_all_features": "Voir Toutes les Fonctionnalités",
+
+  "pain_gro_1": "Le comptage manuel prend des heures.",
+  "sol_gro_1": "Scannez 50 articles par minute grâce à notre **base de données de 4000+ codes-barres**.",
+  "pain_gro_2": "Perte d'argent sur les produits périmés.",
+  "sol_gro_2": "Recevez des **alertes de péremption** et de rupture de stock instantanément.",
+  "pain_gro_3": "Calculer le bénéfice quotidien est un casse-tête.",
+  "sol_gro_3": "**Caisse POS hors-ligne** avec suivi exact du bénéfice net en fin de journée.",
+
+  "pain_food_1": "Serveurs débordés, commandes lentes.",
+  "sol_food_1": "Les clients scannent un **Menu QR** et commandent directement depuis leur table.",
+  "pain_food_2": "La cuisine s'embrouille avec les tickets papier.",
+  "sol_food_2": "**Système d'Affichage Cuisine (KDS)** digital pour une synchronisation instantanée.",
+  "pain_food_3": "Clients frustrés par les plats en rupture.",
+  "sol_food_3": "**Masquez les plats épuisés** instantanément d'un simple clic sur votre téléphone.",
+
+  "pain_ecom_1": "Gérer les couleurs et tailles est un cauchemar.",
+  "sol_ecom_1": "**Matrice de Variantes** avancée pour un suivi sans effort des vêtements.",
+  "pain_ecom_2": "Calculer la livraison pour 58 wilayas.",
+  "sol_ecom_2": "**Calculateur de livraison dynamique** intégré lors du paiement.",
+  "pain_ecom_3": "Créer un site web coûte des millions.",
+  "sol_ecom_3": "Obtenez un **site e-commerce gratuit et personnalisable** en 3 minutes.",
+
+  "modal_title": "Annuaire des Fonctionnalités",
+  "feat_gro_1_t": "Base de 4000+ Codes-barres", "feat_gro_1_d": "Pré-chargée avec les produits algériens. Scannez et vendez.",
+  "feat_gro_2_t": "Alertes Péremption & Stock", "feat_gro_2_d": "Ne perdez plus jamais de stock à cause des dates d'expiration.",
+  "feat_gro_3_t": "Achat vers Reçu", "feat_gro_3_d": "Convertissez les bons de commande fournisseurs directement en stock.",
+  "feat_gro_4_t": "POS Local Hors-ligne", "feat_gro_4_d": "Fonctionne sans internet. Se synchronise automatiquement une fois connecté.",
+  
+  "feat_food_1_t": "Commande par QR Code", "feat_food_1_d": "Générez des codes QR pour chaque table afin d'accélérer le service.",
+  "feat_food_2_t": "Écran Cuisine (KDS)", "feat_food_2_d": "Envoyez les commandes directement sur la tablette du chef.",
+  "feat_food_3_t": "Basculement Menu Instantané", "feat_food_3_d": "Cachez ou affichez les plats en temps réel pour éviter les frustrations.",
+  "feat_food_4_t": "Studio de Création de Flyers", "feat_food_4_d": "Générez de superbes flyers promotionnels directement depuis l'application.",
+
+  "feat_ecom_1_t": "Matrice de Variantes", "feat_ecom_1_d": "Gérez facilement le stock pour différentes tailles, couleurs et modèles.",
+  "feat_ecom_2_t": "Livraison 58 Wilayas", "feat_ecom_2_d": "Calcul automatisé des frais de livraison pour toute l'Algérie.",
+  "feat_ecom_3_t": "Créateur de Page de Vente", "feat_ecom_3_d": "Votre lien hanuut.com/@votre-boutique avec image de marque personnalisée.",
+  "feat_ecom_4_t": "Calculateur de Bénéfice Net", "feat_ecom_4_d": "Suivez vos marges de profit exactes après frais de livraison et coûts."
 }

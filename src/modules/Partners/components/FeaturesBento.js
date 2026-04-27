@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaChevronDown, FaChevronUp, FaCheck } from "react-icons/fa";
+import { FaTimesCircle, FaCheckCircle, FaArrowRight, FaArrowLeft } from "react-icons/fa";
+
+// Component Import
+import FeatureDirectoryModal from "./FeatureDirectoryModal";
 
 // --- Assets ---
 import Grocery1 from "../../../assets/my_hanuut_features/grocery_1.png";
@@ -18,9 +21,8 @@ import Ecom2 from "../../../assets/my_hanuut_features/ecom_2.png";
 import Ecom3 from "../../../assets/my_hanuut_features/ecom_3.png";
 
 // --- Styled Components ---
-
 const Section = styled.section`
-  background-color: #050505; /* Consistent Dark Background */
+  background-color: #050505;
   padding: 6rem 0;
   display: flex;
   justify-content: center;
@@ -88,10 +90,8 @@ const TabButton = styled.button`
   }
 `;
 
-// --- THE SPLIT LAYOUT ---
 const SplitContent = styled(motion.div)`
   display: grid;
-  /* 60% Images, 40% Text */
   grid-template-columns: 1.4fr 1fr; 
   gap: 4rem;
   width: 100%;
@@ -99,16 +99,15 @@ const SplitContent = styled(motion.div)`
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 
   @media (max-width: 1024px) {
-    grid-template-columns: 1fr; /* Stack on smaller screens */
+    grid-template-columns: 1fr;
     gap: 3rem;
   }
 `;
 
-// --- LEFT SIDE: The Image Grid (Bento) ---
 const ImageGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 280px 240px; /* Fixed compact heights */
+  grid-template-rows: 280px 240px; 
   gap: 1rem;
   width: 100%;
 
@@ -125,19 +124,9 @@ const ImageCard = styled(motion.div)`
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   
-  /* Grid Span Logic based on index */
-  /* Item 0: Big Main (Span 2 cols) */
-  &:nth-child(1) {
-    grid-column: span 2;
-  }
-  /* Item 1: Normal */
-  &:nth-child(2) {
-    grid-column: span 1;
-  }
-  /* Item 2: Normal */
-  &:nth-child(3) {
-    grid-column: span 1;
-  }
+  &:nth-child(1) { grid-column: span 2; }
+  &:nth-child(2) { grid-column: span 1; }
+  &:nth-child(3) { grid-column: span 1; }
 
   img {
     width: 100%;
@@ -146,13 +135,9 @@ const ImageCard = styled(motion.div)`
     object-position: top center;
     transition: transform 0.5s ease;
   }
-
-  &:hover img {
-    transform: scale(1.03);
-  }
+  &:hover img { transform: scale(1.03); }
 `;
 
-// --- RIGHT SIDE: The Q&A Content ---
 const ContentSide = styled.div`
   display: flex;
   flex-direction: column;
@@ -161,7 +146,7 @@ const ContentSide = styled.div`
   height: 100%;
 `;
 
-const QuestionBox = styled.div`
+const PainSolutionBox = styled.div`
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
@@ -174,40 +159,19 @@ const QuestionBox = styled.div`
   }
 `;
 
-const QuestionHeader = styled.div`
+const Row = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: ${(props) => (props.$isLast ? "0" : "1rem")};
 `;
 
-const IconBadge = styled.div`
-  min-width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: ${(props) => props.theme.primaryColor};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.8rem;
-`;
-
-const QuestionText = styled.h3`
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #FFF;
-  margin: 0;
-  font-family: 'Tajawal', sans-serif;
-`;
-
-const AnswerText = styled.p`
+const TextContent = styled.p`
   font-size: 0.95rem;
-  color: #A1A1AA;
-  line-height: 1.6;
+  color: ${(props) => (props.$isSolution ? "#E4E4E7" : "#A1A1AA")};
   margin: 0;
-  padding-left: ${(props) => (props.$isArabic ? "0" : "2.5rem")};
-  padding-right: ${(props) => (props.$isArabic ? "2.5rem" : "0")};
+  line-height: 1.5;
+  font-family: 'Cairo', sans-serif;
   
   strong {
     color: ${(props) => props.theme.primaryColor};
@@ -215,26 +179,50 @@ const AnswerText = styled.p`
   }
 `;
 
+const ViewMoreBtn = styled.button`
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(240, 122, 72, 0.1);
+  color: #F07A48;
+  border: 1px solid rgba(240, 122, 72, 0.3);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  font-family: "Tajawal", sans-serif;
+
+  &:hover {
+    background: #F07A48;
+    color: #FFF;
+  }
+`;
+
 const FeaturesBento = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const [activeTab, setActiveTab] = useState("supermarkets");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const contentMap = {
     supermarkets: [
-      { q: "qna_gro_1_q", a: "qna_gro_1_a", image: Grocery1 },
-      { q: "qna_gro_2_q", a: "qna_gro_2_a", image: Grocery2 },
-      { q: "qna_gro_3_q", a: "qna_gro_3_a", image: Grocery3 },
+      { pain: "pain_gro_1", sol: "sol_gro_1", image: Grocery1 },
+      { pain: "pain_gro_2", sol: "sol_gro_2", image: Grocery2 },
+      { pain: "pain_gro_3", sol: "sol_gro_3", image: Grocery3 },
     ],
     foodShops: [
-      { q: "qna_food_1_q", a: "qna_food_1_a", image: Food1 },
-      { q: "qna_food_2_q", a: "qna_food_2_a", image: Food2 },
-      { q: "qna_food_3_q", a: "qna_food_3_a", image: Food3 },
+      { pain: "pain_food_1", sol: "sol_food_1", image: Food1 },
+      { pain: "pain_food_2", sol: "sol_food_2", image: Food2 },
+      { pain: "pain_food_3", sol: "sol_food_3", image: Food3 },
     ],
     globalShops: [
-      { q: "qna_ecom_1_q", a: "qna_ecom_1_a", image: Ecom1 },
-      { q: "qna_ecom_2_q", a: "qna_ecom_2_a", image: Ecom2 },
-      { q: "qna_ecom_3_q", a: "qna_ecom_3_a", image: Ecom3 },
+      { pain: "pain_ecom_1", sol: "sol_ecom_1", image: Ecom1 },
+      { pain: "pain_ecom_2", sol: "sol_ecom_2", image: Ecom2 },
+      { pain: "pain_ecom_3", sol: "sol_ecom_3", image: Ecom3 },
     ],
   };
 
@@ -254,63 +242,76 @@ const FeaturesBento = () => {
   };
 
   return (
-    <Section>
-      <Container>
-        <Header>
-          <Title>
-            {t("features_section_title")} <span>{t("myHanuutTitle")}</span>
-          </Title>
-          
-          <TabsWrapper>
-            <TabButton $isActive={activeTab === "supermarkets"} onClick={() => setActiveTab("supermarkets")}>
-              {t("tab_grocery")}
-            </TabButton>
-            <TabButton $isActive={activeTab === "foodShops"} onClick={() => setActiveTab("foodShops")}>
-              {t("tab_food")}
-            </TabButton>
-            <TabButton $isActive={activeTab === "globalShops"} onClick={() => setActiveTab("globalShops")}>
-              {t("tab_global")}
-            </TabButton>
-          </TabsWrapper>
-        </Header>
+    <>
+      <Section>
+        <Container>
+          <Header>
+            <Title>
+              {t("features_section_title")} <span>{t("myHanuutTitle")}</span>
+            </Title>
+            <TabsWrapper>
+              <TabButton $isActive={activeTab === "supermarkets"} onClick={() => setActiveTab("supermarkets")}>
+                {t("tab_grocery")}
+              </TabButton>
+              <TabButton $isActive={activeTab === "foodShops"} onClick={() => setActiveTab("foodShops")}>
+                {t("tab_food")}
+              </TabButton>
+              <TabButton $isActive={activeTab === "globalShops"} onClick={() => setActiveTab("globalShops")}>
+                {t("tab_global")}
+              </TabButton>
+            </TabsWrapper>
+          </Header>
 
-        <AnimatePresence mode="wait">
-          <SplitContent
-            key={activeTab}
-            $isArabic={isArabic}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4 }}
-          >
-            {/* --- LEFT: GRID OF IMAGES (Static, Bento Style) --- */}
-            <ImageGrid>
-              {activeData.map((item, index) => (
-                <ImageCard key={`img-${index}`}>
-                  <img src={item.image} alt="Feature" loading="lazy" />
-                </ImageCard>
-              ))}
-            </ImageGrid>
+          <AnimatePresence mode="wait">
+            <SplitContent
+              key={activeTab}
+              $isArabic={isArabic}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+            >
+              {/* LEFT: GRID OF IMAGES */}
+              <ImageGrid>
+                {activeData.map((item, index) => (
+                  <ImageCard key={`img-${index}`}>
+                    <img src={item.image} alt="Feature" loading="lazy" />
+                  </ImageCard>
+                ))}
+              </ImageGrid>
 
-            {/* --- RIGHT: Q&A CONTENT (User Guide Info) --- */}
-            <ContentSide>
-              {activeData.map((item, index) => (
-                <QuestionBox key={`qna-${index}`}>
-                  <QuestionHeader>
-                    <IconBadge><FaCheck /></IconBadge>
-                    <QuestionText>{t(item.q)}</QuestionText>
-                  </QuestionHeader>
-                  <AnswerText $isArabic={isArabic}>
-                    {parseBold(t(item.a))}
-                  </AnswerText>
-                </QuestionBox>
-              ))}
-            </ContentSide>
+              {/* RIGHT: PAIN VS SOLUTION CONTENT */}
+              <ContentSide>
+                {activeData.map((item, index) => (
+                  <PainSolutionBox key={`ps-${index}`}>
+                    <Row>
+                      <FaTimesCircle style={{ color: '#EF4444', fontSize: '1.2rem', flexShrink: 0, marginTop: '2px' }} />
+                      <TextContent>{t(item.pain)}</TextContent>
+                    </Row>
+                    <Row $isLast>
+                      <FaCheckCircle style={{ color: '#39A170', fontSize: '1.2rem', flexShrink: 0, marginTop: '2px' }} />
+                      <TextContent $isSolution>{parseBold(t(item.sol))}</TextContent>
+                    </Row>
+                  </PainSolutionBox>
+                ))}
+                
+                <ViewMoreBtn onClick={() => setIsModalOpen(true)}>
+                  {t("view_all_features")} 
+                  {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+                </ViewMoreBtn>
+              </ContentSide>
+            </SplitContent>
+          </AnimatePresence>
+        </Container>
+      </Section>
 
-          </SplitContent>
-        </AnimatePresence>
-      </Container>
-    </Section>
+      {/* RENDER THE DIRECTORY MODAL */}
+      <FeatureDirectoryModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        activeTab={activeTab} 
+      />
+    </>
   );
 };
 
