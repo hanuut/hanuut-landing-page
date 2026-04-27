@@ -970,8 +970,6 @@
   "seo_home_desc": "Hanuut connects shops, customers, and drivers. Shop local with eSUUQ, manage your business with My Hanuut, or drive with Abridh.",
   "seo_esuuq_title": "eSUUQ | Buy, Sell & Order Delivery in Algeria",
   "seo_esuuq_desc": "The ultimate marketplace in Algeria. Order food, shop from local supermarkets, or buy and sell used items securely in your neighborhood.",
-  "seo_partners_title": "My Hanuut | Free POS & Online Store Builder for Algerian Merchants",
-  "seo_partners_desc": "Digitize your shop for free. Get a digital menu, barcode inventory management, and a custom e-commerce website. Available on Windows & Android.",
   "tawsila_btn_drive": "Join as a Driving Member",
   "tawsila_btn_ride": "Request a Trip",
   "tawsila_bento_1_title": "Private Network",
@@ -1036,25 +1034,10 @@
   "vision_subtitle": "The complete Digital Brain for your shop. Powerful Offline POS, Barcode Stock Management, and a free Online Store. Zero technical skills required.",
   
   "features_section_title": "The Digital Brain for",
-  "tab_grocery": "Supermarkets & Retail",
-  "tab_food": "Restaurants & Cafés",
-  "tab_global": "E-commerce & Boutiques",
+
   "view_all_features": "View All Features",
 
-  "pain_gro_1": "Manual counting takes hours.",
-  "sol_gro_1": "Scan 50 items a minute with our **4000+ Algerian barcode database**.",
-  "pain_gro_2": "Losing money to expired products.",
-  "sol_gro_2": "Get automated **expiry alerts** and low-stock warnings instantly.",
-  "pain_gro_3": "Calculating daily profit is confusing.",
-  "sol_gro_3": "**Offline-first POS** with exact net profit tracking at the end of the day.",
-
-  "pain_food_1": "Waiters overwhelmed, slow ordering.",
-  "sol_food_1": "Customers scan a **QR Menu** and order directly from their table.",
-  "pain_food_2": "Kitchen gets confused with paper tickets.",
-  "sol_food_2": "Digital **Kitchen Display System (KDS)** for instant order syncing.",
-  "pain_food_3": "Customers angry about out-of-stock items.",
-  "sol_food_3": "Instantly **hide out-of-stock** meals with a single tap on your phone.",
-
+  
   "pain_ecom_1": "Managing colors and sizes is a nightmare.",
   "sol_ecom_1": "Advanced **Variant Matrix** for effortless tracking of clothes and gear.",
   "pain_ecom_2": "Calculating shipping for 58 wilayas.",
@@ -1062,7 +1045,7 @@
   "pain_ecom_3": "Building an online store costs millions.",
   "sol_ecom_3": "Get a **Free customizable e-commerce website** in 3 minutes.",
 
-  "modal_title": "Complete Feature Directory",
+
   "feat_gro_1_t": "4000+ Barcode Database", "feat_gro_1_d": "Pre-loaded with Algerian products. Just scan and sell.",
   "feat_gro_2_t": "Expiry & Low-Stock Alerts", "feat_gro_2_d": "Never lose inventory to expiration dates again.",
   "feat_gro_3_t": "Purchase to Receipt", "feat_gro_3_d": "Convert supplier purchase orders directly into inventory stock.",
@@ -1076,6 +1059,61 @@
   "feat_ecom_1_t": "Variant Matrix", "feat_ecom_1_d": "Easily manage stock for different sizes, colors, and models.",
   "feat_ecom_2_t": "58 Wilayas Shipping", "feat_ecom_2_d": "Automated delivery fee calculation across all of Algeria.",
   "feat_ecom_3_t": "Landing Page Builder", "feat_ecom_3_d": "Your own hanuut.com/@yourshop link with customizable branding.",
-  "feat_ecom_4_t": "Net Profit Calculator", "feat_ecom_4_d": "Track exact profit margins after shipping and product costs."
+  "feat_ecom_4_t": "Net Profit Calculator", "feat_ecom_4_d": "Track exact profit margins after shipping and product costs.",
+  "seo_partners_title": "Free POS Software & QR Menu Algeria | My Hanuut",
+  "seo_partners_desc": "Stop wasting time. Digitize your shop with offline POS, free QR Menu for restaurants, and a Link-in-Bio store for Instagram sellers in Algeria.",
+
+  "vision_hero_title": "Stop wasting time in DMs. <br/><span class='highlight'>Protect your profit.</span>",
+  "vision_hero_subtitle": "Built for Algeria. Offline-first POS, Free QR Menu, and a Link-in-Bio store. Work smart, not hard.",
+
+  "tab_global": "E-commerce & Other Stores",
+  "tab_food": "Restaurants & Cafés",
+  "tab_grocery": "Supermarkets",
+
+  "pain_global_1": "Answering 'Price?' 100 times a day in DMs.",
+  "sol_global_1": "Share your **Link-in-Bio store**. Customers order directly.",
+  "pain_global_2": "Calculating delivery for 58 Wilayas manually.",
+  "sol_global_2": "**Automated shipping calculator** built into checkout.",
+  "pain_global_3": "Losing track of available colors and sizes.",
+  "sol_global_3": "Advanced **Variant Matrix** manages your stock automatically.",
+
+  "pain_food_1": "Reprinting menus every time prices change.",
+  "sol_food_1": "Free **Digital QR Menu**. Update prices instantly from your phone.",
+  "pain_food_2": "Waiters writing down orders and making mistakes.",
+  "sol_food_2": "Customers order from the table directly to your **Kitchen Display System**.",
+  "pain_food_3": "Arguing about out-of-stock items.",
+  "sol_food_3": "**Hide unavailable dishes** with a single tap.",
+
+  "pain_gro_1": "Counting inventory manually takes all night.",
+  "sol_gro_1": "Scan items instantly with our **4000+ Algerian barcode database**.",
+  "pain_gro_2": "Internet cuts off and the software stops working.",
+  "sol_gro_2": "**Offline-first POS**. Keeps working and syncs when connected.",
+  "pain_gro_3": "Throwing away expired products.",
+  "sol_gro_3": "Automated **Expiry & Low-Stock Alerts** save your money.",
+
+  "modal_title": "Complete Feature Directory",
+  "cat_sales": "Point of Sale (POS) & Orders",
+  "cat_logistics": "Logistics & Delivery",
+
+  "feat_sales_1_t": "Offline-First POS", "feat_sales_1_d": "Rings up sales even without Wi-Fi. Syncs automatically.",
+  "feat_sales_2_t": "Digital QR Menu", "feat_sales_2_d": "Contactless dining experience. Update in real-time.",
+  "feat_sales_3_t": "Kitchen Display (KDS)", "feat_sales_3_d": "Send digital tickets straight to the kitchen.",
+  
+  "feat_inv_1_t": "Barcode Database", "feat_inv_1_d": "Thousands of local Algerian products pre-loaded.",
+  "feat_inv_2_t": "Expiry Alerts", "feat_inv_2_d": "Push notifications before products go bad.",
+  "feat_inv_3_t": "Variant Management", "feat_inv_3_d": "Track inventory by size, color, and model.",
+
+  "feat_grow_1_t": "Link-in-Bio Store", "feat_grow_1_d": "Your own hanuut.com/@shop link for Instagram & TikTok.",
+  "feat_grow_2_t": "Promo Studio", "feat_grow_2_d": "Generate branded flyers for social media instantly.",
+  "feat_grow_3_t": "Net Profit Analytics", "feat_grow_3_d": "Know exactly what you earned at the end of the day.",
+
+  "feat_log_1_t": "58 Wilayas Shipping", "feat_log_1_d": "Dynamic delivery fee calculation for national shipping.",
+  "feat_log_2_t": "Self-Delivery Mode", "feat_log_2_d": "Set custom radiuses for your own delivery boys.",
+  "cat_sales_pos": "Point of Sale (POS)",
+  "cat_inventory": "Stock & Inventory",
+  "cat_sales_orders": "Digital Menu & Orders",
+  "cat_operations": "Operations & Marketing",
+  "cat_digital_store": "Digital Storefront",
+  "cat_growth": "Growth & Analytics"
 
 }

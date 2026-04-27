@@ -202,156 +202,73 @@ const DigitalMatrixCanvas = () => {
   return <CanvasContainer ref={canvasRef} />;
 };
 
-const float = keyframes`
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); } 
-  100% { transform: translateY(0px); }
-`;
-
 const Section = styled.section`
-  width: 100%;
-  min-height: 100vh;
-  background-color: #050505;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-  top: 0;
+  width: 100%; min-height: 100vh; background-color: #050505; color: white;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; overflow: hidden; top: 0;
 `;
 
 const Container = styled.div`
-  width: 90%;
-  max-width: 1000px;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 2rem;
-  padding-top: calc(${(props) => props.theme.navHeight} + 2rem);
-  padding-bottom: 4rem;
+  width: 90%; max-width: 1000px; z-index: 5;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2rem;
+  padding-top: calc(${(props) => props.theme.navHeight} + 2rem); padding-bottom: 4rem;
   pointer-events: none;
-
-  @media (max-width: 768px) {
-    padding-top: calc(${(props) => props.theme.navHeightMobile} + 2rem);
-  }
 `;
 
 const LogoContainer = styled(motion.div)`
-  position: relative;
-  width: 65px; 
-  height: 65px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative; width: 65px; height: 65px;
+  display: flex; align-items: center; justify-content: center;
   margin-bottom: -1rem; 
-  animation: ${float} 5s ease-in-out infinite;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    position: relative;
-    z-index: 2;
-    filter: drop-shadow(0 10px 20px rgba(240, 122, 72, 0.5));
-  }
+  /* Assume float keyframes defined */
+  img { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; filter: drop-shadow(0 10px 20px rgba(240, 122, 72, 0.5)); }
 `;
 
 const Badge = styled(motion.div)`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1.4rem;
-  border-radius: 100px;
-  background: rgba(240, 122, 72, 0.08); 
-  border: 1px solid rgba(240, 122, 72, 0.3);
-  backdrop-filter: blur(8px);
-  color: #F07A48; 
-  font-size: 0.85rem;
-  font-weight: 700;
-  font-family: 'Tajawal', sans-serif;
-  margin-bottom: 0.5rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.5rem 1.4rem; border-radius: 100px;
+  background: rgba(240, 122, 72, 0.08); border: 1px solid rgba(240, 122, 72, 0.3);
+  backdrop-filter: blur(8px); color: #F07A48; font-size: 0.85rem; font-weight: 700;
+  font-family: 'Tajawal', sans-serif; margin-bottom: 0.5rem;
 `;
 
 const HeroTitle = styled(motion.h1)`
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 800;
-  line-height: 1.2;
+  font-size: clamp(1.6rem, 3.8vw, 3rem); font-weight: 800; line-height: 1.2;
   color: white;
-  font-family: 'Tajawal', sans-serif;
-
+  
   .highlight {
     background: linear-gradient(to bottom, #FFFFFF 30%, #F07A48 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
 `;
 
 const SubHeading = styled(motion.p)`
-  font-size: clamp(1.1rem, 2vw, 1.25rem);
-  color: #a1a1aa;
-  max-width: 600px;
-  line-height: 1.7;
-  font-family: 'Cairo Variable', sans-serif;
+  font-size: clamp(1.1rem, 2vw, 1.25rem); color: #a1a1aa; max-width: 600px;
+  line-height: 1.7; 
 `;
 
 const ButtonGroup = styled(motion.div)`
-  display: flex;
-  gap: 1.2rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  pointer-events: auto;
+  display: flex; gap: 1.2rem; margin-top: 1rem; flex-wrap: wrap;
+  justify-content: center; pointer-events: auto;
 `;
 
-const Icon = styled.img`
-  height: 1.5rem;
-  width: auto;
-  filter: invert(1);
-`;
+const Icon = styled.img` height: 1.5rem; width: auto; filter: invert(1); `;
 
 const WizardButton = styled.button`
-  margin-top: 1.5rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.9rem 2.2rem;
-  border-radius: 50px;
-  color: white;
-  font-size: 1.05rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.3s ease;
-  font-family: 'Tajawal', sans-serif;
-  pointer-events: auto;
-
-  &:hover {
-    background: rgba(240, 122, 72, 0.15);
-    border-color: #F07A48;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(240, 122, 72, 0.1);
-  }
-
+  margin-top: 1.5rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.9rem 2.2rem; border-radius: 50px; color: white; font-size: 1.05rem; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease;
+  font-family: 'Tajawal', sans-serif; pointer-events: auto;
+  &:hover { background: rgba(240, 122, 72, 0.15); border-color: #F07A48; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(240, 122, 72, 0.1); }
   svg { color: #F07A48; }
 `;
 
-const SubText = styled.p`
-  font-size: 0.85rem;
-  color: #71717a;
-  margin-top: 0.8rem;
-`;
+const SubText = styled.p` font-size: 0.85rem; color: #71717a; margin-top: 0.8rem; `;
 
 const PartnersHero = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate(); 
 
   const handleDownloadPlay = () => window.open(process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY, "_blank");
-  const handleDownloadWindows = () => window.open(process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK, "_blank");
   const handleDownloadIOS = () => window.open("https://apps.apple.com/us/app/my-hanuut/id6762234117", "_blank");
   const handleWizardClick = () => {
     navigate("/partners/onboarding");
@@ -366,7 +283,6 @@ const PartnersHero = () => {
   return (
     <Section>
       <DigitalMatrixCanvas />
-
       <Container as={motion.div} initial="hidden" animate="visible" transition={{ staggerChildren: 0.1 }}>
         
         <LogoContainer variants={itemVars}>
@@ -374,13 +290,17 @@ const PartnersHero = () => {
         </LogoContainer>
 
         <Badge variants={itemVars}>
-           {t("partnerHeadingBoost")} {t("myHanuutTitle")}
+           My Hanuut
         </Badge>
 
-        <HeroTitle variants={itemVars} lang={i18n.language} dangerouslySetInnerHTML={{ __html: t("vision_title") }} />
+        <HeroTitle 
+          variants={itemVars} 
+          lang={i18n.language} 
+          dangerouslySetInnerHTML={{ __html: t("vision_hero_title") }} 
+        />
         
         <SubHeading variants={itemVars}>
-          {t("vision_subtitle")}
+          {t("vision_hero_subtitle")}
         </SubHeading>
 
         <ButtonGroup variants={itemVars}>

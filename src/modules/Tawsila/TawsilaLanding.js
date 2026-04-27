@@ -270,7 +270,7 @@ const Badge = styled(motion.div)`
 `;
 
 const Title = styled(motion.h1)`
-  font-size: clamp(3rem, 7vw, 6rem);
+  font-size: clamp(1.6rem, 3.8vw, 3rem)
   font-weight: 900;
   color: white;
   line-height: 1.1;
