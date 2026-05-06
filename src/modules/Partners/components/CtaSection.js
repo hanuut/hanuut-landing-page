@@ -6,127 +6,110 @@ import Windows from "../../../assets/windows.svg";
 import Playstore from "../../../assets/playstore.webp";
 import BorderBeamButton from "../../../components/BorderBeamButton";
 import { useNavigate } from "react-router-dom"; 
-import { FaMagic, FaApple } from "react-icons/fa";
+import { FaMagic, FaApple, FaShieldAlt } from "react-icons/fa";
 
 // --- Styled Components ---
-
 const Section = styled.section`
-  width: 100%;
-  padding: 8rem 0 6rem 0;
-  background-color: #050505;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
+  width: 100%; padding: 8rem 0 6rem 0; background-color: #050505;
+  position: relative; display: flex; justify-content: center; overflow: hidden;
   border-top: 1px solid #18181b;
 `;
 
 const Glow = styled.div`
-  position: absolute;
-  bottom: -50%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100vw;
-  height: 50vh;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(240, 122, 72, 0.2) 0%, 
-    transparent 70%
-  );
-  filter: blur(60px);
-  pointer-events: none;
+  position: absolute; bottom: -50%; left: 50%; transform: translateX(-50%);
+  width: 100vw; height: 50vh;
+  background: radial-gradient(ellipse at center, rgba(240, 122, 72, 0.2) 0%, transparent 70%);
+  filter: blur(60px); pointer-events: none;
 `;
 
 const Container = styled.div`
-  max-width: 800px;
-  width: 90%;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2.5rem;
-  z-index: 2;
+  max-width: 800px; width: 90%; text-align: center; display: flex;
+  flex-direction: column; align-items: center; gap: 2.5rem; z-index: 2;
 `;
 
 const Title = styled.h2`
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 800;
-  color: white;
-  line-height: 1.1;
-  font-family: 'Tajawal', sans-serif;
-  
-  span {
-    color: #F07A48;
-  }
+  font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; color: white;
+  line-height: 1.1; font-family: 'Tajawal', sans-serif;
+  span { color: #F07A48; }
 `;
 
 const Description = styled.p`
-  font-size: 1.25rem;
-  color: #a1a1aa;
-  line-height: 1.6;
-  max-width: 600px;
-  font-family: 'Cairo', sans-serif;
+  font-size: 1.25rem; color: #a1a1aa; line-height: 1.6; max-width: 600px; font-family: 'Cairo', sans-serif;
 `;
 
 const ButtonsRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1.5rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: flex; flex-direction: row; align-items: center; gap: 1.5rem;
+  margin-top: 1rem; flex-wrap: wrap; justify-content: center;
 `;
 
 const WizardButton = styled.button`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1rem 2rem;
-  border-radius: 50px;
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 2rem; border-radius: 50px; color: white; font-size: 1rem; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease;
   font-family: 'Tajawal', sans-serif;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: #39A170;
-    transform: translateY(-2px);
-  }
-
-  svg {
-    color: #39A170;
-  }
+  &:hover { background: rgba(255, 255, 255, 0.1); border-color: #39A170; transform: translateY(-2px); }
+  svg { color: #39A170; }
 `;
 
 const SubText = styled.p`
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 0.5rem;
+  font-size: 0.9rem; color: #666; margin-top: 0.5rem;
+`;
+
+// --- NEW TRUST NOTE STYLING ---
+const TrustNote = styled(motion.div)`
+  margin-top: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  max-width: 550px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+
+  svg {
+    color: #39A170;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: #A1A1AA;
+    margin: 0;
+    line-height: 1.5;
+    font-family: 'Cairo', sans-serif;
+
+    strong {
+      color: #E4E4E7;
+      font-weight: 700;
+    }
+  }
 `;
 
 const CtaSection = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate(); 
+  const isArabic = i18n.language === "ar";
 
   const handleDownloadPlay = () => {
     const link = process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
     if (link) window.open(link, "_blank");
   };
 
-  const handleDownloadWindows = () => {
-    const link = process.env.REACT_APP_WINDOWS_MY_HANUUT_DOWNLOAD_LINK;
-    if (link) window.open(link, "_blank");
+  const handleDownloadIOS = () => {
+    window.open("https://apps.apple.com/us/app/my-hanuut/id6762234117", "_blank");
   };
 
-  const handleDownloadIOS = () => {
-  window.open("https://apps.apple.com/us/app/my-hanuut/id6762234117", "_blank");
-};
+  // --- NEW NESTJS PIPELINE ROUTING ---
+  const handleDownloadWindows = () => {
+    const API_URL = process.env.REACT_APP_API_PROD_URL || 'https://api.hanuut.com';
+    // Direct link to trigger the browser's download manager via the backend redirect
+    window.location.href = `${API_URL}/download/windows/latest`;
+  };
 
   const handleWizardClick = () => {
     navigate("/partners/onboarding"); 
@@ -137,65 +120,50 @@ const CtaSection = () => {
     <Section>
       <Glow />
       <Container>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          {/* Using dangerouslySetInnerHTML to allow span styling if needed in translation, or simple string */}
-          <Title>
-             {t("cta_final_title")}
-          </Title>
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+          <Title>{t("cta_final_title")}</Title>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          viewport={{ once: true }}
-        >
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} viewport={{ once: true }}>
           <Description>{t("cta_final_desc")}</Description>
         </motion.div>
 
-        {/* Wizard Link (Onboarding) */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <WizardButton onClick={handleWizardClick}>
-            <FaMagic /> 
-            {t("cta_wizard_button")}
+            <FaMagic /> {t("cta_wizard_button")}
           </WizardButton>
           <SubText>{t("cta_wizard_sub")}</SubText>
         </div>
 
-        {/* Downloads */}
         <ButtonsRow>
-          <BorderBeamButton
-            onClick={handleDownloadPlay}
-            beamColor="#F07A48"
-          >
+          <BorderBeamButton onClick={handleDownloadPlay} beamColor="#F07A48">
             <img src={Playstore} alt="Google Play" style={{ height: '1.5rem', filter: 'invert(1)' }} />
             <span>Android</span>
           </BorderBeamButton>
 
-          <BorderBeamButton
-            onClick={handleDownloadIOS}
-            secondary={true}
-            beamColor="#F07A48"
-          >
+          <BorderBeamButton onClick={handleDownloadIOS} secondary={true} beamColor="#F07A48">
             <FaApple style={{ fontSize: '1.5rem' }} />
             <span>iOS</span>
           </BorderBeamButton>
-          {/* 
-          <BorderBeamButton
-            onClick={handleDownloadWindows}
-            secondary={true}
-            beamColor="#397FF9"
-          >
+
+          {/* WINDOWS BUTTON RESTORED */}
+          <BorderBeamButton onClick={handleDownloadWindows} secondary={true} beamColor="#397FF9">
             <img src={Windows} alt="Windows" style={{ height: '1.5rem' }} />
             <span>Windows</span>
           </BorderBeamButton>
-          */}
         </ButtonsRow>
+
+        {/* TRUST NOTE FOR SMART SCREEN */}
+        <TrustNote 
+          $isArabic={isArabic}
+          initial={{ opacity: 0, y: 10 }} 
+          whileInView={{ opacity: 1, y: 0 }} 
+          transition={{ delay: 0.4 }} 
+          viewport={{ once: true }}
+        >
+          <FaShieldAlt />
+          <p dangerouslySetInnerHTML={{ __html: t("windows_trust_note") }} />
+        </TrustNote>
          
       </Container>
     </Section>

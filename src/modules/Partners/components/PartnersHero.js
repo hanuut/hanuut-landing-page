@@ -280,6 +280,11 @@ const PartnersHero = () => {
     visible: { y: 0, opacity: 1, transition: { duration: 0.7 } }
   };
 
+  const handleDownloadWindows = () => {
+    const API_URL = process.env.REACT_APP_API_PROD_URL || 'https://api.hanuut.com';
+    window.location.href = `${API_URL}/download/windows/latest`;
+  };
+
   return (
     <Section>
       <DigitalMatrixCanvas />
@@ -313,7 +318,14 @@ const PartnersHero = () => {
             <FaApple style={{ fontSize: '1.5rem' }} />
             <span>App Store</span>
           </BorderBeamButton>
+
+          {/* ADD WINDOWS BUTTON HERE */}
+          <BorderBeamButton onClick={handleDownloadWindows} secondary={true} beamColor="#397FF9">
+            <Icon src={Windows} alt="Windows" />
+            <span>Windows</span>
+          </BorderBeamButton>
         </ButtonGroup>
+
 
         <motion.div variants={itemVars} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <WizardButton onClick={handleWizardClick}>

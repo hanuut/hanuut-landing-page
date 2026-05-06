@@ -1114,6 +1114,7 @@
   "cat_sales_orders": "Digital Menu & Orders",
   "cat_operations": "Operations & Marketing",
   "cat_digital_store": "Digital Storefront",
-  "cat_growth": "Growth & Analytics"
+  "cat_growth": "Growth & Analytics",
+  "windows_trust_note": "Note: As a new application, Windows may display a 'SmartScreen' warning. Click <strong>'More info'</strong> then <strong>'Run anyway'</strong>. Our software is verified safe and official."
 
 }
