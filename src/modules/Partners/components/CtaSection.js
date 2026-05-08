@@ -2,11 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import Windows from "../../../assets/windows.svg";
-import Playstore from "../../../assets/playstore.webp";
-import BorderBeamButton from "../../../components/BorderBeamButton";
 import { useNavigate } from "react-router-dom"; 
-import { FaMagic, FaApple, FaShieldAlt } from "react-icons/fa";
+import { FaMagic, FaShieldAlt } from "react-icons/fa";
+
+// IMPORT THE NEW COMPONENT
+import PlatformDownloadButtons from "./PlatformDownloadButtons";
 
 // --- Styled Components ---
 const Section = styled.section`
@@ -37,11 +37,6 @@ const Description = styled.p`
   font-size: 1.25rem; color: #a1a1aa; line-height: 1.6; max-width: 600px; font-family: 'Cairo', sans-serif;
 `;
 
-const ButtonsRow = styled.div`
-  display: flex; flex-direction: row; align-items: center; gap: 1.5rem;
-  margin-top: 1rem; flex-wrap: wrap; justify-content: center;
-`;
-
 const WizardButton = styled.button`
   background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1rem 2rem; border-radius: 50px; color: white; font-size: 1rem; font-weight: 600;
@@ -55,7 +50,6 @@ const SubText = styled.p`
   font-size: 0.9rem; color: #666; margin-top: 0.5rem;
 `;
 
-// --- NEW TRUST NOTE STYLING ---
 const TrustNote = styled(motion.div)`
   margin-top: 1.5rem;
   background: rgba(255, 255, 255, 0.03);
@@ -69,24 +63,10 @@ const TrustNote = styled(motion.div)`
   text-align: ${(props) => (props.$isArabic ? "right" : "left")};
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 
-  svg {
-    color: #39A170;
-    font-size: 1.2rem;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
+  svg { color: #39A170; font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
   p {
-    font-size: 0.85rem;
-    color: #A1A1AA;
-    margin: 0;
-    line-height: 1.5;
-    font-family: 'Cairo', sans-serif;
-
-    strong {
-      color: #E4E4E7;
-      font-weight: 700;
-    }
+    font-size: 0.85rem; color: #A1A1AA; margin: 0; line-height: 1.5; font-family: 'Cairo', sans-serif;
+    strong { color: #E4E4E7; font-weight: 700; }
   }
 `;
 
@@ -94,22 +74,6 @@ const CtaSection = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate(); 
   const isArabic = i18n.language === "ar";
-
-  const handleDownloadPlay = () => {
-    const link = process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY;
-    if (link) window.open(link, "_blank");
-  };
-
-  const handleDownloadIOS = () => {
-    window.open("https://apps.apple.com/us/app/my-hanuut/id6762234117", "_blank");
-  };
-
-  // --- NEW NESTJS PIPELINE ROUTING ---
-  const handleDownloadWindows = () => {
-    const API_URL = process.env.REACT_APP_API_PROD_URL || 'https://api.hanuut.com';
-    // Direct link to trigger the browser's download manager via the backend redirect
-    window.location.href = `${API_URL}/download/windows/latest`;
-  };
 
   const handleWizardClick = () => {
     navigate("/partners/onboarding"); 
@@ -135,23 +99,8 @@ const CtaSection = () => {
           <SubText>{t("cta_wizard_sub")}</SubText>
         </div>
 
-        <ButtonsRow>
-          <BorderBeamButton onClick={handleDownloadPlay} beamColor="#F07A48">
-            <img src={Playstore} alt="Google Play" style={{ height: '1.5rem', filter: 'invert(1)' }} />
-            <span>Android</span>
-          </BorderBeamButton>
-
-          <BorderBeamButton onClick={handleDownloadIOS} secondary={true} beamColor="#F07A48">
-            <FaApple style={{ fontSize: '1.5rem' }} />
-            <span>iOS</span>
-          </BorderBeamButton>
-
-          {/* WINDOWS BUTTON RESTORED */}
-          <BorderBeamButton onClick={handleDownloadWindows} secondary={true} beamColor="#397FF9">
-            <img src={Windows} alt="Windows" style={{ height: '1.5rem' }} />
-            <span>Windows</span>
-          </BorderBeamButton>
-        </ButtonsRow>
+        {/* REPLACED BUTTON GROUP WITH UNIFIED COMPONENT */}
+        <PlatformDownloadButtons layout="cta" />
 
         {/* TRUST NOTE FOR SMART SCREEN */}
         <TrustNote 

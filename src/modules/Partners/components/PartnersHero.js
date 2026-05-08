@@ -8,6 +8,7 @@ import Playstore from "../../../assets/playstore.webp";
 import { useNavigate } from "react-router-dom"; 
 import { FaMagic, FaApple } from "react-icons/fa";
 import AppLogo3D from "../../../assets/logos/myHanuut/logo_ar.png"; 
+import PlatformDownloadButtons from "./PlatformDownloadButtons";
 
 // --- 1. THE DIGITAL MATRIX CANVAS ---
 const CanvasContainer = styled.canvas`
@@ -219,7 +220,6 @@ const LogoContainer = styled(motion.div)`
   position: relative; width: 65px; height: 65px;
   display: flex; align-items: center; justify-content: center;
   margin-bottom: -1rem; 
-  /* Assume float keyframes defined */
   img { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; filter: drop-shadow(0 10px 20px rgba(240, 122, 72, 0.5)); }
 `;
 
@@ -246,13 +246,6 @@ const SubHeading = styled(motion.p)`
   line-height: 1.7; 
 `;
 
-const ButtonGroup = styled(motion.div)`
-  display: flex; gap: 1.2rem; margin-top: 1rem; flex-wrap: wrap;
-  justify-content: center; pointer-events: auto;
-`;
-
-const Icon = styled.img` height: 1.5rem; width: auto; filter: invert(1); `;
-
 const WizardButton = styled.button`
   margin-top: 1.5rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0.9rem 2.2rem; border-radius: 50px; color: white; font-size: 1.05rem; font-weight: 700;
@@ -268,8 +261,6 @@ const PartnersHero = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate(); 
 
-  const handleDownloadPlay = () => window.open(process.env.REACT_APP_MY_HANUUT_DOWNLOAD_LINK_GOOGLE_PLAY, "_blank");
-  const handleDownloadIOS = () => window.open("https://apps.apple.com/us/app/my-hanuut/id6762234117", "_blank");
   const handleWizardClick = () => {
     navigate("/partners/onboarding");
     window.scrollTo(0, 0);
@@ -278,11 +269,6 @@ const PartnersHero = () => {
   const itemVars = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { duration: 0.7 } }
-  };
-
-  const handleDownloadWindows = () => {
-    const API_URL = process.env.REACT_APP_API_PROD_URL || 'https://api.hanuut.com';
-    window.location.href = `${API_URL}/download/windows/latest`;
   };
 
   return (
@@ -308,24 +294,10 @@ const PartnersHero = () => {
           {t("vision_hero_subtitle")}
         </SubHeading>
 
-        <ButtonGroup variants={itemVars}>
-          <BorderBeamButton onClick={handleDownloadPlay} beamColor="#F07A48">
-            <Icon src={Playstore} alt="Google Play" />
-            <span>Google Play</span>
-          </BorderBeamButton>
-
-          <BorderBeamButton onClick={handleDownloadIOS} secondary={true} beamColor="#F07A48">
-            <FaApple style={{ fontSize: '1.5rem' }} />
-            <span>App Store</span>
-          </BorderBeamButton>
-
-          {/* ADD WINDOWS BUTTON HERE */}
-          <BorderBeamButton onClick={handleDownloadWindows} secondary={true} beamColor="#397FF9">
-            <Icon src={Windows} alt="Windows" />
-            <span>Windows</span>
-          </BorderBeamButton>
-        </ButtonGroup>
-
+        {/* REPLACED BUTTON GROUP WITH UNIFIED COMPONENT */}
+        <motion.div variants={itemVars}>
+          <PlatformDownloadButtons layout="hero" />
+        </motion.div>
 
         <motion.div variants={itemVars} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <WizardButton onClick={handleWizardClick}>
