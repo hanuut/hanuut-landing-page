@@ -3,29 +3,23 @@ import { useTranslation } from "react-i18next";
 import Seo from "../../components/Seo";
 // Import the new components
 import PartnersHero from "./components/PartnersHero";
+import DomainSelector from "./components/DomainSelector"; // REPLACES FeaturesBento
 import PartnersValues from "./components/PartnersValues";
 import CtaSection from "./components/CtaSection";
-// --- REPLACE THIS LINE ---
-import FeaturesBento from "./components/FeaturesBento"; 
 
 // --- Main Page Container ---
 const PageWrapper = styled.main`
   width: 100%;
-  /* 
-     FIX: Removed padding-top so the dark background 
-     extends behind the transparent navbar.
-  */
   padding-top: 0; 
   position: relative;
   z-index: 1;
 `;
 
-
-
 const PartnersPage = () => {
-  const { t, i18n } = useTranslation();
-const seoTitle = t("seo_partners_title", "My Hanuut | Free POS & Online Store Builder");
+  const { t } = useTranslation();
+  const seoTitle = t("seo_partners_title", "My Hanuut | Free POS & Online Store Builder");
   const seoDesc = t("seo_partners_desc", "Digitize your shop for free. Get a digital menu, barcode inventory management, and a custom e-commerce website.");
+  
   return (
     <>
      <Seo 
@@ -56,7 +50,7 @@ const seoTitle = t("seo_partners_title", "My Hanuut | Free POS & Online Store Bu
 
       <PageWrapper>
         <PartnersHero />
-        <FeaturesBento /> 
+        <DomainSelector /> 
         <PartnersValues />
         <CtaSection />
       </PageWrapper>

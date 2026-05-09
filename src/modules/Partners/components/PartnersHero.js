@@ -1,25 +1,16 @@
 import React, { useEffect, useRef } from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import BorderBeamButton from "../../../components/BorderBeamButton";
-import Windows from "../../../assets/windows.svg";
-import Playstore from "../../../assets/playstore.webp";
 import { useNavigate } from "react-router-dom"; 
-import { FaMagic, FaApple } from "react-icons/fa";
+import { FaMagic } from "react-icons/fa";
 import AppLogo3D from "../../../assets/logos/myHanuut/logo_ar.png"; 
+
 import PlatformDownloadButtons from "./PlatformDownloadButtons";
 
-// --- 1. THE DIGITAL MATRIX CANVAS ---
 const CanvasContainer = styled.canvas`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  background: #050505;
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none; background: #050505;
 `;
 
 const DigitalMatrixCanvas = () => {
@@ -125,7 +116,7 @@ const DigitalMatrixCanvas = () => {
       }
     };
 
-    const animate = (now) => {
+    const animate = () => {
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = "#050505";
       ctx.fillRect(0, 0, w, h);
@@ -142,7 +133,6 @@ const DigitalMatrixCanvas = () => {
         const currentX = xStart + (xEnd - xStart) * p.progress;
         const currentY = horizon + (Math.pow(1 - p.progress, 2)) * (h - horizon);
 
-        // FIX: Math.max ensures size is never negative to prevent IndexSizeError
         const rawSize = p.isShooting ? 30 : (15 * (1 - p.progress));
         const size = Math.max(0.1, rawSize);
 
@@ -175,22 +165,15 @@ const DigitalMatrixCanvas = () => {
       animationFrame = requestAnimationFrame(animate);
     };
 
-    const handleMouseMove = (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    };
-
-    const handleMouseLeave = () => {
-      mouse.x = -1000;
-      mouse.y = -1000;
-    };
+    const handleMouseMove = (e) => { mouse.x = e.clientX; mouse.y = e.clientY; };
+    const handleMouseLeave = () => { mouse.x = -1000; mouse.y = -1000; };
 
     window.addEventListener("resize", resize);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseleave", handleMouseLeave);
 
     resize();
-    animate(0);
+    animate();
 
     return () => {
       window.removeEventListener("resize", resize);
@@ -232,9 +215,9 @@ const Badge = styled(motion.div)`
 `;
 
 const HeroTitle = styled(motion.h1)`
-  font-size: clamp(1.6rem, 3.8vw, 3rem); font-weight: 800; line-height: 1.2;
-  color: white;
+  font-size: clamp(2rem, 5vw, 4rem); font-weight: 900; line-height: 1.1; color: white;
   
+  .darija { display: block; font-family: 'Tajawal', sans-serif; margin-bottom: 0.5rem; }
   .highlight {
     background: linear-gradient(to bottom, #FFFFFF 30%, #F07A48 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -243,7 +226,8 @@ const HeroTitle = styled(motion.h1)`
 
 const SubHeading = styled(motion.p)`
   font-size: clamp(1.1rem, 2vw, 1.25rem); color: #a1a1aa; max-width: 600px;
-  line-height: 1.7; 
+  line-height: 1.7; font-family: "Cairo", sans-serif;
+  strong { color: #e4e4e7; }
 `;
 
 const WizardButton = styled.button`
@@ -258,7 +242,7 @@ const WizardButton = styled.button`
 const SubText = styled.p` font-size: 0.85rem; color: #71717a; margin-top: 0.8rem; `;
 
 const PartnersHero = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate(); 
 
   const handleWizardClick = () => {
@@ -280,21 +264,18 @@ const PartnersHero = () => {
           <img src={AppLogo3D} alt="My Hanuut App" />
         </LogoContainer>
 
-        <Badge variants={itemVars}>
-           My Hanuut
-        </Badge>
+        <Badge variants={itemVars}>My Hanuut</Badge>
 
-        <HeroTitle 
-          variants={itemVars} 
-          lang={i18n.language} 
-          dangerouslySetInnerHTML={{ __html: t("vision_hero_title") }} 
-        />
+        <HeroTitle variants={itemVars}>
+          <span className="darija">{t("partners_hero_title")}</span>
+          <span className="highlight">Digital Command Center.</span>
+        </HeroTitle>
         
         <SubHeading variants={itemVars}>
-          {t("vision_hero_subtitle")}
+          {t("partners_hero_subtitle")} <br/>
+          <strong>{t("partners_hero_outcome")}</strong>
         </SubHeading>
 
-        {/* REPLACED BUTTON GROUP WITH UNIFIED COMPONENT */}
         <motion.div variants={itemVars}>
           <PlatformDownloadButtons layout="hero" />
         </motion.div>
