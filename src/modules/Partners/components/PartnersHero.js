@@ -215,19 +215,41 @@ const Badge = styled(motion.div)`
 `;
 
 const HeroTitle = styled(motion.h1)`
-  font-size: clamp(2rem, 5vw, 4rem); font-weight: 900; line-height: 1.1; color: white;
-  
-  .darija { display: block; font-family: 'Tajawal', sans-serif; margin-bottom: 0.5rem; }
-  .highlight {
-    background: linear-gradient(to bottom, #FFFFFF 30%, #F07A48 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  /* Using KOGhorab for the Hook */
+  font-family: 'KOGhorab', sans-serif !important;
+  font-size: clamp(2.2rem, 8vw, 4.5rem); 
+  font-weight: 400; 
+  line-height: 1.1;
+  color: white;
+  margin: 0;
+
+  span.darija {
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  span.highlight {
+    background: linear-gradient(135deg, #FFFFFF 30%, #F07A48 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: block;
   }
 `;
 
+// --- UPDATED SUBHEADING (Tajawal Light) ---
 const SubHeading = styled(motion.p)`
-  font-size: clamp(1.1rem, 2vw, 1.25rem); color: #a1a1aa; max-width: 600px;
-  line-height: 1.7; font-family: "Cairo", sans-serif;
-  strong { color: #e4e4e7; }
+  font-family: 'Tajawal', sans-serif !important;
+  font-weight: 300; /* Light weight as requested */
+  font-size: clamp(1.05rem, 2.5vw, 1.3rem); 
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 750px;
+  line-height: 1.6;
+  margin: 0 auto;
+
+  strong {
+    font-weight: 500;
+    color: white;
+  }
 `;
 
 const WizardButton = styled.button`
