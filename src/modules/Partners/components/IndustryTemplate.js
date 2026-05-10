@@ -1,15 +1,15 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom"; 
-import { FaCheck, FaTimes, FaMagic, FaDownload } from "react-icons/fa";
+import { FaCheck, FaTimes, FaMagic, FaDownload, FaWhatsapp } from "react-icons/fa";
 
 import PlatformDownloadButtons from "./PlatformDownloadButtons";
-import DigitalMatrixCanvas from "./DigitalMatrixCanvas"; // Added animated background
+import DigitalMatrixCanvas from "./DigitalMatrixCanvas";
 
 // --- STYLING ---
-const PageWrapper = styled.div` background: #050505; color: white; width: 100%; `;
+const PageWrapper = styled.div` background: #050505; color: white; width: 100%; position: relative; `;
 
 const HeroSection = styled.section` 
   position: relative; 
@@ -32,6 +32,7 @@ const ContentSection = styled.section`
 const Container = styled.div` width: 90%; max-width: 1000px; z-index: 2; position: relative; `;
 
 const HeroTitle = styled(motion.h1)`
+  font-family: var(--font-title), 'KOGhorab', sans-serif !important;
   font-size: clamp(2.5rem, 6vw, 4rem); 
   font-weight: normal; 
   line-height: 1.2; 
@@ -86,6 +87,56 @@ const DownloadSection = styled.div`
   margin-top: 6rem; padding-top: 4rem; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; display: flex; flex-direction: column; align-items: center;
 `;
 
+// --- WHATSAPP FLOATING BUTTON ---
+const WhatsAppFAB = styled(motion.a)`
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  color: white;
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+
+  svg {
+    font-size: 1.5rem;
+    color: #25D366; /* WhatsApp Green */
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #25D366;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(37, 211, 102, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 1rem;
+    border-radius: 50%;
+    
+    span {
+      display: none; /* Hide text on mobile */
+    }
+    
+    svg {
+      font-size: 1.8rem;
+    }
+  }
+`;
+
 const getDomainConfig = (domain, t) => {
   const configs = {
     food: {
@@ -117,6 +168,16 @@ const IndustryTemplate = ({ domain }) => {
   
   const downloadRef = useRef(null);
   const conf = getDomainConfig(domain, t);
+
+  const [showWhatsApp, setShowWhatsApp] = useState(false);
+
+  // Trigger WhatsApp button appearance after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowWhatsApp(true);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const scrollToDownload = () => {
     downloadRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -163,8 +224,8 @@ const IndustryTemplate = ({ domain }) => {
             </CompCard>
           </CompGrid>
 
-          <div style={{ textAlign: 'center', marginTop: '6rem' }}>
-            <h3 style={{ fontSize: '2rem', fontFamily: 'Tajawal' }}>{t("faq_title")}</h3>
+          <div style={{ textAlign: 'center', margin: '6rem auto 2rem auto' }}>
+            <h3 style={{ fontSize: '2.5rem', fontFamily: 'Tajawal', fontWeight: 800 }}>{t("faq_title")}</h3>
           </div>
           <FaqGrid>
             {[1, 2, 3].map(num => (
@@ -183,6 +244,24 @@ const IndustryTemplate = ({ domain }) => {
 
         </Container>
       </ContentSection>
+
+      {/* DELAYED FLOATING WHATSAPP BUTTON */}
+      <AnimatePresence>
+        {showWhatsApp && (
+          <WhatsAppFAB
+            href="https://wa.me/213557713440?text=Bonjour%2C%20je%20veux%20en%20savoir%20plus%20sur%20My%20Hanuut"
+            target="_blank"
+            rel="noopener noreferrer"
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <FaWhatsapp />
+            <span>Une question ?</span>
+          </WhatsAppFAB>
+        )}
+      </AnimatePresence>
     </PageWrapper>
   );
 };
