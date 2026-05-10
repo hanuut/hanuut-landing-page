@@ -38,6 +38,10 @@ const PaymentProcessingPage = lazy(() =>
   import("../modules/payment/PaymentProcessingPage")
 );
 
+const RestaurantPage = lazy(() => import("../modules/Partners/RestaurantPage"));
+const EpiceriePage = lazy(() => import("../modules/Partners/EpiceriePage"));
+const BoutiquePage = lazy(() => import("../modules/Partners/BoutiquePage"));
+
 const BlogListPage = lazy(() =>
   import("../modules/Blog/component/BlogListPage")
 );
@@ -132,10 +136,14 @@ const CustomRouter = ({ appConfig, location }) => {
 
           {/* Content pages */}
           <Route path="/partners" element={<PartnersPage />} />
+          <Route path="/myHanuut" element={<PartnersPage />} />
           <Route path="/my-hanuut-guide" element={<MyHanuutGuide />} />
           <Route path="/links" element={<LinksPage />} />
           <Route path="/partners/onboarding" element={<OnboardingWizard />} />
-         
+         {/* New Targeted Sales Pages */}
+          <Route path="/restaurant" element={<RestaurantPage />} />
+          <Route path="/epicerie" element={<EpiceriePage />} />
+          <Route path="/boutique" element={<BoutiquePage />} />
           {/* Tawsila related routes */}
           <Route path="/abridh" element={<TawsilaLanding />} />
           <Route path="/abrid" element={<TawsilaLanding />} />

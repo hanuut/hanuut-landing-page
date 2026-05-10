@@ -1180,6 +1180,31 @@
   
   "cta_new_title": "Your Hanuut. Online today.",
   "cta_new_desc": "Join hundreds of Algerian merchants who stopped answering DMs and started running a real business.",
-  "cta_wizard_note": "Not tech-savvy? Our team sets it up for you — for free."
+  "cta_wizard_note": "Not tech-savvy? Our team sets it up for you — for free.",
+  "industry_food_hook": "Still reprinting menus and fixing waiter mistakes? There is a better way.",
+  "industry_food_subhook": "Transform your restaurant with a free QR Menu, Kitchen Display System, and seamless order management.",
+  "industry_grocery_hook": "Midnight inventory counts and expired product losses end here.",
+  "industry_grocery_subhook": "An offline-first POS, a scanner with 4000+ DZ products, and smart expiration alerts.",
+  "industry_global_hook": "Tired of answering 'Price?' 100 times a day in DMs?",
+  "industry_global_subhook": "Launch your Link-in-Bio store, let customers order directly, and automate 58-wilaya shipping.",
+  
+  "demo_title_food": "Watch how to change a price in 5 seconds ⏱️",
+  "demo_title_grocery": "Watch how to scan products instantly ⏱️",
+  "demo_title_global": "Watch how customers order directly ⏱️",
+  
+  "faq_title": "Frequently Asked Questions",
+  "faq_1_q": "Is it free?",
+  "faq_1_a": "It's 100% free to start! Set up your shop and start taking orders. We only charge a small subscription for premium tools later.",
+  "faq_2_q": "Does it work without internet?",
+  "faq_2_a": "Yes! My Hanuut is Offline-First. Your POS keeps working when the Wi-Fi drops, and syncs perfectly when it's back.",
+  "faq_3_q": "Who helps me if I get stuck?",
+  "faq_3_a": "We do, directly. No chatbots. If you have an issue during a busy shift, you call us and we fix it.",
+
+  "cta_onboard_primary": "Create Your Shop (Free)",
+  "cta_demo_secondary": "Download App",
+  "cta_download_section_title": "Already registered? Download the App",
+  "cta_download_section_desc": "My Hanuut is available on all your devices. Download your version and log in.",
+  "gateway_title": "What kind of business do you run?",
+  "gateway_btn": "Explore Solutions ➔"
 
 }

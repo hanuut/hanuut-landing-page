@@ -1185,6 +1185,31 @@
 
   "cta_new_title": "Votre Hanuut. En ligne aujourd'hui.",
   "cta_new_desc": "Rejoignez des centaines de commerçants qui ont arrêté de répondre aux DM pour gérer un vrai business.",
-  "cta_wizard_note": "Pas à l'aise avec la technologie ? Notre équipe configure tout pour vous - gratuitement."
+  "cta_wizard_note": "Pas à l'aise avec la technologie ? Notre équipe configure tout pour vous - gratuitement.",
+  "industry_food_hook": "Vous passez vos journées à réimprimer des menus et corriger les commandes ? Il y a mieux.",
+  "industry_food_subhook": "Transformez votre restaurant : Menu QR, affichage cuisine (KDS) et gestion des commandes en un seul endroit.",
+  "industry_grocery_hook": "L'inventaire jusqu'à minuit et les produits périmés, c'est fini.",
+  "industry_grocery_subhook": "Une caisse qui marche sans internet, un scanner avec 4000+ produits DZ, et des alertes de péremption.",
+  "industry_global_hook": "Marre de répondre 'Prix svp ?' 100 fois par jour en DM ?",
+  "industry_global_subhook": "Ouvrez votre boutique en ligne, laissez les clients commander, et automatisez la livraison sur 58 wilayas.",
+  
+  "demo_title_food": "Voyez comment modifier un prix en 5 secondes ⏱️",
+  "demo_title_grocery": "Voyez comment scanner un produit sans rien taper ⏱️",
+  "demo_title_global": "Voyez comment vos clients commandent en 1 clic ⏱️",
+  
+  "faq_title": "Les questions que vous vous posez",
+  "faq_1_q": "C'est payant ?",
+  "faq_1_a": "C'est 100% gratuit pour commencer ! Ouvrez votre boutique et testez. Nous ne facturons qu'un abonnement symbolique pour les fonctions avancées.",
+  "faq_2_q": "Est-ce que ça marche sans internet ?",
+  "faq_2_a": "Absolument. My Hanuut est conçu pour l'Algérie (Offline-First). Vous encaissez même sans Wi-Fi, tout se synchronise après.",
+  "faq_3_q": "Qui gère si j'ai un problème ?",
+  "faq_3_a": "Nous, directement. Pas de robots. Un problème en plein service ? Vous nous appelez et on règle ça en direct.",
+
+  "cta_onboard_primary": "Créer ma boutique (Gratuit)",
+  "cta_demo_secondary": "Télécharger l'App",
+  "cta_download_section_title": "Déjà inscrit ? Téléchargez l'application",
+  "cta_download_section_desc": "L'application My Hanuut est disponible sur tous vos écrans. Connectez-vous à votre compte.",
+  "gateway_title": "Quel est votre domaine d'activité ?",
+  "gateway_btn": "Découvrir ➔"
 
 }
