@@ -1,67 +1,51 @@
-// src/modules/Product/components/landing/PremiumProductCard.js
-
 import React, { useState, useEffect, useMemo } from "react";
 import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { getImageUrl } from "../../../../utils/imageUtils";
 import { getImage } from "../../../Images/services/imageServices";
+import { FaMinus, FaPlus, FaShoppingCart } from "react-icons/fa";
 
 const CardWrapper = styled(motion.div)`
   background-color: ${(props) => props.theme.surface};
-  border-radius: 12px;
+  border-radius: 20px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
   position: relative;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-sizing: border-box;
 
-  /* --- STEP 2.3: Active State Border --- */
-  border: 1px solid
-    ${(props) => (props.$hasItems ? props.theme.primaryColor : "transparent")};
+  /* --- HIGH FIDELITY BORDERS --- */
+  /* Only currently active card gets the glowing accent. In-cart gets a flat, subtle border */
+  border: 2px solid
+    ${(props) =>
+      props.$isActive ? props.theme.primaryColor : "rgba(255,255,255,0.05)"};
 
+  /* Only active card gets the neon drop shadow */
   box-shadow: ${(props) =>
-    props.$hasItems
-      ? `0 4px 15px ${props.theme.primaryColor}30`
-      : "0 4px 6px rgba(0,0,0,0.1)"};
+    props.$isActive
+      ? `0 0 25px ${props.theme.primaryColor}50`
+      : "0 4px 20px rgba(0,0,0,0.1)"};
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    border-color: ${(props) =>
+      props.$isActive ? props.theme.primaryColor : "rgba(255,255,255,0.2)"};
+    box-shadow: ${(props) =>
+      props.$isActive
+        ? `0 0 25px ${props.theme.primaryColor}50`
+        : "0 10px 25px rgba(0,0,0,0.2)"};
   }
-`;
-
-// --- STEP 2.3: Quantity Badge ---
-const QuantityBadge = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: ${(props) => props.theme.primaryColor || "#39A170"};
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 700;
-  min-width: 24px;
-  height: 24px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6px;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  font-family: "Tajawal", sans-serif;
 `;
 
 const ImageContainer = styled.div`
   width: 100%;
   aspect-ratio: 1 / 1;
   position: relative;
-  overflow: hidden;
-  background-color: #1c1c1e;
+  background-color: #121214;
+  cursor: pointer;
 
   img {
     width: 100%;
@@ -76,30 +60,29 @@ const ImageContainer = styled.div`
 `;
 
 const Content = styled.div`
-  padding: 0.6rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  flex-grow: 1;
+  gap: 0.5rem;
+  flex: 1;
 `;
 
-const Brand = styled.p`
-  font-size: 0.65rem;
-  color: ${(props) => props.theme.secondaryText || "#8E8E93"};
+const Brand = styled.span`
+  font-size: 0.75rem;
+  color: ${(props) => props.theme.primaryColor};
   text-transform: uppercase;
-  font-weight: 700;
-  margin: 0;
-  letter-spacing: 0.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
 `;
 
 const ProductName = styled.h3`
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: ${(props) => props.theme.text};
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.4;
   font-family: "Tajawal", sans-serif;
-
+  cursor: pointer;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -111,43 +94,89 @@ const PriceRow = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-top: auto;
-  padding-top: 0.5rem;
+  padding-top: 1rem;
 `;
 
 const Price = styled.span`
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
   color: white;
 `;
 
-const LoadingSkeleton = styled.div`
-  width: 100%;
-  height: 100%;
-  background: #3a3a3c;
-  opacity: 0.5;
+const ActionButton = styled.button`
+  background: ${(props) => props.theme.primaryColor};
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const QuantityController = styled.div`
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 2px;
+`;
+
+const QtyBtn = styled.button`
+  background: transparent;
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.85rem;
+
+  &:hover {
+    color: ${(props) => props.theme.primaryColor};
+  }
+`;
+
+const QtyValue = styled.span`
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: white;
+  min-width: 24px;
+  text-align: center;
 `;
 
 const PremiumProductCard = ({
   product,
   onCardClick,
+  onUpdateQuantity, // --- ADDED ---
   isOrderingEnabled,
-  quantityInCart = 0, // Received from Showcase
+  quantityInCart = 0,
+  $isActive = false,
 }) => {
-  const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === "ar";
-
-  // Image Logic
+  const { t } = useTranslation();
   const [imageBuffer, setImageBuffer] = useState(null);
-  const imageId = product?.availabilities?.[0]?.imageId;
+
+  const defaultAvailability = product?.availabilities?.[0];
+  const defaultSize = defaultAvailability?.sizes?.[0];
+  const imageId = defaultAvailability?.imageId;
 
   useEffect(() => {
     let isMounted = true;
     if (imageId) {
-      getImage(imageId)
-        .then((res) => {
-          if (isMounted && res.data) setImageBuffer(res.data);
-        })
-        .catch((err) => console.error(err));
+      getImage(imageId).then((res) => {
+        if (isMounted && res.data) setImageBuffer(res.data);
+      });
     }
     return () => {
       isMounted = false;
@@ -155,53 +184,66 @@ const PremiumProductCard = ({
   }, [imageId]);
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
+  const productName = product.name;
 
-  // Price Logic (Get min price)
-  const displayPrice = useMemo(() => {
-    if (!product?.availabilities?.length) return 0;
-    let min = Infinity;
-    product.availabilities.forEach((av) => {
-      av.sizes.forEach((size) => {
-        if (size.sellingPrice < min) min = size.sellingPrice;
-      });
-    });
-    return min === Infinity ? 0 : min;
-  }, [product]);
+  // --- STRICTLY CARD SELECT ONLY ---
+  const handleCardSelect = () => {
+    onCardClick(product, false); // Triggers details pane update without adding to cart
+  };
 
-  const productName =
-    !isArabic && product.nameFr ? product.nameFr : product.name;
+  // --- STRICTLY ADD ONLY ---
+  const handleQuickAdd = (e) => {
+    e.stopPropagation(); // Stops card selection event
+    if (!isOrderingEnabled || !defaultSize) return;
+    onCardClick(product, true); // Triggers fast cart addition
+  };
+
+  // --- STRICTLY QUANTITY UPDATE ONLY ---
+  const handleDecrement = (e) => {
+    e.stopPropagation(); // Stops card selection event
+    if (!defaultSize || !onUpdateQuantity) return;
+    const variantId = `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
+    onUpdateQuantity(variantId, quantityInCart - 1);
+  };
+
+  const handleIncrement = (e) => {
+    e.stopPropagation(); // Stops card selection event
+    if (!defaultSize || !onUpdateQuantity) return;
+    const variantId = `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
+    onUpdateQuantity(variantId, quantityInCart + 1);
+  };
 
   return (
-    <CardWrapper
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        onCardClick(product);
-      }}
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      style={{ opacity: isOrderingEnabled ? 1 : 0.6 }}
-      $hasItems={quantityInCart > 0}
-    >
-      {/* Badge Logic */}
-      {quantityInCart > 0 && <QuantityBadge>{quantityInCart}</QuantityBadge>}
-
+    <CardWrapper onClick={handleCardSelect} $isActive={$isActive}>
       <ImageContainer>
-        {imageUrl ? (
-          <img src={imageUrl} alt={productName} loading="lazy" />
-        ) : (
-          <LoadingSkeleton />
-        )}
+        {imageUrl && <img src={imageUrl} alt={productName} loading="lazy" />}
       </ImageContainer>
 
       <Content>
         {product.brand && <Brand>{product.brand}</Brand>}
         <ProductName>{productName}</ProductName>
+
         <PriceRow>
           <Price>
-            {parseInt(displayPrice)} {t("dzd")}
+            {parseInt(defaultSize?.sellingPrice || 0)} {t("dzd")}
           </Price>
+          {isOrderingEnabled &&
+            defaultSize &&
+            (quantityInCart > 0 ? (
+              <QuantityController>
+                <QtyBtn onClick={handleDecrement}>
+                  <FaMinus />
+                </QtyBtn>
+                <QtyValue>{quantityInCart}</QtyValue>
+                <QtyBtn onClick={handleIncrement}>
+                  <FaPlus />
+                </QtyBtn>
+              </QuantityController>
+            ) : (
+              <ActionButton onClick={handleQuickAdd}>
+                <FaShoppingCart />
+              </ActionButton>
+            ))}
         </PriceRow>
       </Content>
     </CardWrapper>

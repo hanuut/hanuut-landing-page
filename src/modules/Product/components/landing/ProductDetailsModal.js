@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,346 +6,277 @@ import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
 import { FaTimes, FaMinus, FaPlus } from "react-icons/fa";
 
-// --- LAYOUT & ANIMATION COMPONENTS ---
-
 const ModalBackdrop = styled(motion.div)`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(15px);
-  z-index: 1000;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 1200;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
-  box-sizing: border-box;
+  padding: 1rem;
 `;
 
-const ModalContent = styled(motion.div)`
+const BentoContainer = styled(motion.div)`
   width: 100%;
-  max-width: 950px;
-  height: auto;
-  max-height: 85vh;
-  background-color: #18181b;
+  max-width: 850px;
+  height: 500px; /* FIXED HEIGHT FOR PERFECT DESKTOP VIEW */
+  background: #111214;
+  border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 28px;
-  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* PERFECT 50/50 SPLIT */
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
   position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(
-      800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      rgba(255, 255, 255, 0.04),
-      transparent 40%
-    );
-    z-index: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
-`;
-
-const ContentLayout = styled.div`
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  width: 100%;
-  z-index: 1;
-  overflow: hidden;
 
   @media (max-width: 768px) {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    max-height: 90vh;
+    height: auto;
     overflow-y: auto;
   }
 `;
 
-const ImageSection = styled.div`
-  flex: 1.2;
-  background-color: #09090b;
+const GallerySection = styled.div`
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
   position: relative;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  height: 100%;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    height: 300px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+`;
+
+const MainImageWrapper = styled.div`
+  width: 100%;
+  height: 280px; /* COMPACT FOR FIXED VIEWPORT */
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 12px;
+  }
 
   @media (max-width: 768px) {
-    flex: none;
-    width: 100%;
-    aspect-ratio: 1/1;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    height: 200px;
   }
+`;
+
+const AltImagesRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  width: 100%;
+  justify-content: center;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const AltThumbnail = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid
+    ${(props) => (props.$active ? props.theme.primaryColor : "transparent")};
+  cursor: pointer;
+  flex-shrink: 0;
 
   img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    padding: 2.5rem;
-    box-sizing: border-box;
-    transition: transform 0.5s ease;
+    object-fit: cover;
   }
 `;
 
 const InfoSection = styled.div`
-  flex: 1;
-  padding: 3rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  overflow-y: auto;
+  gap: 1.25rem;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto; /* Scrollable only internally if content overflows */
 
   &::-webkit-scrollbar {
     display: none;
   }
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 
   @media (max-width: 768px) {
     padding: 1.5rem;
-    gap: 1.5rem;
-    overflow-y: visible;
   }
 `;
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 1.5rem;
-  ${(props) => (props.isArabic ? "left: 1.5rem;" : "right: 1.5rem;")}
-  z-index: 10;
-  width: 42px;
-  height: 42px;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
+  top: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
   color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 1.2rem;
+  z-index: 10;
+  transition: background 0.2s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.1);
   }
 `;
 
-const HeaderGroup = styled.div`
+const TitleBlock = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.2rem;
 `;
 
-const BrandLabel = styled.span`
-  font-size: 0.8rem;
+const Brand = styled.span`
+  font-size: 0.75rem;
+  color: ${(props) => props.theme.primaryColor};
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  font-weight: 700;
-  color: #71717a;
-  display: block;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 `;
 
-const ProductTitle = styled.h2`
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0.5rem 0 0 0;
-  line-height: 1.1;
+const ProductName = styled.h2`
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: white;
+  margin: 0;
   font-family: "Tajawal", sans-serif;
-  letter-spacing: -0.02em;
-
-  @media (max-width: 768px) {
-    font-size: 1.75rem;
-  }
+  line-height: 1.3;
 `;
 
-const PriceTag = styled.div`
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: ${(props) => props.theme.primaryColor || "#F07A48"};
-  margin-top: 0.5rem;
+const Price = styled.div`
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: white;
+  margin-top: 0.25rem;
 `;
 
-const OptionGroup = styled.div`
+const SectionLabel = styled.span`
+  font-size: 0.75rem;
+  color: #71717a;
+  font-weight: 700;
+  text-transform: uppercase;
+`;
+
+const SelectorGrid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-`;
-
-const OptionLabel = styled.span`
-  font-size: 0.9rem;
-  color: #a1a1aa;
-  font-weight: 500;
+  gap: 0.4rem;
 `;
 
 const PillsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.4rem;
 `;
 
-const OptionPill = styled.button`
-  padding: 0.7rem 1.4rem;
-  border-radius: 14px;
-  font-size: 0.95rem;
+const Pill = styled.button`
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: "Tajawal", sans-serif;
-
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #d4d4d8;
-
-  ${(props) =>
-    props.$active &&
-    css`
-      background: #ffffff;
-      color: #000000;
-      border-color: #ffffff;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
-    `}
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-`;
-
-const ColorCircle = styled.button`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  cursor: pointer;
-  background-color: ${(props) => props.$color};
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-
-  ${(props) =>
-    props.$active &&
-    css`
-      transform: scale(1.15);
-      box-shadow:
-        0 0 0 2px #18181b,
-        0 0 0 4px white;
-    `}
-  &:hover {
-    transform: scale(1.1);
-  }
-`;
-
-const Footer = styled.div`
-  margin-top: auto;
-  padding-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const MainButton = styled.button`
-  width: 100%;
-  padding: 1.1rem;
-  border-radius: 18px;
-  border: none;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  font-family: "Tajawal", sans-serif;
-
   background: ${(props) =>
-    props.$disabled ? "#27272a" : props.theme.primaryColor};
-  color: ${(props) => (props.$disabled ? "#52525b" : "#111")};
-
-  ${(props) =>
-    !props.$disabled &&
-    css`
-      box-shadow: 0 4px 20px ${(props) => `${props.theme.primaryColor}40`};
-      &:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.1);
-      }
-      &:active {
-        transform: scale(0.98);
-      }
-    `}
-`;
-
-const QuantityWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 18px;
-  padding: 0.5rem;
-  width: 100%;
-  box-sizing: border-box;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-`;
-
-const QtyBtn = styled.button`
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: ${(props) => props.theme.primaryColor};
-  border: none;
-  color: #111;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    props.$active ? "white" : "rgba(255,255,255,0.03)"};
+  border: 1px solid
+    ${(props) => (props.$active ? "white" : "rgba(255,255,255,0.1)")};
+  color: ${(props) => (props.$active ? "#000" : "#d4d4d8")};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    transform: scale(1.05);
-    filter: brightness(1.1);
-  }
-
-  &:active {
-    transform: scale(0.95);
+    background: ${(props) =>
+      props.$active ? "white" : "rgba(255,255,255,0.08)"};
   }
 `;
 
-const QtyDisplay = styled.span`
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: white;
-  font-family: "Tajawal", sans-serif;
-  min-width: 40px;
-  text-align: center;
+const SpecsTable = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.75rem;
+  border-radius: 10px;
 `;
 
-const WarningBadge = styled.div`
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid #ef4444;
-  color: #ef4444;
-  padding: 1rem;
+const SpecRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  .name {
+    color: #71717a;
+    font-weight: 600;
+  }
+  .val {
+    color: white;
+  }
+`;
+
+const QtyBox = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.4rem;
   border-radius: 12px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 0.95rem;
 `;
 
-// --- COMPONENT LOGIC ---
+const QtyBtn = styled.button`
+  background: ${(props) => props.theme.primaryColor};
+  color: #000;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+const AddToCartBtn = styled.button`
+  background: ${(props) => props.theme.primaryColor};
+  color: #000;
+  border: none;
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+`;
 
 const ProductDetailsModal = ({
   product,
@@ -354,248 +285,221 @@ const ProductDetailsModal = ({
   onUpdateQuantity,
   cartItems,
   isOrderingEnabled,
-  orderingStatusKey,
 }) => {
-  const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === "ar";
-  const modalRef = useRef(null);
-
-  // -- 1. FIXED STATE INITIALIZATION --
-  const initialColor = product?.availabilities?.[0]?.color || "";
-
-  // Function to calculate initial size
-  const getInitialSize = (color) => {
-    const availability = product?.availabilities?.find(
-      (av) => av.color === color,
-    );
-    if (availability && availability.sizes?.length > 0) {
-      return availability.sizes[0].size;
-    }
-    return "";
-  };
-
-  // Initialize state with correct size immediately
-  const [selectedColor, setSelectedColor] = useState(initialColor);
-  const [selectedSize, setSelectedSize] = useState(() =>
-    getInitialSize(initialColor),
+  const { t } = useTranslation();
+  const [selectedColor, setSelectedColor] = useState(
+    product?.availabilities?.[0]?.color || "",
   );
-  const [imageBuffer, setImageBuffer] = useState(null);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [activeImageId, setActiveImageId] = useState(null);
+  const [imagesMap, setImagesMap] = useState({});
 
-  const handleMouseMove = (e) => {
-    if (!modalRef.current) return;
-    const rect = modalRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    modalRef.current.style.setProperty("--mouse-x", `${x}px`);
-    modalRef.current.style.setProperty("--mouse-y", `${y}px`);
-  };
+  const currentAvailability = useMemo(() => {
+    return product.availabilities.find((a) => a.color === selectedColor);
+  }, [product, selectedColor]);
 
-  // -- Derived Data --
-  const currentAvailability = useMemo(
-    () => product.availabilities.find((av) => av.color === selectedColor),
-    [product, selectedColor],
-  );
-
-  const currentSizeDetails = useMemo(
-    () => currentAvailability?.sizes.find((s) => s.size === selectedSize),
-    [currentAvailability, selectedSize],
-  );
-
-  // -- 2. Variant ID Logic --
-  const currentVariantId = `${product._id}_${selectedColor}_${selectedSize}`;
-
-  // Check if this item is in the Redux cart using the matched ID
-  const existingCartItem = useMemo(() => {
-    if (!cartItems || !currentSizeDetails) return null;
-    return cartItems.find((item) => item.variantId === currentVariantId);
-  }, [cartItems, currentVariantId, currentSizeDetails]);
-
-  // -- Effects --
-  const [canClose, setCanClose] = useState(false);
-
-  useEffect(() => {
-    // Allow closing after a brief delay to prevent immediate close on open
-    const timer = setTimeout(() => setCanClose(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Auto-select size only if current size is invalid for new color
-  useEffect(() => {
-    if (currentAvailability && currentAvailability.sizes.length > 0) {
-      const sizeExists = currentAvailability.sizes.some(
-        (s) => s.size === selectedSize,
-      );
-      if (!sizeExists) {
-        setSelectedSize(currentAvailability.sizes[0].size);
-      }
-    }
+  const currentSizeDetails = useMemo(() => {
+    return currentAvailability?.sizes.find((s) => s.size === selectedSize);
   }, [currentAvailability, selectedSize]);
 
   useEffect(() => {
-    let isMounted = true;
-    if (currentAvailability?.imageId) {
-      getImage(currentAvailability.imageId)
-        .then((res) => {
-          if (isMounted && res.data) setImageBuffer(res.data);
-        })
-        .catch((err) => console.error("Img error", err));
+    if (currentAvailability) {
+      if (currentAvailability.sizes?.length > 0) {
+        setSelectedSize(currentAvailability.sizes[0].size);
+      }
+      setActiveImageId(currentAvailability.imageId);
     }
-    return () => {
-      isMounted = false;
-    };
   }, [currentAvailability]);
 
-  const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
-  const productName =
-    !isArabic && product.nameFr ? product.nameFr : product.name;
+  // Lazy load image buffers
+  const allImageIds = useMemo(() => {
+    const ids = [];
+    product.availabilities.forEach((av) => {
+      if (av.imageId) ids.push(av.imageId);
+      if (av.altImageIds) ids.push(...av.altImageIds);
+    });
+    return Array.from(new Set(ids));
+  }, [product]);
 
-  // -- Handlers --
-  const handleAddToCartClick = () => {
+  useEffect(() => {
+    allImageIds.forEach((id) => {
+      if (imagesMap[id]) return;
+      getImage(id).then((res) => {
+        if (res.data) {
+          setImagesMap((prev) => ({ ...prev, [id]: getImageUrl(res.data) }));
+        }
+      });
+    });
+  }, [allImageIds, imagesMap]);
+
+  const currentVariantId = `${product._id}_${selectedColor}_${selectedSize}`;
+  const existingCartItem = cartItems.find(
+    (item) => item.variantId === currentVariantId,
+  );
+
+  const handleAdd = () => {
     if (!currentSizeDetails) return;
-    const cartVariant = {
-      product: product,
-      variantId: currentVariantId, // Use consistent ID
+    onAddToCart({
+      product,
+      variantId: currentVariantId,
       color: selectedColor,
       size: selectedSize,
       sellingPrice: currentSizeDetails.sellingPrice,
       imageId: currentAvailability.imageId,
       quantity: 1,
-    };
-    onAddToCart(cartVariant);
+    });
   };
 
+  const galleryImages = useMemo(() => {
+    if (!currentAvailability) return [];
+    return [
+      currentAvailability.imageId,
+      ...(currentAvailability.altImageIds || []),
+    ];
+  }, [currentAvailability]);
+
   return (
-    <AnimatePresence>
-      <ModalBackdrop
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={(e) => {
-          if (canClose && e.target === e.currentTarget) {
-            onClose();
-          }
-        }}
+    <ModalBackdrop
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <BentoContainer
+        initial={{ scale: 0.95, y: 30 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.95, y: 30 }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <ModalContent
-          ref={modalRef}
-          onMouseMove={handleMouseMove}
-          initial={{ y: 50, opacity: 0, scale: 0.96 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: 50, opacity: 0, scale: 0.96 }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <CloseButton onClick={onClose} isArabic={isArabic}>
-            <FaTimes />
-          </CloseButton>
-
-          <ContentLayout>
-            <ImageSection>
-              {imageUrl ? (
+        {/* Left Side: Photo Bento Block */}
+        <GallerySection>
+          <MainImageWrapper>
+            <AnimatePresence mode="wait">
+              {imagesMap[activeImageId] && (
                 <motion.img
-                  key={imageUrl}
-                  initial={{ opacity: 0, scale: 1.1 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  src={imageUrl}
-                  alt={productName}
+                  key={activeImageId}
+                  src={imagesMap[activeImageId]}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
                 />
+              )}
+            </AnimatePresence>
+          </MainImageWrapper>
+          <AltImagesRow>
+            {galleryImages.map((id, index) => (
+              <AltThumbnail
+                key={index}
+                $active={activeImageId === id}
+                onClick={() => setActiveImageId(id)}
+              >
+                <img src={imagesMap[id]} alt="Alt view" />
+              </AltThumbnail>
+            ))}
+          </AltImagesRow>
+        </GallerySection>
+
+        {/* Right Side: Configuration Bento Block */}
+        <InfoSection>
+          <TitleBlock>
+            {product.brand && <Brand>{product.brand}</Brand>}
+            <ProductName>{product.name}</ProductName>
+            <Price>
+              {parseInt(currentSizeDetails?.sellingPrice || 0)} {t("dzd")}
+            </Price>
+          </TitleBlock>
+
+          {/* Color Matrix Selector */}
+          <SelectorGrid>
+            <SectionLabel>Color</SectionLabel>
+            <PillsContainer>
+              {product.availabilities.map((av) => (
+                <Pill
+                  key={av.color}
+                  $active={selectedColor === av.color}
+                  onClick={() => setSelectedColor(av.color)}
+                >
+                  {av.colorLabel || av.color}
+                </Pill>
+              ))}
+            </PillsContainer>
+          </SelectorGrid>
+
+          {/* Size Matrix Selector */}
+          {currentAvailability && (
+            <SelectorGrid>
+              <SectionLabel>Size</SectionLabel>
+              <PillsContainer>
+                {currentAvailability.sizes.map((s) => (
+                  <Pill
+                    key={s.size}
+                    $active={selectedSize === s.size}
+                    onClick={() => setSelectedSize(s.size)}
+                  >
+                    {s.size}
+                  </Pill>
+                ))}
+              </PillsContainer>
+            </SelectorGrid>
+          )}
+
+          {/* Product Specs */}
+          {product.specifications?.length > 0 && (
+            <SelectorGrid>
+              <SectionLabel>Specifications</SectionLabel>
+              <SpecsTable>
+                {product.specifications.slice(0, 3).map((spec, idx) => (
+                  <SpecRow key={idx}>
+                    <span className="name">{spec.name}</span>
+                    <span className="val">{spec.value}</span>
+                  </SpecRow>
+                ))}
+              </SpecsTable>
+            </SelectorGrid>
+          )}
+
+          {/* Action Footer */}
+          {isOrderingEnabled && (
+            <div style={{ marginTop: "auto" }}>
+              {existingCartItem ? (
+                <QtyBox>
+                  <QtyBtn
+                    onClick={() =>
+                      onUpdateQuantity(
+                        currentVariantId,
+                        existingCartItem.quantity - 1,
+                      )
+                    }
+                  >
+                    <FaMinus />
+                  </QtyBtn>
+                  <span className="font-bold text-lg">
+                    {existingCartItem.quantity}
+                  </span>
+                  <QtyBtn
+                    onClick={() =>
+                      onUpdateQuantity(
+                        currentVariantId,
+                        existingCartItem.quantity + 1,
+                      )
+                    }
+                  >
+                    <FaPlus />
+                  </QtyBtn>
+                </QtyBox>
               ) : (
-                <div style={{ color: "#555" }}>Loading...</div>
+                <AddToCartBtn onClick={handleAdd}>Add to Cart</AddToCartBtn>
               )}
-            </ImageSection>
+            </div>
+          )}
+        </InfoSection>
 
-            <InfoSection isArabic={isArabic}>
-              <HeaderGroup>
-                {product.brand && <BrandLabel>{product.brand}</BrandLabel>}
-                <ProductTitle>{productName}</ProductTitle>
-                <PriceTag>
-                  {currentSizeDetails
-                    ? parseInt(currentSizeDetails.sellingPrice)
-                    : "-"}{" "}
-                  {t("dzd")}
-                </PriceTag>
-              </HeaderGroup>
-
-              {/* Color Selection */}
-              <OptionGroup>
-                <OptionLabel>{t("color", "Color")}</OptionLabel>
-                <PillsContainer>
-                  {product.availabilities.map((av) => (
-                    // Simplified pills
-                    <OptionPill
-                      key={av.color}
-                      $active={selectedColor === av.color}
-                      onClick={() => setSelectedColor(av.color)}
-                    >
-                      {av.color}
-                    </OptionPill>
-                  ))}
-                </PillsContainer>
-              </OptionGroup>
-
-              {/* Size Selection */}
-              {currentAvailability && (
-                <OptionGroup>
-                  <OptionLabel>{t("size", "Size")}</OptionLabel>
-                  <PillsContainer>
-                    {currentAvailability.sizes.map((s) => (
-                      <OptionPill
-                        key={s.size}
-                        $active={selectedSize === s.size}
-                        onClick={() => setSelectedSize(s.size)}
-                      >
-                        {s.size}
-                      </OptionPill>
-                    ))}
-                  </PillsContainer>
-                </OptionGroup>
-              )}
-
-              <Footer>
-                {isOrderingEnabled ? (
-                  existingCartItem ? (
-                    // Show Counter logic based on consistent ID check
-                    <QuantityWrapper>
-                      <QtyBtn
-                        onClick={() =>
-                          onUpdateQuantity(
-                            currentVariantId,
-                            existingCartItem.quantity - 1,
-                          )
-                        }
-                      >
-                        <FaMinus size={14} />
-                      </QtyBtn>
-                      <QtyDisplay>{existingCartItem.quantity}</QtyDisplay>
-                      <QtyBtn
-                        onClick={() =>
-                          onUpdateQuantity(
-                            currentVariantId,
-                            existingCartItem.quantity + 1,
-                          )
-                        }
-                      >
-                        <FaPlus size={14} />
-                      </QtyBtn>
-                    </QuantityWrapper>
-                  ) : (
-                    <MainButton
-                      onClick={handleAddToCartClick}
-                      disabled={!currentSizeDetails}
-                      $disabled={!currentSizeDetails}
-                    >
-                      {t("add_to_cart")}
-                    </MainButton>
-                  )
-                ) : (
-                  <WarningBadge>{t(orderingStatusKey)}</WarningBadge>
-                )}
-              </Footer>
-            </InfoSection>
-          </ContentLayout>
-        </ModalContent>
-      </ModalBackdrop>
-    </AnimatePresence>
+        <CloseButton onClick={onClose}>
+          <FaTimes />
+        </CloseButton>
+      </BentoContainer>
+    </ModalBackdrop>
   );
 };
 

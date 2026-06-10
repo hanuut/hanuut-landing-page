@@ -1,27 +1,9 @@
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-  useRef,
-  useCallback,
-} from "react";
-import styled, { ThemeProvider } from "styled-components";
+import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { usePalette } from "color-thief-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
-
-// --- Imports ---
-import ShopHeader from "./ShopHeader";
-import ProductShowcase from "../../Product/components/landing/ProductShowcase";
-import ProductFilterBar from "../../Product/components/landing/ProductFilterBar";
-import PoweredByHanuut from "../../../components/PoweredByHanuut";
-import { getImageUrl } from "../../../utils/imageUtils";
-import Loader from "../../../components/Loader";
-import Cart from "./Cart";
-import ProductDetailsModal from "../../Product/components/landing/ProductDetailsModal";
-import OrderSuccessModal from "./OrderSuccessModal";
+import { AnimatePresence } from "framer-motion";
 
 // --- Redux ---
 import {
@@ -40,123 +22,95 @@ import {
   selectCart,
   addToCart,
   updateCartQuantity,
-  closeCart,
-    openCart,
 } from "../../Cart/state/reducers";
-import { createGlobalOrder } from "../services/orderServices";
-import { partnerTheme } from "../../../config/Themes";
-import { FaShoppingCart } from "react-icons/fa";
 
-const PageWrapper = styled.main`
+import ProductShowcase from "../../Product/components/landing/ProductShowcase";
+import ProductFilterBar from "../../Product/components/landing/ProductFilterBar";
+import InlineProductDetails from "../../Product/components/landing/InlineProductDetails";
+
+const ContentWrapper = styled.div`
   width: 100%;
-  min-height: 100vh;
-  background-color: ${(props) => props.theme.body};
-  color: ${(props) => props.theme.text};
-  padding-bottom: 6rem;
-  padding-top: 0;
-  position: relative;
-  z-index: 1;
+  background: ${props => props.theme.body};
 `;
 
-const Container = styled(motion.div)`
+const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  width: 100%;
-  padding: 2rem 1rem 6rem 1rem; /* Adjusted for no-navbar and floating cart */
-  direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
-  box-sizing: border-box;
-  @media (max-width: 768px) {
-    padding-top: 1.5rem; /* Mobile top padding */
+  width: 90%;
+  padding: 2rem 0;
+`;
+
+// --- NEW PERFECTED WIDE-DETAILS COLUMN RATIO ---
+const SplitGrid = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  @media(min-width: 1024px) {
+    display: grid;
+    /* 1.1fr for Products Grid (Right/Left depending on RTL), 1.9fr for Premium Details Pane */
+    grid-template-columns: 1.1fr 1.9fr; 
+    align-items: start;
   }
+`;
+
+const DesktopPane = styled.div`
+  display: none;
+  
+  @media(min-width: 1024px) {
+    display: block;
+    position: sticky;
+    top: 100px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    &::-webkit-scrollbar { display: none; }
+  }
+`;
+
+const MobilePane = styled.div`
+  display: block;
+  
+  @media(min-width: 1024px) {
+    display: none;
+  }
+`;
+
+const ProductsListPane = styled.div`
+  width: 100%;
 `;
 
 const LoadMoreTrigger = styled.div`
-  height: 20px;
+  height: 40px;
   width: 100%;
-  margin-top: 1rem;
   display: flex;
   justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
 `;
-const SpinnerSmall = styled.div`
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-top-color: #f07a48;
+
+const Spinner = styled.div`
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: ${props => props.theme.primaryColor};
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+
   @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
   }
 `;
 
-const FloatingCartWrap = styled(motion.div)`
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  width: 90%;
-  max-width: 400px;
-  background-color: ${(props) => props.theme.primaryColor || '#F07A48'};
-  color: #fff;
-  border-radius: 50px;
-  padding: 0.8rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  z-index: 995; /* Above content, below standard Modals */
-  cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
-`;
-
-const Badge = styled.div`
-  background: rgba(0,0,0,0.2);
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-weight: 700;
-  font-size: 1rem;
-`;
-
-const ViewCartText = styled.div`
-  font-weight: 700;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const TotalPrice = styled.div`
-  font-weight: 800;
-  font-size: 1.1rem;
-`;
-
-
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
-
-const GlobalShopLandingPage = ({
-  shop,
-  image,
-  isOrderingEnabled,
-  orderingStatusKey,
-}) => {
-  const { t, i18n } = useTranslation();
+const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
-  const isArabic = i18n.language === "ar";
 
   const normalizedShopId = useMemo(() => shop?._id || shop?.id, [shop]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedProductForModal, setSelectedProductForModal] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(null);
-  const [orderErrorMsg, setOrderErrorMsg] = useState("");
-  const [orderSuccessData, setOrderSuccessData] = useState(null);
+  const [activeProduct, setActiveProduct] = useState(null);
 
   const {
     products: paginatedList,
@@ -167,28 +121,18 @@ const GlobalShopLandingPage = ({
   const { categories } = useSelector(selectCategories);
   const { cart } = useSelector(selectCart);
 
-  // --- FIX 1: Filter cart items using the correct root-level shopId ---
   const shopCartItems = useMemo(() => {
-    console.log(cart, "Filtering cart items for shop"); // Debugging log
     if (!normalizedShopId) return [];
-    return cart.filter((item) => item.product?.shopId === normalizedShopId);
+    return cart.filter((item) => item.shopId === normalizedShopId);
   }, [cart, normalizedShopId]);
 
-  const imageUrl = useMemo(() => getImageUrl(image), [image]);
-  const { data: logoPalette } = usePalette(imageUrl, 2, "hex", {
-    crossOrigin: "Anonymous",
-  });
-  const isSubscribed = shop.subscriptionPlanId !== null;
-  const brandColors = {
-    main: shop.styles?.mainColor || logoPalette?.[0] || "#F07A48",
-    accent: shop.styles?.secondaryColor || logoPalette?.[1] || "#39A170",
-  };
-
+  // Initialize Categories & Featured Products
   useEffect(() => {
     if (normalizedShopId) {
       dispatch(fetchFeaturedProductsByShop(normalizedShopId));
-      if (shop.categories?.length > 0)
+      if (shop.categories?.length > 0) {
         dispatch(fetchCategories(shop.categories));
+      }
       dispatch(
         fetchPaginatedProducts({
           shopId: normalizedShopId,
@@ -203,6 +147,21 @@ const GlobalShopLandingPage = ({
     return () => dispatch(resetPagination());
   }, [dispatch, normalizedShopId, shop.categories]);
 
+  // Self-healing categories loader
+  useEffect(() => {
+    if (paginatedList.length > 0) {
+      const extractedCategoryIds = paginatedList
+        .map(p => p.categoryId)
+        .filter(id => id && typeof id === 'string');
+      
+      const uniqueIds = Array.from(new Set(extractedCategoryIds));
+      if (uniqueIds.length > 0) {
+         dispatch(fetchCategories(uniqueIds));
+      }
+    }
+  }, [paginatedList, dispatch]);
+
+  // Watch Filters
   useEffect(() => {
     if (!normalizedShopId) return;
     const timer = setTimeout(() => {
@@ -216,24 +175,41 @@ const GlobalShopLandingPage = ({
           isNewFilter: true,
         }),
       );
-    }, 500);
+    }, 400);
     return () => clearTimeout(timer);
   }, [dispatch, normalizedShopId, searchQuery, selectedCategory]);
 
-  // --- RESTORED: Deep Linking Logic, managed locally ---
+  // Direct URL Deep Link handler
   const productIdFromUrl = searchParams.get("product");
   useEffect(() => {
     if (productIdFromUrl) {
-      if (selectedProductForModal?._id === productIdFromUrl) return;
+      if (activeProduct?._id === productIdFromUrl) return;
       dispatch(fetchProductById(productIdFromUrl))
         .unwrap()
-        .then(setSelectedProductForModal)
+        .then((product) => {
+          setActiveProduct(product);
+        })
         .catch(() => setSearchParams({}));
-    } else {
-      if (selectedProductForModal) setSelectedProductForModal(null);
     }
-  }, [productIdFromUrl, dispatch, setSearchParams, selectedProductForModal]);
+  }, [productIdFromUrl, dispatch, setSearchParams, activeProduct]);
 
+  // --- RESPONSIVE AUTO-SCROLL ALIGNMENT LOGIC ---
+  useEffect(() => {
+    if (activeProduct) {
+      if (window.innerWidth < 1024) {
+        // Mobile/Tablet: Scroll window to the top so details pane is instantly visible
+        window.scrollTo({ top: 300, behavior: 'smooth' });
+      } else {
+        // Desktop: Keep card aligned and centered in the grid
+        const element = document.getElementById(`product-card-${activeProduct._id}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+  }, [activeProduct]);
+
+  // Infinite Scroll Observer
   const observer = useRef();
   const lastElementRef = useCallback(
     (node) => {
@@ -255,237 +231,146 @@ const GlobalShopLandingPage = ({
       });
       if (node) observer.current.observe(node);
     },
-    [
-      paginatedLoading,
-      paginationMeta.hasMore,
-      normalizedShopId,
-      selectedCategory,
-      searchQuery,
-      dispatch,
-    ],
+    [paginatedLoading, paginationMeta.hasMore, normalizedShopId, selectedCategory, searchQuery, dispatch],
   );
 
-  // --- RESTORED: Local Modal Handlers ---
-  const handleModalOpen = (product) =>
-    setSearchParams({ product: product._id });
-  const handleModalClose = () => setSearchParams({});
-
-  // --- FIX 2: Ensure correct shopId is dispatched ---
-  const handleAddToCart = (variant) =>
-    dispatch(addToCart({ ...variant, shopId: normalizedShopId }));
-  const handleUpdateQuantity = (variantId, newQuantity) =>
-    dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
-
-  const handlePlaceOrder = async (customerDetails) => {
-    if (isSubmitting === "submitting") return;
-    if (
-      !customerDetails.customerName ||
-      !customerDetails.customerPhone ||
-      !customerDetails.address?.wilaya
-    ) {
-      alert(t("errorFillAllFields"));
+  const handleCardClick = (product, quickAdd = false) => {
+    if (activeProduct?._id === product._id && !quickAdd) {
+      setActiveProduct(null);
+      setSearchParams({});
       return;
     }
-    setIsSubmitting("submitting");
 
-    const { address, gpsLocation, deliveryOption } = customerDetails;
-    const deliveryInfoString = `${address.addressLine || ""}, ${address.commune}, ${address.wilaya}`;
-    const productsPayload = shopCartItems.map((item) => ({
-      productId: item.productId || item.product._id || item.product.id,
-      title: item.title || item.product.name,
-      quantity: Number(item.quantity),
-      sellingPrice: Number(item.sellingPrice),
-      categoryId: item.product?.categoryId,
-      supplementary: `${item.size || "Default"},${item.color || "Default"}`,
-    }));
+    setActiveProduct(product);
+    setSearchParams({ product: product._id });
 
-    const orderPayload = {
-      shopId: normalizedShopId,
-      customerName: customerDetails.customerName,
-      customerPhone: customerDetails.customerPhone,
-      deliveryInfo: deliveryInfoString,
-      note: customerDetails.note || "",
-      deliveryPricing: deliveryOption?.price || 0,
-      deliveryOptionKeyword: deliveryOption?.type || "national",
-      city: address?.commune,
-      state: address?.wilaya,
-      addressLine: address?.addressLine || "",
-      ...(gpsLocation && {
-        gpsLocation: {
-          lat: Number(gpsLocation.lat),
-          lng: Number(gpsLocation.lng),
-        },
-      }),
-      products: productsPayload,
-    };
-
-    try {
-      const response = await createGlobalOrder(orderPayload);
-      const result = response.data || response;
-      setOrderSuccessData({
-        orderId: result.orderId,
-        customerPhone: result.customerPhone,
-        shopName: shop.name,
-      });
-      setIsSubmitting("success");
-      dispatch(closeCart()); // Close the cart to reveal the success modal
-    } catch (error) {
-      console.error("Order Failed:", error);
-      const backendMessage = error.response?.data?.message; 
-      setOrderErrorMsg(backendMessage || t("order_error_message", "We couldn't submit your order at this time. Please try again."));
-      
-      setIsSubmitting("error");
-      setTimeout(() => {
-        setIsSubmitting(null);
-        setOrderErrorMsg(""); // Clear message on reset
-      }, 4000); 
+    if (quickAdd && isOrderingEnabled) {
+      const defaultAvail = product.availabilities?.[0];
+      const defaultSize = defaultAvail?.sizes?.[0];
+      if (defaultSize) {
+        dispatch(addToCart({
+          product,
+          variantId: `${product._id}_${defaultAvail.color}_${defaultSize.size}`,
+          color: defaultAvail.color,
+          size: defaultSize.size,
+          sellingPrice: defaultSize.sellingPrice,
+          imageId: defaultAvail.imageId,
+          quantity: 1,
+          shopId: normalizedShopId,
+        }));
+      }
     }
   };
 
-  // --- FIX 3: Clear cart logic moved here to run AFTER modal is closed ---
-  const handleClearSuccess = () => {
-    setIsSubmitting(null);
-    setOrderSuccessData(null);
-    shopCartItems.forEach((item) =>
-      dispatch(updateCartQuantity({ variantId: item.variantId, quantity: 0 })),
-    );
+  const handleClose = () => {
+    setActiveProduct(null);
+    setSearchParams({});
   };
 
-  const isHomeView =
-    !searchQuery && !selectedCategory && paginationMeta.page === 1;
+  const handleAddToCart = (variant) => {
+    dispatch(addToCart({ ...variant, shopId: normalizedShopId }));
+  };
 
-  return (
-    <ThemeProvider theme={partnerTheme}>
-      <PageWrapper>
-        <Container isArabic={isArabic} initial="hidden" animate="visible">
-          <motion.div variants={fadeInUp}>
-            <ShopHeader
-              shop={shop}
-              imageData={imageUrl}
-              isSubscribed={isSubscribed}
-              brandColors={brandColors}
-            />
-          </motion.div>
-          <motion.div variants={fadeInUp} style={{ marginBottom: "1rem" }}>
-            <ProductFilterBar
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              categories={categories}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
-          </motion.div>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key="content"
-              variants={fadeInUp}
-              initial="hidden"
-              animate="visible"
-            >
-              {isHomeView && featuredProducts.length > 0 && (
-                <div style={{ marginBottom: "2rem" }}>
-                  <ProductShowcase
-                    title={t("featured_products_title")}
-                    products={featuredProducts}
-                    onCardClick={handleModalOpen}
-                    isOrderingEnabled={isOrderingEnabled}
-                    cartItems={shopCartItems}
-                  />
-                </div>
-              )}
-              <ProductShowcase
-                title={
-                  searchQuery
-                    ? `${t("search_results_for")} "${searchQuery}"`
-                    : selectedCategory
-                      ? t("productsListTitle")
-                      : t("all_products")
-                }
-                products={paginatedList}
-                loading={paginatedLoading && paginatedList.length === 0}
-                onCardClick={handleModalOpen}
-                isOrderingEnabled={isOrderingEnabled}
-                cartItems={shopCartItems}
-              />
-              <LoadMoreTrigger ref={lastElementRef}>
-                {paginatedLoading && paginatedList.length > 0 && (
-                  <SpinnerSmall />
-                )}
-              </LoadMoreTrigger>
-              {!paginatedLoading &&
-                paginatedList.length === 0 &&
-                !isHomeView && (
-                  <p
-                    style={{
-                      textAlign: "center",
-                      color: "#666",
-                      marginTop: "2rem",
-                    }}
-                  >
-                    {t("noProductsAvailable")}
-                  </p>
-                )}
-            </motion.div>
-          </AnimatePresence>
-        </Container>
+  const handleUpdateQuantity = (variantId, newQuantity) => {
+    dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
+  };
 
-        <AnimatePresence>
-          {shopCartItems.length > 0 && (
-            <FloatingCartWrap
-              initial={{ y: 100, opacity: 0, x: "-50%" }}
-              animate={{ y: 0, opacity: 1, x: "-50%" }}
-              exit={{ y: 100, opacity: 0, x: "-50%" }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => dispatch(openCart())}
-            >
-              <Badge>
-                {shopCartItems.reduce((acc, item) => acc + item.quantity, 0)}
-              </Badge>
-              <ViewCartText>
-                {t("view_cart", "View Cart")}
-              </ViewCartText>
-              <TotalPrice>
-                {shopCartItems.reduce((acc, item) => acc + (parseInt(item.sellingPrice) * item.quantity), 0)} {t("dzd")}
-              </TotalPrice>
-            </FloatingCartWrap>
-          )}
-        </AnimatePresence>
+  const isHomeView = !searchQuery && !selectedCategory && paginationMeta.page === 1;
 
-        {/* RESTORED: Product Modal logic */}
-        {selectedProductForModal && (
-          <ProductDetailsModal
-            product={selectedProductForModal}
-            onClose={handleModalClose}
-            cartItems={shopCartItems}
-            onAddToCart={handleAddToCart}
+  const renderCatalogContent = () => (
+    <>
+      {isHomeView && featuredProducts.length > 0 && (
+        <div style={{ marginBottom: "3rem" }}>
+          <ProductShowcase
+            title={t("featured_products_title")}
+            products={featuredProducts}
+            onCardClick={handleCardClick}
             onUpdateQuantity={handleUpdateQuantity}
             isOrderingEnabled={isOrderingEnabled}
-            orderingStatusKey={orderingStatusKey}
+            cartItems={shopCartItems}
+            activeProductId={activeProduct?._id}
+            hasActive={!!activeProduct}
           />
-        )}
+        </div>
+      )}
 
-        {/* SUCCESS MODAL RENDERED HERE, INDEPENDENT OF CART */}
-        {orderSuccessData && (
-          <OrderSuccessModal
-            orderData={orderSuccessData}
-            onClose={handleClearSuccess}
-          />
-        )}
+      <ProductShowcase
+        title={
+          searchQuery
+            ? `${t("search_results_for")} "${searchQuery}"`
+            : selectedCategory
+              ? t("productsListTitle")
+              : t("all_products")
+        }
+        products={paginatedList}
+        loading={paginatedLoading && paginatedList.length === 0}
+        onCardClick={handleCardClick}
+        onUpdateQuantity={handleUpdateQuantity}
+        isOrderingEnabled={isOrderingEnabled}
+        cartItems={shopCartItems}
+        activeProductId={activeProduct?._id}
+        hasActive={!!activeProduct}
+      />
+    </>
+  );
 
-        <Cart
-          items={shopCartItems}
-          onUpdateQuantity={handleUpdateQuantity}
-          onSubmitOrder={handlePlaceOrder}
-          isSubmitting={isSubmitting}
-          shopDomain="global"
-          shopId={normalizedShopId}
-          orderErrorMsg={orderErrorMsg}
+  return (
+    <ContentWrapper>
+      <Container>
+        {/* --- Category Filter & Search Bar --- */}
+        <ProductFilterBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          categories={categories}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
         />
 
-        <PoweredByHanuut />
-      </PageWrapper>
-    </ThemeProvider>
+        {activeProduct ? (
+          <SplitGrid>
+            <AnimatePresence>
+              <MobilePane>
+                <InlineProductDetails
+                  product={activeProduct}
+                  cartItems={shopCartItems}
+                  onAddToCart={handleAddToCart}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  isOrderingEnabled={isOrderingEnabled}
+                  onClose={handleClose}
+                />
+              </MobilePane>
+            </AnimatePresence>
+
+            <ProductsListPane>
+              {renderCatalogContent()}
+              <LoadMoreTrigger ref={lastElementRef}>
+                {paginatedLoading && paginatedList.length > 0 && <Spinner />}
+              </LoadMoreTrigger>
+            </ProductsListPane>
+
+            <AnimatePresence>
+              <DesktopPane>
+                <InlineProductDetails
+                  product={activeProduct}
+                  cartItems={shopCartItems}
+                  onAddToCart={handleAddToCart}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  isOrderingEnabled={isOrderingEnabled}
+                  onClose={handleClose}
+                />
+              </DesktopPane>
+            </AnimatePresence>
+          </SplitGrid>
+        ) : (
+          <ProductsListPane>
+            {renderCatalogContent()}
+            <LoadMoreTrigger ref={lastElementRef}>
+              {paginatedLoading && paginatedList.length > 0 && <Spinner />}
+            </LoadMoreTrigger>
+          </ProductsListPane>
+        )}
+      </Container>
+    </ContentWrapper>
   );
 };
 
