@@ -22,14 +22,13 @@ const DetailContainer = styled(motion.div)`
   margin-bottom: 2rem;
 `;
 
-// --- NEW SOFT GLASSY BACKDROP ---
 const BlurredBackdrop = styled.div`
   position: absolute;
   inset: 0;
-  background-image: url(${props => props.$imgUrl});
+  background-image: url(${(props) => props.$imgUrl});
   background-size: cover;
   background-position: center;
-  filter: blur(40px) brightness(0.6); /* Softened from 0.35 to let colors pop */
+  filter: blur(40px) brightness(0.6);
   transform: scale(1.15);
   z-index: 0;
   pointer-events: none;
@@ -38,12 +37,11 @@ const BlurredBackdrop = styled.div`
 const GradientOverlay = styled.div`
   position: absolute;
   inset: 0;
-  /* Soft overlay transition to solid black at the bottom */
   background: linear-gradient(
-    to bottom, 
-    rgba(17, 18, 20, 0.25) 0%, 
-    rgba(17, 18, 20, 0.8) 75%, 
-    #111214 100__%
+    to bottom,
+    rgba(17, 18, 20, 0.25) 0%,
+    rgba(17, 18, 20, 0.8) 75%,
+    #111214 100%
   );
   z-index: 1;
   pointer-events: none;
@@ -66,7 +64,7 @@ const GallerySection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 `;
 
 const MainImageWrapper = styled.div`
@@ -90,7 +88,7 @@ const ZoomHint = styled.div`
   position: absolute;
   bottom: 8px;
   right: 8px;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   padding: 4px;
   border-radius: 6px;
   color: white;
@@ -107,7 +105,9 @@ const AltImagesRow = styled.div`
   overflow-x: auto;
   width: 100%;
   justify-content: center;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const AltThumbnail = styled.div`
@@ -115,7 +115,8 @@ const AltThumbnail = styled.div`
   height: 44px;
   border-radius: 6px;
   overflow: hidden;
-  border: 2px solid ${props => props.$active ? props.theme.primaryColor : 'transparent'};
+  border: 2px solid
+    ${(props) => (props.$active ? props.theme.primaryColor : "transparent")};
   cursor: pointer;
   flex-shrink: 0;
 
@@ -157,7 +158,7 @@ const TitleBlock = styled.div`
 
 const Brand = styled.span`
   font-size: 0.75rem;
-  color: ${props => props.theme.primaryColor};
+  color: ${(props) => props.theme.primaryColor};
   text-transform: uppercase;
   font-weight: 800;
   letter-spacing: 1px;
@@ -168,7 +169,7 @@ const ProductName = styled.h2`
   font-weight: 800;
   color: white;
   margin: 0;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   line-height: 1.3;
 `;
 
@@ -202,14 +203,17 @@ const Pill = styled.button`
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
-  background: ${props => props.$active ? 'white' : 'rgba(255,255,255,0.03)'};
-  border: 1px solid ${props => props.$active ? 'white' : 'rgba(255,255,255,0.1)'};
-  color: ${props => props.$active ? '#000' : '#d4d4d8'};
+  background: ${(props) =>
+    props.$active ? "white" : "rgba(255,255,255,0.03)"};
+  border: 1px solid
+    ${(props) => (props.$active ? "white" : "rgba(255,255,255,0.1)")};
+  color: ${(props) => (props.$active ? "#000" : "#d4d4d8")};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: ${props => props.$active ? 'white' : 'rgba(255,255,255,0.08)'};
+    background: ${(props) =>
+      props.$active ? "white" : "rgba(255,255,255,0.08)"};
   }
 `;
 
@@ -217,8 +221,8 @@ const SpecsTable = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   padding: 0.85rem;
   border-radius: 10px;
 `;
@@ -227,8 +231,13 @@ const SpecRow = styled.div`
   display: flex;
   justify-content: space-between;
   font-size: 0.8rem;
-  .name { color: #71717a; font-weight: 600; }
-  .val { color: white; }
+  .name {
+    color: #71717a;
+    font-weight: 600;
+  }
+  .val {
+    color: white;
+  }
 `;
 
 const QtyBox = styled.div`
@@ -242,7 +251,7 @@ const QtyBox = styled.div`
 `;
 
 const QtyBtn = styled.button`
-  background: ${props => props.theme.primaryColor};
+  background: ${(props) => props.theme.primaryColor};
   color: #000;
   border: none;
   width: 32px;
@@ -255,7 +264,7 @@ const QtyBtn = styled.button`
 `;
 
 const AddToCartBtn = styled.button`
-  background: ${props => props.theme.primaryColor};
+  background: ${(props) => props.theme.primaryColor};
   color: #000;
   border: none;
   width: 100%;
@@ -271,11 +280,10 @@ const AddToCartBtn = styled.button`
   }
 `;
 
-// --- LIGHTBOX PORTAL OVERLAY ---
 const LightboxOverlay = styled(motion.div)`
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.95);
+  background: rgba(0, 0, 0, 0.95);
   z-index: 2000;
   display: flex;
   align-items: center;
@@ -288,7 +296,7 @@ const LightboxOverlay = styled(motion.div)`
     max-height: 100%;
     object-fit: contain;
     border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
   }
 `;
 
@@ -307,7 +315,6 @@ const InlineProductDetails = ({
   const [imagesMap, setImagesMap] = useState({});
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  // Reset local state if active product changes
   useEffect(() => {
     if (product?.availabilities?.length > 0) {
       const firstAvail = product.availabilities[0];
@@ -320,16 +327,18 @@ const InlineProductDetails = ({
   }, [product]);
 
   const currentAvailability = useMemo(() => {
-    return product.availabilities.find(a => a.color === selectedColor);
+    return product.availabilities.find((a) => a.color === selectedColor);
   }, [product, selectedColor]);
 
   const currentSizeDetails = useMemo(() => {
-    return currentAvailability?.sizes.find(s => s.size === selectedSize);
+    return currentAvailability?.sizes.find((s) => s.size === selectedSize);
   }, [currentAvailability, selectedSize]);
 
   useEffect(() => {
     if (currentAvailability) {
-      const sizeExists = currentAvailability.sizes.some(s => s.size === selectedSize);
+      const sizeExists = currentAvailability.sizes.some(
+        (s) => s.size === selectedSize,
+      );
       if (!sizeExists && currentAvailability.sizes?.length > 0) {
         setSelectedSize(currentAvailability.sizes[0].size);
       }
@@ -337,10 +346,9 @@ const InlineProductDetails = ({
     }
   }, [currentAvailability, selectedSize]);
 
-  // Load image assets
   const allImageIds = useMemo(() => {
     const ids = [];
-    product.availabilities.forEach(av => {
+    product.availabilities.forEach((av) => {
       if (av.imageId) ids.push(av.imageId);
       if (av.altImageIds) ids.push(...av.altImageIds);
     });
@@ -348,23 +356,27 @@ const InlineProductDetails = ({
   }, [product]);
 
   useEffect(() => {
-    allImageIds.forEach(id => {
+    allImageIds.forEach((id) => {
       if (imagesMap[id]) return;
-      getImage(id).then(res => {
+      getImage(id).then((res) => {
         if (res.data) {
-          setImagesMap(prev => ({ ...prev, [id]: getImageUrl(res.data) }));
+          setImagesMap((prev) => ({ ...prev, [id]: getImageUrl(res.data) }));
         }
       });
     });
   }, [allImageIds, imagesMap]);
 
   const currentVariantId = `${product._id}_${selectedColor}_${selectedSize}`;
-  const existingCartItem = cartItems.find(item => item.variantId === currentVariantId);
+  const existingCartItem = cartItems.find(
+    (item) => item.variantId === currentVariantId,
+  );
 
   const handleAdd = () => {
     if (!currentSizeDetails) return;
     onAddToCart({
       product,
+      productId: product._id, // --- ADDED ---
+      title: product.name, // --- ADDED ---
       variantId: currentVariantId,
       color: selectedColor,
       size: selectedSize,
@@ -376,35 +388,48 @@ const InlineProductDetails = ({
 
   const galleryImages = useMemo(() => {
     if (!currentAvailability) return [];
-    return [currentAvailability.imageId, ...(currentAvailability.altImageIds || [])];
+    return [
+      currentAvailability.imageId,
+      ...(currentAvailability.altImageIds || []),
+    ];
   }, [currentAvailability]);
 
   return (
     <>
-      <DetailContainer initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+      <DetailContainer
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <BlurredBackdrop $imgUrl={imagesMap[activeImageId]} />
         <GradientOverlay />
-        
+
         <RelativeContent>
           <GallerySection>
             <MainImageWrapper onClick={() => setIsLightboxOpen(true)}>
               <AnimatePresence mode="wait">
                 {imagesMap[activeImageId] && (
-                  <motion.img 
+                  <motion.img
                     key={activeImageId}
-                    src={imagesMap[activeImageId]} 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }} 
+                    src={imagesMap[activeImageId]}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.15 }}
                   />
                 )}
               </AnimatePresence>
-              <ZoomHint><FaExpand /></ZoomHint>
+              <ZoomHint>
+                <FaExpand />
+              </ZoomHint>
             </MainImageWrapper>
             <AltImagesRow>
               {galleryImages.map((id, index) => (
-                <AltThumbnail key={index} $active={activeImageId === id} onClick={() => setActiveImageId(id)}>
+                <AltThumbnail
+                  key={index}
+                  $active={activeImageId === id}
+                  onClick={() => setActiveImageId(id)}
+                >
                   <img src={imagesMap[id]} alt="Alt view" />
                 </AltThumbnail>
               ))}
@@ -414,28 +439,36 @@ const InlineProductDetails = ({
           <TitleBlock>
             {product.brand && <Brand>{product.brand}</Brand>}
             <ProductName>{product.name}</ProductName>
-            <Price>{parseInt(currentSizeDetails?.sellingPrice || 0)} {t("dzd")}</Price>
+            <Price>
+              {parseInt(currentSizeDetails?.sellingPrice || 0)} {t("dzd")}
+            </Price>
           </TitleBlock>
 
-          {/* Color Select */}
           <SelectorGrid>
-            <SectionLabel>Color</SectionLabel>
+            <SectionLabel>{t("color_prefix")}</SectionLabel>
             <PillsContainer>
-              {product.availabilities.map(av => (
-                <Pill key={av.color} $active={selectedColor === av.color} onClick={() => setSelectedColor(av.color)}>
+              {product.availabilities.map((av) => (
+                <Pill
+                  key={av.color}
+                  $active={selectedColor === av.color}
+                  onClick={() => setSelectedColor(av.color)}
+                >
                   {av.colorLabel || av.color}
                 </Pill>
               ))}
             </PillsContainer>
           </SelectorGrid>
 
-          {/* Size Select */}
           {currentAvailability && (
             <SelectorGrid>
-              <SectionLabel>Size</SectionLabel>
+              <SectionLabel>{t("size_prefix")}</SectionLabel>
               <PillsContainer>
-                {currentAvailability.sizes.map(s => (
-                  <Pill key={s.size} $active={selectedSize === s.size} onClick={() => setSelectedSize(s.size)}>
+                {currentAvailability.sizes.map((s) => (
+                  <Pill
+                    key={s.size}
+                    $active={selectedSize === s.size}
+                    onClick={() => setSelectedSize(s.size)}
+                  >
                     {s.size}
                   </Pill>
                 ))}
@@ -443,10 +476,9 @@ const InlineProductDetails = ({
             </SelectorGrid>
           )}
 
-          {/* Specs */}
           {product.specifications?.length > 0 && (
             <SelectorGrid>
-              <SectionLabel>Specifications</SectionLabel>
+              <SectionLabel>{t("specifications_header")}</SectionLabel>
               <SpecsTable>
                 {product.specifications.slice(0, 3).map((spec, idx) => (
                   <SpecRow key={idx}>
@@ -459,40 +491,63 @@ const InlineProductDetails = ({
           )}
 
           {isOrderingEnabled && (
-            <div style={{ marginTop: 'auto' }}>
+            <div style={{ marginTop: "auto" }}>
               {existingCartItem ? (
                 <QtyBox>
-                  <QtyBtn onClick={() => onUpdateQuantity(currentVariantId, existingCartItem.quantity - 1)}><FaMinus /></QtyBtn>
-                  <span className="font-bold text-lg">{existingCartItem.quantity}</span>
-                  <QtyBtn onClick={() => onUpdateQuantity(currentVariantId, existingCartItem.quantity + 1)}><FaPlus /></QtyBtn>
+                  <QtyBtn
+                    onClick={() =>
+                      onUpdateQuantity(
+                        currentVariantId,
+                        existingCartItem.quantity - 1,
+                      )
+                    }
+                  >
+                    <FaMinus />
+                  </QtyBtn>
+                  <span className="font-bold text-lg">
+                    {existingCartItem.quantity}
+                  </span>
+                  <QtyBtn
+                    onClick={() =>
+                      onUpdateQuantity(
+                        currentVariantId,
+                        existingCartItem.quantity + 1,
+                      )
+                    }
+                  >
+                    <FaPlus />
+                  </QtyBtn>
                 </QtyBox>
               ) : (
-                <AddToCartBtn onClick={handleAdd}>Add to Cart</AddToCartBtn>
+                <AddToCartBtn onClick={handleAdd}>
+                  {t("add_to_cart")}
+                </AddToCartBtn>
               )}
             </div>
           )}
         </RelativeContent>
 
         {onClose && (
-          <CloseButton onClick={onClose}><FaTimes /></CloseButton>
+          <CloseButton onClick={onClose}>
+            <FaTimes />
+          </CloseButton>
         )}
       </DetailContainer>
 
-      {/* --- LIGHTBOX MODAL --- */}
       <AnimatePresence>
         {isLightboxOpen && imagesMap[activeImageId] && (
-          <LightboxOverlay 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
+          <LightboxOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={() => setIsLightboxOpen(false)}
           >
-            <motion.img 
-              src={imagesMap[activeImageId]} 
-              alt={product.name} 
-              initial={{ scale: 0.9 }} 
-              animate={{ scale: 1 }} 
-              exit={{ scale: 0.9 }} 
+            <motion.img
+              src={imagesMap[activeImageId]}
+              alt={product.name}
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
             />
           </LightboxOverlay>
         )}

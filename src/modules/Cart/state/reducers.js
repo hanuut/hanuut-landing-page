@@ -1,12 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// 1. Helper to Load from Browser Storage
+// 1. Helper to Load from Browser Storage with SMART SELF-HEALING FILTER
 const loadCartFromStorage = () => {
   if (typeof window === 'undefined') return [];
   try {
     const serializedState = localStorage.getItem("hanuut_cart");
     if (serializedState === null) return [];
-    return JSON.parse(serializedState);
+    
+    const parsed = JSON.parse(serializedState);
+    if (!Array.isArray(parsed)) return [];
+
+    // Purge any corrupted item that has NaN price, NaN quantity, or missing identifier
+    return parsed.filter(item => 
+      item && 
+      item.variantId && 
+      !isNaN(item.sellingPrice) && 
+      !isNaN(item.quantity) &&
+      item.sellingPrice !== null &&
+      item.quantity > 0
+    );
   } catch (err) {
     console.error("Error loading cart:", err);
     return [];
@@ -25,7 +37,7 @@ const saveCartToStorage = (cart) => {
 
 const initialState = {
   cart: loadCartFromStorage(),
-  isCartOpen: false, // <--- NEW: Controls the modal visibility globally
+  isCartOpen: false, 
   loading: false,
   error: null,
 };
@@ -56,8 +68,6 @@ const cartSlice = createSlice({
       }
       
       saveCartToStorage(state.cart);
-      // Optional: Auto-open cart on add
-      //state.isCartOpen = true; 
     },
 
     updateCartQuantity: (state, action) => {

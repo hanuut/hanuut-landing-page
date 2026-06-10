@@ -16,21 +16,17 @@ const SectionTitle = styled.h2`
   font-family: "Tajawal", sans-serif;
 `;
 
-// --- DYNAMIC ADAPTIVE GRID ---
 const ProductsGrid = styled.div`
   display: grid;
   gap: 1.5rem;
   
-  /* Standard Grid: No selected item */
   ${props => !props.$hasActive ? css`
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   ` : css`
-    /* Adaptive Grid: Split screen active (Strictly 2 columns) */
     grid-template-columns: repeat(2, 1fr);
   `}
 
   @media (max-width: 768px) {
-    /* Mobile/Tablet: 1 Column if selected, 2 Columns if standard */
     grid-template-columns: ${props => props.$hasActive ? "1fr" : "repeat(2, 1fr)"};
     gap: 10px;
   }
@@ -42,7 +38,7 @@ const ProductShowcase = ({
   loading,
   error,
   onCardClick,
-  onUpdateQuantity, // --- ADDED ---
+  onUpdateQuantity,
   isOrderingEnabled,
   cartItems = [],
   activeProductId = null,
@@ -75,9 +71,10 @@ const ProductShowcase = ({
               <PremiumProductCard
                 product={product}
                 onCardClick={onCardClick}
-                onUpdateQuantity={onUpdateQuantity} // --- PASSED DOWN ---
+                onUpdateQuantity={onUpdateQuantity}
                 isOrderingEnabled={isOrderingEnabled}
                 quantityInCart={totalQuantityInCart}
+                cartItems={cartItems} // --- PASSED DOWN ---
                 $isActive={currentProdId === activeProductId}
               />
             </div>

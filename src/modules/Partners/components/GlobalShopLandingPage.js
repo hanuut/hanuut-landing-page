@@ -250,6 +250,8 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
       if (defaultSize) {
         dispatch(addToCart({
           product,
+          productId: product._id, // --- ADDED ---
+          title: product.name, // --- ADDED ---
           variantId: `${product._id}_${defaultAvail.color}_${defaultSize.size}`,
           color: defaultAvail.color,
           size: defaultSize.size,
@@ -261,7 +263,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
       }
     }
   };
-
+  
   const handleClose = () => {
     setActiveProduct(null);
     setSearchParams({});

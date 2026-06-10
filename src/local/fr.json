@@ -1210,6 +1210,26 @@
   "cta_download_section_title": "Déjà inscrit ? Téléchargez l'application",
   "cta_download_section_desc": "L'application My Hanuut est disponible sur tous vos écrans. Connectez-vous à votre compte.",
   "gateway_title": "Quel est votre domaine d'activité ?",
-  "gateway_btn": "Découvrir ➔"
+  "gateway_btn": "Découvrir ➔",
+  "delivery_type_label": "Vitesse de livraison",
+  "delivery_destination_label": "Type d'expédition",
+  "delivery_company_label": "Transporteur",
+  "destination_home": "À Domicile 🏠",
+  "destination_stop_desk": "Point Relais (Stop Desk) 📦",
+  "select_yalidine_desk": "Sélectionner l'agence de retrait",
+  "agency_desk_placeholder": "Saisissez le nom de l'agence...",
+  "speed_express": "Express",
+  "speed_economic": "Économique",
+  "speed_standard": "Standard",
+  "cart_items_count": "Articles",
+  "color_prefix": "Couleur",
+  "size_prefix": "Taille",
+  "public_page_title": "Votre Page Publique",
+  "copy_btn_label": "Copier",
+  "share_btn_label": "Partager",
+  "preview_btn_label": "Aperçu",
+  "hide_links_btn": "Masquer les liens",
+  "view_all_links_btn": "Voir tout",
+  "specifications_header": "Caractéristiques"
 
 }

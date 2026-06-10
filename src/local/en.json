@@ -1205,6 +1205,26 @@
   "cta_download_section_title": "Already registered? Download the App",
   "cta_download_section_desc": "My Hanuut is available on all your devices. Download your version and log in.",
   "gateway_title": "What kind of business do you run?",
-  "gateway_btn": "Explore Solutions ➔"
+  "gateway_btn": "Explore Solutions ➔",
+  "delivery_type_label": "Delivery Speed",
+  "delivery_destination_label": "Fulfillment Type",
+  "delivery_company_label": "Shipping Carrier",
+  "destination_home": "Home Delivery 🏠",
+  "destination_stop_desk": "Stop Desk (Agency Pickup) 📦",
+  "select_yalidine_desk": "Select Pickup Office / Agency",
+  "agency_desk_placeholder": "Enter nearest agency name...",
+  "speed_express": "Express",
+  "speed_economic": "Economic",
+  "speed_standard": "Standard",
+  "cart_items_count": "Items",
+  "color_prefix": "Color",
+  "size_prefix": "Size",
+  "public_page_title": "Your Public Page",
+  "copy_btn_label": "Copy",
+  "share_btn_label": "Share",
+  "preview_btn_label": "Preview",
+  "hide_links_btn": "Hide Links",
+  "view_all_links_btn": "View All",
+  "specifications_header": "Specifications"
 
 }

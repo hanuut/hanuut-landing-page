@@ -21,12 +21,12 @@ const ModalBackdrop = styled(motion.div)`
 const BentoContainer = styled(motion.div)`
   width: 100%;
   max-width: 850px;
-  height: 500px; /* FIXED HEIGHT FOR PERFECT DESKTOP VIEW */
+  height: 500px;
   background: #111214;
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: grid;
-  grid-template-columns: 1fr 1fr; /* PERFECT 50/50 SPLIT */
+  grid-template-columns: 1fr 1fr;
   overflow: hidden;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
   position: relative;
@@ -61,10 +61,12 @@ const GallerySection = styled.div`
 
 const MainImageWrapper = styled.div`
   width: 100%;
-  height: 280px; /* COMPACT FOR FIXED VIEWPORT */
+  height: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  cursor: zoom-in;
 
   img {
     max-width: 100%;
@@ -114,7 +116,7 @@ const InfoSection = styled.div`
   gap: 1.25rem;
   height: 100%;
   box-sizing: border-box;
-  overflow-y: auto; /* Scrollable only internally if content overflows */
+  overflow-y: auto;
 
   &::-webkit-scrollbar {
     display: none;
@@ -129,7 +131,7 @@ const CloseButton = styled.button`
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   width: 32px;
@@ -140,7 +142,7 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   z-index: 10;
-  transition: background 0.2s;
+  transition: all 0.2s;
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -202,16 +204,16 @@ const Pill = styled.button`
   font-size: 0.85rem;
   font-weight: 600;
   background: ${(props) =>
-    props.$active ? "white" : "rgba(255,255,255,0.03)"};
+    props.$active ? "white" : "rgba(255, 255, 255, 0.03)"};
   border: 1px solid
-    ${(props) => (props.$active ? "white" : "rgba(255,255,255,0.1)")};
+    ${(props) => (props.$active ? "white" : "rgba(255, 255, 255, 0.1)")};
   color: ${(props) => (props.$active ? "#000" : "#d4d4d8")};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
     background: ${(props) =>
-      props.$active ? "white" : "rgba(255,255,255,0.08)"};
+      props.$active ? "white" : "rgba(255, 255, 255, 0.08)"};
   }
 `;
 
@@ -311,7 +313,6 @@ const ProductDetailsModal = ({
     }
   }, [currentAvailability]);
 
-  // Lazy load image buffers
   const allImageIds = useMemo(() => {
     const ids = [];
     product.availabilities.forEach((av) => {
@@ -341,6 +342,8 @@ const ProductDetailsModal = ({
     if (!currentSizeDetails) return;
     onAddToCart({
       product,
+      productId: product._id, // --- ADDED ---
+      title: product.name, // --- ADDED ---
       variantId: currentVariantId,
       color: selectedColor,
       size: selectedSize,
@@ -371,7 +374,6 @@ const ProductDetailsModal = ({
         exit={{ scale: 0.95, y: 30 }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Left Side: Photo Bento Block */}
         <GallerySection>
           <MainImageWrapper>
             <AnimatePresence mode="wait">
@@ -400,7 +402,6 @@ const ProductDetailsModal = ({
           </AltImagesRow>
         </GallerySection>
 
-        {/* Right Side: Configuration Bento Block */}
         <InfoSection>
           <TitleBlock>
             {product.brand && <Brand>{product.brand}</Brand>}
@@ -410,9 +411,8 @@ const ProductDetailsModal = ({
             </Price>
           </TitleBlock>
 
-          {/* Color Matrix Selector */}
           <SelectorGrid>
-            <SectionLabel>Color</SectionLabel>
+            <SectionLabel>{t("color_prefix")}</SectionLabel>
             <PillsContainer>
               {product.availabilities.map((av) => (
                 <Pill
@@ -426,10 +426,9 @@ const ProductDetailsModal = ({
             </PillsContainer>
           </SelectorGrid>
 
-          {/* Size Matrix Selector */}
           {currentAvailability && (
             <SelectorGrid>
-              <SectionLabel>Size</SectionLabel>
+              <SectionLabel>{t("size_prefix")}</SectionLabel>
               <PillsContainer>
                 {currentAvailability.sizes.map((s) => (
                   <Pill
@@ -444,10 +443,9 @@ const ProductDetailsModal = ({
             </SelectorGrid>
           )}
 
-          {/* Product Specs */}
           {product.specifications?.length > 0 && (
             <SelectorGrid>
-              <SectionLabel>Specifications</SectionLabel>
+              <SectionLabel>{t("specifications_header")}</SectionLabel>
               <SpecsTable>
                 {product.specifications.slice(0, 3).map((spec, idx) => (
                   <SpecRow key={idx}>
@@ -459,7 +457,6 @@ const ProductDetailsModal = ({
             </SelectorGrid>
           )}
 
-          {/* Action Footer */}
           {isOrderingEnabled && (
             <div style={{ marginTop: "auto" }}>
               {existingCartItem ? (
@@ -489,7 +486,9 @@ const ProductDetailsModal = ({
                   </QtyBtn>
                 </QtyBox>
               ) : (
-                <AddToCartBtn onClick={handleAdd}>Add to Cart</AddToCartBtn>
+                <AddToCartBtn onClick={handleAdd}>
+                  {t("add_to_cart")}
+                </AddToCartBtn>
               )}
             </div>
           )}
