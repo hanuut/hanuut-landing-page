@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { getImageUrl } from "../../../../utils/imageUtils";
@@ -7,7 +7,7 @@ import { getImage } from "../../../Images/services/imageServices";
 import { FaMinus, FaPlus, FaShoppingCart } from "react-icons/fa";
 
 const CardWrapper = styled(motion.div)`
-  background-color: ${(props) => props.theme.surface};
+  background-color: ${props => props.theme.surface};
   border-radius: 20px;
   overflow: hidden;
   display: flex;
@@ -17,45 +17,43 @@ const CardWrapper = styled(motion.div)`
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-sizing: border-box;
 
-  /* --- HIGH FIDELITY BORDERS --- */
-  /* Only currently active card gets the glowing accent. In-cart gets a flat, subtle border */
-  border: 2px solid
-    ${(props) =>
-      props.$isActive ? props.theme.primaryColor : "rgba(255,255,255,0.05)"};
+  /* --- SPECIFIC SELECTED GLOW VS FLAT IN-CART --- */
+  border: 2px solid ${props => 
+    props.$isActive 
+      ? props.theme.primaryColor // Selected Glow
+      : 'rgba(255,255,255,0.05)' // In-cart or Default remains flat
+  };
 
-  /* Only active card gets the neon drop shadow */
-  box-shadow: ${(props) =>
-    props.$isActive
-      ? `0 0 25px ${props.theme.primaryColor}50`
-      : "0 4px 20px rgba(0,0,0,0.1)"};
+  box-shadow: ${props => 
+    props.$isActive 
+      ? `0 0 25px ${props.theme.primaryColor}50` // Glowing drop shadow
+      : "0 4px 20px rgba(0,0,0,0.1)"
+  };
 
   &:hover {
     transform: translateY(-5px);
-    border-color: ${(props) =>
-      props.$isActive ? props.theme.primaryColor : "rgba(255,255,255,0.2)"};
-    box-shadow: ${(props) =>
-      props.$isActive
-        ? `0 0 25px ${props.theme.primaryColor}50`
-        : "0 10px 25px rgba(0,0,0,0.2)"};
+    border-color: ${props => props.$isActive ? props.theme.primaryColor : "rgba(255,255,255,0.2)"};
+    box-shadow: ${props => props.$isActive ? `0 0 25px ${props.theme.primaryColor}50` : "0 10px 25px rgba(0,0,0,0.2)"};
   }
 `;
 
 const ImageContainer = styled.div`
   width: 100%;
-  aspect-ratio: 1 / 1;
   position: relative;
   background-color: #121214;
   cursor: pointer;
 
   img {
     width: 100%;
-    height: 100%;
+    height: auto; /* --- NATIVE BENTO HEIGHT ADAPTATION --- */
+    max-height: 440px; 
+    display: block;
     object-fit: cover;
     transition: transform 0.5s ease;
   }
 
   ${CardWrapper}:hover img {
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
 `;
 
@@ -69,7 +67,7 @@ const Content = styled.div`
 
 const Brand = styled.span`
   font-size: 0.75rem;
-  color: ${(props) => props.theme.primaryColor};
+  color: ${props => props.theme.primaryColor};
   text-transform: uppercase;
   font-weight: 800;
   letter-spacing: 1px;
@@ -104,7 +102,7 @@ const Price = styled.span`
 `;
 
 const ActionButton = styled.button`
-  background: ${(props) => props.theme.primaryColor};
+  background: ${props => props.theme.primaryColor};
   border: none;
   width: 38px;
   height: 38px;
@@ -144,7 +142,7 @@ const QtyBtn = styled.button`
   font-size: 0.85rem;
 
   &:hover {
-    color: ${(props) => props.theme.primaryColor};
+    color: ${props => props.theme.primaryColor};
   }
 `;
 
@@ -159,58 +157,66 @@ const QtyValue = styled.span`
 const PremiumProductCard = ({
   product,
   onCardClick,
-  onUpdateQuantity, // --- ADDED ---
+  onUpdateQuantity,
   isOrderingEnabled,
   quantityInCart = 0,
   $isActive = false,
+  cartItems = [],
+  imageOverrideId = null, // --- CAROUSEL-SYNCED ID ---
 }) => {
   const { t } = useTranslation();
   const [imageBuffer, setImageBuffer] = useState(null);
 
   const defaultAvailability = product?.availabilities?.[0];
   const defaultSize = defaultAvailability?.sizes?.[0];
-  const imageId = defaultAvailability?.imageId;
+  const activeImageId = imageOverrideId || defaultAvailability?.imageId; // --- DYNAMIC BINDING ---
 
   useEffect(() => {
     let isMounted = true;
-    if (imageId) {
-      getImage(imageId).then((res) => {
+    if (activeImageId) {
+      getImage(activeImageId).then((res) => {
         if (isMounted && res.data) setImageBuffer(res.data);
       });
     }
     return () => {
       isMounted = false;
     };
-  }, [imageId]);
+  }, [activeImageId]);
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
   const productName = product.name;
 
-  // --- STRICTLY CARD SELECT ONLY ---
+  const activeCartItemForThisProduct = useMemo(() => {
+    return cartItems.find(item => {
+      const cartProdId = (item.productId || item.product?._id || item.product?.id)?.toString();
+      return cartProdId === product._id?.toString();
+    });
+  }, [cartItems, product]);
+
   const handleCardSelect = () => {
-    onCardClick(product, false); // Triggers details pane update without adding to cart
+    onCardClick(product, false); 
   };
 
-  // --- STRICTLY ADD ONLY ---
   const handleQuickAdd = (e) => {
-    e.stopPropagation(); // Stops card selection event
+    e.stopPropagation(); 
     if (!isOrderingEnabled || !defaultSize) return;
-    onCardClick(product, true); // Triggers fast cart addition
+    onCardClick(product, true); 
   };
 
-  // --- STRICTLY QUANTITY UPDATE ONLY ---
   const handleDecrement = (e) => {
-    e.stopPropagation(); // Stops card selection event
+    e.stopPropagation(); 
     if (!defaultSize || !onUpdateQuantity) return;
-    const variantId = `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
-    onUpdateQuantity(variantId, quantityInCart - 1);
+    const targetVariantId = activeCartItemForThisProduct?.variantId || `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
+    const currentQty = activeCartItemForThisProduct?.quantity || quantityInCart;
+    onUpdateQuantity(targetVariantId, currentQty - 1);
   };
 
   const handleIncrement = (e) => {
-    e.stopPropagation(); // Stops card selection event
+    e.stopPropagation(); 
     if (!defaultSize || !onUpdateQuantity) return;
-    const variantId = `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
-    onUpdateQuantity(variantId, quantityInCart + 1);
+    const targetVariantId = activeCartItemForThisProduct?.variantId || `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
+    const currentQty = activeCartItemForThisProduct?.quantity || quantityInCart;
+    onUpdateQuantity(targetVariantId, currentQty + 1);
   };
 
   return (

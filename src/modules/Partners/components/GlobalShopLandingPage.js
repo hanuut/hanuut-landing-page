@@ -8,7 +8,6 @@ import { AnimatePresence } from "framer-motion";
 // --- Redux ---
 import {
   fetchPaginatedProducts,
-  selectPaginatedState,
   fetchFeaturedProductsByShop,
   selectProducts,
   resetPagination,
@@ -40,7 +39,7 @@ const Container = styled.div`
   padding: 2rem 0;
 `;
 
-// --- NEW PERFECTED WIDE-DETAILS COLUMN RATIO ---
+// --- MULTI-SCREEN DYNAMIC GRID ---
 const SplitGrid = styled.div`
   display: flex;
   flex-direction: column;
@@ -49,7 +48,7 @@ const SplitGrid = styled.div`
   @media(min-width: 1024px) {
     display: grid;
     /* 1.1fr for Products Grid (Right/Left depending on RTL), 1.9fr for Premium Details Pane */
-    grid-template-columns: 1.1fr 1.9fr; 
+    grid-template-columns: ${props => props.$isArabic ? "1fr 1.5fr" : "1.5fr 1fr"}; 
     align-items: start;
   }
 `;
@@ -102,9 +101,10 @@ const Spinner = styled.div`
 `;
 
 const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
+  const isArabic = i18n.language === "ar";
 
   const normalizedShopId = useMemo(() => shop?._id || shop?.id, [shop]);
 
@@ -112,11 +112,14 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [activeProduct, setActiveProduct] = useState(null);
 
-  const {
-    products: paginatedList,
-    loading: paginatedLoading,
-    meta: paginationMeta,
-  } = useSelector(selectPaginatedState);
+  // --- DYNAMIC PRODUCT IMAGE OVERRIDES MAP (Carousel-to-Grid Sync) ---
+  const [imageOverrides, setImageOverrides] = useState({});
+
+  // --- SELECT INDIVIDUAL PRIMITIVES TO ELIMINATE REDUX WARNING & RE-RENDERS ---
+  const paginatedList = useSelector((state) => state.products.paginatedProducts);
+  const paginatedLoading = useSelector((state) => state.products.paginationLoading);
+  const paginationMeta = useSelector((state) => state.products.paginationMeta);
+  
   const { featuredProducts } = useSelector(selectProducts);
   const { categories } = useSelector(selectCategories);
   const { cart } = useSelector(selectCart);
@@ -147,19 +150,30 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
     return () => dispatch(resetPagination());
   }, [dispatch, normalizedShopId, shop.categories]);
 
-  // Self-healing categories loader
+  // --- DE-DUPLICATED SELF-HEALING CATEGORIES LOADER ---
   useEffect(() => {
     if (paginatedList.length > 0) {
       const extractedCategoryIds = paginatedList
-        .map(p => p.categoryId)
+        .map(p => {
+          if (!p.categoryId) return null;
+          if (typeof p.categoryId === 'object') {
+            return p.categoryId._id || p.categoryId.id;
+          }
+          return p.categoryId;
+        })
         .filter(id => id && typeof id === 'string');
       
       const uniqueIds = Array.from(new Set(extractedCategoryIds));
-      if (uniqueIds.length > 0) {
-         dispatch(fetchCategories(uniqueIds));
+      
+      const missingIds = uniqueIds.filter(id => 
+        !categories.some(cat => cat.id === id)
+      );
+
+      if (missingIds.length > 0) {
+         dispatch(fetchCategories(missingIds));
       }
     }
-  }, [paginatedList, dispatch]);
+  }, [paginatedList, categories, dispatch]);
 
   // Watch Filters
   useEffect(() => {
@@ -193,14 +207,12 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
     }
   }, [productIdFromUrl, dispatch, setSearchParams, activeProduct]);
 
-  // --- RESPONSIVE AUTO-SCROLL ALIGNMENT LOGIC ---
+  // Auto-scroll alignment logic
   useEffect(() => {
     if (activeProduct) {
       if (window.innerWidth < 1024) {
-        // Mobile/Tablet: Scroll window to the top so details pane is instantly visible
         window.scrollTo({ top: 300, behavior: 'smooth' });
       } else {
-        // Desktop: Keep card aligned and centered in the grid
         const element = document.getElementById(`product-card-${activeProduct._id}`);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -250,8 +262,8 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
       if (defaultSize) {
         dispatch(addToCart({
           product,
-          productId: product._id, // --- ADDED ---
-          title: product.name, // --- ADDED ---
+          productId: product._id, 
+          title: product.name, 
           variantId: `${product._id}_${defaultAvail.color}_${defaultSize.size}`,
           color: defaultAvail.color,
           size: defaultSize.size,
@@ -263,7 +275,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
       }
     }
   };
-  
+
   const handleClose = () => {
     setActiveProduct(null);
     setSearchParams({});
@@ -276,6 +288,14 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
   const handleUpdateQuantity = (variantId, newQuantity) => {
     dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
   };
+
+  // --- THE CRITICAL FIX: MEMOIZE ACTION CALLBACK TO STOP INFINITE LOOP ---
+  const handleImageChange = useCallback((productId, imageId) => {
+    setImageOverrides(prev => {
+      if (prev[productId] === imageId) return prev; // Stop redundant rendering
+      return { ...prev, [productId]: imageId };
+    });
+  }, []);
 
   const isHomeView = !searchQuery && !selectedCategory && paginationMeta.page === 1;
 
@@ -292,6 +312,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
             cartItems={shopCartItems}
             activeProductId={activeProduct?._id}
             hasActive={!!activeProduct}
+            imageOverrides={imageOverrides}
           />
         </div>
       )}
@@ -312,6 +333,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
         cartItems={shopCartItems}
         activeProductId={activeProduct?._id}
         hasActive={!!activeProduct}
+        imageOverrides={imageOverrides}
       />
     </>
   );
@@ -329,7 +351,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
         />
 
         {activeProduct ? (
-          <SplitGrid>
+          <SplitGrid $isArabic={isArabic}>
             <AnimatePresence>
               <MobilePane>
                 <InlineProductDetails
@@ -339,6 +361,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
                   onUpdateQuantity={handleUpdateQuantity}
                   isOrderingEnabled={isOrderingEnabled}
                   onClose={handleClose}
+                  onImageChange={handleImageChange}
                 />
               </MobilePane>
             </AnimatePresence>
@@ -359,6 +382,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
                   onUpdateQuantity={handleUpdateQuantity}
                   isOrderingEnabled={isOrderingEnabled}
                   onClose={handleClose}
+                  onImageChange={handleImageChange}
                 />
               </DesktopPane>
             </AnimatePresence>

@@ -16,19 +16,30 @@ const SectionTitle = styled.h2`
   font-family: "Tajawal", sans-serif;
 `;
 
+// --- NEW HIGH-FIDELITY CSS COLUMNS MASONRY GRID ---
 const ProductsGrid = styled.div`
-  display: grid;
-  gap: 1.5rem;
+  width: 100%;
   
-  ${props => !props.$hasActive ? css`
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  ` : css`
-    grid-template-columns: repeat(2, 1fr);
-  `}
+  /* Dynamic Columns based on active details split panel */
+  column-count: ${props => props.$hasActive ? 2 : 4};
+  column-gap: 1.5rem;
+
+  @media (max-width: 1200px) {
+    column-count: ${props => props.$hasActive ? 2 : 3};
+  }
 
   @media (max-width: 768px) {
-    grid-template-columns: ${props => props.$hasActive ? "1fr" : "repeat(2, 1fr)"};
-    gap: 10px;
+    column-count: ${props => props.$hasActive ? 1 : 2};
+    column-gap: 10px;
+  }
+`;
+
+const CardContainer = styled.div`
+  break-inside: avoid; /* Prevents cards from breaking across columns */
+  margin-bottom: 1.5rem; /* Generous vertical spacing */
+  
+  @media (max-width: 768px) {
+    margin-bottom: 10px;
   }
 `;
 
@@ -43,6 +54,7 @@ const ProductShowcase = ({
   cartItems = [],
   activeProductId = null,
   hasActive = false,
+  imageOverrides = {}, // --- ADDED ---
 }) => {
   if (loading) return <Loader fullscreen={false} />;
   if (error) return <p>Error loading products</p>;
@@ -67,17 +79,18 @@ const ProductShowcase = ({
             .reduce((acc, item) => acc + item.quantity, 0);
 
           return (
-            <div id={`product-card-${currentProdId}`} key={currentProdId}>
+            <CardContainer id={`product-card-${currentProdId}`} key={currentProdId}>
               <PremiumProductCard
                 product={product}
                 onCardClick={onCardClick}
                 onUpdateQuantity={onUpdateQuantity}
                 isOrderingEnabled={isOrderingEnabled}
                 quantityInCart={totalQuantityInCart}
-                cartItems={cartItems} // --- PASSED DOWN ---
+                cartItems={cartItems}
                 $isActive={currentProdId === activeProductId}
+                imageOverrideId={imageOverrides[currentProdId]} // --- PASSED DOWN ---
               />
-            </div>
+            </CardContainer>
           );
         })}
       </ProductsGrid>
