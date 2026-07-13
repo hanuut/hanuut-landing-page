@@ -12,9 +12,8 @@ const formatSpecification = (spec) => {
   return value.charAt(0).toUpperCase() + value.slice(1);
 };
 
-// --- DUAL LAYOUT WRAPPER CONTROLLER ---
 const CardWrapper = styled(motion.div)`
-  background-color: ${props => props.theme.surface};
+  background-color: ${(props) => props.theme.surface};
   border-radius: 20px;
   overflow: hidden;
   display: flex;
@@ -22,12 +21,13 @@ const CardWrapper = styled(motion.div)`
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-sizing: border-box;
 
-  /* --- GRID LAYOUT SPECIFICS --- */
-  ${props => props.$layoutType === 'grid' ? `
+  ${(props) =>
+    props.$layoutType === "grid"
+      ? `
     flex-direction: column;
     height: 100%;
-  ` : `
-    /* --- SLEEK HORIZONTAL LIST ROW --- */
+  `
+      : `
     flex-direction: row;
     align-items: center;
     padding: 1.25rem;
@@ -41,49 +41,55 @@ const CardWrapper = styled(motion.div)`
     }
   `}
 
-  border: 2px solid ${props => 
-    props.$isActive 
-      ? props.theme.primaryColor 
-      : 'rgba(255,255,255,0.05)' 
-  };
+  border: 2px solid ${(props) =>
+    props.$isActive ? props.theme.primaryColor : "rgba(255,255,255,0.05)"};
 
-  box-shadow: ${props => 
-    props.$isActive 
-      ? `0 0 25px ${props.theme.primaryColor}50` 
-      : "0 4px 20px rgba(0,0,0,0.1)"
-  };
+  box-shadow: ${(props) =>
+    props.$isActive
+      ? `0 0 25px ${props.theme.primaryColor}50`
+      : "0 4px 20px rgba(0,0,0,0.1)"};
 
   &:hover {
     transform: translateY(-5px);
-    border-color: ${props => props.$isActive ? props.theme.primaryColor : "rgba(255,255,255,0.2)"};
-    box-shadow: ${props => props.$isActive ? `0 0 25px ${props.theme.primaryColor}50` : "0 10px 25px rgba(0,0,0,0.2)"};
+    border-color: ${(props) =>
+      props.$isActive ? props.theme.primaryColor : "rgba(255,255,255,0.2)"};
+    box-shadow: ${(props) =>
+      props.$isActive
+        ? `0 0 25px ${props.theme.primaryColor}50`
+        : "0 10px 25px rgba(0,0,0,0.2)"};
   }
 `;
 
+// --- FIX: APPLIED CHROME GLASSMORPHISM AND BLURRED HIGHLIGHT ---
 const ImageContainer = styled.div`
   position: relative;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  background: radial-gradient(
-    circle at center, 
-    rgba(255, 255, 255, 0.12) 0%, 
-    rgba(255, 255, 255, 0.02) 80%
-  ), rgba(0, 0, 0, 0.25);
-  
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
 
-  ${props => props.$layoutType === 'grid' ? `
+  /* Glassmorphic Layering & Radial Spotlight */
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.03) 70%
+    ),
+    rgba(15, 15, 15, 0.45);
+
+  backdrop-filter: blur(25px) saturate(140%);
+  -webkit-backdrop-filter: blur(25px) saturate(140%);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.03);
+
+  ${(props) =>
+    props.$layoutType === "grid"
+      ? `
     width: 100%;
     padding: 1.5rem 0;
-  ` : `
-    /* --- COMPACT LIST PREVIEW --- */
+  `
+      : `
     width: 110px;
     height: 110px;
     border-radius: 12px;
@@ -100,14 +106,13 @@ const ImageContainer = styled.div`
   img {
     width: 100%;
     height: 100%;
-    display: block;
-    object-fit: contain; 
+    object-fit: contain;
     transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.45)); 
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.45));
   }
 
   ${CardWrapper}:hover img {
-    transform: scale(1.04) translateY(-4px); 
+    transform: scale(1.04) translateY(-4px);
   }
 `;
 
@@ -116,11 +121,13 @@ const Content = styled.div`
   flex-direction: column;
   flex: 1;
 
-  ${props => props.$layoutType === 'grid' ? `
+  ${(props) =>
+    props.$layoutType === "grid"
+      ? `
     padding: 1.25rem;
     gap: 0.5rem;
-  ` : `
-    /* --- ALIGNMENT IN LIST ROW --- */
+  `
+      : `
     gap: 0.35rem;
     text-align: left;
   `}
@@ -136,7 +143,7 @@ const SerialTag = styled.span`
 
 const Brand = styled.span`
   font-size: 0.75rem;
-  color: ${props => props.theme.primaryColor};
+  color: ${(props) => props.theme.primaryColor};
   text-transform: uppercase;
   font-weight: 800;
   letter-spacing: 1px;
@@ -153,10 +160,13 @@ const ProductName = styled.h3`
   -webkit-box-orient: vertical;
   overflow: hidden;
 
-  ${props => props.$layoutType === 'grid' ? `
+  ${(props) =>
+    props.$layoutType === "grid"
+      ? `
     font-size: 1rem;
     line-height: 1.4;
-  ` : `
+  `
+      : `
     font-size: 1.25rem;
     line-height: 1.2;
   `}
@@ -167,7 +177,7 @@ const SpecSheet = styled.div`
   flex-direction: column;
   gap: 4px;
   margin-top: 0.25rem;
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
 `;
 
 const SpecLine = styled.span`
@@ -184,7 +194,7 @@ const RightActionColumn = styled.div`
   flex-shrink: 0;
   min-width: 180px;
 
-  @media(max-width: 600px) {
+  @media (max-width: 600px) {
     align-items: stretch;
     width: 100%;
   }
@@ -195,10 +205,13 @@ const PriceRow = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  ${props => props.$layoutType === 'grid' ? `
+  ${(props) =>
+    props.$layoutType === "grid"
+      ? `
     margin-top: auto;
     padding-top: 1rem;
-  ` : `
+  `
+      : `
     margin: 0;
   `}
 `;
@@ -210,7 +223,7 @@ const Price = styled.span`
 `;
 
 const StudioActionBtn = styled.button`
-  background: ${props => props.theme.primaryColor};
+  background: ${(props) => props.theme.primaryColor};
   color: #000;
   border: none;
   width: 100%;
@@ -223,12 +236,15 @@ const StudioActionBtn = styled.button`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   transition: all 0.2s;
 
-  ${props => props.$layoutType === 'grid' ? `
+  ${(props) =>
+    props.$layoutType === "grid"
+      ? `
     margin-top: 1rem;
-  ` : `
+  `
+      : `
     margin: 0;
   `}
 
@@ -261,7 +277,7 @@ const QtyBtn = styled.button`
   font-size: 0.85rem;
 
   &:hover {
-    color: ${props => props.theme.primaryColor};
+    color: ${(props) => props.theme.primaryColor};
   }
 `;
 
@@ -275,7 +291,7 @@ const QtyValue = styled.span`
 
 const PremiumProductCard = ({
   product,
-  index, 
+  index,
   onCardClick,
   onUpdateQuantity,
   isOrderingEnabled,
@@ -283,16 +299,16 @@ const PremiumProductCard = ({
   cartItems = [],
   $isActive = false,
   isPodShop = false,
-  layoutType = 'grid', 
-  imageOverrideId = null, 
+  layoutType = "grid",
+  imageOverrideId = null,
 }) => {
   const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === 'ar';
+  const isArabic = i18n.language === "ar";
   const [imageBuffer, setImageBuffer] = useState(null);
 
   const defaultAvailability = product?.availabilities?.[0];
   const defaultSize = defaultAvailability?.sizes?.[0];
-  const activeImageId = imageOverrideId || defaultAvailability?.imageId; 
+  const activeImageId = imageOverrideId || defaultAvailability?.imageId;
 
   useEffect(() => {
     let isMounted = true;
@@ -310,35 +326,47 @@ const PremiumProductCard = ({
   const productName = product.name;
 
   const activeCartItemForThisProduct = useMemo(() => {
-    return cartItems.find(item => {
-      const cartProdId = (item.productId || item.product?._id || item.product?.id)?.toString();
+    return cartItems.find((item) => {
+      const cartProdId = (
+        item.productId ||
+        item.product?._id ||
+        item.product?.id
+      )?.toString();
       return cartProdId === product._id?.toString();
     });
   }, [cartItems, product]);
 
   const handleCardSelect = () => {
-    onCardClick(product, false); 
+    onCardClick(product, false);
   };
 
   const handleDecrement = (e) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     if (!defaultSize || !onUpdateQuantity) return;
-    const targetVariantId = activeCartItemForThisProduct?.variantId || `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
+    const targetVariantId =
+      activeCartItemForThisProduct?.variantId ||
+      `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
     const currentQty = activeCartItemForThisProduct?.quantity || quantityInCart;
     onUpdateQuantity(targetVariantId, currentQty - 1);
   };
 
   const handleIncrement = (e) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     if (!defaultSize || !onUpdateQuantity) return;
-    const targetVariantId = activeCartItemForThisProduct?.variantId || `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
+    const targetVariantId =
+      activeCartItemForThisProduct?.variantId ||
+      `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
     const currentQty = activeCartItemForThisProduct?.quantity || quantityInCart;
     onUpdateQuantity(targetVariantId, currentQty + 1);
   };
 
   const mappedSpecs = useMemo(() => {
-    if (!product.specifications || product.specifications.length === 0) return [];
-    return product.specifications.slice(0, 2).map(formatSpecification).filter(Boolean);
+    if (!product.specifications || product.specifications.length === 0)
+      return [];
+    return product.specifications
+      .slice(0, 2)
+      .map(formatSpecification)
+      .filter(Boolean);
   }, [product]);
 
   const renderSpecs = () => {
@@ -348,7 +376,14 @@ const PremiumProductCard = ({
           {mappedSpecs.map((specText, i) => (
             <SpecLine key={i}>• {specText}</SpecLine>
           ))}
-          <SpecLine style={{ color: '#39A170', fontSize: '0.75rem', marginTop: '4px', fontWeight: 'bold' }}>
+          <SpecLine
+            style={{
+              color: "#39A170",
+              fontSize: "0.75rem",
+              marginTop: "4px",
+              fontWeight: "bold",
+            }}
+          >
             Ready for your design
           </SpecLine>
         </SpecSheet>
@@ -357,7 +392,14 @@ const PremiumProductCard = ({
     if (isPodShop && product.shortDescription) {
       return (
         <SpecSheet>
-          <SpecLine style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <SpecLine
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
             {product.shortDescription}
           </SpecLine>
         </SpecSheet>
@@ -366,23 +408,34 @@ const PremiumProductCard = ({
     return null;
   };
 
-  // --- DUAL LAYOUT SWITCHER ---
-  if (isPodShop && layoutType === 'list') {
+  if (isPodShop && layoutType === "list") {
     return (
-      <CardWrapper onClick={handleCardSelect} $isActive={$isActive} $layoutType="list">
+      <CardWrapper
+        onClick={handleCardSelect}
+        $isActive={$isActive}
+        $layoutType="list"
+      >
         <ImageContainer $layoutType="list">
           {imageUrl && <img src={imageUrl} alt={productName} loading="lazy" />}
         </ImageContainer>
 
         <Content $layoutType="list">
-          <SerialTag>{t("pod_studio.base_label")} / {String(index + 1).padStart(3, "0")}</SerialTag>
+          <SerialTag>
+            {t("pod_studio.base_label")} / {String(index + 1).padStart(3, "0")}
+          </SerialTag>
           <ProductName $layoutType="list">{productName}</ProductName>
           {renderSpecs()}
         </Content>
 
         <RightActionColumn>
-          <Price>{parseInt(defaultSize?.sellingPrice || 0)} {t("dzd")}</Price>
-          <StudioActionBtn type="button" onClick={handleCardSelect} $layoutType="list">
+          <Price>
+            {parseInt(defaultSize?.sellingPrice || 0)} {t("dzd")}
+          </Price>
+          <StudioActionBtn
+            type="button"
+            onClick={handleCardSelect}
+            $layoutType="list"
+          >
             <FaTshirt /> {t("pod_studio.design_button")}
           </StudioActionBtn>
         </RightActionColumn>
@@ -391,14 +444,20 @@ const PremiumProductCard = ({
   }
 
   return (
-    <CardWrapper onClick={handleCardSelect} $isActive={$isActive} $layoutType="grid">
+    <CardWrapper
+      onClick={handleCardSelect}
+      $isActive={$isActive}
+      $layoutType="grid"
+    >
       <ImageContainer $layoutType="grid">
         {imageUrl && <img src={imageUrl} alt={productName} loading="lazy" />}
       </ImageContainer>
 
       <Content $layoutType="grid">
         {isPodShop ? (
-          <SerialTag>{t("pod_studio.base_label")} / {String(index + 1).padStart(3, "0")}</SerialTag>
+          <SerialTag>
+            {t("pod_studio.base_label")} / {String(index + 1).padStart(3, "0")}
+          </SerialTag>
         ) : (
           product.brand && <Brand>{product.brand}</Brand>
         )}
@@ -409,23 +468,37 @@ const PremiumProductCard = ({
           <Price>
             {parseInt(defaultSize?.sellingPrice || 0)} {t("dzd")}
           </Price>
-          {isOrderingEnabled && defaultSize && !isPodShop && (
-            quantityInCart > 0 ? (
+          {isOrderingEnabled &&
+            defaultSize &&
+            !isPodShop &&
+            (quantityInCart > 0 ? (
               <QuantityController>
-                <QtyBtn onClick={handleDecrement}><FaMinus /></QtyBtn>
+                <QtyBtn onClick={handleDecrement}>
+                  <FaMinus />
+                </QtyBtn>
                 <QtyValue>{quantityInCart}</QtyValue>
-                <QtyBtn onClick={handleIncrement}><FaPlus /></QtyBtn>
+                <QtyBtn onClick={handleIncrement}>
+                  <FaPlus />
+                </QtyBtn>
               </QuantityController>
             ) : (
-              <QtyBtn onClick={(e) => { e.stopPropagation(); onCardClick(product, true); }}>
+              <QtyBtn
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCardClick(product, true);
+                }}
+              >
                 <FaPlus />
               </QtyBtn>
-            )
-          )}
+            ))}
         </PriceRow>
 
         {isPodShop && (
-          <StudioActionBtn type="button" onClick={handleCardSelect} $layoutType="grid">
+          <StudioActionBtn
+            type="button"
+            onClick={handleCardSelect}
+            $layoutType="grid"
+          >
             <FaTshirt /> {t("pod_studio.design_button")}
           </StudioActionBtn>
         )}

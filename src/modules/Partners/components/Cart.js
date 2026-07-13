@@ -17,8 +17,6 @@ import {
 import useDeliveryCalculator from "../../../hooks/useDeliveryCalculator";
 
 // --- Components ---
-import Loader from "../../../components/Loader";
-import AddressesDropDown from "../../../components/AddressesDropDown";
 import {
   FaTimes,
   FaLocationArrow,
@@ -656,8 +654,6 @@ const Cart = ({
   const [manualAddressLine, setManualAddressLine] = useState("");
   
   const [templatesMap, setTemplatesMap] = useState({});
-
-  // --- NEW STATE: Local Database Snapshot Cache for Price Healing ---
   const [freshProductDb, setFreshProductData] = useState({});
 
   const cleanItems = useMemo(() => {
@@ -675,7 +671,7 @@ const Cart = ({
     );
   }, [items]);
 
-  // --- SELF HEALING ENGINE: Fetch fresh product specifications on open ---
+  // --- INFINITE RENDER LOOP FIX: Removed templatesMap from Dependency Array ---
   useEffect(() => {
     if (isOpen && cleanItems.length > 0) {
       const uniqueProductIds = [...new Set(cleanItems.map(item => item.productId))];
@@ -690,7 +686,7 @@ const Cart = ({
           .catch(err => console.error("Self-healing background fetch failed:", err));
       });
     }
-  }, [isOpen, cleanItems]);
+  }, [isOpen, cleanItems]); // Only re-run when cleanItems or open state changes
 
   useEffect(() => {
     cleanItems.forEach(item => {
@@ -698,10 +694,14 @@ const Cart = ({
         const avail = item.product?.availabilities?.find(a => String(a.color).toLowerCase() === String(item.color).toLowerCase());
         
         const fetchAndMap = (id) => {
-          if (!id || templatesMap[id]) return;
+          if (!id) return;
           getImage(id).then(res => {
             if (res.data) {
-              setTemplatesMap(prev => ({ ...prev, [id]: getImageUrl(res.data) }));
+              // Functional update guarantees state matches previous snapshot cleanly
+              setTemplatesMap(prev => {
+                if (prev[id]) return prev;
+                return { ...prev, [id]: getImageUrl(res.data) };
+              });
             }
           });
         };
@@ -712,7 +712,7 @@ const Cart = ({
         }
       }
     });
-  }, [cleanItems, templatesMap]);
+  }, [cleanItems]); // Removed templatesMap here too to fully break loop!
 
   useEffect(() => {
     if (items && cleanItems.length !== items.length) {
@@ -727,11 +727,10 @@ const Cart = ({
     }
   }, [items, cleanItems, dispatch]);
 
-  // --- SELF HEALING CALCULATION: Recompute item prices from fresh DB data ---
   const recomputedItems = useMemo(() => {
     return cleanItems.map(item => {
       const freshProduct = freshProductDb[item.productId];
-      if (!freshProduct) return item; // Fallback to current item if fetch pending
+      if (!freshProduct) return item; 
 
       const [targetColor, targetSize] = (item.supplementary || `${item.color},${item.size}`).split(',');
       const normalize = (val) => String(val ?? '').trim().toLowerCase();
@@ -743,7 +742,7 @@ const Cart = ({
         (s) => normalize(s.size) === normalize(targetSize)
       );
 
-      if (!matchedSize) return item; // Fallback
+      if (!matchedSize) return item; 
 
       const baseApparelCost = matchedSize.sellingPrice;
       let rawPrintCostTotal = 0;
@@ -769,7 +768,7 @@ const Cart = ({
 
       return {
         ...item,
-        sellingPrice: healedPrice // Inject healed price!
+        sellingPrice: healedPrice 
       };
     });
   }, [cleanItems, freshProductDb]);
@@ -840,7 +839,6 @@ const Cart = ({
 
     const hasGps = typeof locationState.lat === "number" && typeof locationState.lng === "number";
 
-    // --- SUBMIT COMPILATION FORWARDING HEALED VALUES ---
     const orderDetails = {
       customerName,
       customerPhone,
@@ -857,7 +855,6 @@ const Cart = ({
             commune: locationState.communeName,
             addressLine: manualAddressLine || "Home Delivery",
           },
-      // Pass healed products up to checkout dispatcher
       healedProducts: recomputedItems 
     };
     onSubmitOrder(orderDetails);
@@ -1026,7 +1023,7 @@ const Cart = ({
                         </OptionText>
                       </OptionLeft>
                       <OptionPrice>
-                        {opt.price} {t("dzd")}
+                        {opt.price} {t("zd")}
                       </OptionPrice>
                     </DeliveryOptionRow>
                   ))}
@@ -1126,7 +1123,7 @@ const Cart = ({
                     </ItemVariant>
                   )}
                   <ItemPrice>
-                    {parseInt(item.sellingPrice)} {t("dzd")}
+                    {parseInt(item.sellingPrice)} {t("zd")}
                   </ItemPrice>
                 </ItemTextDetails>
               </ItemInfo>
@@ -1185,7 +1182,7 @@ const Cart = ({
           <TotalContainer>
             <TotalLabel>{t("total")}</TotalLabel>
             <TotalValue>
-              {finalTotal} {t("dzd")}
+              {finalTotal} {t("zd")}
             </TotalValue>
           </TotalContainer>
           <SubmitButton
