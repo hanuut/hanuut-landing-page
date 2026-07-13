@@ -2,23 +2,16 @@ import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { useDispatch } from "react-redux"; 
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
-import { FaTimes, FaExpand, FaEye, FaBookmark, FaChevronDown, FaChevronRight,FaChevronLeft, FaChevronUp, FaCheck, FaPalette } from "react-icons/fa";
+import { FaTimes, FaExpand, FaEye, FaBookmark, FaChevronDown, FaChevronRight,FaChevronLeft,  FaChevronUp, FaCheck, FaPalette } from "react-icons/fa";
+import { useDispatch } from "react-redux";
 import axios from "axios";
 
-// --- REDUX ACTIONS ---
+// --- Redux ---
 import { updateCartQuantity } from "../../../Cart/state/reducers";
 
-import { 
-  PodCanvasPreview, 
-  PodStepIndicator, 
-  PodStepTwoControls, 
-  PodStepThreeControls,
-  NavigationRow,
-  WizardBtn
-} from "./PodCustomizer";
+import { PodCanvasPreview, PodStepIndicator, PodStepTwoControls, PodStepThreeControls, NavigationRow, WizardBtn } from "./PodCustomizer";
 
 const DetailContainer = styled(motion.div)`
   width: 100%;
@@ -483,7 +476,7 @@ const InlineProductDetails = ({
   onClose,
   onImageChange,
   onWizardStepChange,
-  editingCartItem,
+  editingCartItem, 
   setEditingCartItem 
 }) => {
   const { t, i18n } = useTranslation();
@@ -499,53 +492,49 @@ const InlineProductDetails = ({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isDescOpen, setIsDescOpen] = useState(false);
 
-  // --- POD MULTI-STEP WIZARD STATE ---
+  // --- POD EXCLUSIVE WIZARD STATE ---
   const [wizardStep, setWizardStep] = useState(1); 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Split state completely to prevent cross-side design bleeding
+  // --- SPLIT SIDE MODEL (Separated Front/Back custom states) ---
   const [podState, setPodState] = useState({
     side: 'front',
     front: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
     back: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
   });
 
-  // --- RE-EDIT POPULATOR (SELF-HEALING LEGACY BACKWARD COMPATIBLE) ---
+  // Share step triggers with parent container
+  useEffect(() => {
+    if (onWizardStepChange) onWizardStepChange(wizardStep);
+  }, [wizardStep, onWizardStepChange]);
+
+  // --- SEAMLESS EDIT FLOW: Restore existing customizations on open ---
   useEffect(() => {
     if (editingCartItem && editingCartItem.podCustomization) {
       const custom = editingCartItem.podCustomization;
-      setWizardStep(2); // Jump directly to design space
-      setSelectedColor(editingCartItem.color);
-      setSelectedSize(editingCartItem.size);
-      
+      setWizardStep(2); // Bypass step 1 completely
+
       setPodState({
         side: custom.printSide === 'back' ? 'back' : 'front',
-        front: custom.front ? { 
+        front: custom.front ? {
           file: 'existing', 
-          previewUrl: custom.front.imageUrl || custom.front.originalImageUrl, // --- SELF HEALING PREVIEW FALLBACK
-          scale: custom.front.width, 
-          x: custom.front.x, 
-          y: custom.front.y, 
-          rotation: custom.front.rotation || 0 
+          previewUrl: custom.front.originalImageUrl,
+          scale: custom.front.width,
+          x: custom.front.x,
+          y: custom.front.y,
+          rotation: custom.front.rotation || 0
         } : { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
-        back: custom.back ? { 
+        back: custom.back ? {
           file: 'existing',
-          previewUrl: custom.back.imageUrl || custom.back.originalImageUrl, // --- SELF HEALING PREVIEW FALLBACK
-          scale: custom.back.width, 
-          x: custom.back.x, 
-          y: custom.back.y, 
-          rotation: custom.back.rotation || 0 
+          previewUrl: custom.back.originalImageUrl,
+          scale: custom.back.width,
+          x: custom.back.x,
+          y: custom.back.y,
+          rotation: custom.back.rotation || 0
         } : { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
       });
     }
   }, [editingCartItem]);
-
-  // Track the wizard step dynamically and propagate it upward to hide product list column
-  useEffect(() => {
-    if (isPod && onWizardStepChange) {
-      onWizardStepChange(wizardStep);
-    }
-  }, [wizardStep, isPod, onWizardStepChange]);
 
   useEffect(() => {
     if (product?.availabilities?.length > 0) {
@@ -644,7 +633,6 @@ const InlineProductDetails = ({
   const showViews = !!(product.viewsCount && product.viewsCount > 0);
   const showSaves = !!(product.savesCount && product.savesCount > 0);
 
-  // --- FINAL WORKSPACE SUBMIT: ATOMIC RE-SAVER AND DEDUPLICATOR ---
   const handleFinalSubmit = async (finalPrice) => {
     if ((!podState.front.file && !podState.back.file) || !currentSizeDetails) return;
     setIsSubmitting(true);
@@ -669,17 +657,17 @@ const InlineProductDetails = ({
         backImageId = backRes.data.url;
       }
 
-      // Determine side keywords
       const hasFront = !!frontImageId;
       const hasBack = !!backImageId;
-      const printSideKeyword = (hasFront && hasBack) ? 'double' : (hasFront ? 'front' : 'back');
+
+      const printSideKeyword = (hasFront && hasBack) ? 'double' : (hasBack ? 'back' : 'front');
 
       const customizationData = {
         printSide: printSideKeyword,
         ...(hasFront && {
           front: {
-            imageId: frontImageId, 
-            imageUrl: frontImageId, 
+            originalImageId: frontImageId,
+            originalImageUrl: frontImageId,
             x: podState.front.x,
             y: podState.front.y,
             width: podState.front.scale,
@@ -689,8 +677,8 @@ const InlineProductDetails = ({
         }),
         ...(hasBack && {
           back: {
-            imageId: backImageId, 
-            imageUrl: backImageId, 
+            originalImageId: backImageId,
+            originalImageUrl: backImageId,
             x: podState.back.x,
             y: podState.back.y,
             width: podState.back.scale,
@@ -700,11 +688,12 @@ const InlineProductDetails = ({
         })
       };
 
+      const uniqueDesignVariantId = `${currentVariantId}_custom_${Date.now()}`;
+
       if (editingCartItem) {
+        // Atomic Overwrite: Delete old stale variant from cart before inserting updated one
         dispatch(updateCartQuantity({ variantId: editingCartItem.variantId, quantity: 0 }));
       }
-
-      const uniqueDesignVariantId = `${currentVariantId}_custom_${Date.now()}`;
 
       onAddToCart({
         product,
@@ -719,13 +708,14 @@ const InlineProductDetails = ({
         podCustomization: customizationData 
       });
 
+      // Reset
       setPodState({
         side: 'front',
         front: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
         back: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
       });
       setWizardStep(1);
-      if (setEditingCartItem) setEditingCartItem(null); 
+      setEditingCartItem(null); 
       if (onClose) onClose();
     } catch (error) {
       console.error("Customization failed:", error);
@@ -755,7 +745,7 @@ const InlineProductDetails = ({
                 <PodCanvasPreview 
                   baseImageUrl={imagesMap[activePodTemplateId] || imagesMap[activeImageId]} 
                   podState={podState} 
-                  setPodState={setPodState}
+                  setPodState={setPodState} // --- INJECT STATE UPDATER FOR ACTIVE CANVAS DRAG/SCALE
                 />
               ) : (
                 <GallerySection>

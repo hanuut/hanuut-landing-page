@@ -24,7 +24,6 @@ import {
   closeCart, 
 } from "../../Cart/state/reducers";
 
-
 import ProductShowcase from "../../Product/components/landing/ProductShowcase";
 import ProductFilterBar from "../../Product/components/landing/ProductFilterBar";
 import InlineProductDetails from "../../Product/components/landing/InlineProductDetails";
@@ -369,7 +368,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
             activeProductId={activeProduct?._id}
             hasActive={!!activeProduct}
             imageOverrides={imageOverrides}
-            layoutType={'list'} // --- ALL STATES: FORCED POD LIST VIEW
+            layoutType={'list'} 
             isPodShop={isPodShop} 
           />
         </div>
@@ -392,7 +391,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
         activeProductId={activeProduct?._id}
         hasActive={!!activeProduct}
         imageOverrides={imageOverrides}
-        layoutType={'list'} // --- ALL STATES: FORCED POD LIST VIEW
+        layoutType={'list'} 
         isPodShop={isPodShop} 
       />
     </>
@@ -403,7 +402,6 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
   return (
     <ContentWrapper>
       <Container>
-        {/* --- RE-POSITION FIXED: SEARCH & TOOLBAR NOW RENDER DIRECTLY ON TOP --- */}
         {!isDesignerFocused && (
           <ProductFilterBar
             searchQuery={searchQuery}

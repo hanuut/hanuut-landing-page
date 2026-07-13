@@ -247,7 +247,7 @@ const ShopPageWithUsername = () => {
   const { username } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams(); 
+  const [searchParams, setSearchParams] = useSearchParams(); // --- DECLARED SEARCH PARAMS HOOK ---
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -382,7 +382,6 @@ const ShopPageWithUsername = () => {
     if (isSubmitting === "submitting") return;
     setIsSubmitting("submitting");
 
-    // Extract healed products calculated dynamically inside Cart.js on open
     const activeProducts = customerDetails.healedProducts || shopCartItems;
 
     const orderPayload = {
@@ -399,12 +398,11 @@ const ShopPageWithUsername = () => {
       gpsLocation: customerDetails.gpsLocation,
       shopDomainKeyword: "global",
       
-      // Map over the validated, self-healed products list
       products: activeProducts.map((item) => ({
         productId: item.productId,
         title: item.title,
         quantity: item.quantity,
-        sellingPrice: item.sellingPrice, // --- SAFE GUARANTEED MATCH VALUE ---
+        sellingPrice: item.sellingPrice, 
         categoryId: item.categoryId || item.product?.categoryId,
         supplementary: item.color && item.size ? `${item.color},${item.size}` : undefined,
         podCustomization: item.podCustomization 

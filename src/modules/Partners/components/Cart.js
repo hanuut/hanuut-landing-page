@@ -16,7 +16,11 @@ import {
 } from "../../Location/state/reducers";
 import useDeliveryCalculator from "../../../hooks/useDeliveryCalculator";
 
-// --- Components ---
+// --- RE-ADDED MISSING COMPONENT IMPORTS ---
+import Loader from "../../../components/Loader";
+import AddressesDropDown from "../../../components/AddressesDropDown";
+
+// --- Icons ---
 import {
   FaTimes,
   FaLocationArrow,
@@ -671,7 +675,6 @@ const Cart = ({
     );
   }, [items]);
 
-  // --- INFINITE RENDER LOOP FIX: Removed templatesMap from Dependency Array ---
   useEffect(() => {
     if (isOpen && cleanItems.length > 0) {
       const uniqueProductIds = [...new Set(cleanItems.map(item => item.productId))];
@@ -686,7 +689,7 @@ const Cart = ({
           .catch(err => console.error("Self-healing background fetch failed:", err));
       });
     }
-  }, [isOpen, cleanItems]); // Only re-run when cleanItems or open state changes
+  }, [isOpen, cleanItems]); 
 
   useEffect(() => {
     cleanItems.forEach(item => {
@@ -697,7 +700,6 @@ const Cart = ({
           if (!id) return;
           getImage(id).then(res => {
             if (res.data) {
-              // Functional update guarantees state matches previous snapshot cleanly
               setTemplatesMap(prev => {
                 if (prev[id]) return prev;
                 return { ...prev, [id]: getImageUrl(res.data) };
@@ -712,7 +714,7 @@ const Cart = ({
         }
       }
     });
-  }, [cleanItems]); // Removed templatesMap here too to fully break loop!
+  }, [cleanItems]); 
 
   useEffect(() => {
     if (items && cleanItems.length !== items.length) {
@@ -943,7 +945,7 @@ const Cart = ({
                   </OptionText>
                 </OptionLeft>
                 <OptionPrice>
-                  {opt.price === 0 ? "Free" : `${opt.price} ${t("dzd")}`}
+                  {opt.price === 0 ? "Free" : `${opt.price} ${t("zd")}`}
                 </OptionPrice>
               </DeliveryOptionRow>
             ))}
