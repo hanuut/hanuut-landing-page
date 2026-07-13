@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 // --- Redux ---
 import {
@@ -21,7 +21,9 @@ import {
   selectCart,
   addToCart,
   updateCartQuantity,
+  closeCart, 
 } from "../../Cart/state/reducers";
+
 
 import ProductShowcase from "../../Product/components/landing/ProductShowcase";
 import ProductFilterBar from "../../Product/components/landing/ProductFilterBar";
@@ -39,7 +41,57 @@ const Container = styled.div`
   padding: 2rem 0;
 `;
 
-// --- MULTI-SCREEN DYNAMIC GRID ---
+const StudioHero = styled(motion.header)`
+  text-align: center;
+  margin-bottom: 3.5rem;
+  padding: 3rem 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  direction: ${props => props.$isArabic ? 'rtl' : 'ltr'};
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: 50%;
+    transform: translateX(-50%);
+    width: 60%; height: 100%;
+    background: radial-gradient(circle, rgba(57, 161, 112, 0.08) 0%, transparent 70%);
+    filter: blur(50px);
+    pointer-events: none;
+  }
+`;
+
+const HeroTag = styled.span`
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: ${props => props.theme.primaryColor};
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+`;
+
+const HeroTitle = styled.h1`
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 900;
+  color: white;
+  margin: 1rem 0;
+  font-family: 'Tajawal', sans-serif;
+  letter-spacing: -1px;
+`;
+
+const HeroSubtitle = styled.p`
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #a1a1aa;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-family: 'Cairo', sans-serif;
+  white-space: pre-line;
+`;
+
 const SplitGrid = styled.div`
   display: flex;
   flex-direction: column;
@@ -47,9 +99,11 @@ const SplitGrid = styled.div`
 
   @media(min-width: 1024px) {
     display: grid;
-    /* 1.1fr for Products Grid (Right/Left depending on RTL), 1.9fr for Premium Details Pane */
-    grid-template-columns: ${props => props.$isArabic ? "1fr 1.5fr" : "1.5fr 1fr"}; 
+    grid-template-columns: ${props => props.$isFocused 
+      ? "1fr" 
+      : (props.$isArabic ? "1fr 1.5fr" : "1.5fr 1fr")}; 
     align-items: start;
+    transition: grid-template-columns 0.4s ease-in-out;
   }
 `;
 
@@ -62,20 +116,22 @@ const DesktopPane = styled.div`
     top: 100px;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
+    width: 100%;
     &::-webkit-scrollbar { display: none; }
   }
 `;
 
 const MobilePane = styled.div`
-  display: block;
+  display: none;
   
-  @media(min-width: 1024px) {
-    display: none;
+  @media(max-width: 1024px) {
+    display: block;
   }
 `;
 
 const ProductsListPane = styled.div`
   width: 100%;
+  display: ${props => props.$hidden ? 'none' : 'block'}; 
 `;
 
 const LoadMoreTrigger = styled.div`
@@ -100,7 +156,7 @@ const Spinner = styled.div`
   }
 `;
 
-const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
+const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEditingCartItem }) => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -108,14 +164,15 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
 
   const normalizedShopId = useMemo(() => shop?._id || shop?.id, [shop]);
 
+  // Detect POD mode from shop configurations
+  const isPodShop = shop?.shopSettings?.printOnDemand === true || shop?.printOnDemand === true;
+
+  const [activeWizardStep, setActiveWizardStep] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [activeProduct, setActiveProduct] = useState(null);
-
-  // --- DYNAMIC PRODUCT IMAGE OVERRIDES MAP (Carousel-to-Grid Sync) ---
   const [imageOverrides, setImageOverrides] = useState({});
 
-  // --- SELECT INDIVIDUAL PRIMITIVES TO ELIMINATE REDUX WARNING & RE-RENDERS ---
   const paginatedList = useSelector((state) => state.products.paginatedProducts);
   const paginatedLoading = useSelector((state) => state.products.paginationLoading);
   const paginationMeta = useSelector((state) => state.products.paginationMeta);
@@ -129,7 +186,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
     return cart.filter((item) => item.shopId === normalizedShopId);
   }, [cart, normalizedShopId]);
 
-  // Initialize Categories & Featured Products
+  // Initial Load with POD Flag propagation
   useEffect(() => {
     if (normalizedShopId) {
       dispatch(fetchFeaturedProductsByShop(normalizedShopId));
@@ -144,13 +201,13 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
           categoryId: "",
           search: "",
           isNewFilter: true,
+          printOnDemand: isPodShop 
         }),
       );
     }
     return () => dispatch(resetPagination());
-  }, [dispatch, normalizedShopId, shop.categories]);
+  }, [dispatch, normalizedShopId, shop.categories, isPodShop]);
 
-  // --- DE-DUPLICATED SELF-HEALING CATEGORIES LOADER ---
   useEffect(() => {
     if (paginatedList.length > 0) {
       const extractedCategoryIds = paginatedList
@@ -164,10 +221,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
         .filter(id => id && typeof id === 'string');
       
       const uniqueIds = Array.from(new Set(extractedCategoryIds));
-      
-      const missingIds = uniqueIds.filter(id => 
-        !categories.some(cat => cat.id === id)
-      );
+      const missingIds = uniqueIds.filter(id => !categories.some(cat => cat.id === id));
 
       if (missingIds.length > 0) {
          dispatch(fetchCategories(missingIds));
@@ -175,7 +229,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
     }
   }, [paginatedList, categories, dispatch]);
 
-  // Watch Filters
+  // Filter watcher propagating POD settings
   useEffect(() => {
     if (!normalizedShopId) return;
     const timer = setTimeout(() => {
@@ -187,13 +241,13 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
           categoryId: selectedCategory || "",
           search: searchQuery,
           isNewFilter: true,
+          printOnDemand: isPodShop 
         }),
       );
     }, 400);
     return () => clearTimeout(timer);
-  }, [dispatch, normalizedShopId, searchQuery, selectedCategory]);
+  }, [dispatch, normalizedShopId, searchQuery, selectedCategory, isPodShop]);
 
-  // Direct URL Deep Link handler
   const productIdFromUrl = searchParams.get("product");
   useEffect(() => {
     if (productIdFromUrl) {
@@ -207,7 +261,6 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
     }
   }, [productIdFromUrl, dispatch, setSearchParams, activeProduct]);
 
-  // Auto-scroll alignment logic
   useEffect(() => {
     if (activeProduct) {
       if (window.innerWidth < 1024) {
@@ -221,8 +274,6 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
     }
   }, [activeProduct]);
 
-  // Infinite Scroll Observer
-  const observer = useRef();
   const lastElementRef = useCallback(
     (node) => {
       if (paginatedLoading) return;
@@ -237,14 +288,17 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
               categoryId: selectedCategory || "",
               search: searchQuery,
               isNewFilter: false,
+              printOnDemand: isPodShop 
             }),
           );
         }
       });
       if (node) observer.current.observe(node);
     },
-    [paginatedLoading, paginationMeta.hasMore, normalizedShopId, selectedCategory, searchQuery, dispatch],
+    [paginatedLoading, paginationMeta.hasMore, normalizedShopId, selectedCategory, searchQuery, dispatch, isPodShop],
   );
+
+  const observer = useRef();
 
   const handleCardClick = (product, quickAdd = false) => {
     if (activeProduct?._id === product._id && !quickAdd) {
@@ -255,6 +309,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
 
     setActiveProduct(product);
     setSearchParams({ product: product._id });
+    setActiveWizardStep(1); 
 
     if (quickAdd && isOrderingEnabled) {
       const defaultAvail = product.availabilities?.[0];
@@ -279,6 +334,8 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
   const handleClose = () => {
     setActiveProduct(null);
     setSearchParams({});
+    setActiveWizardStep(1);
+    setEditingCartItem(null); 
   };
 
   const handleAddToCart = (variant) => {
@@ -289,10 +346,9 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
     dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
   };
 
-  // --- THE CRITICAL FIX: MEMOIZE ACTION CALLBACK TO STOP INFINITE LOOP ---
   const handleImageChange = useCallback((productId, imageId) => {
     setImageOverrides(prev => {
-      if (prev[productId] === imageId) return prev; // Stop redundant rendering
+      if (prev[productId] === imageId) return prev; 
       return { ...prev, [productId]: imageId };
     });
   }, []);
@@ -313,6 +369,8 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
             activeProductId={activeProduct?._id}
             hasActive={!!activeProduct}
             imageOverrides={imageOverrides}
+            layoutType={'list'} // --- ALL STATES: FORCED POD LIST VIEW
+            isPodShop={isPodShop} 
           />
         </div>
       )}
@@ -334,39 +392,63 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
         activeProductId={activeProduct?._id}
         hasActive={!!activeProduct}
         imageOverrides={imageOverrides}
+        layoutType={'list'} // --- ALL STATES: FORCED POD LIST VIEW
+        isPodShop={isPodShop} 
       />
     </>
   );
 
+  const isDesignerFocused = isPodShop && activeProduct && activeWizardStep >= 2;
+
   return (
     <ContentWrapper>
       <Container>
-        {/* --- Category Filter & Search Bar --- */}
-        <ProductFilterBar
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          categories={categories}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-        />
+        {/* --- RE-POSITION FIXED: SEARCH & TOOLBAR NOW RENDER DIRECTLY ON TOP --- */}
+        {!isDesignerFocused && (
+          <ProductFilterBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            isPodShop={isPodShop} 
+          />
+        )}
+
+        {isPodShop && !isDesignerFocused && (
+          <StudioHero
+            $isArabic={isArabic}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <HeroTag>{t("pod_studio.hero_tag")}</HeroTag>
+            <HeroTitle>{t("pod_studio.hero_title")}</HeroTitle>
+            <HeroSubtitle>{t("pod_studio.hero_subtitle")}</HeroSubtitle>
+          </StudioHero>
+        )}
 
         {activeProduct ? (
-          <SplitGrid $isArabic={isArabic}>
+          <SplitGrid $isArabic={isArabic} $isFocused={isDesignerFocused}>
             <AnimatePresence>
               <MobilePane>
                 <InlineProductDetails
                   product={activeProduct}
+                  isPodShop={isPodShop} 
                   cartItems={shopCartItems}
                   onAddToCart={handleAddToCart}
                   onUpdateQuantity={handleUpdateQuantity}
                   isOrderingEnabled={isOrderingEnabled}
                   onClose={handleClose}
                   onImageChange={handleImageChange}
+                  onWizardStepChange={setActiveWizardStep} 
+                  editingCartItem={editingCartItem} 
+                  setEditingCartItem={setEditingCartItem} 
                 />
               </MobilePane>
             </AnimatePresence>
 
-            <ProductsListPane>
+            <ProductsListPane $hidden={isDesignerFocused}>
               {renderCatalogContent()}
               <LoadMoreTrigger ref={lastElementRef}>
                 {paginatedLoading && paginatedList.length > 0 && <Spinner />}
@@ -377,12 +459,16 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled }) => {
               <DesktopPane>
                 <InlineProductDetails
                   product={activeProduct}
+                  isPodShop={isPodShop} 
                   cartItems={shopCartItems}
                   onAddToCart={handleAddToCart}
                   onUpdateQuantity={handleUpdateQuantity}
                   isOrderingEnabled={isOrderingEnabled}
                   onClose={handleClose}
                   onImageChange={handleImageChange}
+                  onWizardStepChange={setActiveWizardStep} 
+                  editingCartItem={editingCartItem} 
+                  setEditingCartItem={setEditingCartItem} 
                 />
               </DesktopPane>
             </AnimatePresence>

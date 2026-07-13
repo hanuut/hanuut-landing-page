@@ -3,6 +3,9 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
+import { getImage } from "../../Images/services/imageServices";
+import { getImageUrl } from "../../../utils/imageUtils";
+import axios from "axios";
 
 // --- Redux & Hooks ---
 import { closeCart, selectIsCartOpen, updateCartQuantity } from "../../Cart/state/reducers";
@@ -12,7 +15,6 @@ import {
   selectLocation,
 } from "../../Location/state/reducers";
 import useDeliveryCalculator from "../../../hooks/useDeliveryCalculator";
-import { getImageUrl } from "../../../utils/imageUtils";
 
 // --- Components ---
 import Loader from "../../../components/Loader";
@@ -24,6 +26,8 @@ import {
   FaMotorcycle,
   FaGlobeAfrica,
   FaBoxOpen,
+  FaEdit,
+  FaExpand
 } from "react-icons/fa";
 
 // --- Styled Components ---
@@ -112,28 +116,6 @@ const CartItem = styled.div`
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   gap: 1rem;
-`;
-
-const GrowableImageWrapper = styled.div`
-  width: 50px;
-  height: 50px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: zoom-in;
-  flex-shrink: 0;
-  transition: transform 0.2s;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  &:hover {
-    transform: scale(1.1);
-  }
 `;
 
 const ItemInfo = styled.div`
@@ -433,21 +415,218 @@ const LightboxOverlay = styled(motion.div)`
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.95);
-  z-index: 2100;
+  z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
   cursor: zoom-out;
+`;
 
-  img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.85);
+const LightboxContent = styled(motion.div)`
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 900px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap; 
+`;
+
+// --- LIVE MINIATURE MOCKUP COMPONENT ---
+const GrowableImageWrapper = styled.div`
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #E5E5E5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: zoom-in;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+`;
+
+const MiniWorkspace = styled.div`
+  position: relative;
+  width: ${props => props.$isDouble ? '26px' : '52px'};
+  height: 54px;
+  background: #E5E5E5;
+  overflow: hidden;
+`;
+
+const MiniBaseShirt = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
+
+const MiniPrintArea = styled.div`
+  position: absolute;
+  top: 18%; left: 20%; width: 60%; height: 70%;
+`;
+
+const MiniDesign = styled.img`
+  position: absolute;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+`;
+
+const ZoomOverlayIcon = styled.div`
+  position: absolute;
+  bottom: 2px; right: 2px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  font-size: 0.6rem;
+  padding: 2px;
+  border-radius: 4px;
+  z-index: 5;
+`;
+
+const MiniMockupPreview = ({ item, templatesMap, onClick }) => {
+  const custom = item.podCustomization;
+  if (!custom) return null;
+
+  const isDouble = custom.printSide === 'double';
+  const avail = item.product?.availabilities?.find(a => String(a.color).toLowerCase() === String(item.color).toLowerCase());
+
+  const frontTemplate = avail?.podFrontTemplateId ? templatesMap[avail.podFrontTemplateId] : null;
+  const backTemplate = avail?.podBackTemplateId ? templatesMap[avail.podBackTemplateId] : null;
+
+  return (
+    <GrowableImageWrapper onClick={onClick}>
+      <ZoomOverlayIcon><FaExpand /></ZoomOverlayIcon>
+      {custom.front && (
+        <MiniWorkspace $isDouble={isDouble}>
+          <MiniBaseShirt src={frontTemplate} />
+          <MiniPrintArea>
+            <MiniDesign 
+              src={custom.front.originalImageUrl} 
+              style={{
+                left: `${custom.front.x}%`,
+                top: `${custom.front.y}%`,
+                width: `${custom.front.width}%`,
+                transform: `translate(-50%, -50%) rotate(${custom.front.rotation || 0}deg)`
+              }}
+            />
+          </MiniPrintArea>
+        </MiniWorkspace>
+      )}
+
+      {custom.back && (
+        <MiniWorkspace $isDouble={isDouble}>
+          <MiniBaseShirt src={backTemplate} />
+          <MiniPrintArea>
+            <MiniDesign 
+              src={custom.back.originalImageUrl} 
+              style={{
+                left: `${custom.back.x}%`,
+                top: `${custom.back.y}%`,
+                width: `${custom.back.width}%`,
+                transform: `translate(-50%, -50%) rotate(${custom.back.rotation || 0}deg)`
+              }}
+            />
+          </MiniPrintArea>
+        </MiniWorkspace>
+      )}
+    </GrowableImageWrapper>
+  );
+};
+
+const LbWorkspace = styled.div`
+  position: relative;
+  width: 400px;
+  height: 400px;
+  background: #E5E5E5;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  @media(max-width: 500px) {
+    width: 280px;
+    height: 280px;
   }
 `;
+
+const LbPrintArea = styled.div`
+  position: absolute;
+  top: 15%; left: 20%; width: 60%; height: 70%;
+  border: 1px dashed rgba(57, 161, 112, 0.4);
+`;
+
+const CustomItemEditBtn = styled.button`
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  width: fit-content;
+  font-family: 'Tajawal', sans-serif;
+  transition: all 0.2s;
+
+  &:hover {
+    background: ${props => props.theme.primaryColor};
+    color: #000;
+    border-color: transparent;
+  }
+`;
+
+// ============================================================================
+// CONTINUOUS PRICING SCALER (DUPLICATED FOR SELF-HEALING SYNC)
+// ============================================================================
+const interpolateValue = (x, nodes) => {
+  if (x <= nodes[0].x) return nodes[0].y;
+  if (x >= nodes[nodes.length - 1].x) return nodes[nodes.length - 1].y;
+
+  for (let i = 0; i < nodes.length - 1; i++) {
+    const p1 = nodes[i];
+    const p2 = nodes[i + 1];
+    if (x >= p1.x && x <= p2.x) {
+      return p1.y + ((x - p1.x) / (p2.x - p1.x)) * (p2.y - p1.y);
+    }
+  }
+  return nodes[nodes.length - 1].y;
+};
+
+const getRawPrintCost = (widthCm, heightCm) => {
+  const largestSide = Math.max(widthCm, heightCm);
+  const smallestSide = Math.min(widthCm, heightCm);
+
+  let printCost = 0;
+
+  if (widthCm <= 30 || heightCm <= 30) {
+    const x = largestSide;
+    const nodes = [
+      { x: 0, y: 20 }, { x: 5, y: 60 }, { x: 10, y: 110 }, { x: 15, y: 180 },
+      { x: 20, y: 270 }, { x: 25, y: 380 }, { x: 30, y: 440 }, { x: 35, y: 500 },
+      { x: 40, y: 560 }, { x: 45, y: 610 }, { x: 50, y: 680 }, { x: 55, y: 740 },
+      { x: 60, y: 800 }
+    ];
+    printCost = interpolateValue(x, nodes);
+  } else {
+    const x = smallestSide;
+    const nodes = [
+      { x: 30, y: 860 }, { x: 35, y: 960 }, { x: 40, y: 1100 }, { x: 45, y: 1220 },
+      { x: 50, y: 1460 }, { x: 60, y: 1600 }
+    ];
+    printCost = interpolateValue(x, nodes);
+  }
+
+  return Math.round(printCost);
+};
 
 const Cart = ({
   items,
@@ -457,6 +636,7 @@ const Cart = ({
   shopDomain,
   shopId,
   orderErrorMsg,
+  onEditCustomItem 
 }) => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
@@ -472,10 +652,14 @@ const Cart = ({
   const [fulfillmentType, setFulfillmentType] = useState("home");
   const [selectedDeliveryIndex, setSelectedDeliveryIndex] = useState(0);
   const [selectedStopDeskOffice, setSelectedStopDeskOffice] = useState("");
-  const [zoomedImageUrl, setZoomedImageUrl] = useState(null);
+  const [zoomedItem, setZoomedItem] = useState(null);
   const [manualAddressLine, setManualAddressLine] = useState("");
+  
+  const [templatesMap, setTemplatesMap] = useState({});
 
-  // Clean corrupted items safely
+  // --- NEW STATE: Local Database Snapshot Cache for Price Healing ---
+  const [freshProductDb, setFreshProductData] = useState({});
+
   const cleanItems = useMemo(() => {
     if (!items || items.length === 0) return [];
     return items.filter(
@@ -491,6 +675,45 @@ const Cart = ({
     );
   }, [items]);
 
+  // --- SELF HEALING ENGINE: Fetch fresh product specifications on open ---
+  useEffect(() => {
+    if (isOpen && cleanItems.length > 0) {
+      const uniqueProductIds = [...new Set(cleanItems.map(item => item.productId))];
+      
+      uniqueProductIds.forEach(id => {
+        axios.get(`${process.env.REACT_APP_API_PROD_URL}/global-product/findById/${id}`)
+          .then(res => {
+            if (res.data) {
+              setFreshProductData(prev => ({ ...prev, [id]: res.data }));
+            }
+          })
+          .catch(err => console.error("Self-healing background fetch failed:", err));
+      });
+    }
+  }, [isOpen, cleanItems]);
+
+  useEffect(() => {
+    cleanItems.forEach(item => {
+      if (item.podCustomization) {
+        const avail = item.product?.availabilities?.find(a => String(a.color).toLowerCase() === String(item.color).toLowerCase());
+        
+        const fetchAndMap = (id) => {
+          if (!id || templatesMap[id]) return;
+          getImage(id).then(res => {
+            if (res.data) {
+              setTemplatesMap(prev => ({ ...prev, [id]: getImageUrl(res.data) }));
+            }
+          });
+        };
+
+        if (avail) {
+          fetchAndMap(avail.podFrontTemplateId);
+          fetchAndMap(avail.podBackTemplateId);
+        }
+      }
+    });
+  }, [cleanItems, templatesMap]);
+
   useEffect(() => {
     if (items && cleanItems.length !== items.length) {
       items.forEach((item) => {
@@ -504,13 +727,59 @@ const Cart = ({
     }
   }, [items, cleanItems, dispatch]);
 
+  // --- SELF HEALING CALCULATION: Recompute item prices from fresh DB data ---
+  const recomputedItems = useMemo(() => {
+    return cleanItems.map(item => {
+      const freshProduct = freshProductDb[item.productId];
+      if (!freshProduct) return item; // Fallback to current item if fetch pending
+
+      const [targetColor, targetSize] = (item.supplementary || `${item.color},${item.size}`).split(',');
+      const normalize = (val) => String(val ?? '').trim().toLowerCase();
+
+      const matchedAvailability = freshProduct.availabilities?.find(
+        (av) => normalize(av.color) === normalize(targetColor)
+      );
+      const matchedSize = matchedAvailability?.sizes?.find(
+        (s) => normalize(s.size) === normalize(targetSize)
+      );
+
+      if (!matchedSize) return item; // Fallback
+
+      const baseApparelCost = matchedSize.sellingPrice;
+      let rawPrintCostTotal = 0;
+      let activeSidesCount = 0;
+
+      if (item.podCustomization) {
+        const custom = item.podCustomization;
+        if (custom.front) {
+          const wCm = (custom.front.width / 100) * ((freshProduct.printableAreaWidthMm || 280) / 10);
+          const hCm = (custom.front.height / 100) * ((freshProduct.printableAreaHeightMm || 350) / 10);
+          rawPrintCostTotal += getRawPrintCost(wCm, hCm);
+          activeSidesCount++;
+        }
+        if (custom.back) {
+          const wCm = (custom.back.width / 100) * ((freshProduct.printableAreaWidthMm || 280) / 10);
+          const hCm = (custom.back.height / 100) * ((freshProduct.printableAreaHeightMm || 350) / 10);
+          rawPrintCostTotal += getRawPrintCost(wCm, hCm);
+          activeSidesCount++;
+        }
+      }
+
+      const healedPrice = baseApparelCost + rawPrintCostTotal + (50 * activeSidesCount);
+
+      return {
+        ...item,
+        sellingPrice: healedPrice // Inject healed price!
+      };
+    });
+  }, [cleanItems, freshProductDb]);
+
   const itemsTotal = useMemo(
     () =>
-      cleanItems.reduce((sum, item) => {
-        const price = item.dish ? item.dish.sellingPrice : item.sellingPrice;
-        return sum + parseInt(price, 10) * item.quantity;
+      recomputedItems.reduce((sum, item) => {
+        return sum + parseInt(item.sellingPrice, 10) * item.quantity;
       }, 0),
-    [cleanItems],
+    [recomputedItems],
   );
 
   const shouldCalculate = isOpen && cleanItems.length > 0;
@@ -540,9 +809,7 @@ const Cart = ({
   }, [filteredDeliveryOptions]);
 
   const selectedDeliveryOption = filteredDeliveryOptions[selectedDeliveryIndex];
-  const deliveryPrice = selectedDeliveryOption
-    ? selectedDeliveryOption.price
-    : 0;
+  const deliveryPrice = selectedDeliveryOption ? selectedDeliveryOption.price : 0;
   const finalTotal = itemsTotal + (isDineIn ? 0 : deliveryPrice);
 
   const handleClose = () => dispatch(closeCart());
@@ -573,6 +840,7 @@ const Cart = ({
 
     const hasGps = typeof locationState.lat === "number" && typeof locationState.lng === "number";
 
+    // --- SUBMIT COMPILATION FORWARDING HEALED VALUES ---
     const orderDetails = {
       customerName,
       customerPhone,
@@ -589,6 +857,8 @@ const Cart = ({
             commune: locationState.communeName,
             addressLine: manualAddressLine || "Home Delivery",
           },
+      // Pass healed products up to checkout dispatcher
+      healedProducts: recomputedItems 
     };
     onSubmitOrder(orderDetails);
   };
@@ -809,18 +1079,27 @@ const Cart = ({
     return (
       <FormWrapper onSubmit={handleSubmit}>
         <Column>
-          {cleanItems.map((item) => (
+          {recomputedItems.map((item) => (
             <CartItem key={item.dish ? item.dish._id : item.variantId}>
               <ItemInfo>
-                {shopDomain === "global" && item.imageId && (
-                  <GrowableImageWrapper
-                    onClick={() => setZoomedImageUrl(getImageUrl(item.imageId))}
-                  >
-                    <img
-                      src={getImageUrl(item.imageId)}
-                      alt={item.title || item.product?.name}
-                    />
-                  </GrowableImageWrapper>
+                {shopDomain === "global" && item.podCustomization ? (
+                  <MiniMockupPreview 
+                    item={item} 
+                    templatesMap={templatesMap} 
+                    onClick={() => setZoomedItem(item)} 
+                  />
+                ) : (
+                  shopDomain === "global" && item.imageId && (
+                    <GrowableImageWrapper
+                      onClick={() => setZoomedItem({ singleUrl: getImageUrl(item.imageId) })}
+                    >
+                      <ZoomOverlayIcon><FaExpand /></ZoomOverlayIcon>
+                      <img
+                        src={getImageUrl(item.imageId)}
+                        alt={item.title || item.product?.name}
+                      />
+                    </GrowableImageWrapper>
+                  )
                 )}
                 <ItemTextDetails>
                   <ItemName>
@@ -832,13 +1111,22 @@ const Cart = ({
                     <ItemVariant>
                       {t("color_prefix")}: {item.color}, {t("size_prefix")}:{" "}
                       {item.size}
+                      
+                      {item.podCustomization && (
+                        <span style={{ display: 'block', color: '#39A170', fontWeight: 'bold', marginTop: '4px', fontSize: '0.75rem' }}>
+                          ✨ Custom Print ({item.podCustomization.printSide})
+                        </span>
+                      )}
+
+                      {item.podCustomization && onEditCustomItem && (
+                        <CustomItemEditBtn type="button" onClick={() => onEditCustomItem(item)}>
+                          <FaEdit /> Edit Design
+                        </CustomItemEditBtn>
+                      )}
                     </ItemVariant>
                   )}
                   <ItemPrice>
-                    {parseInt(
-                      item.dish ? item.dish.sellingPrice : item.sellingPrice,
-                    )}{" "}
-                    {t("dzd")}
+                    {parseInt(item.sellingPrice)} {t("dzd")}
                   </ItemPrice>
                 </ItemTextDetails>
               </ItemInfo>
@@ -917,6 +1205,62 @@ const Cart = ({
     );
   };
 
+  const renderLightboxContent = () => {
+    if (!zoomedItem) return null;
+
+    if (zoomedItem.singleUrl) {
+      return <img src={zoomedItem.singleUrl} alt="Zoomed view" style={{ borderRadius: '12px' }} />;
+    }
+
+    const custom = zoomedItem.podCustomization;
+    const avail = zoomedItem.product?.availabilities?.find(a => String(a.color).toLowerCase() === String(zoomedItem.color).toLowerCase());
+    const frontTemplate = avail?.podFrontTemplateId ? templatesMap[avail.podFrontTemplateId] : null;
+    const backTemplate = avail?.podBackTemplateId ? templatesMap[avail.podBackTemplateId] : null;
+
+    return (
+      <LightboxContent onClick={(e) => e.stopPropagation()}>
+        {custom.front && (
+          <LbWorkspace>
+            <img src={frontTemplate} alt="Front Template" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <LbPrintArea>
+              <img 
+                src={custom.front.originalImageUrl} 
+                alt="Front Design" 
+                style={{
+                  position: 'absolute',
+                  left: `${custom.front.x}%`,
+                  top: `${custom.front.y}%`,
+                  width: `${custom.front.width}%`,
+                  transform: `translate(-50%, -50%) rotate(${custom.front.rotation || 0}deg)`,
+                  objectFit: 'contain'
+                }}
+              />
+            </LbPrintArea>
+          </LbWorkspace>
+        )}
+        {custom.back && (
+          <LbWorkspace>
+            <img src={backTemplate} alt="Back Template" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <LbPrintArea>
+              <img 
+                src={custom.back.originalImageUrl} 
+                alt="Back Design" 
+                style={{
+                  position: 'absolute',
+                  left: `${custom.back.x}%`,
+                  top: `${custom.back.y}%`,
+                  width: `${custom.back.width}%`,
+                  transform: `translate(-50%, -50%) rotate(${custom.back.rotation || 0}deg)`,
+                  objectFit: 'contain'
+                }}
+              />
+            </LbPrintArea>
+          </LbWorkspace>
+        )}
+      </LightboxContent>
+    );
+  };
+
   return (
     <>
       <AnimatePresence>
@@ -944,20 +1288,14 @@ const Cart = ({
       </AnimatePresence>
 
       <AnimatePresence>
-        {zoomedImageUrl && (
+        {zoomedItem && (
           <LightboxOverlay
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setZoomedImageUrl(null)}
+            onClick={() => setZoomedItem(null)}
           >
-            <motion.img
-              src={zoomedImageUrl}
-              alt="Zoomed view"
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-            />
+            {renderLightboxContent()}
           </LightboxOverlay>
         )}
       </AnimatePresence>

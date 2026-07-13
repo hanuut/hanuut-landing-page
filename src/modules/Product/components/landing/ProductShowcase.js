@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import PremiumProductCard from "./PremiumProductCard";
 import Loader from "../../../../components/Loader";
 
@@ -16,31 +16,40 @@ const SectionTitle = styled.h2`
   font-family: "Tajawal", sans-serif;
 `;
 
-// --- NEW HIGH-FIDELITY CSS COLUMNS MASONRY GRID ---
+// --- GRID SHIFTS LAYOUT SYSTEM IN-FLIGHT ---
 const ProductsGrid = styled.div`
   width: 100%;
   
-  /* Dynamic Columns based on active details split panel */
-  column-count: ${props => props.$hasActive ? 2 : 4};
-  column-gap: 1.5rem;
+  ${props => props.$layoutType === 'list' ? `
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  ` : `
+    column-count: ${props.$hasActive ? 2 : 4};
+    column-gap: 1.5rem;
 
-  @media (max-width: 1200px) {
-    column-count: ${props => props.$hasActive ? 2 : 3};
-  }
+    @media (max-width: 1200px) {
+      column-count: ${props.$hasActive ? 2 : 3};
+    }
 
-  @media (max-width: 768px) {
-    column-count: ${props => props.$hasActive ? 1 : 2};
-    column-gap: 10px;
-  }
+    @media (max-width: 768px) {
+      column-count: ${props.$hasActive ? 1 : 2};
+      column-gap: 10px;
+    }
+  `}
 `;
 
 const CardContainer = styled.div`
-  break-inside: avoid; /* Prevents cards from breaking across columns */
-  margin-bottom: 1.5rem; /* Generous vertical spacing */
-  
-  @media (max-width: 768px) {
-    margin-bottom: 10px;
-  }
+  ${props => props.$layoutType === 'list' ? `
+    width: 100%;
+  ` : `
+    break-inside: avoid; 
+    margin-bottom: 1.5rem; 
+    
+    @media (max-width: 768px) {
+      margin-bottom: 10px;
+    }
+  `}
 `;
 
 const ProductShowcase = ({
@@ -54,7 +63,8 @@ const ProductShowcase = ({
   cartItems = [],
   activeProductId = null,
   hasActive = false,
-  imageOverrides = {}, // --- ADDED ---
+  isPodShop = false,
+  layoutType = 'grid' // --- VALUE: 'grid' or 'list'
 }) => {
   if (loading) return <Loader fullscreen={false} />;
   if (error) return <p>Error loading products</p>;
@@ -63,8 +73,8 @@ const ProductShowcase = ({
   return (
     <ShowcaseSection>
       {title && <SectionTitle>{title}</SectionTitle>}
-      <ProductsGrid $hasActive={hasActive}>
-        {products.map((product) => {
+      <ProductsGrid $hasActive={hasActive} $layoutType={layoutType}>
+        {products.map((product, index) => {
           const currentProdId = (product._id || product.id)?.toString();
 
           const totalQuantityInCart = cartItems
@@ -79,16 +89,18 @@ const ProductShowcase = ({
             .reduce((acc, item) => acc + item.quantity, 0);
 
           return (
-            <CardContainer id={`product-card-${currentProdId}`} key={currentProdId}>
+            <CardContainer id={`product-card-${currentProdId}`} key={currentProdId} $layoutType={layoutType}>
               <PremiumProductCard
                 product={product}
+                index={index} 
                 onCardClick={onCardClick}
                 onUpdateQuantity={onUpdateQuantity}
                 isOrderingEnabled={isOrderingEnabled}
                 quantityInCart={totalQuantityInCart}
                 cartItems={cartItems}
                 $isActive={currentProdId === activeProductId}
-                imageOverrideId={imageOverrides[currentProdId]} // --- PASSED DOWN ---
+                isPodShop={isPodShop} 
+                layoutType={layoutType} // <--- PASS DOWN FOR DUAL LAYOUT
               />
             </CardContainer>
           );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useLocation, useNavigate, useSearchParams } from "react-router-dom"; 
 import BackgroundImage from "../../../assets/background.webp";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -10,7 +10,7 @@ import { usePalette } from "color-thief-react";
 // --- Redux Selectors & Actions ---
 import { fetchShopWithUsername, selectShop, selectShops } from "../state/reducers";
 import { fetchImage, selectSelectedShopImage } from "../../Images/state/reducers";
-import { addToCart, updateCartQuantity, selectCart, openCart } from "../../Cart/state/reducers";
+import { addToCart, updateCartQuantity, selectCart, openCart, closeCart } from "../../Cart/state/reducers"; 
 
 // --- Services & Utilities ---
 import { createGlobalOrder } from "../services/orderServices"; 
@@ -191,7 +191,7 @@ const LinkPill = styled.a`
 const MoreLinksButton = styled.button`
   width: 100%;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: white;
   padding: 0.5rem;
   border-radius: 10px;
@@ -205,7 +205,7 @@ const MoreLinksButton = styled.button`
   transition: background 0.2s;
 
   &:hover {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
   }
 `;
 
@@ -247,6 +247,7 @@ const ShopPageWithUsername = () => {
   const { username } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams(); 
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -262,6 +263,8 @@ const ShopPageWithUsername = () => {
   const [isSubmitting, setIsSubmitting] = useState(null);
   const [orderSuccessData, setOrderSuccessData] = useState(null);
   const [orderErrorMsg, setOrderErrorMsg] = useState("");
+
+  const [editingCartItem, setEditingCartItem] = useState(null);
 
   const isLinksRoute = location.pathname.endsWith("/links");
 
@@ -379,6 +382,9 @@ const ShopPageWithUsername = () => {
     if (isSubmitting === "submitting") return;
     setIsSubmitting("submitting");
 
+    // Extract healed products calculated dynamically inside Cart.js on open
+    const activeProducts = customerDetails.healedProducts || shopCartItems;
+
     const orderPayload = {
       shopId: selectedShop._id,
       customerName: customerDetails.customerName,
@@ -392,12 +398,16 @@ const ShopPageWithUsername = () => {
       addressLine: customerDetails.address?.addressLine || "Home Delivery",
       gpsLocation: customerDetails.gpsLocation,
       shopDomainKeyword: "global",
-      products: shopCartItems.map((item) => ({
+      
+      // Map over the validated, self-healed products list
+      products: activeProducts.map((item) => ({
         productId: item.productId,
         title: item.title,
         quantity: item.quantity,
-        sellingPrice: item.sellingPrice,
+        sellingPrice: item.sellingPrice, // --- SAFE GUARANTEED MATCH VALUE ---
         categoryId: item.categoryId || item.product?.categoryId,
+        supplementary: item.color && item.size ? `${item.color},${item.size}` : undefined,
+        podCustomization: item.podCustomization 
       })),
     };
 
@@ -434,6 +444,15 @@ const ShopPageWithUsername = () => {
     setOrderSuccessData(null);
   };
 
+  const handleEditCustomItem = (cartItem) => {
+    dispatch(closeCart()); 
+    setEditingCartItem(cartItem); 
+    setSearchParams({ product: cartItem.productId });
+  };
+
+  const isPodShop = selectedShop?.shopSettings?.printOnDemand === true || selectedShop?.printOnDemand === true;
+  const pageProps = { onCardClick: handleCardClick };
+
   if (loading || (error && retryCount < MAX_RETRIES)) return <Section><Loader fullscreen={false} /></Section>;
   if (error && retryCount >= MAX_RETRIES) return <NotFoundPage />;
 
@@ -454,7 +473,6 @@ const ShopPageWithUsername = () => {
       ? selectedShop.description || `Connect with ${shopTitle} across all platforms.`
       : t(`seo.shop_desc_${domainKeyWord}`, { shopName: shopTitle, commune: commune, wilaya: wilaya, defaultValue: selectedShop.description || t("partnersPage_seo_description") });
 
-    const pageProps = { onCardClick: handleCardClick };
     const coverUrl = selectedShop.styles?.coverImageId 
       ? `https://api.hanuut.com/image/raw/${selectedShop.styles.coverImageId}` 
       : null;
@@ -478,37 +496,41 @@ const ShopPageWithUsername = () => {
                   return (
                     <PageWrapper>
                       <PremiumHeader>
-                        <CoverPhoto $bgUrl={coverUrl} $logoUrl={shopImageUrl} />
-                        <HeaderContent>
-                          <ShopLogo src={shopImageUrl} alt={selectedShop.name} />
-                          <IdentityBlock>
-                            <ShopName>{selectedShop.name}</ShopName>
-                            <ShopDesc>{selectedShop.description}</ShopDesc>
-                          </IdentityBlock>
+                        {!isPodShop && (
+                          <>
+                            <CoverPhoto $bgUrl={coverUrl} $logoUrl={shopImageUrl} />
+                            <HeaderContent>
+                              <ShopLogo src={shopImageUrl} alt={selectedShop.name} />
+                              <IdentityBlock>
+                                <ShopName>{selectedShop.name}</ShopName>
+                                <ShopDesc>{selectedShop.description}</ShopDesc>
+                              </IdentityBlock>
 
-                          {parsedBioLinks.length > 0 && (
-                            <BioLinksWrapper>
-                              <LinkGrid>
-                                {visibleLinks.map((link, idx) => (
-                                  <LinkPill 
-                                    key={idx} 
-                                    href={link.url} 
-                                    target="_blank" 
-                                    $isPrimary={link.isPrimary}
-                                    title={link.label}
-                                  >
-                                    {link.icon}
-                                  </LinkPill>
-                                ))}
-                              </LinkGrid>
-                              {parsedBioLinks.length > 4 && (
-                                <MoreLinksButton onClick={() => setShowAllLinks(!showAllLinks)}>
-                                  {showAllLinks ? <><FaChevronUp /> Hide Links</> : <><FaChevronDown /> View All ({parsedBioLinks.length})</>}
-                                </MoreLinksButton>
+                              {parsedBioLinks.length > 0 && (
+                                <BioLinksWrapper>
+                                  <LinkGrid>
+                                    {visibleLinks.map((link, idx) => (
+                                      <LinkPill 
+                                        key={idx} 
+                                        href={link.url} 
+                                        target="_blank" 
+                                        $isPrimary={link.isPrimary}
+                                        title={link.label}
+                                      >
+                                        {link.icon}
+                                      </LinkPill>
+                                    ))}
+                                  </LinkGrid>
+                                  {parsedBioLinks.length > 4 && (
+                                    <MoreLinksButton onClick={() => setShowAllLinks(!showAllLinks)}>
+                                      {showAllLinks ? <><FaChevronUp /> Hide Links</> : <><FaChevronDown /> View All ({parsedBioLinks.length})</>}
+                                    </MoreLinksButton>
+                                  )}
+                                </BioLinksWrapper>
                               )}
-                            </BioLinksWrapper>
-                          )}
-                        </HeaderContent>
+                            </HeaderContent>
+                          </>
+                        )}
                       </PremiumHeader>
 
                       <GlobalShopLandingPage
@@ -516,6 +538,8 @@ const ShopPageWithUsername = () => {
                         image={selectedShopImage}
                         isOrderingEnabled={isOrderingEnabled}
                         orderingStatusKey={orderingStatusKey}
+                        editingCartItem={editingCartItem} 
+                        setEditingCartItem={setEditingCartItem} 
                         {...pageProps}
                       />
                       
@@ -528,6 +552,7 @@ const ShopPageWithUsername = () => {
                         shopDomain="global"
                         shopId={selectedShop?._id || selectedShop?.id}
                         orderErrorMsg={orderErrorMsg}
+                        onEditCustomItem={handleEditCustomItem} 
                       />
 
                       {/* --- SUCCESS RECEIPT MODAL --- */}

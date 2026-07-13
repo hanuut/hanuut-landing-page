@@ -1230,6 +1230,18 @@
   "preview_btn_label": "Aperçu",
   "hide_links_btn": "Masquer les liens",
   "view_all_links_btn": "Voir tout",
-  "specifications_header": "Caractéristiques"
+  "specifications_header": "Caractéristiques",
+  "pod_studio": {
+    "hero_tag": "STUDIO DE CRÉATION DIGITALE v1.0",
+    "hero_title": "Votre idée commence ici.",
+    "hero_subtitle": "Choisissez une pièce. Ajoutez votre vision. Nous fabriquons le résultat.\nCréez quelque chose qui vous appartient.",
+    "search_placeholder": "Rechercher une pièce...",
+    "category_label": "Types de Création",
+    "all_items": "Toutes les Bases",
+    "base_label": "BASE",
+    "design_button": "Start Creating",
+    "empty_state_title": "Aucune Base Trouvée",
+    "empty_state_description": "Nous n'avons trouvé aucune base correspondant à votre recherche."
+  }
 
 }

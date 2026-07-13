@@ -1273,7 +1273,19 @@
   "preview_btn_label": "معاينة",
   "hide_links_btn": "إخفاء الروابط",
   "view_all_links_btn": "عرض الكل",
-  "specifications_header": "المواصفات"
+  "specifications_header": "المواصفات",
+  "pod_studio": {
+    "hero_tag": "استوديو الإبداع الرقمي v1.0",
+    "hero_title": "فكرتك تبدأ هنا.",
+    "hero_subtitle": "اختر القطعة. أضف رؤيتك. ونحن نحولها إلى منتج حقيقي.\nاصنع شيئًا يعبر عنك.",
+    "search_placeholder": "البحث عن قطع للتصميم...",
+    "category_label": "قوالب التصنيع",
+    "all_items": "كل القطع",
+    "base_label": "قطعة",
+    "design_button": "ابدأ التصميم",
+    "empty_state_title": "لم يتم العثور على قطع",
+    "empty_state_description": "لم نتمكن من العثور على أي قطع مطابقة لبحثك."
+  }
 
 
 }

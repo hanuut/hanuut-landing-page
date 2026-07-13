@@ -2,13 +2,23 @@ import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
+import { useDispatch } from "react-redux"; 
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
-import { FaMinus, FaPlus, FaTimes, FaExpand, FaEye, FaBookmark, FaChevronDown, FaChevronUp, FaCheck } from "react-icons/fa";
+import { FaTimes, FaExpand, FaEye, FaBookmark, FaChevronDown, FaChevronRight,FaChevronLeft, FaChevronUp, FaCheck, FaPalette } from "react-icons/fa";
+import axios from "axios";
 
-// =========================================================
-// 🛡️ STYLED COMPONENTS MOVED TO TOP (RESOLVES LINTER ERRORS)
-// =========================================================
+// --- REDUX ACTIONS ---
+import { updateCartQuantity } from "../../../Cart/state/reducers";
+
+import { 
+  PodCanvasPreview, 
+  PodStepIndicator, 
+  PodStepTwoControls, 
+  PodStepThreeControls,
+  NavigationRow,
+  WizardBtn
+} from "./PodCustomizer";
 
 const DetailContainer = styled(motion.div)`
   width: 100%;
@@ -24,6 +34,7 @@ const DetailContainer = styled(motion.div)`
   position: relative;
   overflow: hidden;
   margin-bottom: 2rem;
+  min-height: 550px;
 `;
 
 const BlurredBackdrop = styled.div`
@@ -32,7 +43,7 @@ const BlurredBackdrop = styled.div`
   background-image: url(${(props) => props.$imgUrl});
   background-size: cover;
   background-position: center;
-  filter: blur(50px) brightness(0.7);
+  filter: blur(50px) brightness(0.5);
   transform: scale(1.15);
   z-index: 0;
   pointer-events: none;
@@ -43,8 +54,8 @@ const GradientOverlay = styled.div`
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(17, 18, 20, 0.15) 0%,
-    rgba(17, 18, 20, 0.55) 65%,
+    rgba(17, 18, 20, 0.4) 0%,
+    rgba(17, 18, 20, 0.85) 50%,
     #111214 100%
   );
   z-index: 1;
@@ -59,28 +70,29 @@ const RelativeContent = styled.div`
   gap: 1.25rem;
 `;
 
+const SplitGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+`;
+
 const GallerySection = styled.div`
   width: 100%;
-  height: 240px;
-  background: #000;
-  border-radius: 16px;
+  height: 350px;
+  background: #E5E5E5; 
+  border-radius: 20px;
   overflow: hidden;
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
-`;
-
-const BlurredGalleryBg = styled.div`
-  position: absolute;
-  inset: 0;
-  background-image: url(${props => props.$imgUrl});
-  background-size: cover;
-  background-position: center;
-  filter: blur(25px) brightness(0.4);
-  z-index: 1;
-  pointer-events: none;
 `;
 
 const SharpForegroundImage = styled.img`
@@ -105,31 +117,23 @@ const MainImageWrapper = styled.div`
 `;
 
 const AltImagesRow = styled.div`
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   gap: 0.5rem;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 6px;
-  border-radius: 12px;
-  z-index: 10;
-  max-width: 80%;
+  margin-top: 1rem;
   overflow-x: auto;
+  width: 100%;
+  justify-content: center;
   &::-webkit-scrollbar {
     display: none;
   }
 `;
 
 const AltThumbnail = styled.div`
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 6px;
   overflow: hidden;
+  background: #E5E5E5;
   border: 2px solid
     ${(props) => (props.$active ? props.theme.primaryColor : "transparent")};
   cursor: pointer;
@@ -154,7 +158,6 @@ const FloatingSocialProof = styled.div`
 const ProofBadge = styled.span`
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 4px 10px;
   border-radius: 20px;
@@ -176,11 +179,11 @@ const ImageOverlayScrim = styled.div`
   right: 0;
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.95) 0%,
-    rgba(0, 0, 0, 0.3) 70%,
+    rgba(17, 18, 20, 0.95) 0%,
+    rgba(17, 18, 20, 0.4) 60%,
     transparent 100%
   );
-  padding: 2.5rem 1.25rem 1.25rem 1.25rem;
+  padding: 3rem 1.25rem 1.25rem 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
@@ -251,7 +254,7 @@ const CloseButton = styled.button`
 `;
 
 const InfoSection = styled.div`
-  padding: 0 1.25rem 1.25rem 1.25rem;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -311,10 +314,8 @@ const ColorSwatch = styled.button`
   justify-content: center;
   flex-shrink: 0;
   background-color: ${(props) => props.$colorCode || "#27272a"};
-  border: 2px solid
-    ${(props) => (props.$active ? "white" : "rgba(255,255,255,0.1)")};
-  box-shadow: ${(props) =>
-    props.$active ? `0 0 8px ${props.theme.primaryColor}` : "none"};
+  border: 2px solid ${(props) => (props.$active ? "white" : "rgba(255,255,255,0.1)")};
+  box-shadow: ${(props) => props.$active ? `0 0 8px ${props.theme.primaryColor}` : "none"};
 
   &:hover {
     transform: scale(1.15);
@@ -329,19 +330,13 @@ const SizePill = styled.button`
   cursor: pointer;
   transition: all 0.2s;
   flex-shrink: 0;
-
-  background: ${(props) =>
-    props.$active ? "white" : "rgba(255,255,255,0.03)"};
-  border: 1px solid
-    ${(props) =>
-      props.$active ? props.theme.primaryColor : "rgba(255,255,255,0.1)"};
+  background: ${(props) => props.$active ? "white" : "rgba(255,255,255,0.03)"};
+  border: 1px solid ${(props) => props.$active ? props.theme.primaryColor : "rgba(255,255,255,0.1)"};
   color: ${(props) => (props.$active ? "#000" : "#D4D4D8")};
-  box-shadow: ${(props) =>
-    props.$active ? `0 0 8px ${props.theme.primaryColor}50` : "none"};
+  box-shadow: ${(props) => props.$active ? `0 0 8px ${props.theme.primaryColor}50` : "none"};
 
   &:hover {
-    background: ${(props) =>
-      props.$active ? "white" : "rgba(255,255,255,0.08)"};
+    background: ${(props) => props.$active ? "white" : "rgba(255,255,255,0.08)"};
   }
 `;
 
@@ -467,37 +462,35 @@ const LightboxOverlay = styled(motion.div)`
 `;
 
 const COLOR_MAP = {
-  black: "#000000",
-  white: "#FFFFFF",
-  red: "#EF4444",
-  blue: "#3B82F6",
-  green: "#10B981",
-  yellow: "#F59E0B",
-  purple: "#8B5CF6",
-  pink: "#EC4899",
-  grey: "#6B7280",
-  beige: "#F5F5DC",
+  black: "#000000", white: "#FFFFFF", red: "#EF4444", blue: "#3B82F6",
+  green: "#10B981", yellow: "#F59E0B", purple: "#8B5CF6", pink: "#EC4899",
+  grey: "#6B7280", beige: "#F5F5DC",
 };
 
-// --- NEW COMPONENT SPECIFICS GROUP ---
 const SelectorGrid = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 `;
 
-// --- MAIN INLINE COMPONENT ---
 const InlineProductDetails = ({
   product,
+  isPodShop,
   onAddToCart,
   onUpdateQuantity,
   cartItems,
   isOrderingEnabled,
   onClose,
   onImageChange,
+  onWizardStepChange,
+  editingCartItem,
+  setEditingCartItem 
 }) => {
   const { t, i18n } = useTranslation();
+  const dispatch = useDispatch();
   const isArabic = i18n.language === "ar";
+
+  const isPod = product?.printOnDemand || isPodShop;
 
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
@@ -505,6 +498,54 @@ const InlineProductDetails = ({
   const [imagesMap, setImagesMap] = useState({});
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isDescOpen, setIsDescOpen] = useState(false);
+
+  // --- POD MULTI-STEP WIZARD STATE ---
+  const [wizardStep, setWizardStep] = useState(1); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Split state completely to prevent cross-side design bleeding
+  const [podState, setPodState] = useState({
+    side: 'front',
+    front: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
+    back: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
+  });
+
+  // --- RE-EDIT POPULATOR (SELF-HEALING LEGACY BACKWARD COMPATIBLE) ---
+  useEffect(() => {
+    if (editingCartItem && editingCartItem.podCustomization) {
+      const custom = editingCartItem.podCustomization;
+      setWizardStep(2); // Jump directly to design space
+      setSelectedColor(editingCartItem.color);
+      setSelectedSize(editingCartItem.size);
+      
+      setPodState({
+        side: custom.printSide === 'back' ? 'back' : 'front',
+        front: custom.front ? { 
+          file: 'existing', 
+          previewUrl: custom.front.imageUrl || custom.front.originalImageUrl, // --- SELF HEALING PREVIEW FALLBACK
+          scale: custom.front.width, 
+          x: custom.front.x, 
+          y: custom.front.y, 
+          rotation: custom.front.rotation || 0 
+        } : { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
+        back: custom.back ? { 
+          file: 'existing',
+          previewUrl: custom.back.imageUrl || custom.back.originalImageUrl, // --- SELF HEALING PREVIEW FALLBACK
+          scale: custom.back.width, 
+          x: custom.back.x, 
+          y: custom.back.y, 
+          rotation: custom.back.rotation || 0 
+        } : { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
+      });
+    }
+  }, [editingCartItem]);
+
+  // Track the wizard step dynamically and propagate it upward to hide product list column
+  useEffect(() => {
+    if (isPod && onWizardStepChange) {
+      onWizardStepChange(wizardStep);
+    }
+  }, [wizardStep, isPod, onWizardStepChange]);
 
   useEffect(() => {
     if (product?.availabilities?.length > 0) {
@@ -535,7 +576,7 @@ const InlineProductDetails = ({
       }
       setActiveImageId(currentAvailability.imageId);
     }
-  }, [selectedColor]);
+  }, [selectedColor, currentAvailability, selectedSize]);
 
   useEffect(() => {
     if (activeImageId && onImageChange) {
@@ -543,11 +584,20 @@ const InlineProductDetails = ({
     }
   }, [activeImageId, onImageChange, product._id]);
 
+  const activePodTemplateId = useMemo(() => {
+    if (!isPod || !currentAvailability) return null; 
+    return podState.side === 'back' 
+      ? currentAvailability.podBackTemplateId 
+      : currentAvailability.podFrontTemplateId;
+  }, [isPod, currentAvailability, podState.side]);
+
   const allImageIds = useMemo(() => {
     const ids = [];
     product.availabilities.forEach((av) => {
       if (av.imageId) ids.push(av.imageId);
       if (av.altImageIds) ids.push(...av.altImageIds);
+      if (av.podFrontTemplateId) ids.push(av.podFrontTemplateId);
+      if (av.podBackTemplateId) ids.push(av.podBackTemplateId);
     });
     return Array.from(new Set(ids));
   }, [product]);
@@ -591,9 +641,99 @@ const InlineProductDetails = ({
     ];
   }, [currentAvailability]);
 
-  // --- STRICT STIPULATION: BOOLEAN CAST CONVERTER ---
   const showViews = !!(product.viewsCount && product.viewsCount > 0);
   const showSaves = !!(product.savesCount && product.savesCount > 0);
+
+  // --- FINAL WORKSPACE SUBMIT: ATOMIC RE-SAVER AND DEDUPLICATOR ---
+  const handleFinalSubmit = async (finalPrice) => {
+    if ((!podState.front.file && !podState.back.file) || !currentSizeDetails) return;
+    setIsSubmitting(true);
+
+    try {
+      let frontImageId = podState.front.file === 'existing' ? podState.front.previewUrl : null;
+      let backImageId = podState.back.file === 'existing' ? podState.back.previewUrl : null;
+
+      // Upload Front design ONLY if newly changed
+      if (podState.front.file && podState.front.file !== 'existing') {
+        const frontForm = new FormData();
+        frontForm.append('file', podState.front.file);
+        const frontRes = await axios.post(`${process.env.REACT_APP_API_PROD_URL}/image/upload`, frontForm);
+        frontImageId = frontRes.data.url;
+      }
+
+      // Upload Back design ONLY if newly changed
+      if (podState.back.file && podState.back.file !== 'existing') {
+        const backForm = new FormData();
+        backForm.append('file', podState.back.file);
+        const backRes = await axios.post(`${process.env.REACT_APP_API_PROD_URL}/image/upload`, backForm);
+        backImageId = backRes.data.url;
+      }
+
+      // Determine side keywords
+      const hasFront = !!frontImageId;
+      const hasBack = !!backImageId;
+      const printSideKeyword = (hasFront && hasBack) ? 'double' : (hasFront ? 'front' : 'back');
+
+      const customizationData = {
+        printSide: printSideKeyword,
+        ...(hasFront && {
+          front: {
+            imageId: frontImageId, 
+            imageUrl: frontImageId, 
+            x: podState.front.x,
+            y: podState.front.y,
+            width: podState.front.scale,
+            height: podState.front.scale,
+            rotation: podState.front.rotation
+          }
+        }),
+        ...(hasBack && {
+          back: {
+            imageId: backImageId, 
+            imageUrl: backImageId, 
+            x: podState.back.x,
+            y: podState.back.y,
+            width: podState.back.scale,
+            height: podState.back.scale,
+            rotation: podState.back.rotation
+          }
+        })
+      };
+
+      if (editingCartItem) {
+        dispatch(updateCartQuantity({ variantId: editingCartItem.variantId, quantity: 0 }));
+      }
+
+      const uniqueDesignVariantId = `${currentVariantId}_custom_${Date.now()}`;
+
+      onAddToCart({
+        product,
+        productId: product._id,
+        title: product.name,
+        variantId: uniqueDesignVariantId, 
+        color: selectedColor,
+        size: selectedSize,
+        sellingPrice: finalPrice, 
+        imageId: currentAvailability.imageId, 
+        quantity: 1,
+        podCustomization: customizationData 
+      });
+
+      setPodState({
+        side: 'front',
+        front: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
+        back: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
+      });
+      setWizardStep(1);
+      if (setEditingCartItem) setEditingCartItem(null); 
+      if (onClose) onClose();
+    } catch (error) {
+      console.error("Customization failed:", error);
+      alert("Failed to submit design, try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -602,219 +742,209 @@ const InlineProductDetails = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <BlurredBackdrop $imgUrl={imagesMap[activeImageId]} />
+        <BlurredBackdrop $imgUrl={imagesMap[activePodTemplateId] || imagesMap[activeImageId]} />
         <GradientOverlay />
 
         <RelativeContent>
-          <GallerySection>
-            {/* --- STRICTLY BOOLEAN CHECK PREVENTS ROGUE "0" TEXT BUG --- */}
-            {(showViews || showSaves) && (
-              <FloatingSocialProof>
-                {showViews ? (
-                  <ProofBadge>
-                    <FaEye /> {product.viewsCount}
-                  </ProofBadge>
-                ) : null}
-                {showSaves ? (
-                  <ProofBadge>
-                    <FaBookmark /> {product.savesCount}
-                  </ProofBadge>
-                ) : null}
-              </FloatingSocialProof>
-            )}
+          {isPod && <PodStepIndicator currentStep={wizardStep} isArabic={isArabic} />}
 
-            <MainImageWrapper onClick={() => setIsLightboxOpen(true)}>
-              {/* Blurred background fills full width */}
-              <BlurredGalleryBg $imgUrl={imagesMap[activeImageId]} />
+          <SplitGrid>
+            {/* ==================== LEFT SIDE: VISUAL CONTAINER ==================== */}
+            <div>
+              {isPod ? (
+                <PodCanvasPreview 
+                  baseImageUrl={imagesMap[activePodTemplateId] || imagesMap[activeImageId]} 
+                  podState={podState} 
+                  setPodState={setPodState}
+                />
+              ) : (
+                <GallerySection>
+                  {(showViews || showSaves) && (
+                    <FloatingSocialProof>
+                      {showViews ? (
+                        <ProofBadge>
+                          <FaEye /> {product.viewsCount}
+                        </ProofBadge>
+                      ) : null}
+                      {showSaves ? (
+                        <ProofBadge>
+                          <FaBookmark /> {product.savesCount}
+                        </ProofBadge>
+                      ) : null}
+                    </FloatingSocialProof>
+                  )}
 
-              {/* Foreground sharp image fits neatly inside viewport constraints */}
-              <AnimatePresence mode="wait">
-                {imagesMap[activeImageId] && (
-                  <SharpForegroundImage
-                    key={activeImageId}
-                    src={imagesMap[activeImageId]}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                  />
-                )}
-              </AnimatePresence>
+                  <MainImageWrapper onClick={() => setIsLightboxOpen(true)}>
+                    <AnimatePresence mode="wait">
+                      {imagesMap[activeImageId] && (
+                        <SharpForegroundImage
+                          key={activeImageId}
+                          src={imagesMap[activeImageId]}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15 }}
+                        />
+                      )}
+                    </AnimatePresence>
 
-              <ImageOverlayScrim $isArabic={isArabic}>
-                {product.brand && <Brand>{product.brand}</Brand>}
-                <ProductName>{product.name}</ProductName>
-                <Price>
-                  {parseInt(currentSizeDetails?.sellingPrice || 0)} {t("dzd")}
-                </Price>
-              </ImageOverlayScrim>
+                    <ImageOverlayScrim $isArabic={isArabic}>
+                      {product.brand && <Brand>{product.brand}</Brand>}
+                      <ProductName>{product.name}</ProductName>
+                      <Price>
+                        {parseInt(currentSizeDetails?.sellingPrice || 0)} {t("dzd")}
+                      </Price>
+                    </ImageOverlayScrim>
 
-              <ZoomHint>
-                <FaExpand />
-              </ZoomHint>
-            </MainImageWrapper>
+                    <ZoomHint><FaExpand /></ZoomHint>
+                  </MainImageWrapper>
 
-            {/* Carousel thumbnails absolutely positioned on top at bottom */}
-            {galleryImages.length > 1 && (
-              <AltImagesRow>
-                {galleryImages.map((id, index) => (
-                  <AltThumbnail
-                    key={index}
-                    $active={activeImageId === id}
-                    onClick={() => setActiveImageId(id)}
-                  >
-                    <img src={imagesMap[id]} alt="Alt view" />
-                  </AltThumbnail>
-                ))}
-              </AltImagesRow>
-            )}
-          </GallerySection>
+                  {galleryImages.length > 1 && (
+                    <AltImagesRow>
+                      {galleryImages.map((id, index) => (
+                        <AltThumbnail
+                          key={index}
+                          $active={activeImageId === id}
+                          onClick={() => setActiveImageId(id)}
+                        >
+                          <img src={imagesMap[id]} alt="Alt view" />
+                        </AltThumbnail>
+                      ))}
+                    </AltImagesRow>
+                  )}
+                </GallerySection>
+              )}
+            </div>
 
-          <InfoSection>
-            {product.shortDescription && (
-              <p
-                style={{
-                  fontSize: "0.95rem",
-                  color: "#a1a1aa",
-                  margin: 0,
-                  fontFamily: "Cairo, sans-serif",
-                  lineHeight: 1.5,
-                }}
-              >
-                {product.shortDescription}
-              </p>
-            )}
-
-            {/* --- MULTI-VARIANT COMPACT HORIZONTAL PANEL --- */}
-            <ActionPanelRow>
-              {/* Colors */}
-              <PanelSection>
-                <SectionLabel>{t("color_prefix")}</SectionLabel>
-                <PillsContainer>
-                  {product.availabilities.map((av) => {
-                    const hex = COLOR_MAP[av.color.toLowerCase()] || av.color;
-                    return (
-                      <ColorSwatch
-                        key={av.color}
-                        $active={selectedColor === av.color}
-                        $colorCode={hex}
-                        onClick={() => setSelectedColor(av.color)}
-                        title={av.colorLabel || av.color}
-                      >
-                        {selectedColor === av.color && (
-                          <FaCheck
-                            size={10}
-                            color={
-                              av.color.toLowerCase() === "white"
-                                ? "#000"
-                                : "#fff"
-                            }
+            {/* ==================== RIGHT SIDE: STEPPED CONTROLS ==================== */}
+            <div>
+              {!isPod ? (
+                <InfoSection>
+                  <ProductName>{product.name}</ProductName>
+                  <ActionPanelRow>
+                    <PanelSection>
+                      <SectionLabel>{t("color_prefix")}</SectionLabel>
+                      <PillsContainer>
+                        {product.availabilities.map((av) => (
+                          <ColorSwatch
+                            key={av.color}
+                            $active={selectedColor === av.color}
+                            $colorCode={COLOR_MAP[av.color.toLowerCase()] || av.color}
+                            onClick={() => setSelectedColor(av.color)}
                           />
-                        )}
-                      </ColorSwatch>
-                    );
-                  })}
-                </PillsContainer>
-              </PanelSection>
+                        ))}
+                      </PillsContainer>
+                    </PanelSection>
 
-              {/* Sizes */}
-              {currentAvailability && (
-                <PanelSection>
-                  <SectionLabel>{t("size_prefix")}</SectionLabel>
-                  <PillsContainer>
-                    {currentAvailability.sizes.map((s) => (
-                      <SizePill
-                        key={s.size}
-                        $active={selectedSize === s.size}
-                        onClick={() => setSelectedSize(s.size)}
-                      >
-                        {s.size}
-                      </SizePill>
-                    ))}
-                  </PillsContainer>
-                </PanelSection>
-              )}
-
-              {/* Add to Cart / Qty */}
-              {isOrderingEnabled && (
-                <PanelSection $isButton>
-                  <SectionLabel style={{ visibility: "hidden" }}>
-                    Action
-                  </SectionLabel>
-                  {existingCartItem ? (
-                    <QtyBox>
-                      <QtyBtn
-                        onClick={() =>
-                          onUpdateQuantity(
-                            currentVariantId,
-                            existingCartItem.quantity - 1,
-                          )
-                        }
-                      >
-                        <FaMinus />
-                      </QtyBtn>
-                      <span className="font-bold text-lg">
-                        {existingCartItem.quantity}
-                      </span>
-                      <QtyBtn
-                        onClick={() =>
-                          onUpdateQuantity(
-                            currentVariantId,
-                            existingCartItem.quantity + 1,
-                          )
-                        }
-                      >
-                        <FaPlus />
-                      </QtyBtn>
-                    </QtyBox>
-                  ) : (
-                    <AddToCartBtn onClick={handleAdd}>
-                      {t("add_to_cart")}
-                    </AddToCartBtn>
-                  )}
-                </PanelSection>
-              )}
-            </ActionPanelRow>
-
-            {/* Two-Column Specifications Grid */}
-            {product.specifications?.length > 0 && (
-              <SelectorGrid>
-                <SectionLabel>{t("specifications_header")}</SectionLabel>
-                <SpecsGrid>
-                  {product.specifications.slice(0, 4).map((spec, idx) => (
-                    <SpecItem key={idx}>
-                      <span className="name">{spec.name}</span>
-                      <span className="val">{spec.value}</span>
-                    </SpecItem>
-                  ))}
-                </SpecsGrid>
-              </SelectorGrid>
-            )}
-
-            {/* Collapsible Accordion description */}
-            {product.longDescription && (
-              <AccordionContainer>
-                <AccordionHeader onClick={() => setIsDescOpen(!isDescOpen)}>
-                  <span>Details & Care</span>
-                  {isDescOpen ? <FaChevronUp /> : <FaChevronDown />}
-                </AccordionHeader>
-                <AnimatePresence>
-                  {isDescOpen && (
-                    <AccordionBody
-                      initial={{ height: 0 }}
-                      animate={{ height: "auto" }}
-                      exit={{ height: 0 }}
-                      transition={{ duration: 0.25 }}
-                    >
-                      <div style={{ padding: "0 1.25rem 1.25rem 1.25rem" }}>
-                        {product.longDescription}
+                    {currentAvailability && (
+                      <PanelSection>
+                        <SectionLabel>{t("size_prefix")}</SectionLabel>
+                        <PillsContainer>
+                          {currentAvailability.sizes.map((s) => (
+                            <SizePill
+                              key={s.size}
+                              $active={selectedSize === s.size}
+                              onClick={() => setSelectedSize(s.size)}
+                            >
+                              {s.size}
+                            </SizePill>
+                          ))}
+                        </PillsContainer>
+                      </PanelSection>
+                    )}
+                  </ActionPanelRow>
+                  <AddToCartBtn onClick={handleAdd}>
+                    {t("add_to_cart")}
+                  </AddToCartBtn>
+                </InfoSection>
+              ) : (
+                <div style={{ minHeight: '350px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  {wizardStep === 1 && (
+                    <InfoSection style={{ padding: 0 }}>
+                      <div style={{ marginBottom: '1rem' }}>
+                        <Brand>{product.brand}</Brand>
+                        <ProductName style={{ fontSize: '1.6rem', marginTop: '4px' }}>{product.name}</ProductName>
+                        <Price style={{ fontSize: '1.4rem', marginTop: '4px' }}>{currentSizeDetails?.sellingPrice} DA</Price>
                       </div>
-                    </AccordionBody>
+
+                      <ActionPanelRow>
+                        <PanelSection>
+                          <SectionLabel style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <FaPalette /> Colors
+                          </SectionLabel>
+                          <PillsContainer>
+                            {product.availabilities.map((av) => {
+                              const hex = COLOR_MAP[av.color.toLowerCase()] || av.color;
+                              return (
+                                <ColorSwatch
+                                  key={av.color}
+                                  $active={selectedColor === av.color}
+                                  $colorCode={hex}
+                                  onClick={() => setSelectedColor(av.color)}
+                                >
+                                  {selectedColor === av.color && (
+                                    <FaCheck size={10} color={av.color.toLowerCase() === "white" ? "#000" : "#fff"} />
+                                  )}
+                                </ColorSwatch>
+                              );
+                            })}
+                          </PillsContainer>
+                        </PanelSection>
+
+                        {currentAvailability && (
+                          <PanelSection>
+                            <SectionLabel>Sizes</SectionLabel>
+                            <PillsContainer>
+                              {currentAvailability.sizes.map((s) => (
+                                <SizePill
+                                  key={s.size}
+                                  $active={selectedSize === s.size}
+                                  onClick={() => setSelectedSize(s.size)}
+                                >
+                                  {s.size}
+                                </SizePill>
+                              ))}
+                            </PillsContainer>
+                          </PanelSection>
+                        )}
+                      </ActionPanelRow>
+
+                      <NavigationRow style={{ marginTop: '2rem' }}>
+                        <WizardBtn type="button" $primary onClick={() => setWizardStep(2)}>
+                          Customize Garment {isArabic ? <FaChevronLeft /> : <FaChevronRight />}
+                        </WizardBtn>
+                      </NavigationRow>
+                    </InfoSection>
                   )}
-                </AnimatePresence>
-              </AccordionContainer>
-            )}
-          </InfoSection>
+
+                  {wizardStep === 2 && (
+                    <PodStepTwoControls 
+                      podState={podState}
+                      setPodState={setPodState}
+                      product={product}
+                      isArabic={isArabic}
+                      onBack={() => setWizardStep(1)}
+                      onNext={() => setWizardStep(3)}
+                    />
+                  )}
+
+                  {wizardStep === 3 && (
+                    <PodStepThreeControls 
+                      podState={podState}
+                      product={product}
+                      selectedColor={selectedColor}
+                      selectedSize={selectedSize}
+                      currentSizeDetails={currentSizeDetails}
+                      isArabic={isArabic}
+                      isSubmitting={isSubmitting}
+                      onBack={() => setWizardStep(2)}
+                      onSubmit={handleFinalSubmit}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          </SplitGrid>
         </RelativeContent>
 
         {onClose && (
@@ -825,7 +955,7 @@ const InlineProductDetails = ({
       </DetailContainer>
 
       <AnimatePresence>
-        {isLightboxOpen && imagesMap[activeImageId] && (
+        {isLightboxOpen && imagesMap[activeImageId] && !isPod && (
           <LightboxOverlay
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

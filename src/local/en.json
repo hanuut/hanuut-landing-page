@@ -1225,6 +1225,17 @@
   "preview_btn_label": "Preview",
   "hide_links_btn": "Hide Links",
   "view_all_links_btn": "View All",
-  "specifications_header": "Specifications"
-
+  "specifications_header": "Specifications",
+  "pod_studio": {
+    "hero_tag": "DIGITAL CREATION STUDIO v1.0",
+    "hero_title": "Your idea starts here.",
+    "hero_subtitle": "Choose a piece. Add your vision. We manufacture the result.\nCreate something that belongs to you.",
+    "search_placeholder": "Search blank design bases...",
+    "category_label": "Creation Types",
+    "all_items": "All Bases",
+    "base_label": "BASE",
+    "design_button": "Start Creating",
+    "empty_state_title": "No Bases Found",
+    "empty_state_description": "We couldn't find any printable bases matching your search."
+  }
 }
