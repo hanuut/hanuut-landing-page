@@ -86,7 +86,7 @@ const CartTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 800;
   color: #fff;
-  font-family: "Tajawal", sans-serif;
+  font-family: \"Tajawal\", sans-serif;
 `;
 
 const CloseButton = styled.button`
@@ -994,7 +994,20 @@ const Cart = ({
                       )}
                     </ItemVariant>
                   )}
-                  <ItemPrice>
+                  
+                  {/* PRINT SIZING & ITEM PRICING BREAKDOWN DETAILS UNDER TOTAL */}
+                  {item.podCustomization ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px' }}>
+                      <span style={{ fontSize: '0.8rem', color: '#888' }}>
+                        Apparel Base: {parseInt(item.podCustomization.baseGarmentCost || 0)} {t("zd")}
+                      </span>
+                      <span style={{ fontSize: '0.8rem', color: '#39A170' }}>
+                        Custom Print: +{parseInt(item.podCustomization.printCost || 0)} {t("zd")}
+                      </span>
+                    </div>
+                  ) : null}
+
+                  <ItemPrice style={{ marginTop: '6px' }}>
                     {parseInt(item.sellingPrice)} {t("zd")}
                   </ItemPrice>
                 </ItemTextDetails>
@@ -1218,3 +1231,4 @@ function LightboxComponent({ item, onClose, onEdit }) {
 };
 
 export default Cart;
+

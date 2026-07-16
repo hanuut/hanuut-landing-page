@@ -61,7 +61,7 @@ const UnifiedHeaderRow = styled.div`
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 1.5rem;
+  padding-bottom: 1rem;
   box-sizing: border-box;
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 
@@ -211,7 +211,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
   const shopLogoUrl = useMemo(() => getImageUrl(selectedShopImage), [selectedShopImage]);
 
   const seoMetadata = useMemo(() => {
-    const shopTitle = shop.name || "AF Print Studio";
+    const shopTitle = shop.name === "AURAS FORGE" ? "AURAS LAB" : (shop.name || "AURAS LAB");
 
     const translations = {
       en: {
@@ -223,7 +223,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
         description: `Concevez et fabriquez vos vêtements personnalisés haut de gamme avec ${shopTitle}. Importez vos visuels et créez votre collection sur des supports en coton de qualité supérieure.`,
       },
       ar: {
-        title: `أوراس فورج بود لابد | صمم ملابسك المخصصة بجودة فاخرة | ${shopTitle}`,
+        title: `أوراس لاب ستوديو | صمم ملابسك المخصصة بجودة فاخرة | ${shopTitle}`,
         description: `صمم وأنتج ملابسك الفاخرة والمخصصة مع معمل ${shopTitle}. ارفع تصاميمك الخاصة وابدأ إنتاج تشكيلتك الفريدة على خامات من القطن الطبيعي مع شحن لكافة الولايات بالجزائر.`,
       },
     };
@@ -358,7 +358,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
       setOrderSuccessData({
         orderId: orderResult.orderId,
         customerPhone: customerDetails.customerPhone,
-        shopName: shop.name,
+        shopName: shop.name === "AURAS FORGE" ? "AURAS LAB" : (shop.name || "AURAS LAB"),
       });
 
       setIsSubmitting("success");
@@ -428,7 +428,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
                   />
                 )}
                 <StudioText>
-                  <StudioName>{shop.name}</StudioName>
+                  <StudioName>{shop.name === "AURAS FORGE" ? "AURAS LAB" : (shop.name || "AURAS LAB")}</StudioName>
                   <StudioDesc>
                     {shop.description || "Print-On-Demand Studio"}
                   </StudioDesc>

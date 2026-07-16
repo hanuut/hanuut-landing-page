@@ -1,10 +1,19 @@
-// src/modules/PodStudio/components/StudioLanding/StudioHero.jsx
-
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  AnimatePresence,
+} from "framer-motion";
+import { FaChevronDown } from "react-icons/fa";
+import AppLogo3D from "../../../../assets/logos/myHanuut/logo_ar.png";
+
+import PlatformDownloadButtons from "../../../Partners/components/PlatformDownloadButtons";
+import DigitalMatrixCanvas from "../../../Partners/components/DigitalMatrixCanvas";
 
 const HeroContainer = styled.div`
   width: 100%;
@@ -40,11 +49,19 @@ const CrosshairTarget = styled.div`
   pointer-events: none;
   z-index: -1;
   opacity: 0.04;
-  background-image: 
+  background-image:
     linear-gradient(rgba(255, 255, 255, 1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 1) 1px, transparent 1px),
-    radial-gradient(circle, transparent 25%, rgba(255, 255, 255, 1) 26%, transparent 28%);
-  background-size: 80px 80px, 80px 80px, 300px 300px;
+    radial-gradient(
+      circle,
+      transparent 25%,
+      rgba(255, 255, 255, 1) 26%,
+      transparent 28%
+    );
+  background-size:
+    80px 80px,
+    80px 80px,
+    300px 300px;
   background-position: center;
 `;
 
@@ -55,7 +72,7 @@ const Title = styled.h1`
   line-height: 1.15;
   margin: 0;
   text-transform: uppercase;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   letter-spacing: -0.5px;
 `;
 
@@ -63,7 +80,7 @@ const Description = styled.p`
   font-size: 1.05rem;
   color: #a1a1aa;
   line-height: 1.6;
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
   max-width: 90%;
   margin: 0;
 `;
@@ -81,7 +98,7 @@ const EnterButton = styled.button`
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.2s;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   box-shadow: 0 10px 25px rgba(240, 122, 72, 0.25);
 
   &:hover {
@@ -100,7 +117,6 @@ const RightCol = styled.div`
   transform-style: preserve-3d;
 `;
 
-// --- NEW: Stacked card container allowing 3D depth offsets ---
 const StackWrapper = styled(motion.div)`
   position: relative;
   width: 100%;
@@ -124,13 +140,15 @@ const ShowcaseCard = styled(motion.div)`
   transform-style: preserve-3d;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
   overflow: hidden;
-  transition: opacity 0.5s, transform 0.5s;
+  transition:
+    opacity 0.5s,
+    transform 0.5s;
 `;
 
 const GlowingGrid = styled.div`
   position: absolute;
   inset: -10%;
-  background-image: 
+  background-image:
     linear-gradient(rgba(0, 210, 255, 0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 210, 255, 0.08) 1px, transparent 1px);
   background-size: 30px 30px;
@@ -142,7 +160,7 @@ const GlowingGrid = styled.div`
 const GarmentVisual = styled.div`
   font-size: 8rem;
   color: #ffffff;
-  filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
   transform: translateZ(45px);
   user-select: none;
 `;
@@ -160,7 +178,7 @@ const CoordinateOverlay = styled.div`
 `;
 
 const CoordText = styled.span`
-  color: #00D2FF;
+  color: #00d2ff;
   font-family: monospace;
   font-size: 0.75rem;
   font-weight: 700;
@@ -193,7 +211,7 @@ const CoreTag = styled.div`
 const ProductTitle = styled.div`
   color: #ffffff;
   font-weight: 900;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   font-size: 1.1rem;
   letter-spacing: 0.5px;
 `;
@@ -207,7 +225,7 @@ const DEFAULT_STACK = [
 const StudioHero = ({ onEnterWorkspace }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
-  
+
   const [activeIdx, setActiveIdx] = useState(0);
 
   const x = useMotionValue(0);
@@ -247,22 +265,17 @@ const StudioHero = ({ onEnterWorkspace }) => {
     <HeroContainer dir={isArabic ? "rtl" : "ltr"}>
       <LeftCol $isArabic={isArabic}>
         <CrosshairTarget />
-        <Title>
-          {t("pod_studio.hero_create_once")}
-        </Title>
-        <Description>
-          {t("pod_studio.hero_desc")}
-        </Description>
+        <Title>{t("pod_studio.hero_create_once")}</Title>
+        <Description>{t("pod_studio.hero_desc")}</Description>
         <EnterButton onClick={onEnterWorkspace}>
           {t("pod_studio.btn_enter_workspace")}
         </EnterButton>
       </LeftCol>
-
       <RightCol onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
         <StackWrapper style={{ rotateX, rotateY }}>
           {DEFAULT_STACK.map((item, index) => {
-            // Determine structural depth rendering
-            const offset = (index - activeIdx + DEFAULT_STACK.length) % DEFAULT_STACK.length;
+            const offset =
+              (index - activeIdx + DEFAULT_STACK.length) % DEFAULT_STACK.length;
             const isFront = offset === 0;
             const isMiddle = offset === 1;
 
@@ -295,30 +308,24 @@ const StudioHero = ({ onEnterWorkspace }) => {
                 }}
               >
                 <GlowingGrid />
-                
                 <TagInfo>
-                  <CoreTag>{item.label}</CoreTag>
-                  <ProductTitle>{item.title}</ProductTitle>
-                </TagInfo>
-
-                <GarmentVisual>{item.emoji}</GarmentVisual>
-
+                  <CoreTag>{item.label}</CoreTag>{" "}
+                  <ProductTitle>{item.title}</ProductTitle>{" "}
+                </TagInfo>{" "}
+                <GarmentVisual>{item.emoji}</GarmentVisual>{" "}
                 <CoordinateOverlay>
-                  <CoordText>COORD_X: 42.09</CoordText>
-                  <CoordText>COORD_Y: 80.11</CoordText>
-                  <CoordText>Z_DEPTH: 0.25</CoordText>
-                </CoordinateOverlay>
+                  {" "}
+                  <CoordText>COORD_X: 42.09</CoordText>{" "}
+                  <CoordText>COORD_Y: 80.11</CoordText>{" "}
+                  <CoordText>Z_DEPTH: 0.25</CoordText>{" "}
+                </CoordinateOverlay>{" "}
               </ShowcaseCard>
             );
-          })}
-        </StackWrapper>
-      </RightCol>
+          })}{" "}
+        </StackWrapper>{" "}
+      </RightCol>{" "}
     </HeroContainer>
   );
 };
-
-StudioHero.propTypes = {
-  onEnterWorkspace: PropTypes.func.isRequired,
-};
-
+StudioHero.propTypes = { onEnterWorkspace: PropTypes.func.isRequired };
 export default StudioHero;

@@ -528,7 +528,7 @@ const ShopPageWithUsername = () => {
       );
     }
 
-    const shopTitle = selectedShop.name || "Hanuut Shop";
+    const shopTitle = selectedShop.name || "HANUUT";
     const shopImage = getImageUrl(selectedShop.imageId); 
     const cleanUsername = selectedShop.username?.startsWith("@") ? selectedShop.username : `@${selectedShop.username}`;
     const currentUrl = `https://hanuut.com/${cleanUsername}${isLinksRoute ? '/links' : ''}`;
@@ -537,12 +537,21 @@ const ShopPageWithUsername = () => {
 
     const metaTitle = isLinksRoute 
       ? `${shopTitle} | Links & Socials` 
-      : t(`seo.shop_title_${domainKeyWord}`, { shopName: shopTitle, commune: commune, wilaya: wilaya, defaultValue: `${shopTitle} | Hanuut` });
+      : t(`seo.shop_title_${domainKeyWord}`, { 
+          shopName: shopTitle, 
+          commune: commune, 
+          wilaya: wilaya, 
+          defaultValue: `${shopTitle} | HANUUT` 
+        });
 
     const metaDesc = isLinksRoute
       ? selectedShop.description || `Connect with ${shopTitle} across all platforms.`
-      : t(`seo.shop_desc_${domainKeyWord}`, { shopName: shopTitle, commune: commune, wilaya: wilaya, defaultValue: selectedShop.description || t("partnersPage_seo_description") });
-
+      : t(`seo.shop_desc_${domainKeyWord}`, { 
+          shopName: shopTitle, 
+          commune: commune, 
+          wilaya: wilaya, 
+          defaultValue: selectedShop.description || t("partnersPage_seo_description") 
+        });
     const coverUrl = selectedShop.styles?.coverImageId 
       ? `https://api.hanuut.com/image/raw/${selectedShop.styles.coverImageId}` 
       : null;

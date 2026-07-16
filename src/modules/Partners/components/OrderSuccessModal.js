@@ -43,7 +43,6 @@ const ModalContainer = styled(motion.div)`
   text-align: center;
 `;
 
-// --- FIX: Force LTR and Standard Font for Image Generation ---
 const ReceiptCard = styled.div`
   background: #fff;
   color: #111;
@@ -57,7 +56,6 @@ const ReceiptCard = styled.div`
   flex-direction: column;
   gap: 1rem;
 
-  /* FORCE LTR FOR IMAGE GENERATION */
   direction: ltr !important;
   text-align: left !important;
   font-family: "Arial", sans-serif !important;
@@ -80,6 +78,7 @@ const SuccessIcon = styled.div`
   color: #39a170;
   margin-bottom: 0.5rem;
 `;
+
 const Title = styled.h2`
   font-size: 1.5rem;
   font-weight: 800;
@@ -87,12 +86,14 @@ const Title = styled.h2`
   margin: 0;
   font-family: "Tajawal", sans-serif;
 `;
+
 const Subtitle = styled.p`
   font-size: 0.95rem;
   color: #a1a1aa;
   margin-top: 0.5rem;
   line-height: 1.4;
 `;
+
 const Label = styled.span`
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -103,6 +104,7 @@ const Label = styled.span`
   margin-bottom: 0.25rem;
   font-family: "Arial", sans-serif !important;
 `;
+
 const Value = styled.span`
   font-size: 1.25rem;
   font-weight: 800;
@@ -111,17 +113,20 @@ const Value = styled.span`
   letter-spacing: 1px;
   font-family: "Arial", sans-serif !important;
 `;
+
 const Divider = styled.div`
   width: 100%;
   height: 1px;
   background: #e5e5e5;
   margin: 0.5rem 0;
 `;
+
 const InfoRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
+
 const ActionGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -129,6 +134,7 @@ const ActionGrid = styled.div`
   width: 100%;
   margin-top: 1rem;
 `;
+
 const Button = styled.button`
   display: flex;
   align-items: center;
@@ -149,6 +155,7 @@ const Button = styled.button`
       ? `background: #39A170; color: white; grid-column: span 2; font-size: 1rem;`
       : `background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.1); &:hover { background: rgba(255,255,255,0.2); }`}
 `;
+
 const CloseIcon = styled.button`
   position: absolute;
   top: 1rem;
@@ -168,10 +175,13 @@ const OrderSuccessModal = ({ orderData, onClose }) => {
 
   const orderId = orderData?.orderId || "---";
   const phone = orderData?.customerPhone || "---";
-  const shopName = orderData?.shopName || "Hanuut Shop";
+  const shopName =
+    orderData?.shopName === "AURAS FORGE"
+      ? "AURAS LAB"
+      : orderData?.shopName || "AURAS LAB";
 
   const handleCopy = () => {
-    const text = `Order ID: ${orderId}\nPhone: ${phone}\nShop: ${shopName}`;
+    const text = `Order ID: ${orderId}Phone: ${phone}Shop: ${shopName}`;
     navigator.clipboard.writeText(text);
     alert("Copied!");
   };
@@ -180,7 +190,6 @@ const OrderSuccessModal = ({ orderData, onClose }) => {
     if (!receiptRef.current) return;
     setDownloading(true);
     try {
-      // useCORS: true allows loading images (like logos) if they are on a CDN
       const canvas = await html2canvas(receiptRef.current, {
         scale: 2,
         useCORS: true,
@@ -197,7 +206,7 @@ const OrderSuccessModal = ({ orderData, onClose }) => {
 
   const handleTrack = () => {
     onClose();
-    navigate("/track");
+    navigate(`/track/${phone}/${orderId}`);
   };
 
   return (
@@ -221,8 +230,6 @@ const OrderSuccessModal = ({ orderData, onClose }) => {
             "Keep this info safe to track your delivery.",
           )}
         </Subtitle>
-
-        {/* --- RECEIPT CARD (FORCED ENGLISH/LTR) --- */}
         <ReceiptCard ref={receiptRef}>
           <div
             style={{
@@ -233,45 +240,52 @@ const OrderSuccessModal = ({ orderData, onClose }) => {
               marginBottom: "10px",
             }}
           >
-            <span style={{ fontWeight: "800", fontSize: "1.1rem" }}>
+            <span
+              style={{ fontSize: "1.1rem", fontWeight: "900", color: "#111" }}
+            >
               {shopName}
             </span>
           </div>
           <Divider />
           <InfoRow>
             <div style={{ textAlign: "left" }}>
-              <Label>ORDER ID</Label>
-              <Value style={{ color: "#39A170" }}>{orderId}</Value>
-            </div>
+              <Label>ORDER ID</Label>{" "}
+              <Value style={{ color: "#39A170" }}>{orderId}</Value>{" "}
+            </div>{" "}
             <div style={{ textAlign: "right" }}>
-              <Label>PHONE</Label>
-              <Value>{phone}</Value>
-            </div>
-          </InfoRow>
-          <Divider />
+              {" "}
+              <Label>PHONE</Label> <Value>{phone}</Value>{" "}
+            </div>{" "}
+          </InfoRow>{" "}
+          <Divider />{" "}
           <p style={{ fontSize: "0.8rem", color: "#888", margin: 0 }}>
-            Use the Order ID and Phone Number to track your status on Hanuut.
-          </p>
-        </ReceiptCard>
-
+            {" "}
+            Use the Order ID and Phone Number to track your status on
+            Hanuut.{" "}
+          </p>{" "}
+        </ReceiptCard>{" "}
         <ActionGrid>
+          {" "}
           <Button onClick={handleCopy}>
-            <FaCopy /> {t("copy", "Copy")}
-          </Button>
+            {" "}
+            <FaCopy /> {t("copy", "Copy")}{" "}
+          </Button>{" "}
           <Button onClick={handleDownload} disabled={downloading}>
-            <FaDownload /> {downloading ? "..." : t("save_image", "Save Image")}
-          </Button>
+            {" "}
+            <FaDownload />{" "}
+            {downloading ? "..." : t("save_image", "Save Image")}{" "}
+          </Button>{" "}
           <Button $primary onClick={handleTrack}>
-            <FaSearchLocation /> {t("track_order", "Track Order Now")}
-          </Button>
-        </ActionGrid>
-
+            {" "}
+            <FaSearchLocation /> {t("track_order", "Track Order Now")}{" "}
+          </Button>{" "}
+        </ActionGrid>{" "}
         <CloseIcon onClick={onClose}>
-          <FaTimes />
-        </CloseIcon>
-      </ModalContainer>
+          {" "}
+          <FaTimes />{" "}
+        </CloseIcon>{" "}
+      </ModalContainer>{" "}
     </Overlay>
   );
 };
-
 export default OrderSuccessModal;
