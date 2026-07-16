@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { usePalette } from "color-thief-react";
+import { FaBookOpen } from "react-icons/fa";
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
 import PreviewStage from "./PreviewStage";
@@ -10,7 +11,10 @@ import DesignControls from "./DesignControls";
 import ProductionSummary from "./ProductionSummary";
 import PartnerSizingWidget from "./PartnerSizingWidget";
 import { retrieveFile } from "../../utils/indexedDbHelper";
-import { getGarmentDimensions, getTemplateConfig } from "../../hooks/usePrintableArea";
+import {
+  getGarmentDimensions,
+  getTemplateConfig,
+} from "../../hooks/usePrintableArea";
 
 const WorkspaceGrid = styled.div`
   display: grid;
@@ -140,30 +144,87 @@ const SegmentButton = styled.button`
   font-family: "Tajawal", sans-serif;
 `;
 
+const SizingScrollButton = styled.button`
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  font-family: "Tajawal", sans-serif;
+  margin-top: 0.5rem;
+  width: fit-content;
+
+  &:hover {
+    background: rgba(240, 122, 72, 0.1);
+    border-color: #f07a48;
+    color: #f07a48;
+  }
+`;
+
 const COLOR_MAP = {
-  black: "#000000", noir: "#000000", white: "#FFFFFF", blanc: "#FFFFFF",
-  red: "#EF4444", rouge: "#EF4444", blue: "#3B82F6", bleu: "#3B82F6",
-  green: "#10B981", vert: "#10B981", yellow: "#F59E0B", jaune: "#F59E0B",
-  purple: "#8B5CF6", pink: "#EC4899", rose: "#EC4899", grey: "#6B7280",
-  gris: "#6B7280", beige: "#F5F5DC", navy: "#1E3A8A", charcoal: "#374151"
+  black: "#000000",
+  noir: "#000000",
+  white: "#FFFFFF",
+  blanc: "#FFFFFF",
+  red: "#EF4444",
+  rouge: "#EF4444",
+  blue: "#3B82F6",
+  bleu: "#3B82F6",
+  green: "#10B981",
+  vert: "#10B981",
+  yellow: "#F59E0B",
+  jaune: "#F59E0B",
+  purple: "#8B5CF6",
+  pink: "#EC4899",
+  rose: "#EC4899",
+  grey: "#6B7280",
+  gris: "#6B7280",
+  beige: "#F5F5DC",
+  navy: "#1E3A8A",
+  charcoal: "#374151",
 };
 
 const getDisplayColorHex = (colorName) => {
-  const normalized = String(colorName || "").trim().toLowerCase();
+  const normalized = String(colorName || "")
+    .trim()
+    .toLowerCase();
   if (COLOR_MAP[normalized]) return COLOR_MAP[normalized];
-  if (normalized.includes("rose") || normalized.includes("pink")) return "#EC4899";
-  if (normalized.includes("noir") || normalized.includes("black")) return "#111111";
-  if (normalized.includes("blanc") || normalized.includes("white")) return "#FFFFFF";
-  if (normalized.includes("gris") || normalized.includes("grey")) return "#6B7280";
-  if (normalized.includes("bleu") || normalized.includes("blue")) return "#3B82F6";
-  if (normalized.includes("rouge") || normalized.includes("red")) return "#EF4444";
+  if (normalized.includes("rose") || normalized.includes("pink"))
+    return "#EC4899";
+  if (normalized.includes("noir") || normalized.includes("black"))
+    return "#111111";
+  if (normalized.includes("blanc") || normalized.includes("white"))
+    return "#FFFFFF";
+  if (normalized.includes("gris") || normalized.includes("grey"))
+    return "#6B7280";
+  if (normalized.includes("bleu") || normalized.includes("blue"))
+    return "#3B82F6";
+  if (normalized.includes("rouge") || normalized.includes("red"))
+    return "#EF4444";
   return "#27272a";
 };
 
-const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuccess }) => {
+const DesignWorkspace = ({
+  canvas,
+  onClose,
+  shopId,
+  editingCartItem,
+  onCommitSuccess,
+}) => {
   const { t } = useTranslation();
-  const [selectedColor, setSelectedColor] = useState(canvas.availableColors[0]?.colorName || "");
-  const [selectedSize, setSelectedSize] = useState(canvas.sizes[0]?.sizeCode || "");
+  const [selectedColor, setSelectedColor] = useState(
+    canvas.availableColors[0]?.colorName || "",
+  );
+  const [selectedSize, setSelectedSize] = useState(
+    canvas.sizes[0]?.sizeCode || "",
+  );
   const [activeSide, setActiveSide] = useState("front");
   const [templateUrl, setTemplateUrl] = useState(null);
 
@@ -174,19 +235,49 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
   const [showSolidBg, setShowSolidBg] = useState(false);
   const [solidBgColor, setSolidBgColor] = useState("#FFFFFF");
 
-  const [frontDesign, setFrontDesign] = useState({ file: null, previewUrl: null, x: 50, y: 50, scale: 50, rotation: 0 });
-  const [backDesign, setBackDesign] = useState({ file: null, previewUrl: null, x: 50, y: 50, scale: 50, rotation: 0 });
+  const [frontDesign, setFrontDesign] = useState({
+    file: null,
+    previewUrl: null,
+    x: 50,
+    y: 50,
+    scale: 50,
+    rotation: 0,
+  });
+  const [backDesign, setBackDesign] = useState({
+    file: null,
+    previewUrl: null,
+    x: 50,
+    y: 50,
+    scale: 50,
+    rotation: 0,
+  });
 
   const activeDesignState = activeSide === "back" ? backDesign : frontDesign;
-  const setActiveDesignState = activeSide === "back" ? setBackDesign : setFrontDesign;
+  const setActiveDesignState =
+    activeSide === "back" ? setBackDesign : setFrontDesign;
+
+  // Enforce scrolling viewport directly to the top on page load
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [canvas]);
+
+  const handleScrollToSizeChart = () => {
+    const el = document.getElementById("sizing-spec-widget");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
 
   useEffect(() => {
     if (selectedColor) {
       const lowerCol = String(selectedColor).toLowerCase();
       if (
-        lowerCol.includes("black") || lowerCol.includes("noir") || lowerCol.includes("navy") ||
-        lowerCol.includes("charcoal") || lowerCol.includes("gray") || lowerCol.includes("gris") ||
-        lowerCol.includes("green") || lowerCol.includes("vert")
+        lowerCol.includes("black") ||
+        lowerCol.includes("noir") ||
+        lowerCol.includes("navy") ||
+        lowerCol.includes("charcoal") ||
+        lowerCol.includes("gray") ||
+        lowerCol.includes("gris") ||
+        lowerCol.includes("green") ||
+        lowerCol.includes("vert")
       ) {
         setShowSolidBg(true);
         setSolidBgColor("#FFFFFF");
@@ -212,19 +303,33 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
               printSide: adaptedCustom.printSide,
               front: adaptedCustom.front
                 ? {
-                    originalImageUrl: adaptedCustom.front.artworkUrl || adaptedCustom.front.originalImageUrl,
-                    width: adaptedCustom.front.widthPercent ?? adaptedCustom.front.width,
-                    x:   adaptedCustom.front.xOffsetPercent ?? adaptedCustom.front.x,
-                    y:   adaptedCustom.front.yOffsetPercent ?? adaptedCustom.front.y,
+                    originalImageUrl:
+                      adaptedCustom.front.artworkUrl ||
+                      adaptedCustom.front.originalImageUrl,
+                    width:
+                      adaptedCustom.front.widthPercent ??
+                      adaptedCustom.front.width,
+                    x:
+                      adaptedCustom.front.xOffsetPercent ??
+                      adaptedCustom.front.x,
+                    y:
+                      adaptedCustom.front.yOffsetPercent ??
+                      adaptedCustom.front.y,
                     rotation: adaptedCustom.front.rotation,
                   }
                 : null,
               back: adaptedCustom.back
                 ? {
-                    originalImageUrl: adaptedCustom.back.artworkUrl || adaptedCustom.back.originalImageUrl,
-                    width: adaptedCustom.back.widthPercent ?? adaptedCustom.back.width,
-                    x:   adaptedCustom.back.xOffsetPercent ?? adaptedCustom.back.x,
-                    y:   adaptedCustom.back.yOffsetPercent ?? adaptedCustom.back.y,
+                    originalImageUrl:
+                      adaptedCustom.back.artworkUrl ||
+                      adaptedCustom.back.originalImageUrl,
+                    width:
+                      adaptedCustom.back.widthPercent ??
+                      adaptedCustom.back.width,
+                    x:
+                      adaptedCustom.back.xOffsetPercent ?? adaptedCustom.back.x,
+                    y:
+                      adaptedCustom.back.yOffsetPercent ?? adaptedCustom.back.y,
                     rotation: adaptedCustom.back.rotation,
                   }
                 : null,
@@ -232,13 +337,26 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
           : null);
 
       if (custom) {
-        const stableId = editingCartItem.variantId || editingCartItem.lineItemId;
+        const stableId =
+          editingCartItem.variantId || editingCartItem.lineItemId;
 
-        setSelectedColor(editingCartItem.colorSelected || editingCartItem.color || canvas.availableColors[0]?.colorName || "");
-        setSelectedSize(editingCartItem.sizeSelected || editingCartItem.size || canvas.sizes[0]?.sizeCode || "");
+        setSelectedColor(
+          editingCartItem.colorSelected ||
+            editingCartItem.color ||
+            canvas.availableColors[0]?.colorName ||
+            "",
+        );
+        setSelectedSize(
+          editingCartItem.sizeSelected ||
+            editingCartItem.size ||
+            canvas.sizes[0]?.sizeCode ||
+            "",
+        );
 
         const loadDesignUrls = async () => {
-          let frontPreview = custom.front ? custom.front.originalImageUrl : null;
+          let frontPreview = custom.front
+            ? custom.front.originalImageUrl
+            : null;
           let backPreview = custom.back ? custom.back.originalImageUrl : null;
 
           if (custom.front?.originalImageUrl?.startsWith("blob:") && stableId) {
@@ -257,11 +375,13 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
             }
           }
 
-          // --- SYNCHRONOUS SIZE-AWARE SELF-HEALING ADAPTER ---
           const cfg = getTemplateConfig(canvas.title);
           const garmentDims = getGarmentDimensions(
-            canvas.title, 
-            editingCartItem.sizeSelected || editingCartItem.size || canvas.sizes[0]?.sizeCode || "M"
+            canvas.title,
+            editingCartItem.sizeSelected ||
+              editingCartItem.size ||
+              canvas.sizes[0]?.sizeCode ||
+              "M",
           );
           const printWidthRatio = cfg.printW_ref / cfg.B_ref;
           const maxPrintWidthCm = garmentDims.B * printWidthRatio;
@@ -269,13 +389,11 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
           const resolveInitialScale = (designNode) => {
             if (!designNode) return 50;
             const currentWidth = designNode.width;
-            
-            // If width < 15, it's a legacy physical centimeter value (e.g. 12.2 cm)
+
             if (currentWidth < 15) {
               const healedScale = (currentWidth / maxPrintWidthCm) * 100;
               return Math.min(100, Math.max(15, Math.round(healedScale)));
             }
-            // Otherwise, it represents the scale percentage directly
             return currentWidth;
           };
 
@@ -288,12 +406,19 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
                 ? {
                     file: "existing",
                     previewUrl: frontPreview,
-                    scale: frontScale, 
+                    scale: frontScale,
                     x: custom.front.x,
                     y: custom.front.y,
                     rotation: custom.front.rotation || 0,
                   }
-                : { file: null, previewUrl: null, scale: 50, x: 50, y: 50, rotation: 0 }
+                : {
+                    file: null,
+                    previewUrl: null,
+                    scale: 50,
+                    x: 50,
+                    y: 50,
+                    rotation: 0,
+                  },
             );
 
             setBackDesign(
@@ -301,12 +426,19 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
                 ? {
                     file: "existing",
                     previewUrl: backPreview,
-                    scale: backScale, 
+                    scale: backScale,
                     x: custom.back.x,
                     y: custom.back.y,
                     rotation: custom.back.rotation || 0,
                   }
-                : { file: null, previewUrl: null, scale: 50, x: 50, y: 50, rotation: 0 }
+                : {
+                    file: null,
+                    previewUrl: null,
+                    scale: 50,
+                    x: 50,
+                    y: 50,
+                    rotation: 0,
+                  },
             );
 
             setActiveSide(custom.printSide === "back" ? "back" : "front");
@@ -316,8 +448,22 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
         loadDesignUrls();
       }
     } else {
-      setFrontDesign({ file: null, previewUrl: null, scale: 50, x: 50, y: 50, rotation: 0 });
-      setBackDesign({ file: null, previewUrl: null, scale: 50, x: 50, y: 50, rotation: 0 });
+      setFrontDesign({
+        file: null,
+        previewUrl: null,
+        scale: 50,
+        x: 50,
+        y: 50,
+        rotation: 0,
+      });
+      setBackDesign({
+        file: null,
+        previewUrl: null,
+        scale: 50,
+        x: 50,
+        y: 50,
+        rotation: 0,
+      });
       setActiveSide("front");
     }
 
@@ -353,7 +499,9 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
     } else {
       setTemplateUrl(null);
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [activeTemplateId]);
 
   useEffect(() => {
@@ -382,12 +530,30 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
 
         <ControlPanel>
           <div>
-            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, fontFamily: "Tajawal", marginBottom: "0.15rem", color: "white" }}>
+            <h2
+              style={{
+                fontSize: "1.45rem",
+                fontWeight: 800,
+                fontFamily: "Tajawal",
+                marginBottom: "0.15rem",
+                color: "white",
+              }}
+            >
               {canvas.title}
             </h2>
-            <span style={{ fontFamily: "monospace", color: "#F07A48", fontWeight: 700, fontSize: "0.85rem" }}>
+            <span
+              style={{
+                fontFamily: "monospace",
+                color: "#F07A48",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+              }}
+            >
               {canvas.serialNumber}
             </span>
+            <SizingScrollButton onClick={handleScrollToSizeChart}>
+              <FaBookOpen /> {t("pod_studio.blank_specifications")}
+            </SizingScrollButton>
           </div>
 
           <OptionRow>
@@ -418,7 +584,11 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
               <SectionLabel>{t("pod_studio.sizes_title")}</SectionLabel>
               <CollapsiblePills $expanded={sizesExpanded}>
                 {canvas.sizes.map((s) => (
-                  <SizePill key={s.sizeCode} $active={selectedSize === s.sizeCode} onClick={() => setSelectedSize(s.sizeCode)}>
+                  <SizePill
+                    key={s.sizeCode}
+                    $active={selectedSize === s.sizeCode}
+                    onClick={() => setSelectedSize(s.sizeCode)}
+                  >
                     {s.sizeCode}
                   </SizePill>
                 ))}
@@ -431,19 +601,26 @@ const DesignWorkspace = ({ canvas, onClose, shopId, editingCartItem, onCommitSuc
             </OptionSection>
           </OptionRow>
 
-          {canvas.specifications.printableSurfaces.length > 1 && hasBackTemplate && (
-            <OptionSection>
-              <SectionLabel>{t("pod_studio.print_side")}</SectionLabel>
-              <SegmentedSideControl>
-                <SegmentButton $active={activeSide === "front"} onClick={() => setActiveSide("front")}>
-                  {t("pod_studio.front_side")}
-                </SegmentButton>
-                <SegmentButton $active={activeSide === "back"} onClick={() => setActiveSide("back")}>
-                  {t("pod_studio.back_side")}
-                </SegmentButton>
-              </SegmentedSideControl>
-            </OptionSection>
-          )}
+          {canvas.specifications.printableSurfaces.length > 1 &&
+            hasBackTemplate && (
+              <OptionSection>
+                <SectionLabel>{t("pod_studio.print_side")}</SectionLabel>
+                <SegmentedSideControl>
+                  <SegmentButton
+                    $active={activeSide === "front"}
+                    onClick={() => setActiveSide("front")}
+                  >
+                    {t("pod_studio.front_side")}
+                  </SegmentButton>
+                  <SegmentButton
+                    $active={activeSide === "back"}
+                    onClick={() => setActiveSide("back")}
+                  >
+                    {t("pod_studio.back_side")}
+                  </SegmentButton>
+                </SegmentedSideControl>
+              </OptionSection>
+            )}
 
           <DesignControls
             designState={activeDesignState}

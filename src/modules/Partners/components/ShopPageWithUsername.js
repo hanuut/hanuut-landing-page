@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useMemo } from "react";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 import { useParams, useLocation, useNavigate, useSearchParams } from "react-router-dom"; 
-import BackgroundImage from "../../../assets/background.webp";
+import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { usePalette } from "color-thief-react";
 
 import { fetchShopWithUsername, selectShop, selectShops } from "../state/reducers";
@@ -18,7 +18,6 @@ import { getImageUrl } from "../../../utils/imageUtils";
 import { light, partnerTheme } from "../../../config/Themes";
 
 import Loader from "../../../components/Loader";
-import NotFoundPage from "../../NotFoundPage";
 import MenuPage from "./MenuPage";
 import GroceryShopPage from "./GroceryShopPage";
 import GlobalShopLandingPage from "./GlobalShopLandingPage";
@@ -27,7 +26,8 @@ import Cart from "./Cart";
 import OrderSuccessModal from "./OrderSuccessModal"; 
 import BioLinksPage from "./BioLinksPage";
 import PodStudioDashboard from "../../PodStudio/components/StudioLanding/PodStudioDashboard";
-
+import { retrieveFile } from "../../PodStudio/utils/indexedDbHelper"; // --- SECURE BINARY STORAGE HOOK ---
+import NotFoundPage from "../../NotFoundPage";
 import { FaShoppingCart, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const DynamicThemeStyles = createGlobalStyle`
@@ -43,16 +43,11 @@ const Section = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background-image: url(${BackgroundImage});
   background-size: 100%;
   background-position: center;
   padding: 0;
   width: 100%;
   position: relative;
-  @media (max-width: 768px) {
-    justify-content: flex-start;
-    width: 100%;
-  }
 `;
 
 const PageWrapper = styled.div`
@@ -78,17 +73,6 @@ const CoverPhoto = styled.div`
   position: relative;
   background: ${props => props.$bgUrl ? `url(${props.$bgUrl}) center/cover no-repeat` : 'none'};
   overflow: hidden;
-
-  ${props => !props.$bgUrl && `
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: url(${props.$logoUrl}) center/cover no-repeat;
-      filter: blur(30px) scale(1.3);
-      opacity: 0.35;
-    }
-  `}
 
   &::after {
     content: '';
@@ -242,6 +226,33 @@ const hexToRgbString = (hex) => {
 
 const MAX_RETRIES = 2;
 
+const uploadAssetWithFallback = async (fileBlob) => {
+  const API_URL = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+  
+  // Try S3/Cloudinary first
+  try {
+    const formData = new FormData();
+    formData.append("file", fileBlob);
+    const res = await axios.post(`${API_URL}/image/upload`, formData, {
+      headers: { "Content-Type": "multipart/form-data" }
+    });
+    if (res.data && res.data.url) return res.data.url;
+  } catch (err) {
+    console.warn("Cloudinary upload failed, using NestJS database fallback...", err);
+  }
+
+  // Fallback: local MongoDB/GridFS
+  const fallbackData = new FormData();
+  fallbackData.append("image", fileBlob);
+  const fallbackRes = await axios.post(`${API_URL}/image`, fallbackData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+  if (fallbackRes.data && fallbackRes.data.id) {
+    return `${API_URL}/image/raw/${fallbackRes.data.id}`;
+  }
+  throw new Error("Failed to save custom asset across both primary and fallback backends.");
+};
+
 const ShopPageWithUsername = () => {
   const { username } = useParams();
   const location = useLocation();
@@ -295,7 +306,6 @@ const ShopPageWithUsername = () => {
     if (selectedShop?.imageId) dispatch(fetchImage(selectedShop.imageId));
   }, [dispatch, selectedShop]);
 
-  // Normalize and fetch shop categories at the root layer to avoid duplicate requests
   useEffect(() => {
     if (selectedShop && selectedShop.categories) {
       const validCategoryIds = selectedShop.categories
@@ -307,7 +317,6 @@ const ShopPageWithUsername = () => {
     }
   }, [dispatch, selectedShop]);
 
-  // Route protection
   useEffect(() => {
     if (selectedShop && isLinksRoute) {
       const bioLinksActive = selectedShop.shopSettings?.bioLinks?.isActive;
@@ -385,7 +394,7 @@ const ShopPageWithUsername = () => {
     }
   }
 
-  const handleCardClick = (product) => { /* Details are handled inline now */ };
+  const handleCardClick = (product) => {};
   const handleAddToCart = (variant) => dispatch(addToCart({ ...variant, shopId: selectedShop?._id || selectedShop?.id }));
   const handleUpdateQuantity = (variantId, newQuantity) => dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
 
@@ -395,32 +404,75 @@ const ShopPageWithUsername = () => {
 
     const activeProducts = customerDetails.healedProducts || shopCartItems;
 
-    const orderPayload = {
-      shopId: selectedShop._id,
-      customerName: customerDetails.customerName,
-      customerPhone: customerDetails.customerPhone,
-      deliveryInfo: customerDetails.note || "No note",
-      note: customerDetails.note,
-      deliveryPricing: customerDetails.deliveryOption?.price || 0,
-      deliveryOptionKeyword: customerDetails.deliveryOption?.type === "STOP_DESK" ? "stop_desk" : "byShop",
-      state: customerDetails.address?.wilaya,
-      city: customerDetails.address?.commune,
-      addressLine: customerDetails.address?.addressLine || "Home Delivery",
-      gpsLocation: customerDetails.gpsLocation,
-      shopDomainKeyword: "global",
-      
-      products: activeProducts.map((item) => ({
-        productId: item.productId,
-        title: item.title,
-        quantity: item.quantity,
-        sellingPrice: item.sellingPrice, 
-        categoryId: item.categoryId || item.product?.categoryId,
-        supplementary: item.color && item.size ? `${item.color},${item.size}` : undefined,
-        podCustomization: item.podCustomization 
-      })),
-    };
-
     try {
+      // --- SYNCHRONOUS HANDOFF VALIDATION ---
+      const resolvedProducts = await Promise.all(
+        activeProducts.map(async (item) => {
+          if (!item.podCustomization) return item;
+
+          const custom = { ...item.podCustomization };
+          const stableId = item.variantId;
+
+          if (custom.front && custom.front.imageUrl && custom.front.imageUrl.startsWith("blob:")) {
+            const fileBlob = await retrieveFile(`${stableId}_front`);
+            if (fileBlob) {
+              const permanentUrl = await uploadAssetWithFallback(fileBlob);
+              custom.front = {
+                ...custom.front,
+                imageUrl: permanentUrl,
+                imageId: permanentUrl,
+                originalImageUrl: permanentUrl,
+                originalImageId: permanentUrl,
+              };
+            }
+          }
+
+          if (custom.back && custom.back.imageUrl && custom.back.imageUrl.startsWith("blob:")) {
+            const fileBlob = await retrieveFile(`${stableId}_back`);
+            if (fileBlob) {
+              const permanentUrl = await uploadAssetWithFallback(fileBlob);
+              custom.back = {
+                ...custom.back,
+                imageUrl: permanentUrl,
+                imageId: permanentUrl,
+                originalImageUrl: permanentUrl,
+                originalImageId: permanentUrl,
+              };
+            }
+          }
+
+          return {
+            ...item,
+            podCustomization: custom,
+          };
+        })
+      );
+
+      const orderPayload = {
+        shopId: selectedShop._id,
+        customerName: customerDetails.customerName,
+        customerPhone: customerDetails.customerPhone,
+        deliveryInfo: customerDetails.note || "No note",
+        note: customerDetails.note,
+        deliveryPricing: customerDetails.deliveryOption?.price || 0,
+        deliveryOptionKeyword: customerDetails.deliveryOption?.type === "STOP_DESK" ? "stop_desk" : "byShop",
+        state: customerDetails.address?.wilaya,
+        city: customerDetails.address?.commune,
+        addressLine: customerDetails.address?.addressLine || "Home Delivery",
+        gpsLocation: customerDetails.gpsLocation,
+        shopDomainKeyword: "global",
+        
+        products: resolvedProducts.map((item) => ({
+          productId: item.productId,
+          title: item.title,
+          quantity: item.quantity,
+          sellingPrice: item.sellingPrice, 
+          categoryId: item.categoryId || item.product?.categoryId,
+          supplementary: item.color && item.size ? `${item.color},${item.size}` : undefined,
+          podCustomization: item.podCustomization 
+        })),
+      };
+
       const response = await createGlobalOrder(orderPayload);
       const orderResult = response.data;
 
@@ -432,13 +484,12 @@ const ShopPageWithUsername = () => {
 
       setIsSubmitting("success");
 
-      // Clear the cart for this shop after success
       shopCartItems.forEach((item) =>
         dispatch(updateCartQuantity({ variantId: item.variantId, quantity: 0 }))
       );
     } catch (error) {
       console.error("Global Order Placement Failed:", error);
-      const backendMessage = error.response?.data?.message;
+      const backendMessage = error.response?.data?.message || error.message;
       setOrderErrorMsg(backendMessage || t("order_error_message"));
       setIsSubmitting("error");
       setTimeout(() => {
@@ -465,10 +516,9 @@ const ShopPageWithUsername = () => {
   if (loading || (error && retryCount < MAX_RETRIES)) return <Section><Loader fullscreen={false} /></Section>;
   if (error && retryCount >= MAX_RETRIES) return <NotFoundPage />;
 
-   if (selectedShop && Object.keys(selectedShop).length > 0 && selectedShopImage && domainKeyWord) {
+  if (selectedShop && Object.keys(selectedShop).length > 0 && selectedShopImage && domainKeyWord) {
     const isPodEnabled = selectedShop?.shopSettings?.printOnDemand === true;
 
-    // --- DIRECT SYSTEM HANDOFF ---
     if (isPodEnabled) {
       return (
         <PodStudioDashboard 
@@ -504,7 +554,6 @@ const ShopPageWithUsername = () => {
           
           <Seo title={metaTitle} description={metaDesc} url={currentUrl} image={shopImage} shop={!isLinksRoute ? selectedShop : null} />
 
-          {/* --- RENDER BIO LINKS OR STANDARD SHOP --- */}
           {isLinksRoute && selectedShop.shopSettings?.bioLinks?.isActive ? (
             <BioLinksPage shop={selectedShop} />
           ) : (
@@ -563,7 +612,6 @@ const ShopPageWithUsername = () => {
                         {...pageProps}
                       />
                       
-                      {/* --- RENDER THE CART MODAL CONTAINER HERE --- */}
                       <Cart
                         items={shopCartItems}
                         onUpdateQuantity={handleUpdateQuantity}
@@ -575,7 +623,6 @@ const ShopPageWithUsername = () => {
                         onEditCustomItem={handleEditCustomItem} 
                       />
 
-                      {/* --- SUCCESS RECEIPT MODAL --- */}
                       <AnimatePresence>
                         {orderSuccessData && (
                           <OrderSuccessModal
@@ -585,7 +632,6 @@ const ShopPageWithUsername = () => {
                         )}
                       </AnimatePresence>
 
-                      {/* Only render Floating Cart Pill on Global shop type */}
                       {shopCartItems.length > 0 && (
                         <FloatingCartPill 
                           onClick={() => dispatch(openCart())}

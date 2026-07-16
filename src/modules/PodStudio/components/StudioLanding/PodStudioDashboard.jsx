@@ -1,10 +1,9 @@
-// src/modules/PodStudio/components/StudioLanding/PodStudioDashboard.jsx
-
 import React, { useState, useMemo, useEffect } from "react";
 import PropTypes from "prop-types";
 import styled, { ThemeProvider } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
 import { FaShoppingCart, FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import {
   selectCart,
@@ -28,6 +27,7 @@ import Seo from "../../../../components/Seo";
 import { createGlobalOrder } from "../../../Partners/services/orderServices";
 import OrderSuccessModal from "../../../Partners/components/OrderSuccessModal";
 import { AnimatePresence, motion } from "framer-motion";
+import { retrieveFile } from "../../utils/indexedDbHelper"; // --- SECURE BINARY RETRIEVAL HOOK ---
 
 const LayoutShell = styled.div`
   min-height: 100vh;
@@ -162,6 +162,31 @@ const HiddenCartTriggerWrapper = styled.div`
   }
 `;
 
+const uploadAssetWithFallback = async (fileBlob) => {
+  const API_URL = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+  
+  try {
+    const formData = new FormData();
+    formData.append("file", fileBlob);
+    const res = await axios.post(`${API_URL}/image/upload`, formData, {
+      headers: { "Content-Type": "multipart/form-data" }
+    });
+    if (res.data && res.data.url) return res.data.url;
+  } catch (err) {
+    console.warn("Cloudinary upload failed, using NestJS database fallback...", err);
+  }
+
+  const fallbackData = new FormData();
+  fallbackData.append("image", fileBlob);
+  const fallbackRes = await axios.post(`${API_URL}/image`, fallbackData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+  if (fallbackRes.data && fallbackRes.data.id) {
+    return `${API_URL}/image/raw/${fallbackRes.data.id}`;
+  }
+  throw new Error("Failed to save custom asset across both primary and fallback backends.");
+};
+
 const PodStudioDashboard = ({ shop, selectedShopImage }) => {
   const { i18n, t } = useTranslation();
   const dispatch = useDispatch();
@@ -183,10 +208,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
     return cart.filter((item) => item.shopId === shopIdValue);
   }, [cart, shop]);
 
-  const shopLogoUrl = useMemo(
-    () => getImageUrl(selectedShopImage),
-    [selectedShopImage],
-  );
+  const shopLogoUrl = useMemo(() => getImageUrl(selectedShopImage), [selectedShopImage]);
 
   const seoMetadata = useMemo(() => {
     const shopTitle = shop.name || "AF Print Studio";
@@ -250,7 +272,6 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
     dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
   };
 
-  // --- RESTORED HELPER: Scrolls down to library segment on CTA click ---
   const handleEnterWorkspace = () => {
     const el = document.getElementById("canvas-library-anchor");
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -262,36 +283,75 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
 
     const activeProducts = customerDetails.healedProducts || shopCartItems;
 
-    const orderPayload = {
-      shopId: shop._id || shop.id,
-      customerName: customerDetails.customerName,
-      customerPhone: customerDetails.customerPhone,
-      deliveryInfo: customerDetails.note || "No note",
-      note: customerDetails.note,
-      deliveryPricing: customerDetails.deliveryOption?.price || 0,
-      deliveryOptionKeyword:
-        customerDetails.deliveryOption?.type === "STOP_DESK"
-          ? "stop_desk"
-          : "byShop",
-      state: customerDetails.address?.wilaya,
-      city: customerDetails.address?.commune,
-      addressLine: customerDetails.address?.addressLine || "Home Delivery",
-      gpsLocation: customerDetails.gpsLocation,
-      shopDomainKeyword: "global",
-
-      products: activeProducts.map((item) => ({
-        productId: item.productId,
-        title: item.title,
-        quantity: item.quantity,
-        sellingPrice: item.sellingPrice,
-        categoryId: item.categoryId || item.product?.categoryId,
-        supplementary:
-          item.color && item.size ? `${item.color},${item.size}` : undefined,
-        podCustomization: item.podCustomization,
-      })),
-    };
-
     try {
+      // --- SYNCHRONOUS HANDOFF VALIDATION ---
+      const resolvedProducts = await Promise.all(
+        activeProducts.map(async (item) => {
+          if (!item.podCustomization) return item;
+
+          const custom = { ...item.podCustomization };
+          const stableId = item.variantId;
+
+          if (custom.front && custom.front.imageUrl && custom.front.imageUrl.startsWith("blob:")) {
+            const fileBlob = await retrieveFile(`${stableId}_front`);
+            if (fileBlob) {
+              const permanentUrl = await uploadAssetWithFallback(fileBlob);
+              custom.front = {
+                ...custom.front,
+                imageUrl: permanentUrl,
+                imageId: permanentUrl,
+                originalImageUrl: permanentUrl,
+                originalImageId: permanentUrl,
+              };
+            }
+          }
+
+          if (custom.back && custom.back.imageUrl && custom.back.imageUrl.startsWith("blob:")) {
+            const fileBlob = await retrieveFile(`${stableId}_back`);
+            if (fileBlob) {
+              const permanentUrl = await uploadAssetWithFallback(fileBlob);
+              custom.back = {
+                ...custom.back,
+                imageUrl: permanentUrl,
+                imageId: permanentUrl,
+                originalImageUrl: permanentUrl,
+                originalImageId: permanentUrl,
+              };
+            }
+          }
+
+          return {
+            ...item,
+            podCustomization: custom,
+          };
+        })
+      );
+
+      const orderPayload = {
+        shopId: shop._id || shop.id,
+        customerName: customerDetails.customerName,
+        customerPhone: customerDetails.customerPhone,
+        deliveryInfo: customerDetails.note || "No note",
+        note: customerDetails.note,
+        deliveryPricing: customerDetails.deliveryOption?.price || 0,
+        deliveryOptionKeyword: customerDetails.deliveryOption?.type === "STOP_DESK" ? "stop_desk" : "byShop",
+        state: customerDetails.address?.wilaya,
+        city: customerDetails.address?.commune,
+        addressLine: customerDetails.address?.addressLine || "Home Delivery",
+        gpsLocation: customerDetails.gpsLocation,
+        shopDomainKeyword: "global",
+
+        products: resolvedProducts.map((item) => ({
+          productId: item.productId,
+          title: item.title,
+          quantity: item.quantity,
+          sellingPrice: item.sellingPrice,
+          categoryId: item.categoryId || item.product?.categoryId,
+          supplementary: item.color && item.size ? `${item.color},${item.size}` : undefined,
+          podCustomization: item.podCustomization,
+        })),
+      };
+
       const response = await createGlobalOrder(orderPayload);
       const orderResult = response.data;
 
@@ -303,15 +363,12 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
 
       setIsSubmitting("success");
 
-      // Clear the cart for this shop after success
       shopCartItems.forEach((item) =>
-        dispatch(
-          updateCartQuantity({ variantId: item.variantId, quantity: 0 }),
-        ),
+        dispatch(updateCartQuantity({ variantId: item.variantId, quantity: 0 }))
       );
     } catch (error) {
       console.error("Global Order Placement Failed:", error);
-      const backendMessage = error.response?.data?.message;
+      const backendMessage = error.response?.data?.message || error.message;
       setOrderErrorMsg(backendMessage || t("order_error_message"));
       setIsSubmitting("error");
       setTimeout(() => {
@@ -326,9 +383,8 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
     setOrderSuccessData(null);
   };
 
-  // SECURE EDIT TRIGGER: Closes the active Cart overlay modal before initiating editor state load
   const handleEditCustomItem = (cartItem) => {
-    dispatch(closeCart()); // <-- FIXED: MODAL CLOSES NATIVELY
+    dispatch(closeCart()); 
     setEditingCartItem(cartItem);
     dispatch(fetchProductById(cartItem.productId))
       .unwrap()
@@ -358,9 +414,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
                   <span>{t("pod_studio.btn_back")}</span>
                 </BackButton>
               )}
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "12px" }}
-              >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }} >
                 {shopLogoUrl ? (
                   <StudioLogo src={shopLogoUrl} alt={shop.name} />
                 ) : (
@@ -387,10 +441,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
                 <FaShoppingCart />
                 {shopCartItems.length > 0 && (
                   <span>
-                    {shopCartItems.reduce(
-                      (acc, item) => acc + item.quantity,
-                      0,
-                    )}{" "}
+                    {shopCartItems.reduce((acc, item) => acc + item.quantity, 0)}{" "}
                     {t("pod_studio.tray_title")}
                   </span>
                 )}
@@ -409,10 +460,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
           ) : (
             <>
               <StudioHero onEnterWorkspace={handleEnterWorkspace} />
-              <div
-                id="canvas-library-anchor"
-                style={{ width: "100%", paddingTop: "1rem" }}
-              >
+              <div id="canvas-library-anchor" style={{ width: "100%", paddingTop: "1rem" }} >
                 <CanvasLibrary
                   shopId={shop._id || shop.id}
                   onSelectCanvas={handleSelectCanvas}
