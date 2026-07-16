@@ -3,8 +3,8 @@ import styled from "styled-components";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import { light } from "../../../config/Themes";
 import CartIcon from "../../../assets/icons/cart.svg";
-import { useSelector } from "react-redux";
-import { selectCart } from "../state/reducers";
+import { useSelector, useDispatch } from "react-redux";
+import { selectCart, selectIsCartOpen, openCart, closeCart } from "../state/reducers";
 import { ActionButton } from "../../../components/ActionButton";
 import CartElementsGrid from "./CartElementsGrid";
 import AddressesDropDown from "../../../components/AddressesDropDown";
@@ -39,19 +39,6 @@ const CartContent = styled.div`
   @media (max-width: 768px) {
   }
 `;
-
-// const CartElementContainer = styled.div`
-//   width: 100%;
-//   display: flex;
-//   align-items: center;
-//   justify-content: flex-start;
-//   flex-direction: column;
-//   overflow: scroll;
-//   flex: 8;
-//   padding: 1rem 0;
-//   @media (max-width: 768px) {
-//   }
-// `;
 
 const CartDetails = styled.div`
   width: 95%;
@@ -148,8 +135,11 @@ const Button = styled.button`
 
 const Cart = ({ shopId }) => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  
   const { cart } = useSelector(selectCart);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const isCartOpen = useSelector(selectIsCartOpen);
+
   const [filteredCartItems, setFilteredCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [selectedForm, setSelectedForm] = useState(0);
@@ -159,80 +149,24 @@ const Cart = ({ shopId }) => {
   const [address, setAddress] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  // const [successMessage, setSuccessMessage] = useState("");
-  // const [isAccepted, setIsAccepted] = useState(false);
 
   const handleChooseAddress = (newAddress) => {
     setAddress(newAddress);
   };
 
-  // const handleSubscribe = async (event) => {
-  //   event.preventDefault();
-  //   if (
-  //     !fullName ||
-  //     !phone ||
-  //     !address ||
-  //     !email ||
-  //     !address.wilaya ||
-  //     !address.commune
-  //   ) {
-  //     setErrorMessage(t("errorFillAllFields"));
-  //     return;
-  //   }
-  //   if (!isValidPhone(phone)) {
-  //     setErrorMessage(t("errorPhoneNotValid"));
-  //     return;
-  //   }
-  //   if (!isValidEmail(email)) {
-  //     setErrorMessage(t("errorEmailNotValid"));
-  //     return;
-  //   }
-  //   setErrorMessage("");
-  //   setIsSubmitting(true);
-
-  //   const isPhoneUsed = await checkPhoneNumberAvailability(phone);
-
-  //   if (isPhoneUsed === true) {
-  //     const subscribeRequest = await getSubscribeRequest(phone);
-  //     if (subscribeRequest.isAccepted === true) {
-  //       setSuccessMessage(t("clickToDownloadApp"));
-  //       setIsAccepted(true);
-  //     } else {
-  //       setSuccessMessage(t("messagePhoneIsUsed"));
-  //       setIsAccepted(false);
-  //     }
-  //     setIsSubmitting(false);
-  //     return;
-  //   } else {
-  //     setIsAccepted(false);
-  //     const data = {
-  //       fullName: fullName,
-  //       phone: phone,
-  //       email: email,
-  //       wilaya: address.wilaya,
-  //       commune: address.commune,
-  //       type: "driver",
-  //     };
-
-  //     const response = postSubscribeRequest(data);
-  //     if (!response) {
-  //       setErrorMessage(t("errorCouldNotSubscribe"));
-  //     } else {
-  //       setErrorMessage("");
-  //       setSuccessMessage(t("partnersFormThankYouSubTitle"));
-  //     }
-  //     setIsSubmitting(false);
-  //   }
-  // };
-
   const handleSubscribe = async (event) => {};
+  
   const onCartClick = () => {
-    setIsCartOpen(!isCartOpen);
+    if (isCartOpen) {
+      dispatch(closeCart());
+    } else {
+      dispatch(openCart());
+    }
   };
 
   useEffect(() => {
     const filteredCartItemsPerShop = cart.filter((cartItem) => {
-      return (cartItem.shopId || item.product?.shopId) === shopId;
+      return (cartItem.shopId || cartItem.product?.shopId) === shopId;
     });
     setFilteredCartItems(filteredCartItemsPerShop);
   }, [shopId, cart]);
@@ -248,6 +182,7 @@ const Cart = ({ shopId }) => {
   const onProceedClick = (e) => {
     setSelectedForm(1);
   };
+
   return (
     <Section>
       <ButtonWithIcon

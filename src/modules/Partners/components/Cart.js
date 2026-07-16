@@ -1,38 +1,27 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
-import { useDispatch, useSelector } from "react-redux";
-import { getImage } from "../../Images/services/imageServices";
-import { getImageUrl } from "../../../utils/imageUtils";
-import axios from "axios";
-
-// --- Redux & Hooks ---
-import { closeCart, selectIsCartOpen, updateCartQuantity } from "../../Cart/state/reducers";
-import {
-  detectUserLocation,
-  setManualLocation,
-  selectLocation,
-} from "../../Location/state/reducers";
-import useDeliveryCalculator from "../../../hooks/useDeliveryCalculator";
-
-// --- RE-ADDED MISSING COMPONENT IMPORTS ---
-import Loader from "../../../components/Loader";
+import ButtonWithIcon from "../../../components/ButtonWithIcon";
+import { light } from "../../../config/Themes";
+import CartIcon from "../../../assets/icons/cart.svg";
+import { useSelector, useDispatch } from "react-redux";
+import { selectCart, selectIsCartOpen, openCart, closeCart, updateCartQuantity } from "../../Cart/state/reducers";
+import { ActionButton } from "../../../components/ActionButton";
+import CartElementsGrid from "../../Cart/components/CartElementsGrid";
 import AddressesDropDown from "../../../components/AddressesDropDown";
+import { useTranslation } from "react-i18next";
+import { fetchImage, selectSelectedShopImage } from "../../Images/state/reducers";
+import { getImageUrl } from "../../../utils/imageUtils";
+import { getImage } from "../../Images/services/imageServices";
+import { motion, AnimatePresence } from "framer-motion";
+import Loader from "../../../components/Loader";
+import { FaTimes, FaLocationArrow, FaUtensils, FaMotorcycle, FaGlobeAfrica, FaBoxOpen, FaEdit, FaExpand } from "react-icons/fa";
+import { detectUserLocation, setManualLocation, selectLocation } from "../../Location/state/reducers";
+import useDeliveryCalculator from "../../../hooks/useDeliveryCalculator";
+import { retrieveFile } from "../../PodStudio/utils/indexedDbHelper";
+import { getFittedPrintZoneRatios, getGarmentDimensions } from "../../PodStudio/hooks/usePrintableArea";
+import PodMockupPreview from "../../PodStudio/components/Workspace/PodMockupPreview";
 
-// --- Icons ---
-import {
-  FaTimes,
-  FaLocationArrow,
-  FaUtensils,
-  FaMotorcycle,
-  FaGlobeAfrica,
-  FaBoxOpen,
-  FaEdit,
-  FaExpand
-} from "react-icons/fa";
 
-// --- Styled Components ---
 const ModalBackdrop = styled(motion.div)`
   position: fixed;
   inset: 0;
@@ -247,7 +236,7 @@ const SegmentButton = styled.button`
 const DeliveryCard = styled.div`
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid
-    ${(props) => (props.$error ? "#EF4444" : "rgba(255, 255, 255, 0.1)")};
+    ${(props) => (props.$error ? "#EF4444" : "rgba(255, 255, 255, 0.05)")};
   border-radius: 16px;
   padding: 1rem;
 `;
@@ -425,17 +414,24 @@ const LightboxOverlay = styled(motion.div)`
   cursor: zoom-out;
 `;
 
-const LightboxContent = styled(motion.div)`
+const LightboxContent = styled.div`
   display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   width: 100%;
   max-width: 900px;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap; 
 `;
 
-// --- LIVE MINIATURE MOCKUP COMPONENT ---
+const LightboxPreviewsRow = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
 const GrowableImageWrapper = styled.div`
   width: 54px;
   height: 54px;
@@ -452,23 +448,40 @@ const GrowableImageWrapper = styled.div`
   gap: 2px;
 `;
 
+
+
 const MiniWorkspace = styled.div`
   position: relative;
-  width: ${props => props.$isDouble ? '26px' : '52px'};
+  width: 54px;
   height: 54px;
-  background: #E5E5E5;
+  background-color: #0c0c0e;
+  border-radius: 10px;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const MiniBaseShirt = styled.img`
   width: 100%;
   height: 100%;
   object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
 `;
 
-const MiniPrintArea = styled.div`
+const DynamicMiniPrintArea = styled.div`
   position: absolute;
-  top: 18%; left: 20%; width: 60%; height: 70%;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  
+  /* Precision positioning and sizing based on getFittedPrintZoneRatios output */
+  top: ${props => props.$top}%;
+  left: ${props => props.$left}%;
+  width: ${props => props.$width}%;
+  height: ${props => props.$height}%;
 `;
 
 const MiniDesign = styled.img`
@@ -488,67 +501,18 @@ const ZoomOverlayIcon = styled.div`
   z-index: 5;
 `;
 
-const MiniMockupPreview = ({ item, templatesMap, onClick }) => {
-  const custom = item.podCustomization;
-  if (!custom) return null;
-
-  const isDouble = custom.printSide === 'double';
-  const avail = item.product?.availabilities?.find(a => String(a.color).toLowerCase() === String(item.color).toLowerCase());
-
-  const frontTemplate = avail?.podFrontTemplateId ? templatesMap[avail.podFrontTemplateId] : null;
-  const backTemplate = avail?.podBackTemplateId ? templatesMap[avail.podBackTemplateId] : null;
-
-  return (
-    <GrowableImageWrapper onClick={onClick}>
-      <ZoomOverlayIcon><FaExpand /></ZoomOverlayIcon>
-      {custom.front && (
-        <MiniWorkspace $isDouble={isDouble}>
-          <MiniBaseShirt src={frontTemplate} />
-          <MiniPrintArea>
-            <MiniDesign 
-              src={custom.front.originalImageUrl} 
-              style={{
-                left: `${custom.front.x}%`,
-                top: `${custom.front.y}%`,
-                width: `${custom.front.width}%`,
-                transform: `translate(-50%, -50%) rotate(${custom.front.rotation || 0}deg)`
-              }}
-            />
-          </MiniPrintArea>
-        </MiniWorkspace>
-      )}
-
-      {custom.back && (
-        <MiniWorkspace $isDouble={isDouble}>
-          <MiniBaseShirt src={backTemplate} />
-          <MiniPrintArea>
-            <MiniDesign 
-              src={custom.back.originalImageUrl} 
-              style={{
-                left: `${custom.back.x}%`,
-                top: `${custom.back.y}%`,
-                width: `${custom.back.width}%`,
-                transform: `translate(-50%, -50%) rotate(${custom.back.rotation || 0}deg)`
-              }}
-            />
-          </MiniPrintArea>
-        </MiniWorkspace>
-      )}
-    </GrowableImageWrapper>
-  );
-};
-
 const LbWorkspace = styled.div`
   position: relative;
-  width: 400px;
-  height: 400px;
-  background: #E5E5E5;
-  border-radius: 16px;
+  width: 380px;
+  height: 380px;
+  background: #0c0c0e;
+  border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 
   @media(max-width: 500px) {
     width: 280px;
@@ -556,10 +520,27 @@ const LbWorkspace = styled.div`
   }
 `;
 
-const LbPrintArea = styled.div`
+const DynamicLbPrintArea = styled.div`
   position: absolute;
-  top: 15%; left: 20%; width: 60%; height: 70%;
   border: 1px dashed rgba(57, 161, 112, 0.4);
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  
+  /* Precision positioning and sizing */
+  top: ${props => props.$top}%;
+  left: ${props => props.$left}%;
+  width: ${props => props.$width}%;
+  height: ${props => props.$height}%;
+`;
+
+const LightboxActions = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: auto;
 `;
 
 const CustomItemEditBtn = styled.button`
@@ -586,49 +567,35 @@ const CustomItemEditBtn = styled.button`
   }
 `;
 
-// ============================================================================
-// CONTINUOUS PRICING SCALER (DUPLICATED FOR SELF-HEALING SYNC)
-// ============================================================================
-const interpolateValue = (x, nodes) => {
-  if (x <= nodes[0].x) return nodes[0].y;
-  if (x >= nodes[nodes.length - 1].x) return nodes[nodes.length - 1].y;
+const LbButton = styled.button`
+  padding: 0.8rem 1.8rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  font-family: 'Tajawal', sans-serif;
+  transition: transform 0.2s;
 
-  for (let i = 0; i < nodes.length - 1; i++) {
-    const p1 = nodes[i];
-    const p2 = nodes[i + 1];
-    if (x >= p1.x && x <= p2.x) {
-      return p1.y + ((x - p1.x) / (p2.x - p1.x)) * (p2.y - p1.y);
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  ${props => props.$primary ? `
+    background: ${props.theme.primaryColor};
+    color: #000;
+  ` : `
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
     }
-  }
-  return nodes[nodes.length - 1].y;
-};
-
-const getRawPrintCost = (widthCm, heightCm) => {
-  const largestSide = Math.max(widthCm, heightCm);
-  const smallestSide = Math.min(widthCm, heightCm);
-
-  let printCost = 0;
-
-  if (widthCm <= 30 || heightCm <= 30) {
-    const x = largestSide;
-    const nodes = [
-      { x: 0, y: 20 }, { x: 5, y: 60 }, { x: 10, y: 110 }, { x: 15, y: 180 },
-      { x: 20, y: 270 }, { x: 25, y: 380 }, { x: 30, y: 440 }, { x: 35, y: 500 },
-      { x: 40, y: 560 }, { x: 45, y: 610 }, { x: 50, y: 680 }, { x: 55, y: 740 },
-      { x: 60, y: 800 }
-    ];
-    printCost = interpolateValue(x, nodes);
-  } else {
-    const x = smallestSide;
-    const nodes = [
-      { x: 30, y: 860 }, { x: 35, y: 960 }, { x: 40, y: 1100 }, { x: 45, y: 1220 },
-      { x: 50, y: 1460 }, { x: 60, y: 1600 }
-    ];
-    printCost = interpolateValue(x, nodes);
-  }
-
-  return Math.round(printCost);
-};
+  `}
+`;
 
 const Cart = ({
   items,
@@ -638,11 +605,13 @@ const Cart = ({
   shopDomain,
   shopId,
   orderErrorMsg,
-  onEditCustomItem 
+  onEditCustomItem,
+  orderSuccessData,
+  onClearSuccess,
 }) => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
-  const isOpen = useSelector(selectIsCartOpen);
+  const isCartOpen = useSelector(selectIsCartOpen);
   const locationState = useSelector(selectLocation);
   const isArabic = i18n.language === "ar";
 
@@ -656,9 +625,9 @@ const Cart = ({
   const [selectedStopDeskOffice, setSelectedStopDeskOffice] = useState("");
   const [zoomedItem, setZoomedItem] = useState(null);
   const [manualAddressLine, setManualAddressLine] = useState("");
-  
-  const [templatesMap, setTemplatesMap] = useState({});
-  const [freshProductDb, setFreshProductData] = useState({});
+
+  const [zoomFrontUrl, setZoomFrontUrl] = useState(null);
+  const [zoomBackUrl, setZoomBackUrl] = useState(null);
 
   const cleanItems = useMemo(() => {
     if (!items || items.length === 0) return [];
@@ -675,115 +644,15 @@ const Cart = ({
     );
   }, [items]);
 
-  useEffect(() => {
-    if (isOpen && cleanItems.length > 0) {
-      const uniqueProductIds = [...new Set(cleanItems.map(item => item.productId))];
-      
-      uniqueProductIds.forEach(id => {
-        axios.get(`${process.env.REACT_APP_API_PROD_URL}/global-product/findById/${id}`)
-          .then(res => {
-            if (res.data) {
-              setFreshProductData(prev => ({ ...prev, [id]: res.data }));
-            }
-          })
-          .catch(err => console.error("Self-healing background fetch failed:", err));
-      });
-    }
-  }, [isOpen, cleanItems]); 
-
-  useEffect(() => {
-    cleanItems.forEach(item => {
-      if (item.podCustomization) {
-        const avail = item.product?.availabilities?.find(a => String(a.color).toLowerCase() === String(item.color).toLowerCase());
-        
-        const fetchAndMap = (id) => {
-          if (!id) return;
-          getImage(id).then(res => {
-            if (res.data) {
-              setTemplatesMap(prev => {
-                if (prev[id]) return prev;
-                return { ...prev, [id]: getImageUrl(res.data) };
-              });
-            }
-          });
-        };
-
-        if (avail) {
-          fetchAndMap(avail.podFrontTemplateId);
-          fetchAndMap(avail.podBackTemplateId);
-        }
-      }
-    });
-  }, [cleanItems]); 
-
-  useEffect(() => {
-    if (items && cleanItems.length !== items.length) {
-      items.forEach((item) => {
-        const isValid = cleanItems.some((c) => c.variantId === item.variantId);
-        if (!isValid && item.variantId) {
-          dispatch(
-            updateCartQuantity({ variantId: item.variantId, quantity: 0 }),
-          );
-        }
-      });
-    }
-  }, [items, cleanItems, dispatch]);
-
-  const recomputedItems = useMemo(() => {
-    return cleanItems.map(item => {
-      const freshProduct = freshProductDb[item.productId];
-      if (!freshProduct) return item; 
-
-      const [targetColor, targetSize] = (item.supplementary || `${item.color},${item.size}`).split(',');
-      const normalize = (val) => String(val ?? '').trim().toLowerCase();
-
-      const matchedAvailability = freshProduct.availabilities?.find(
-        (av) => normalize(av.color) === normalize(targetColor)
-      );
-      const matchedSize = matchedAvailability?.sizes?.find(
-        (s) => normalize(s.size) === normalize(targetSize)
-      );
-
-      if (!matchedSize) return item; 
-
-      const baseApparelCost = matchedSize.sellingPrice;
-      let rawPrintCostTotal = 0;
-      let activeSidesCount = 0;
-
-      if (item.podCustomization) {
-        const custom = item.podCustomization;
-        if (custom.front) {
-          const wCm = (custom.front.width / 100) * ((freshProduct.printableAreaWidthMm || 280) / 10);
-          const hCm = (custom.front.height / 100) * ((freshProduct.printableAreaHeightMm || 350) / 10);
-          rawPrintCostTotal += getRawPrintCost(wCm, hCm);
-          activeSidesCount++;
-        }
-        if (custom.back) {
-          const wCm = (custom.back.width / 100) * ((freshProduct.printableAreaWidthMm || 280) / 10);
-          const hCm = (custom.back.height / 100) * ((freshProduct.printableAreaHeightMm || 350) / 10);
-          rawPrintCostTotal += getRawPrintCost(wCm, hCm);
-          activeSidesCount++;
-        }
-      }
-
-      const healedPrice = baseApparelCost + rawPrintCostTotal + (50 * activeSidesCount);
-
-      return {
-        ...item,
-        sellingPrice: healedPrice 
-      };
-    });
-  }, [cleanItems, freshProductDb]);
-
   const itemsTotal = useMemo(
     () =>
-      recomputedItems.reduce((sum, item) => {
+      cleanItems.reduce((sum, item) => {
         return sum + parseInt(item.sellingPrice, 10) * item.quantity;
       }, 0),
-    [recomputedItems],
+    [cleanItems],
   );
 
-  const shouldCalculate = isOpen && cleanItems.length > 0;
+  const shouldCalculate = isCartOpen && cleanItems.length > 0;
   const {
     isLoading: calcLoading,
     error: calcError,
@@ -857,12 +726,12 @@ const Cart = ({
             commune: locationState.communeName,
             addressLine: manualAddressLine || "Home Delivery",
           },
-      healedProducts: recomputedItems 
+      healedProducts: cleanItems 
     };
     onSubmitOrder(orderDetails);
   };
-
-  const renderDeliverySection = () => {
+  
+  function renderDeliverySection() {
     if (shopDomain === "food") {
       if (locationState.status === "idle" || locationState.status === "error") {
         return (
@@ -1054,9 +923,9 @@ const Cart = ({
       );
     }
     return null;
-  };
+  }
 
-  const renderContent = () => {
+  function renderContent() {
     if (isSubmitting === "submitting") {
       return (
         <StatusContainer>
@@ -1078,14 +947,15 @@ const Cart = ({
     return (
       <FormWrapper onSubmit={handleSubmit}>
         <Column>
-          {recomputedItems.map((item) => (
+          {cleanItems.map((item) => (
             <CartItem key={item.dish ? item.dish._id : item.variantId}>
               <ItemInfo>
                 {shopDomain === "global" && item.podCustomization ? (
                   <MiniMockupPreview 
                     item={item} 
-                    templatesMap={templatesMap} 
-                    onClick={() => setZoomedItem(item)} 
+                    onClick={() => {
+                      setZoomedItem(item);
+                    }} 
                   />
                 ) : (
                   shopDomain === "global" && item.imageId && (
@@ -1201,69 +1071,113 @@ const Cart = ({
           </SubmitButton>
         </Column>
       </FormWrapper>
-    );
-  };
+    ); 
+  }
 
-  const renderLightboxContent = () => {
+  function renderLightboxContent() {
     if (!zoomedItem) return null;
 
     if (zoomedItem.singleUrl) {
-      return <img src={zoomedItem.singleUrl} alt="Zoomed view" style={{ borderRadius: '12px' }} />;
+      return (
+        <LightboxContent onClick={(e) => e.stopPropagation()}>
+          <LbWorkspace>
+            <img src={zoomedItem.singleUrl} alt="Zoomed view" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </LbWorkspace>
+          <LightboxActions>
+            <LbButton onClick={() => setZoomedItem(null)}>
+              <FaTimes /> {t("back_to_cart", "Back to Cart")}
+            </LbButton>
+          </LightboxActions>
+        </LightboxContent>
+      );
     }
 
-    const custom = zoomedItem.podCustomization;
-    const avail = zoomedItem.product?.availabilities?.find(a => String(a.color).toLowerCase() === String(zoomedItem.color).toLowerCase());
-    const frontTemplate = avail?.podFrontTemplateId ? templatesMap[avail.podFrontTemplateId] : null;
-    const backTemplate = avail?.podBackTemplateId ? templatesMap[avail.podBackTemplateId] : null;
-
     return (
-      <LightboxContent onClick={(e) => e.stopPropagation()}>
+      <LightboxComponent 
+        item={zoomedItem} 
+        onClose={() => setZoomedItem(null)} 
+        onEdit={onEditCustomItem} 
+      />
+    );
+  }
+
+  const MiniMockupPreview = ({ item, onClick }) => {
+  const custom = item?.podCustomization;
+  if (!custom) return null;
+
+  return (
+    <GrowableImageWrapper onClick={onClick}>
+      <ZoomOverlayIcon><FaExpand /></ZoomOverlayIcon>
+      {custom.front && (
+        <PodMockupPreview
+          item={item}
+          side="front"
+          width="54px"
+          height="54px"
+          borderRadius="10px"
+        />
+      )}
+      {custom.back && (
+        <PodMockupPreview
+          item={item}
+          side="back"
+          width="54px"
+          height="54px"
+          borderRadius="10px"
+        />
+      )}
+    </GrowableImageWrapper>
+  );
+};
+
+function LightboxComponent({ item, onClose, onEdit }) {
+  const { t } = useTranslation();
+  const custom = item?.podCustomization;
+  if (!custom) return null;
+
+  return (
+    <LightboxContent onClick={(e) => e.stopPropagation()}>
+      <LightboxPreviewsRow>
         {custom.front && (
-          <LbWorkspace>
-            <img src={frontTemplate} alt="Front Template" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            <LbPrintArea>
-              <img 
-                src={custom.front.originalImageUrl} 
-                alt="Front Design" 
-                style={{
-                  position: 'absolute',
-                  left: `${custom.front.x}%`,
-                  top: `${custom.front.y}%`,
-                  width: `${custom.front.width}%`,
-                  transform: `translate(-50%, -50%) rotate(${custom.front.rotation || 0}deg)`,
-                  objectFit: 'contain'
-                }}
-              />
-            </LbPrintArea>
-          </LbWorkspace>
+          <PodMockupPreview
+            item={item}
+            side="front"
+            width="380px"
+            height="380px"
+            borderRadius="24px"
+          />
         )}
         {custom.back && (
-          <LbWorkspace>
-            <img src={backTemplate} alt="Back Template" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            <LbPrintArea>
-              <img 
-                src={custom.back.originalImageUrl} 
-                alt="Back Design" 
-                style={{
-                  position: 'absolute',
-                  left: `${custom.back.x}%`,
-                  top: `${custom.back.y}%`,
-                  width: `${custom.back.width}%`,
-                  transform: `translate(-50%, -50%) rotate(${custom.back.rotation || 0}deg)`,
-                  objectFit: 'contain'
-                }}
-              />
-            </LbPrintArea>
-          </LbWorkspace>
+          <PodMockupPreview
+            item={item}
+            side="back"
+            width="380px"
+            height="380px"
+            borderRadius="24px"
+          />
         )}
-      </LightboxContent>
-    );
-  };
+      </LightboxPreviewsRow>
+      <LightboxActions>
+        {onEdit && (
+          <LbButton $primary onClick={() => {
+            onEdit(item);
+            onClose();
+          }}>
+            <FaEdit /> {t("edit_design", "Edit Design")}
+          </LbButton>
+        )}
+        <LbButton onClick={onClose}>
+          <FaTimes /> {t("back_to_cart", "Back to Cart")}
+        </LbButton>
+      </LightboxActions>
+    </LightboxContent>
+  );
+}
 
   return (
     <>
       <AnimatePresence>
-        {isOpen && (
+        {isCartOpen && (
           <ModalBackdrop
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1271,6 +1185,7 @@ const Cart = ({
             onClick={handleClose}
           >
             <ModalContent
+              className="hanuut-cart-modal"
               onClick={(e) => e.stopPropagation()}
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -1299,7 +1214,7 @@ const Cart = ({
         )}
       </AnimatePresence>
     </>
-  );
+  ); 
 };
 
 export default Cart;

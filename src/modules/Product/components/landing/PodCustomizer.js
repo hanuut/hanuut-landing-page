@@ -1,5 +1,6 @@
-import React, { useRef, useState, useMemo } from "react";
-import styled from "styled-components";
+import React, { useRef, useState, useMemo, useEffect } from "react";
+import styled, { css } from "styled-components";
+import { useTranslation } from "react-i18next";
 import {
   FaUpload,
   FaRedo,
@@ -11,10 +12,46 @@ import {
   FaSpinner,
   FaBorderAll,
   FaTshirt,
+  FaArrowsAltH,
+  FaArrowsAltV,
+  FaTimes,
+  FaTrash,
 } from "react-icons/fa";
-import axios from "axios";
+import { 
+  getGarmentDimensions, 
+  getTemplateConfig, 
+  getRawPrintCost, 
+  getFittedPrintZoneRatios,
+  calculatePhysicalMetrics,
+  calculateScaleFromPhysicalWidth
+} from "../../../PodStudio/hooks/usePrintableArea";
+import { motion, AnimatePresence } from "framer-motion";
 
-// --- Progress steps bar on top ---
+// ============================================================================
+// STYLED COMPONENTS - UNIFIED LAYOUT LAYERS
+// ============================================================================
+
+const TemplateContentArea = styled.div`
+  position: absolute;
+  z-index: 2;
+  overflow: hidden; /* THE PHYSICAL PRODUCT BOUNDARY CLIPPING CONTAINER */
+  top: ${props => props.$area.top}%;
+  left: ${props => props.$area.left}%;
+  width: ${props => props.$area.width}%;
+  height: ${props => props.$area.height}%;
+  pointer-events: none;
+`;
+
+const InteractivePrintArea = styled.div`
+  position: absolute;
+  top: ${props => props.$area.top}%;
+  left: ${props => props.$area.left}%;
+  width: ${props => props.$area.width}%;
+  height: ${props => props.$area.height}%;
+  pointer-events: auto;
+  z-index: 3;
+`;
+
 const StepIndicatorWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -30,7 +67,7 @@ const StepNode = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  opacity: ${(props) => (props.$active ? 1 : 0.4)};
+  opacity: ${(props) => (props.$active ? 1 : 0.45)};
   transition: opacity 0.3s;
 `;
 
@@ -62,28 +99,37 @@ const StepLine = styled.div`
   margin: 0 1rem;
 `;
 
-// ============================================================================
-// STYLED WORKSPACE
-// ============================================================================
-
-export const PodCanvasContainer = styled.div`
+const PodCanvasContainer = styled.div`
   width: 100%;
-  height: 400px;
+  height: 440px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #e5e5e5;
+  background: 
+    radial-gradient(circle at center, rgba(240, 122, 72, 0.1) 0%, rgba(12, 12, 14, 0.98) 100%),
+    linear-gradient(45deg, #141416 25%, transparent 25%), 
+    linear-gradient(-45deg, #141416 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #141416 75%), 
+    linear-gradient(-45deg, transparent 75%, #141416 75%);
+  background-size: 100% 100%, 16px 16px, 16px 16px, 16px 16px, 16px 16px;
+  background-position: center, 0 0, 0 8px, 8px -8px, -8px 0px;
+  background-color: #0c0c0e;
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 
+    inset 0 0 40px rgba(0, 0, 0, 0.85),
+    0 20px 40px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   user-select: none;
 `;
 
 const GarmentWorkspace = styled.div`
   position: relative;
-  height: 100%;
+  width: 95%;
+  height: 95%;
+  max-width: 410px;
+  max-height: 410px;
   aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
@@ -96,17 +142,6 @@ const BaseGarmentImage = styled.img`
   object-fit: contain;
   position: relative;
   z-index: 1;
-`;
-
-const PrintableArea = styled.div`
-  position: absolute;
-  top: 15%;
-  left: 20%;
-  width: 60%;
-  height: 70%;
-  border: 1px dashed ${(props) => props.theme.primaryColor || "#39A170"};
-  z-index: 2;
-  overflow: hidden;
 `;
 
 const GridOverlay = styled.div`
@@ -142,22 +177,14 @@ const GridOverlay = styled.div`
   }
 `;
 
-const InteractiveContainer = styled.div`
+const TransformableBox = styled.div`
   position: absolute;
   transform: translate(-50%, -50%);
   cursor: move;
   z-index: 5;
   user-select: none;
   touch-action: none;
-  border: 1px dashed rgba(255, 255, 255, 0.4);
-`;
-
-const SharpArtwork = styled.img`
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
-  pointer-events: none;
+  border: 1.5px dashed rgba(255, 255, 255, 0.65);
 `;
 
 const ScaleHandle = styled.div`
@@ -201,21 +228,75 @@ const ToggleGridBtn = styled.button`
   position: absolute;
   top: 15px;
   right: 15px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: white;
-  padding: 8px 12px;
+  background: rgba(15, 15, 18, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e4e4e7;
+  padding: 8px 14px;
   border-radius: 50px;
   cursor: pointer;
-  z-index: 10;
+  z-index: 100;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-weight: 700;
   font-size: 0.8rem;
-  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: "Tajawal", sans-serif;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+
   &:hover {
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: white;
+  }
+`;
+
+// --- WORKSPACE BLUEPRINT LEGEND KEY ---
+const CanvasLegend = styled.div`
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  background: rgba(15, 15, 18, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 100;
+  font-family: 'Cairo', sans-serif;
+  pointer-events: none;
+  text-align: left;
+  direction: ltr;
+`;
+
+const LegendItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: #a1a1aa;
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: ${props => props.$color || "#fff"};
+  }
+  
+  .label {
+    font-weight: 700;
+    color: #ffffff;
+    font-family: 'Tajawal', sans-serif;
+  }
+
+  .value {
+    font-family: monospace;
+    font-weight: 700;
+    color: ${props => props.$valColor || "#a1a1aa"};
   }
 `;
 
@@ -288,9 +369,9 @@ const SliderGroup = styled.div`
   }
 
   input[type="number"] {
-    width: 60px;
+    width: 65px;
     background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 6px;
     color: white;
     padding: 4px 6px;
@@ -308,13 +389,14 @@ const SliderGroup = styled.div`
   }
 `;
 
-const SegmentedControl = styled.div`
+const DimensionSegment = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 4px;
-  border-radius: 12px;
+  padding: 2px;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
 `;
 
 const SegmentBtn = styled.button`
@@ -328,16 +410,30 @@ const SegmentBtn = styled.button`
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Tajawal', sans-serif;
 `;
 
-export const NavigationRow = styled.div`
+const OptionSegment = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px;
+  border-radius: 12px;
+`;
+
+const NavigationRow = styled.div`
   display: flex;
   gap: 1rem;
   width: 100%;
   margin-top: 1rem;
 `;
 
-export const WizardBtn = styled.button`
+const WizardBtn = styled.button`
   flex: 1;
   padding: 0.9rem;
   border-radius: 12px;
@@ -437,72 +533,145 @@ const SpecMetric = styled.div`
   }
 `;
 
-// ============================================================================
-// THE LINEAR INTERPOLATION ENGINE (CONTINUOUS PRICING SCALER)
-// ============================================================================
+const OptionSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: start;
+`;
 
-const interpolateValue = (x, nodes) => {
-  if (x <= nodes[0].x) return nodes[0].y;
-  if (x >= nodes[nodes.length - 1].x) return nodes[nodes.length - 1].y;
+const SectionLabel = styled.span`
+  font-size: 0.75rem;
+  color: #71717a;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: "Tajawal", sans-serif;
+`;
 
-  for (let i = 0; i < nodes.length - 1; i++) {
-    const p1 = nodes[i];
-    const p2 = nodes[i + 1];
-    if (x >= p1.x && x <= p2.x) {
-      return p1.y + ((x - p1.x) / (p2.x - p1.x)) * (p2.y - p1.y);
-    }
+const ArtworkManager = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+`;
+
+const ArtworkInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+`;
+
+const ArtworkThumbnailWrap = styled.div`
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-image: 
+    linear-gradient(45deg, #18181b 25%, transparent 25%), 
+    linear-gradient(-45deg, #18181b 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #18181b 75%), 
+    linear-gradient(-45deg, transparent 75%, #18181b 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+  background-color: #27272a; /* Checkered grid pattern */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  
+  img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
   }
-  return nodes[nodes.length - 1].y;
-};
+`;
 
-// --- FIX: Returns RAW print cost strictly (decoupled from transfer fees) ---
-export const getRawPrintCost = (widthCm, heightCm) => {
-  const largestSide = Math.max(widthCm, heightCm);
-  const smallestSide = Math.min(widthCm, heightCm);
+const ActionRow = styled.div`
+  display: flex;
+  gap: 0.4rem;
+`;
 
-  let printCost = 0;
+const MiniActionButton = styled.button`
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  color: #a1a1aa;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-size: 0.95rem;
 
-  if (widthCm <= 30 || heightCm <= 30) {
-    // Category 1: Small Formats - Linear Interpolation Nodes
-    const x = largestSide;
-    const nodes = [
-      { x: 0, y: 20 },
-      { x: 5, y: 60 },
-      { x: 10, y: 110 },
-      { x: 15, y: 180 },
-      { x: 20, y: 270 },
-      { x: 25, y: 380 },
-      { x: 30, y: 440 },
-      { x: 35, y: 500 },
-      { x: 40, y: 560 },
-      { x: 45, y: 610 },
-      { x: 50, y: 680 },
-      { x: 55, y: 740 },
-      { x: 60, y: 800 },
-    ];
-    printCost = interpolateValue(x, nodes);
-  } else {
-    // Category 2: Large Formats - Linear Interpolation Nodes
-    const x = smallestSide;
-    const nodes = [
-      { x: 30, y: 860 },
-      { x: 35, y: 960 },
-      { x: 40, y: 1100 },
-      { x: 45, y: 1220 },
-      { x: 50, y: 1460 },
-      { x: 60, y: 1600 },
-    ];
-    printCost = interpolateValue(x, nodes);
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
   }
 
-  return Math.round(printCost);
-};
+  &.danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-color: #ef4444;
+  }
+`;
+
+const LightboxOverlay = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  cursor: zoom-out;
+`;
+
+const LightboxCard = styled(motion.div)`
+  width: 90%;
+  max-width: 450px;
+  aspect-ratio: 1;
+  background-image: 
+    linear-gradient(45deg, #18181b 25%, transparent 25%), 
+    linear-gradient(-45deg, #18181b 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #18181b 75%), 
+    linear-gradient(-45deg, transparent 75%, #18181b 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-color: #27272a;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+  position: relative;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+`;
 
 // ============================================================================
-// COMPONENT RENDER SECTIONS
+// COMPONENT LOGIC IMPLEMENTATIONS
 // ============================================================================
 
-export const PodStepIndicator = ({ currentStep, isArabic }) => {
+const PodStepIndicator = ({ currentStep, isArabic }) => {
   return (
     <StepIndicatorWrapper $isArabic={isArabic}>
       <StepNode $active={currentStep === 1}>
@@ -523,7 +692,7 @@ export const PodStepIndicator = ({ currentStep, isArabic }) => {
   );
 };
 
-export const PodCanvasPreview = ({ baseImageUrl, podState, setPodState }) => {
+const PodCanvasPreview = ({ baseImageUrl, podState, setPodState, productName, selectedSize = "M" }) => {
   const [showGrid, setShowGrid] = useState(false);
   const containerRef = useRef(null);
   const interactionRef = useRef({
@@ -538,6 +707,19 @@ export const PodCanvasPreview = ({ baseImageUrl, podState, setPodState }) => {
 
   const currentSide = podState.side;
   const config = podState[currentSide];
+
+  const ratios = useMemo(() => {
+    return getFittedPrintZoneRatios(productName, selectedSize, currentSide);
+  }, [productName, selectedSize, currentSide]);
+
+  // Real-world physical dimensions lookup
+  const garmentDims = useMemo(() => {
+    return getGarmentDimensions(productName, selectedSize);
+  }, [productName, selectedSize]);
+
+  const cfg = useMemo(() => {
+    return getTemplateConfig(productName);
+  }, [productName]);
 
   const handlePointerDown = (e, type) => {
     e.stopPropagation();
@@ -582,14 +764,8 @@ export const PodCanvasPreview = ({ baseImageUrl, podState, setPodState }) => {
         ...prev,
         [currentSide]: {
           ...prev[currentSide],
-          x: Math.min(
-            100,
-            Math.max(0, Math.round(startXVal + percentageChangeX)),
-          ),
-          y: Math.min(
-            100,
-            Math.max(0, Math.round(startYVal + percentageChangeY)),
-          ),
+          x: Math.min(100, Math.max(0, Math.round(startXVal + percentageChangeX))),
+          y: Math.min(100, Math.max(0, Math.round(startYVal + percentageChangeY))),
         },
       }));
     } else if (type === "scale") {
@@ -598,22 +774,13 @@ export const PodCanvasPreview = ({ baseImageUrl, podState, setPodState }) => {
         ...prev,
         [currentSide]: {
           ...prev[currentSide],
-          scale: Math.min(
-            100,
-            Math.max(15, Math.round(startScale * scaleFactor)),
-          ),
+          scale: Math.min(100, Math.max(15, Math.round(startScale * scaleFactor))),
         },
       }));
     } else if (type === "rotate") {
-      const center = {
-        x: bounds.left + bounds.width / 2,
-        top: bounds.top + bounds.height / 2,
-      };
-      const angle =
-        Math.atan2(e.clientY - center.top, e.clientX - center.x) *
-        (180 / Math.PI);
-      const startAngle =
-        Math.atan2(startY - center.top, startX - center.x) * (180 / Math.PI);
+      const center = { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 };
+      const angle = Math.atan2(e.clientY - center.y, e.clientX - center.x) * (180 / Math.PI);
+      const startAngle = Math.atan2(startY - center.y, startX - center.x) * (180 / Math.PI);
 
       setPodState((prev) => ({
         ...prev,
@@ -634,20 +801,49 @@ export const PodCanvasPreview = ({ baseImageUrl, podState, setPodState }) => {
   return (
     <PodCanvasContainer>
       <GarmentWorkspace ref={containerRef}>
-        <ToggleGridBtn type="button" onClick={() => setShowGrid(!showGrid)}>
+        <ToggleGridBtn type="button" onClick={() => setShowGrid(!showGrid)} >
           <FaBorderAll /> Grid
         </ToggleGridBtn>
 
         {baseImageUrl ? (
-          <BaseGarmentImage src={baseImageUrl} alt="Base Product" />
+          <BaseGarmentImage src={baseImageUrl} alt="Base Product Substrate" />
         ) : (
           <div style={{ color: "#888" }}>Loading templates...</div>
         )}
 
-        <PrintableArea>
+        {/* 1. VISUAL PORTION (Sits inside the TemplateContentArea clipping container) */}
+        <TemplateContentArea $area={ratios.contentArea}>
+          <div style={{
+            position: "absolute",
+            top: `${ratios.printArea.top}%`,
+            left: `${ratios.printArea.left}%`,
+            width: `${ratios.printArea.width}%`,
+            height: `${ratios.printArea.height}%`,
+            overflow: "visible"
+          }}>
+            {config.previewUrl && (
+              <img
+                src={config.previewUrl}
+                alt="Visual Print Layer"
+                style={{
+                  position: "absolute",
+                  left: `${config.x}%`,
+                  top: `${config.y}%`,
+                  width: `${config.scale}%`,
+                  transform: `translate(-50%, -50%) rotate(${config.rotation || 0}deg)`,
+                  objectFit: "contain",
+                  pointerEvents: "none"
+                }}
+              />
+            )}
+          </div>
+        </TemplateContentArea>
+
+        {/* 2. INTERACTIVE CONTROLS OVERLAY LAYER (Crisp figma-like selection guidelines and handles) */}
+        <InteractivePrintArea ref={containerRef} $area={ratios.absolutePrintArea}>
           <GridOverlay $visible={showGrid} />
           {config.previewUrl && (
-            <InteractiveContainer
+            <TransformableBox
               style={{
                 left: `${config.x}%`,
                 top: `${config.y}%`,
@@ -657,22 +853,35 @@ export const PodCanvasPreview = ({ baseImageUrl, podState, setPodState }) => {
               }}
               onPointerDown={(e) => handlePointerDown(e, "drag")}
             >
-              <SharpArtwork src={config.previewUrl} alt="Artwork" />
-              <ScaleHandle
-                onPointerDown={(e) => handlePointerDown(e, "scale")}
-              />
-              <RotateHandle
-                onPointerDown={(e) => handlePointerDown(e, "rotate")}
-              />
-            </InteractiveContainer>
+              {/* Fully transparent touch target hitbox */}
+              <div style={{ width: "100%", height: "100%", opacity: 0 }} />
+              <ScaleHandle onPointerDown={(e) => handlePointerDown(e, "scale")} />
+              <RotateHandle onPointerDown={(e) => handlePointerDown(e, "rotate")} />
+            </TransformableBox>
           )}
-        </PrintableArea>
+        </InteractivePrintArea>
+
+        {/* BLUEPRINT PHYSICAL SPECIFICATION KEY/LEGEND */}
+        {garmentDims && cfg && (
+          <CanvasLegend>
+            <LegendItem $color="#ffffff" $valColor="#ffffff">
+              <span className="dot" />
+              <span className="label">Garment (Body):</span>
+              <span className="value">A: {garmentDims.A}cm {garmentDims.B ? `× B: ${garmentDims.B}cm` : ""}</span>
+            </LegendItem>
+            <LegendItem $color="#39a170" $valColor="#39a170">
+              <span className="dot" />
+              <span className="label">Print Area (Zone):</span>
+              <span className="value">{(cfg.printW_ref / cfg.B_ref * garmentDims.B).toFixed(1)}cm × {(cfg.printH_ref / cfg.A_ref * garmentDims.A).toFixed(1)}cm</span>
+            </LegendItem>
+          </CanvasLegend>
+        )}
       </GarmentWorkspace>
     </PodCanvasContainer>
   );
 };
 
-export const PodStepTwoControls = ({
+const PodStepTwoControls = ({
   podState,
   setPodState,
   product,
@@ -680,27 +889,42 @@ export const PodStepTwoControls = ({
   onBack,
   isArabic,
 }) => {
+  const { t } = useTranslation();
   const currentSide = podState.side;
   const config = podState[currentSide];
+  const replacementInputRef = useRef(null);
 
-  // Dynamic real-time dimensions in cm
-  const printWidthCm = useMemo(() => {
-    const maxW = (product.printableAreaWidthMm || 280) / 10;
-    return ((config.scale / 100) * maxW).toFixed(1);
-  }, [config.scale, product]);
+  const [aspectRatio, setAspectRatio] = useState(1);
+  const [refDimension, setRefDimension] = useState("width");
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  const printHeightCm = useMemo(() => {
-    const maxH = (product.printableAreaHeightMm || 350) / 10;
-    return ((config.scale / 100) * maxH).toFixed(1);
-  }, [config.scale, product]);
+  const cfg = useMemo(() => getTemplateConfig(product.name), [product.name]);
+  const garmentDims = useMemo(() => getGarmentDimensions(product.name, "M"), [product.name]);
 
-  // Real-time linear print cost calculation (fully continuous)
-  const livePrintCost = useMemo(() => {
-    const w = parseFloat(printWidthCm);
-    const h = parseFloat(printHeightCm);
-    // Raw cost + single side transfer fee (+50 DA)
-    return getRawPrintCost(w, h) + 50;
-  }, [printWidthCm, printHeightCm]);
+  useEffect(() => {
+    let isMounted = true;
+    if (config.previewUrl) {
+      const img = new Image();
+      img.src = config.previewUrl;
+      img.onload = () => {
+        if (isMounted) {
+          const ratio = img.naturalWidth / img.naturalHeight;
+          setAspectRatio(ratio);
+          setRefDimension(ratio >= 1 ? "width" : "height");
+        }
+      };
+    } else {
+      setAspectRatio(1);
+    }
+    return () => { isMounted = false; };
+  }, [config.previewUrl]);
+
+  // Compute live real-world physical coordinates scaled EXACTLY to the print zone limits
+  const physicalMetrics = useMemo(() => {
+    const printWidthRatio = cfg.printW_ref / cfg.B_ref;
+    const printHeightRatio = cfg.printH_ref / cfg.A_ref;
+    return calculatePhysicalMetrics(config.scale, garmentDims.B, garmentDims.A, printWidthRatio, printHeightRatio, aspectRatio);
+  }, [config.scale, garmentDims, cfg, aspectRatio]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -721,16 +945,17 @@ export const PodStepTwoControls = ({
     }));
   };
 
-  const handleNumericChange = (e) => {
-    const { name, value } = e.target;
-    let numericValue = Math.round(parseFloat(value) || 0);
-    if (name === "scale")
-      numericValue = Math.min(100, Math.max(15, numericValue));
-    else numericValue = Math.min(100, Math.max(0, numericValue));
+  const handlePhysicalSizeChange = (e) => {
+    const val = parseFloat(e.target.value) || 0;
+    const printWidthRatio = cfg.printW_ref / cfg.B_ref;
+    const targetScalePct = calculateScaleFromPhysicalWidth(val, garmentDims.B, printWidthRatio);
 
     setPodState((prev) => ({
       ...prev,
-      [currentSide]: { ...prev[currentSide], [name]: numericValue },
+      [currentSide]: {
+        ...prev[currentSide],
+        scale: Math.min(100, Math.max(15, Math.round(targetScalePct)))
+      }
     }));
   };
 
@@ -740,18 +965,38 @@ export const PodStepTwoControls = ({
       [currentSide]: {
         file: null,
         previewUrl: null,
-        scale: 80,
+        scale: 50,
         x: 50,
         y: 50,
         rotation: 0,
       },
     }));
+    setRefDimension("width");
+    if (replacementInputRef.current) replacementInputRef.current.value = "";
   };
+
+  const maxLimit = useMemo(() => {
+    if (refDimension === "width") {
+      return physicalMetrics.maxPrintWidthCm;
+    } else {
+      return physicalMetrics.maxPrintHeightCm;
+    }
+  }, [refDimension, physicalMetrics]);
+
+  const currentActiveVal = refDimension === "width" ? physicalMetrics.width : physicalMetrics.height;
+
+  // Real-time linear print cost calculation (fully continuous)
+  const livePrintCost = useMemo(() => {
+    const w = parseFloat(physicalMetrics.width);
+    const h = parseFloat(physicalMetrics.height);
+    // Raw cost + single side transfer fee (+50 DA)
+    return getRawPrintCost(w, h) + 50;
+  }, [physicalMetrics.width, physicalMetrics.height]);
 
   return (
     <ControlsWrapper>
       {product.hasBackPrintSurface && (
-        <SegmentedControl>
+        <OptionSegment>
           <SegmentBtn
             $active={podState.side === "front"}
             onClick={() => setPodState((prev) => ({ ...prev, side: "front" }))}
@@ -764,7 +1009,7 @@ export const PodStepTwoControls = ({
           >
             Back Side
           </SegmentBtn>
-        </SegmentedControl>
+        </OptionSegment>
       )}
 
       {!config.previewUrl ? (
@@ -780,45 +1025,59 @@ export const PodStepTwoControls = ({
         </UploadBox>
       ) : (
         <>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{ fontSize: "0.85rem", color: "#a1a1aa", fontWeight: 700 }}
-            >
-              Artwork Configured
-            </span>
-            <button
-              onClick={clearSide}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "#EF4444",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-                fontSize: "0.85rem",
-                fontWeight: 700,
-              }}
-            >
-              <FaRedo /> Reset Side
-            </button>
-          </div>
+          {/* Checkered Artwork Asset Manager Header */}
+          <ArtworkManager $isArabic={isArabic}>
+            <ArtworkInfo>
+              <ArtworkThumbnailWrap>
+                <img src={config.previewUrl} alt="Thumbnail" />
+              </ArtworkThumbnailWrap>
+              <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "#FFF" }}>
+                {config.file?.name ? (
+                  config.file.name.substring(0, 12) + (config.file.name.length > 12 ? "..." : "")
+                ) : "Artwork File"}
+              </span>
+            </ArtworkInfo>
+            <ActionRow>
+              <MiniActionButton 
+                type="button" 
+                title={t("view", "View Alone")} 
+                onClick={() => setIsLightboxOpen(true)}
+              >
+                <FaEye />
+              </MiniActionButton>
+              <MiniActionButton 
+                type="button" 
+                title={t("change", "Replace Image")} 
+                onClick={() => replacementInputRef.current.click()}
+              >
+                <FaUpload />
+                <input
+                  type="file"
+                  ref={replacementInputRef}
+                  accept="image/png"
+                  onChange={handleFileChange}
+                  style={{ display: "none" }}
+                />
+              </MiniActionButton>
+              <MiniActionButton 
+                type="button" 
+                className="danger" 
+                title={t("delete", "Remove Design")} 
+                onClick={clearSide}
+              >
+                <FaTrash />
+              </MiniActionButton>
+            </ActionRow>
+          </ArtworkManager>
 
-          {/* --- ENFORCED LIVE SPECS & LINEAR COST METRICS BAR --- */}
           <LiveSpecsCard>
             <SpecMetric>
               <span className="label">Width</span>
-              <span className="value">{printWidthCm} cm</span>
+              <span className="value">{physicalMetrics.width} cm</span>
             </SpecMetric>
             <SpecMetric>
               <span className="label">Height</span>
-              <span className="value">{printHeightCm} cm</span>
+              <span className="value">{physicalMetrics.height} cm</span>
             </SpecMetric>
             <SpecMetric
               style={{
@@ -831,26 +1090,52 @@ export const PodStepTwoControls = ({
             </SpecMetric>
           </LiveSpecsCard>
 
-          <SliderGroup>
-            <label>Scale Percentage</label>
-            <div className="row-input">
-              <input
-                type="range"
-                name="scale"
-                min="15"
-                max="100"
-                value={config.scale}
-                onChange={handleSliderChange}
-              />
-              <input
-                type="number"
-                name="scale"
-                value={config.scale}
-                onChange={handleNumericChange}
-              />
-              <span style={{ fontSize: "0.8rem" }}>%</span>
-            </div>
-          </SliderGroup>
+          <OptionSection>
+            <SectionLabel>{t("pod_studio.scale_percentage")}</SectionLabel>
+            <DimensionSegment>
+              <SegmentBtn
+                type="button"
+                $active={refDimension === "width"}
+                onClick={() => setRefDimension("width")}
+              >
+                <FaArrowsAltH /> {t("width_prefix", "Width")}
+              </SegmentBtn>
+              <SegmentBtn
+                type="button"
+                $active={refDimension === "height"}
+                onClick={() => setRefDimension("height")}
+              >
+                <FaArrowsAltV /> {t("height_prefix", "Height")}
+              </SegmentBtn>
+            </DimensionSegment>
+
+            <SliderGroup>
+              <label>
+                <span>{refDimension === "width" ? t("width_prefix", "Width") : t("height_prefix", "Height")}</span>
+                <span>{currentActiveVal} cm</span>
+              </label>
+              <div className="row-input">
+                <input
+                  type="range"
+                  name="scale"
+                  min="15"
+                  max="100"
+                  value={config.scale}
+                  onChange={handleSliderChange}
+                />
+                <input
+                  type="number"
+                  name="scale_cm"
+                  step="0.1"
+                  min={(0.15 * maxLimit).toFixed(1)}
+                  max={maxLimit.toFixed(1)}
+                  value={currentActiveVal}
+                  onChange={handlePhysicalSizeChange}
+                />
+                <span style={{ fontSize: "0.8rem", color: "white" }}>cm</span>
+              </div>
+            </SliderGroup>
+          </OptionSection>
 
           <SliderGroup>
             <label>X-Axis Alignment</label>
@@ -863,13 +1148,6 @@ export const PodStepTwoControls = ({
                 value={config.x}
                 onChange={handleSliderChange}
               />
-              <input
-                type="number"
-                name="x"
-                value={config.x}
-                onChange={handleNumericChange}
-              />
-              <span style={{ fontSize: "0.8rem" }}>%</span>
             </div>
           </SliderGroup>
 
@@ -884,13 +1162,6 @@ export const PodStepTwoControls = ({
                 value={config.y}
                 onChange={handleSliderChange}
               />
-              <input
-                type="number"
-                name="y"
-                value={config.y}
-                onChange={handleNumericChange}
-              />
-              <span style={{ fontSize: "0.8rem" }}>%</span>
             </div>
           </SliderGroup>
 
@@ -905,13 +1176,6 @@ export const PodStepTwoControls = ({
                 value={config.rotation}
                 onChange={handleSliderChange}
               />
-              <input
-                type="number"
-                name="rotation"
-                value={config.rotation}
-                onChange={handleNumericChange}
-              />
-              <span style={{ fontSize: "0.8rem" }}>°</span>
             </div>
           </SliderGroup>
         </>
@@ -930,11 +1194,52 @@ export const PodStepTwoControls = ({
           Continue {isArabic ? <FaChevronLeft /> : <FaChevronRight />}
         </WizardBtn>
       </NavigationRow>
+
+      {/* Full-Screen Artwork Lightbox Overlay */}
+      <AnimatePresence>
+        {isLightboxOpen && (
+          <LightboxOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsLightboxOpen(false)}
+          >
+            <LightboxCard
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img src={config.previewUrl} alt="Bespoke Design view" />
+              <button 
+                onClick={() => setIsLightboxOpen(false)}
+                style={{
+                  position: "absolute",
+                  top: "15px",
+                  right: "15px",
+                  background: "rgba(0,0,0,0.6)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "white",
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <FaTimes />
+              </button>
+            </LightboxCard>
+          </LightboxOverlay>
+        )}
+      </AnimatePresence>
     </ControlsWrapper>
   );
 };
 
-export const PodStepThreeControls = ({
+const PodStepThreeControls = ({ 
   podState,
   product,
   selectedColor,
@@ -983,6 +1288,8 @@ export const PodStepThreeControls = ({
           display: "flex",
           alignItems: "center",
           gap: "8px",
+          color: "white",
+          fontFamily: "Tajawal"
         }}
       >
         <FaEye style={{ color: "#39A170" }} /> Billing Breakdown
@@ -1045,4 +1352,14 @@ export const PodStepThreeControls = ({
       </NavigationRow>
     </ControlsWrapper>
   );
+};
+
+export {
+  PodStepIndicator,
+  PodCanvasPreview,
+  PodStepTwoControls,
+  PodStepThreeControls,
+  NavigationRow,
+  WizardBtn,
+  PodCanvasContainer,
 };

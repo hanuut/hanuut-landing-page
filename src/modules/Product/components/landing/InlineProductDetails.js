@@ -1,17 +1,21 @@
+// src/modules/Product/components/landing/InlineProductDetails.js
+
 import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
-import { FaTimes, FaExpand, FaEye, FaBookmark, FaChevronDown, FaChevronRight,FaChevronLeft,  FaChevronUp, FaCheck, FaPalette } from "react-icons/fa";
+import { FaTimes, FaExpand, FaEye, FaBookmark, FaChevronDown, FaChevronRight, FaChevronLeft, FaChevronUp, FaCheck, FaPalette } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import { getTemplateConfig, getGarmentDimensions, getRawPrintCost } from "../../../PodStudio/hooks/usePrintableArea";
 
 // --- Redux ---
 import { updateCartQuantity } from "../../../Cart/state/reducers";
 
 import { PodCanvasPreview, PodStepIndicator, PodStepTwoControls, PodStepThreeControls, NavigationRow, WizardBtn } from "./PodCustomizer";
+import { retrieveFile, persistFile } from "../../../PodStudio/utils/indexedDbHelper"; // <-- PERSISTED FILE UTILITIES
 
 const DetailContainer = styled(motion.div)`
   width: 100%;
@@ -492,48 +496,103 @@ const InlineProductDetails = ({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isDescOpen, setIsDescOpen] = useState(false);
 
-  // --- POD EXCLUSIVE WIZARD STATE ---
   const [wizardStep, setWizardStep] = useState(1); 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // --- SPLIT SIDE MODEL (Separated Front/Back custom states) ---
   const [podState, setPodState] = useState({
     side: 'front',
     front: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
     back: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
   });
 
-  // Share step triggers with parent container
   useEffect(() => {
     if (onWizardStepChange) onWizardStepChange(wizardStep);
   }, [wizardStep, onWizardStepChange]);
 
-  // --- SEAMLESS EDIT FLOW: Restore existing customizations on open ---
-  useEffect(() => {
-    if (editingCartItem && editingCartItem.podCustomization) {
-      const custom = editingCartItem.podCustomization;
-      setWizardStep(2); // Bypass step 1 completely
+  // STABLE SCHEMA RESOLVER: Adapts and normalizes both raw Redux Cart & Creation Tray structures on the fly
+useEffect(() => {
+    let isMounted = true;
+    let freshFrontUrl = null;
+    let freshBackUrl = null;
 
-      setPodState({
-        side: custom.printSide === 'back' ? 'back' : 'front',
-        front: custom.front ? {
-          file: 'existing', 
-          previewUrl: custom.front.originalImageUrl,
-          scale: custom.front.width,
-          x: custom.front.x,
-          y: custom.front.y,
-          rotation: custom.front.rotation || 0
-        } : { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
-        back: custom.back ? {
-          file: 'existing',
-          previewUrl: custom.back.originalImageUrl,
-          scale: custom.back.width,
-          x: custom.back.x,
-          y: custom.back.y,
-          rotation: custom.back.rotation || 0
-        } : { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
-      });
+    if (editingCartItem) {
+      const rawCustom = editingCartItem.podCustomization;
+      const adaptedCustom = editingCartItem.customization;
+      
+      const custom = rawCustom || (adaptedCustom ? {
+        printSide: adaptedCustom.printSide,
+        front: adaptedCustom.front ? {
+          originalImageUrl: adaptedCustom.front.artworkUrl || adaptedCustom.front.originalImageUrl,
+          width: adaptedCustom.front.widthPercent ?? adaptedCustom.front.width,
+          x: adaptedCustom.front.xOffsetPercent ?? adaptedCustom.front.x,
+          y: adaptedCustom.front.yOffsetPercent ?? adaptedCustom.front.y,
+          rotation: adaptedCustom.front.rotation
+        } : null,
+        back: adaptedCustom.back ? {
+          originalImageUrl: adaptedCustom.back.artworkUrl || adaptedCustom.back.originalImageUrl,
+          width: adaptedCustom.back.widthPercent ?? adaptedCustom.back.width,
+          x: adaptedCustom.back.xOffsetPercent ?? adaptedCustom.back.x,
+          y: adaptedCustom.back.yOffsetPercent ?? adaptedCustom.back.y,
+          rotation: adaptedCustom.back.rotation
+        } : null,
+      } : null);
+
+      if (custom) {
+        const stableId = editingCartItem.variantId || editingCartItem.lineItemId;
+        setWizardStep(2); 
+
+        const loadDesignUrls = async () => {
+          let frontPreview = custom.front ? custom.front.originalImageUrl : null;
+          let backPreview = custom.back ? custom.back.originalImageUrl : null;
+
+          if (custom.front?.originalImageUrl?.startsWith("blob:") && stableId) {
+            const blob = await retrieveFile(`${stableId}_front`);
+            if (blob && isMounted) {
+              freshFrontUrl = URL.createObjectURL(blob);
+              frontPreview = freshFrontUrl;
+            }
+          }
+
+          if (custom.back?.originalImageUrl?.startsWith("blob:") && stableId) {
+            const blob = await retrieveFile(`${stableId}_back`);
+            if (blob && isMounted) {
+              freshBackUrl = URL.createObjectURL(blob);
+              backPreview = freshBackUrl;
+            }
+          }
+
+          if (isMounted) {
+            setPodState({
+              side: custom.printSide === 'back' ? 'back' : 'front',
+              front: custom.front ? {
+                file: 'existing',
+                previewUrl: frontPreview,
+                scale: custom.front.width || 50, // --- DETERMINISTIC DIRECT MAPPING ---
+                x: custom.front.x,
+                y: custom.front.y,
+                rotation: custom.front.rotation || 0
+              } : { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
+              back: custom.back ? {
+                file: 'existing',
+                previewUrl: backPreview,
+                scale: custom.back.width || 50, // --- DETERMINISTIC DIRECT MAPPING ---
+                x: custom.back.x,
+                y: custom.back.y,
+                rotation: custom.back.rotation || 0
+              } : { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
+            });
+          }
+        };
+
+        loadDesignUrls();
+      }
     }
+
+    return () => {
+      isMounted = false;
+      if (freshFrontUrl) URL.revokeObjectURL(freshFrontUrl);
+      if (freshBackUrl) URL.revokeObjectURL(freshBackUrl);
+    };
   }, [editingCartItem]);
 
   useEffect(() => {
@@ -611,8 +670,8 @@ const InlineProductDetails = ({
     if (!currentSizeDetails) return;
     onAddToCart({
       product,
-      productId: product._id,
-      title: product.name,
+      productId: product._id, 
+      title: product.name, 
       variantId: currentVariantId,
       color: selectedColor,
       size: selectedSize,
@@ -637,24 +696,29 @@ const InlineProductDetails = ({
     if ((!podState.front.file && !podState.back.file) || !currentSizeDetails) return;
     setIsSubmitting(true);
 
+    const oldId = editingCartItem ? (editingCartItem.variantId || editingCartItem.lineItemId) : null;
+    const targetVariantId = oldId || `${currentVariantId}_custom_${Date.now()}`;
+
     try {
       let frontImageId = podState.front.file === 'existing' ? podState.front.previewUrl : null;
       let backImageId = podState.back.file === 'existing' ? podState.back.previewUrl : null;
 
-      // Upload Front design ONLY if newly changed
       if (podState.front.file && podState.front.file !== 'existing') {
         const frontForm = new FormData();
         frontForm.append('file', podState.front.file);
         const frontRes = await axios.post(`${process.env.REACT_APP_API_PROD_URL}/image/upload`, frontForm);
         frontImageId = frontRes.data.url;
+        
+        await persistFile(`${targetVariantId}_front`, podState.front.file);
       }
 
-      // Upload Back design ONLY if newly changed
       if (podState.back.file && podState.back.file !== 'existing') {
         const backForm = new FormData();
         backForm.append('file', podState.back.file);
         const backRes = await axios.post(`${process.env.REACT_APP_API_PROD_URL}/image/upload`, backForm);
         backImageId = backRes.data.url;
+        
+        await persistFile(`${targetVariantId}_back`, podState.back.file);
       }
 
       const hasFront = !!frontImageId;
@@ -662,53 +726,93 @@ const InlineProductDetails = ({
 
       const printSideKeyword = (hasFront && hasBack) ? 'double' : (hasBack ? 'back' : 'front');
 
-      const customizationData = {
-        printSide: printSideKeyword,
-        ...(hasFront && {
-          front: {
-            originalImageId: frontImageId,
-            originalImageUrl: frontImageId,
-            x: podState.front.x,
-            y: podState.front.y,
-            width: podState.front.scale,
-            height: podState.front.scale,
-            rotation: podState.front.rotation
-          }
-        }),
-        ...(hasBack && {
-          back: {
-            originalImageId: backImageId,
-            originalImageUrl: backImageId,
-            x: podState.back.x,
-            y: podState.back.y,
-            width: podState.back.scale,
-            height: podState.back.scale,
-            rotation: podState.back.rotation
-          }
-        })
+      // --- CALCULATE APPAREL & PRINTING COSTS ---
+      const baseApparelCost = currentSizeDetails?.sellingPrice || 0;
+
+      const frontPrintCost = (() => {
+        if (!podState.front.file) return 0;
+        const wCm =
+          (podState.front.scale / 100) *
+          ((product.printableAreaWidthMm || 280) / 10);
+        const hCm =
+          (podState.front.scale / 100) *
+          ((product.printableAreaHeightMm || 350) / 10);
+        return getRawPrintCost(wCm, hCm) + 50 + 60;
+      })();
+
+      const backPrintCost = (() => {
+        if (!podState.back.file) return 0;
+        const wCm =
+          (podState.back.scale / 100) *
+          ((product.printableAreaWidthMm || 280) / 10);
+        const hCm =
+          (podState.back.scale / 100) *
+          ((product.printableAreaHeightMm || 350) / 10);
+        return getRawPrintCost(wCm, hCm) + 50 + 60;
+      })();
+
+      // --- RESOLVE REAL-WORLD DIMENSIONS ---
+      const cfg = getTemplateConfig(product.name);
+      const garmentDims = getGarmentDimensions(product.name, selectedSize);
+      const productHeightPct = 1 - cfg.topPadding - cfg.bottomPadding;
+      const totalWorkspacePhysicalCm = garmentDims.A / productHeightPct;
+
+      const getPhysicalMetrics = (designState) => {
+        const scaleFactor = designState.scale / 100;
+        const containerWidthCm = scaleFactor * totalWorkspacePhysicalCm;
+        return { width: containerWidthCm, height: containerWidthCm }; 
       };
 
-      const uniqueDesignVariantId = `${currentVariantId}_custom_${Date.now()}`;
+      const frontMetrics = getPhysicalMetrics(podState.front);
+      const backMetrics = getPhysicalMetrics(podState.back);
+
+      const customizationData = {
+        printSide: printSideKeyword,
+        baseGarmentCost: baseApparelCost,
+        printCost: frontPrintCost + backPrintCost,
+        front: hasFront ? {
+          imageId: frontImageId,
+          imageUrl: frontImageId,
+          originalImageId: frontImageId,
+          originalImageUrl: frontImageId,
+          x: podState.front.x,
+          y: podState.front.y,
+          width: podState.front.scale,   // Scale percentage (0-100)
+          height: podState.front.scale,  // Scale percentage (0-100)
+          rotation: podState.front.rotation,
+          templateUrl: currentAvailability?.podFrontTemplateId ? `${process.env.REACT_APP_API_PROD_URL}/image/raw/${currentAvailability.podFrontTemplateId}` : null
+        } : null,
+        back: hasBack ? {
+          imageId: backImageId,
+          imageUrl: backImageId,
+          originalImageId: backImageId,
+          originalImageUrl: backImageId,
+          x: podState.back.x,
+          y: podState.back.y,
+          width: podState.back.scale,   // Scale percentage (0-100)
+          height: podState.back.scale,  // Scale percentage (0-100)
+          rotation: podState.back.rotation,
+          templateUrl: currentAvailability?.podBackTemplateId ? `${process.env.REACT_APP_API_PROD_URL}/image/raw/${currentAvailability.podBackTemplateId}` : null
+        } : null
+      };
 
       if (editingCartItem) {
-        // Atomic Overwrite: Delete old stale variant from cart before inserting updated one
-        dispatch(updateCartQuantity({ variantId: editingCartItem.variantId, quantity: 0 }));
+        dispatch(updateCartQuantity({ variantId: oldId, quantity: 0 }));
       }
 
       onAddToCart({
         product,
         productId: product._id,
         title: product.name,
-        variantId: uniqueDesignVariantId, 
+        variantId: targetVariantId, 
         color: selectedColor,
         size: selectedSize,
         sellingPrice: finalPrice, 
         imageId: currentAvailability.imageId, 
-        quantity: 1,
+        quantity: editingCartItem ? editingCartItem.quantity : 1,
         podCustomization: customizationData 
       });
 
-      // Reset
       setPodState({
         side: 'front',
         front: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
@@ -725,6 +829,7 @@ const InlineProductDetails = ({
     }
   };
 
+
   return (
     <>
       <DetailContainer
@@ -739,13 +844,13 @@ const InlineProductDetails = ({
           {isPod && <PodStepIndicator currentStep={wizardStep} isArabic={isArabic} />}
 
           <SplitGrid>
-            {/* ==================== LEFT SIDE: VISUAL CONTAINER ==================== */}
+            {/* LEFT SIDE */}
             <div>
               {isPod ? (
                 <PodCanvasPreview 
                   baseImageUrl={imagesMap[activePodTemplateId] || imagesMap[activeImageId]} 
                   podState={podState} 
-                  setPodState={setPodState} // --- INJECT STATE UPDATER FOR ACTIVE CANVAS DRAG/SCALE
+                  setPodState={setPodState}
                 />
               ) : (
                 <GallerySection>
@@ -806,7 +911,7 @@ const InlineProductDetails = ({
               )}
             </div>
 
-            {/* ==================== RIGHT SIDE: STEPPED CONTROLS ==================== */}
+            {/* RIGHT SIDE */}
             <div>
               {!isPod ? (
                 <InfoSection>

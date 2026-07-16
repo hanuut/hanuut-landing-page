@@ -7,18 +7,16 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePalette } from "color-thief-react";
 
-// --- Redux Selectors & Actions ---
 import { fetchShopWithUsername, selectShop, selectShops } from "../state/reducers";
 import { fetchImage, selectSelectedShopImage } from "../../Images/state/reducers";
+import { fetchCategories } from "../../Categories/state/reducers";
 import { addToCart, updateCartQuantity, selectCart, openCart, closeCart } from "../../Cart/state/reducers"; 
 
-// --- Services & Utilities ---
 import { createGlobalOrder } from "../services/orderServices"; 
 import { parseBioLinks } from "../../../utils/bioLinkParser";
 import { getImageUrl } from "../../../utils/imageUtils";
 import { light, partnerTheme } from "../../../config/Themes";
 
-// --- UI Sub-components ---
 import Loader from "../../../components/Loader";
 import NotFoundPage from "../../NotFoundPage";
 import MenuPage from "./MenuPage";
@@ -28,6 +26,7 @@ import Seo from "../../../components/Seo";
 import Cart from "./Cart";
 import OrderSuccessModal from "./OrderSuccessModal"; 
 import BioLinksPage from "./BioLinksPage";
+import PodStudioDashboard from "../../PodStudio/components/StudioLanding/PodStudioDashboard";
 
 import { FaShoppingCart, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
@@ -247,7 +246,7 @@ const ShopPageWithUsername = () => {
   const { username } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams(); // --- DECLARED SEARCH PARAMS HOOK ---
+  const [searchParams, setSearchParams] = useSearchParams(); 
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -294,6 +293,18 @@ const ShopPageWithUsername = () => {
 
   useEffect(() => {
     if (selectedShop?.imageId) dispatch(fetchImage(selectedShop.imageId));
+  }, [dispatch, selectedShop]);
+
+  // Normalize and fetch shop categories at the root layer to avoid duplicate requests
+  useEffect(() => {
+    if (selectedShop && selectedShop.categories) {
+      const validCategoryIds = selectedShop.categories
+        .map(cat => (typeof cat === "object" ? (cat._id || cat.id) : cat))
+        .filter(catId => catId && !selectedShop.hiddenCategories?.includes(catId));
+      if (validCategoryIds.length > 0) {
+        dispatch(fetchCategories(validCategoryIds));
+      }
+    }
   }, [dispatch, selectedShop]);
 
   // Route protection
@@ -454,11 +465,22 @@ const ShopPageWithUsername = () => {
   if (loading || (error && retryCount < MAX_RETRIES)) return <Section><Loader fullscreen={false} /></Section>;
   if (error && retryCount >= MAX_RETRIES) return <NotFoundPage />;
 
-  if (selectedShop && Object.keys(selectedShop).length > 0 && selectedShopImage && domainKeyWord) {
+   if (selectedShop && Object.keys(selectedShop).length > 0 && selectedShopImage && domainKeyWord) {
+    const isPodEnabled = selectedShop?.shopSettings?.printOnDemand === true;
+
+    // --- DIRECT SYSTEM HANDOFF ---
+    if (isPodEnabled) {
+      return (
+        <PodStudioDashboard 
+          shop={selectedShop} 
+          selectedShopImage={selectedShopImage} 
+        />
+      );
+    }
+
     const shopTitle = selectedShop.name || "Hanuut Shop";
     const shopImage = getImageUrl(selectedShop.imageId); 
     const cleanUsername = selectedShop.username?.startsWith("@") ? selectedShop.username : `@${selectedShop.username}`;
-
     const currentUrl = `https://hanuut.com/${cleanUsername}${isLinksRoute ? '/links' : ''}`;
     const commune = selectedShop.addressId?.commune || "Algeria";
     const wilaya = selectedShop.addressId?.wilaya || "Algeria";

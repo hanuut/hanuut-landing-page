@@ -1,9 +1,10 @@
+// src/modules/Cart/components/CartElement.js
+
 import React from "react";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import {
-  incrementQuantity,
-  decrementQuantity,
+  updateCartQuantity,
   removeFromCart,
 } from "../state/reducers";
 import ArrowUp from "../../../assets/icons/arrowUp.svg";
@@ -105,19 +106,20 @@ const DeleteButton = styled.img`
 
 const CartElement = ({ cartItem }) => {
   const dispatch = useDispatch();
-  const { productId, title, brand, color, size, sellingPrice, quantity } =
-    cartItem;
+  const { productId, variantId, title, brand, color, size, sellingPrice, quantity } = cartItem;
+
+  const targetVariantId = variantId || productId;
 
   const handleIncrement = () => {
-    dispatch(incrementQuantity(productId));
+    dispatch(updateCartQuantity({ variantId: targetVariantId, quantity: quantity + 1 }));
   };
 
   const handleDecrement = () => {
-    dispatch(decrementQuantity(productId));
+    dispatch(updateCartQuantity({ variantId: targetVariantId, quantity: quantity - 1 }));
   };
 
   const handleRemove = () => {
-    dispatch(removeFromCart(productId));
+    dispatch(removeFromCart(targetVariantId));
   };
 
   return (
@@ -126,19 +128,19 @@ const CartElement = ({ cartItem }) => {
         <ItemDetails>
           <TitleRow>
             <ItemTitle>
-              {title} - {brand}
+              {title} {brand ? `- ${brand}` : ""}
             </ItemTitle>
-            <DeleteButton src={DeleteIcon} onClick={handleRemove} alt="delete"/>
+            <DeleteButton src={DeleteIcon} onClick={handleRemove} alt="delete" />
           </TitleRow>
-          <ItemColorSize>Color: {color}</ItemColorSize>
-          <ItemColorSize>Size: {size}</ItemColorSize>
+          {color && <ItemColorSize>Color: {color}</ItemColorSize>}
+          {size && <ItemColorSize>Size: {size}</ItemColorSize>}
         </ItemDetails>
         <TotalItemPrice>{sellingPrice * quantity} DZD</TotalItemPrice>
       </ContentContainer>
       <QuantityControls>
-        <QuantityControlsButton src={ArrowUp} onClick={handleIncrement} alt="-"/>
+        <QuantityControlsButton src={ArrowUp} onClick={handleIncrement} alt="plus" />
         <Quantity>{quantity}</Quantity>
-        <QuantityControlsButton src={ArrowDown} onClick={handleDecrement} alt="+"/>
+        <QuantityControlsButton src={ArrowDown} onClick={handleDecrement} alt="minus" />
       </QuantityControls>
     </CartItemContainer>
   );
