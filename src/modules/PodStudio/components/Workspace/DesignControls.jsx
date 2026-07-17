@@ -2,12 +2,21 @@ import React, { useRef, useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { FaCloudUploadAlt, FaSync, FaArrowsAltH, FaArrowsAltV, FaEye, FaTrash, FaTimes } from "react-icons/fa";
-import { 
-  getTemplateConfig, 
-  getGarmentDimensions, 
-  calculatePhysicalMetrics, 
-  calculateScaleFromPhysicalWidth 
+import {
+  FaCloudUploadAlt,
+  FaEye,
+  FaTrash,
+  FaTimes,
+  FaArrowsAltH,
+  FaArrowsAltV,
+  FaCheckCircle,
+  FaExclamationTriangle,
+} from "react-icons/fa";
+import {
+  getTemplateConfig,
+  getGarmentDimensions,
+  calculatePhysicalMetrics,
+  calculateScaleFromPhysicalWidth,
 } from "../../hooks/usePrintableArea";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -50,13 +59,13 @@ const UploadLabel = styled.span`
   font-size: 0.9rem;
   font-weight: 700;
   color: #ffffff;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
 `;
 
 const UploadSub = styled.span`
   font-size: 0.7rem;
   color: #71717a;
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
 `;
 
 const SliderGroup = styled.div`
@@ -72,7 +81,7 @@ const SliderGroup = styled.div`
     text-transform: uppercase;
     display: flex;
     justify-content: space-between;
-    font-family: 'Tajawal', sans-serif;
+    font-family: "Tajawal", sans-serif;
   }
 
   .range-row {
@@ -85,7 +94,7 @@ const SliderGroup = styled.div`
     flex: 1;
     accent-color: ${(props) => props.theme.primaryColor || "#F07A48"};
     height: 4px;
-    background: rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
     outline: none;
   }
@@ -122,7 +131,8 @@ const DimensionSegment = styled.div`
 `;
 
 const SegmentButton = styled.button`
-  background: ${(props) => (props.$active ? "rgba(240, 122, 72, 0.15)" : "transparent")};
+  background: ${(props) =>
+    props.$active ? "rgba(240, 122, 72, 0.15)" : "transparent"};
   color: ${(props) => (props.$active ? "#F07A48" : "#A1A1AA")};
   border: 1px solid ${(props) => (props.$active ? "#F07A48" : "transparent")};
   padding: 0.5rem;
@@ -162,20 +172,24 @@ const ArtworkThumbnailWrap = styled.div`
   height: 46px;
   border-radius: 10px;
   overflow: hidden;
-  background-image: 
-    linear-gradient(45deg, #18181b 25%, transparent 25%), 
-    linear-gradient(-45deg, #18181b 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #18181b 75%), 
+  background-image:
+    linear-gradient(45deg, #18181b 25%, transparent 25%),
+    linear-gradient(-45deg, #18181b 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #18181b 75%),
     linear-gradient(-45deg, transparent 75%, #18181b 75%);
   background-size: 10px 10px;
-  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
-  background-color: #27272a; /* Checkered grid pattern */
+  background-position:
+    0 0,
+    0 5px,
+    5px -5px,
+    -5px 0px;
+  background-color: #27272a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  
+
   img {
     max-width: 90%;
     max-height: 90%;
@@ -215,6 +229,34 @@ const MiniActionButton = styled.button`
   }
 `;
 
+const ResolutionWidget = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: ${(props) =>
+    props.$isHigh ? "rgba(57, 161, 112, 0.08)" : "rgba(239, 68, 68, 0.08)"};
+  border: 1px solid
+    ${(props) =>
+      props.$isHigh ? "rgba(57, 161, 112, 0.2)" : "rgba(239, 68, 68, 0.2)"};
+  color: ${(props) => (props.$isHigh ? "#39A170" : "#ef4444")};
+  font-family: "Cairo", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  width: 100%;
+  box-sizing: border-box;
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #a1a1aa;
+    font-size: 0.8rem;
+    font-family: "Tajawal", sans-serif;
+  }
+`;
+
 const LightboxOverlay = styled(motion.div)`
   position: fixed;
   inset: 0;
@@ -231,13 +273,17 @@ const LightboxCard = styled(motion.div)`
   width: 90%;
   max-width: 450px;
   aspect-ratio: 1;
-  background-image: 
-    linear-gradient(45deg, #18181b 25%, transparent 25%), 
-    linear-gradient(-45deg, #18181b 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #18181b 75%), 
+  background-image:
+    linear-gradient(45deg, #18181b 25%, transparent 25%),
+    linear-gradient(-45deg, #18181b 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #18181b 75%),
     linear-gradient(-45deg, transparent 75%, #18181b 75%);
   background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0px;
   background-color: #27272a;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -246,7 +292,7 @@ const LightboxCard = styled(motion.div)`
   justify-content: center;
   padding: 2rem;
   box-sizing: border-box;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
   position: relative;
 
   img {
@@ -256,14 +302,11 @@ const LightboxCard = styled(motion.div)`
   }
 `;
 
-const ControlsWrapper = styled.div`
-  width: 100%;
-`;
-
 const OptionSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  text-align: start;
 `;
 
 const SectionLabel = styled.span`
@@ -273,10 +316,14 @@ const SectionLabel = styled.span`
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-family: "Tajawal", sans-serif;
-  text-align: start;
 `;
 
-const DesignControls = ({ designState, setDesignState, canvasName, selectedSize = "M" }) => {
+const DesignControls = ({
+  designState,
+  setDesignState,
+  canvasName,
+  selectedSize = "M",
+}) => {
   const { t, i18n } = useTranslation();
   const fileInputRef = useRef(null);
   const replacementInputRef = useRef(null);
@@ -285,10 +332,15 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
   const [aspectRatio, setAspectRatio] = useState(1);
   const [refDimension, setRefDimension] = useState("width");
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
 
   const cfg = useMemo(() => getTemplateConfig(canvasName), [canvasName]);
-  const garmentDims = useMemo(() => getGarmentDimensions(canvasName, selectedSize), [canvasName, selectedSize]);
+  const garmentDims = useMemo(
+    () => getGarmentDimensions(canvasName, selectedSize),
+    [canvasName, selectedSize],
+  );
 
+  // Load natural dimensions of custom design file
   useEffect(() => {
     let isMounted = true;
     if (designState.previewUrl) {
@@ -299,15 +351,22 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
           const ratio = img.naturalWidth / img.naturalHeight;
           setAspectRatio(ratio);
           setRefDimension(ratio >= 1 ? "width" : "height");
+          setImgDimensions({
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+          });
         }
       };
     } else {
       setAspectRatio(1);
+      setImgDimensions({ width: 0, height: 0 });
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [designState.previewUrl]);
 
-  // Size-Aware physical metrics resolution (System 1)
+  // Dynamic S1 physical sizing projection
   const physicalMetrics = useMemo(() => {
     const printWidthRatio = cfg.printW_ref / cfg.B_ref;
     const printHeightRatio = cfg.printH_ref / cfg.A_ref;
@@ -318,38 +377,42 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
       garmentDims.A,
       printWidthRatio,
       printHeightRatio,
-      aspectRatio
+      aspectRatio,
     );
   }, [designState.scale, garmentDims, cfg, aspectRatio]);
+
+  // Continuous System 1 Dynamic Resolution Warning Calculation
+  const dpiValue = useMemo(() => {
+    if (!imgDimensions.width || !physicalMetrics.width) return 0;
+    const widthInInches = physicalMetrics.width / 2.54;
+    return Math.round(imgDimensions.width / widthInInches);
+  }, [imgDimensions, physicalMetrics.width]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const previewUrl = URL.createObjectURL(file);
-      setDesignState((prev) => ({
-        ...prev,
-        file,
-        previewUrl,
-      }));
+      setDesignState((prev) => ({ ...prev, file, previewUrl }));
     }
   };
 
   const handleSliderChange = (e) => {
     const { name, value } = e.target;
-    setDesignState((prev) => ({
-      ...prev,
-      [name]: parseFloat(value),
-    }));
+    setDesignState((prev) => ({ ...prev, [name]: parseFloat(value) }));
   };
 
   const handlePhysicalSizeChange = (e) => {
     const val = parseFloat(e.target.value) || 0;
     const printWidthRatio = cfg.printW_ref / cfg.B_ref;
-    const targetScalePct = calculateScaleFromPhysicalWidth(val, garmentDims.B, printWidthRatio);
+    const targetScalePct = calculateScaleFromPhysicalWidth(
+      val,
+      garmentDims.B,
+      printWidthRatio,
+    );
 
     setDesignState((prev) => ({
       ...prev,
-      scale: Math.min(100, Math.max(15, Math.round(targetScalePct)))
+      scale: Math.min(100, Math.max(15, Math.round(targetScalePct))),
     }));
   };
 
@@ -368,17 +431,16 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
   };
 
   const maxLimit = useMemo(() => {
-    if (refDimension === "width") {
-      return physicalMetrics.maxPrintWidthCm || 30;
-    } else {
-      return physicalMetrics.maxPrintHeightCm || 40;
-    }
+    return refDimension === "width"
+      ? physicalMetrics.maxPrintWidthCm
+      : physicalMetrics.maxPrintHeightCm;
   }, [refDimension, physicalMetrics]);
 
-  const currentActiveVal = refDimension === "width" ? physicalMetrics.width : physicalMetrics.height;
+  const currentActiveVal =
+    refDimension === "width" ? physicalMetrics.width : physicalMetrics.height;
 
   return (
-    <ControlsWrapper>
+    <div style={{ width: "100%" }}>
       {!designState.previewUrl ? (
         <UploadZone>
           <FaCloudUploadAlt style={{ fontSize: "1.75rem", color: "#a1a1aa" }} />
@@ -398,23 +460,30 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
               <ArtworkThumbnailWrap>
                 <img src={designState.previewUrl} alt="Thumbnail" />
               </ArtworkThumbnailWrap>
-              <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "#FFF" }}>
-                {designState.file?.name ? (
-                  designState.file.name.substring(0, 12) + (designState.file.name.length > 12 ? "..." : "")
-                ) : "Artwork File"}
+              <span
+                style={{
+                  fontSize: "0.85rem",
+                  fontWeight: "700",
+                  color: "#FFF",
+                }}
+              >
+                {designState.file?.name
+                  ? designState.file.name.substring(0, 12) +
+                    (designState.file.name.length > 12 ? "..." : "")
+                  : "Artwork File"}
               </span>
             </ArtworkInfo>
             <ActionRow>
-              <MiniActionButton 
-                type="button" 
-                title={t("view", "View Alone")} 
+              <MiniActionButton
+                type="button"
+                title="View Alone"
                 onClick={() => setIsLightboxOpen(true)}
               >
                 <FaEye />
               </MiniActionButton>
-              <MiniActionButton 
-                type="button" 
-                title={t("change", "Replace Image")} 
+              <MiniActionButton
+                type="button"
+                title="Replace Image"
                 onClick={() => replacementInputRef.current.click()}
               >
                 <FaCloudUploadAlt />
@@ -426,16 +495,37 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
                   style={{ display: "none" }}
                 />
               </MiniActionButton>
-              <MiniActionButton 
-                type="button" 
-                className="danger" 
-                title={t("delete", "Remove Design")} 
+              <MiniActionButton
+                type="button"
+                className="danger"
+                title="Remove Design"
                 onClick={handleReset}
               >
                 <FaTrash />
               </MiniActionButton>
             </ActionRow>
           </ArtworkManager>
+
+          {/* Dynamic i18n DPI Warning */}
+          {dpiValue > 0 && (
+            <ResolutionWidget $isHigh={dpiValue >= 150}>
+              <span className="label">
+                {dpiValue >= 150 ? (
+                  <FaCheckCircle />
+                ) : (
+                  <FaExclamationTriangle />
+                )}
+                {t("pod_studio.printable_surface")}
+              </span>
+              <span>
+                {dpiValue} DPI (
+                {dpiValue >= 150
+                  ? t("pod_studio.status_artwork_ok")
+                  : "Low Quality"}
+                )
+              </span>
+            </ResolutionWidget>
+          )}
 
           <OptionSection>
             <SectionLabel>{t("pod_studio.scale_percentage")}</SectionLabel>
@@ -444,23 +534,29 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
                 type="button"
                 $active={refDimension === "width"}
                 onClick={() => setRefDimension("width")}
-                $isArabic={isArabic}
               >
-                <FaArrowsAltH /> {t("width_prefix", "Width")}
+                <FaArrowsAltH /> {isArabic ? "العرض" : "Width"}
               </SegmentButton>
               <SegmentButton
                 type="button"
                 $active={refDimension === "height"}
                 onClick={() => setRefDimension("height")}
-                $isArabic={isArabic}
               >
-                <FaArrowsAltV /> {t("height_prefix", "Height")}
+                <FaArrowsAltV /> {isArabic ? "الارتفاع" : "Height"}
               </SegmentButton>
             </DimensionSegment>
 
             <SliderGroup>
               <label>
-                <span>{refDimension === "width" ? t("width_prefix", "Width") : t("height_prefix", "Height")}</span>
+                <span>
+                  {refDimension === "width"
+                    ? isArabic
+                      ? "العرض"
+                      : "Width"
+                    : isArabic
+                      ? "الارتفاع"
+                      : "Height"}
+                </span>
                 <span>{currentActiveVal} cm</span>
               </label>
               <div className="range-row">
@@ -539,7 +635,6 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
         </ControlsCard>
       )}
 
-      {/* Full-Screen Artwork Lightbox Overlay */}
       <AnimatePresence>
         {isLightboxOpen && (
           <LightboxOverlay
@@ -555,7 +650,7 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
               onClick={(e) => e.stopPropagation()}
             >
               <img src={designState.previewUrl} alt="Bespoke Design view" />
-              <button 
+              <button
                 onClick={() => setIsLightboxOpen(false)}
                 style={{
                   position: "absolute",
@@ -570,7 +665,7 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  justifyContent: "center",
                 }}
               >
                 <FaTimes />
@@ -579,7 +674,7 @@ const DesignControls = ({ designState, setDesignState, canvasName, selectedSize 
           </LightboxOverlay>
         )}
       </AnimatePresence>
-    </ControlsWrapper>
+    </div>
   );
 };
 

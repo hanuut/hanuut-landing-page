@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import styled, { ThemeProvider } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { FaShoppingCart, FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import {
@@ -14,20 +15,30 @@ import {
 import { partnerTheme } from "../../../../config/Themes";
 import { getImageUrl } from "../../../../utils/imageUtils";
 
-import StudioHero from "./StudioHero";
-import CanvasLibrary from "./CanvasLibrary";
 import DesignWorkspace from "../Workspace/DesignWorkspace";
 import CreationTray from "../CreationTray/CreationTray";
-
 import Cart from "../../../Partners/components/Cart";
-import { productToCanvasAdapter } from "../../adapters/productToCanvasAdapter";
-import { fetchProductById } from "../../../Product/state/reducers";
-
-import Seo from "../../../../components/Seo";
-import { createGlobalOrder } from "../../../Partners/services/orderServices";
 import OrderSuccessModal from "../../../Partners/components/OrderSuccessModal";
 import { AnimatePresence, motion } from "framer-motion";
-import { retrieveFile } from "../../utils/indexedDbHelper"; // --- SECURE BINARY RETRIEVAL HOOK ---
+import { retrieveFile } from "../../utils/indexedDbHelper";
+import CanvasLibrary from "./CanvasLibrary";
+import LanguagesDropDown from "../../../../components/LanguagesDropDown";
+
+// --- PHASE 2 INTEGRATED STOREFRONT IMPORTS ---
+import "../storefront/styles/storefront.css";
+import HeroSection from "../storefront/sections/HeroSection";
+import CreativePossibilities from "../storefront/sections/CreativePossibilities";
+import CTASection from "../storefront/sections/CTASection";
+
+import {
+  fetchPaginatedProducts,
+  selectProducts,
+} from "../../../Product/state/reducers";
+import { selectCategories } from "../../../Categories/state/reducers";
+import { productToCanvasAdapter } from "../../adapters/productToCanvasAdapter";
+import { fetchProductById } from "../../../Product/state/reducers";
+import Seo from "../../../../components/Seo";
+import { createGlobalOrder } from "../../../Partners/services/orderServices";
 
 const LayoutShell = styled.div`
   min-height: 100vh;
@@ -63,12 +74,13 @@ const UnifiedHeaderRow = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding-bottom: 1rem;
   box-sizing: border-box;
+  z-index: 10;
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 1.5rem;
   }
 `;
 
@@ -77,6 +89,59 @@ const HeaderLeft = styled.div`
   align-items: center;
   gap: 1.5rem;
   text-align: start;
+`;
+
+const HeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: flex-end;
+  }
+`;
+
+const HeaderCircleBtn = styled(Link)`
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 44px;
+  width: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+  }
+`;
+
+const LangWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  padding: 0 4px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
 `;
 
 const BackButton = styled.button`
@@ -138,7 +203,8 @@ const FloatingCartPill = styled.button`
   background: ${(props) => props.theme.primaryColor || "#F07A48"};
   color: #050505;
   border: none;
-  padding: 0.8rem 1.5rem;
+  height: 44px;
+  padding: 0 1.5rem;
   border-radius: 50px;
   font-weight: 800;
   font-size: 0.95rem;
@@ -163,28 +229,34 @@ const HiddenCartTriggerWrapper = styled.div`
 `;
 
 const uploadAssetWithFallback = async (fileBlob) => {
-  const API_URL = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
-  
+  const API_URL =
+    process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+
   try {
     const formData = new FormData();
     formData.append("file", fileBlob);
     const res = await axios.post(`${API_URL}/image/upload`, formData, {
-      headers: { "Content-Type": "multipart/form-data" }
+      headers: { "Content-Type": "multipart/form-data" },
     });
     if (res.data && res.data.url) return res.data.url;
   } catch (err) {
-    console.warn("Cloudinary upload failed, using NestJS database fallback...", err);
+    console.warn(
+      "Cloudinary upload failed, using NestJS database fallback...",
+      err,
+    );
   }
 
   const fallbackData = new FormData();
   fallbackData.append("image", fileBlob);
   const fallbackRes = await axios.post(`${API_URL}/image`, fallbackData, {
-    headers: { "Content-Type": "multipart/form-data" }
+    headers: { "Content-Type": "multipart/form-data" },
   });
   if (fallbackRes.data && fallbackRes.data.id) {
     return `${API_URL}/image/raw/${fallbackRes.data.id}`;
   }
-  throw new Error("Failed to save custom asset across both primary and fallback backends.");
+  throw new Error(
+    "Failed to save custom asset across both primary and fallback backends.",
+  );
 };
 
 const PodStudioDashboard = ({ shop, selectedShopImage }) => {
@@ -193,6 +265,8 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
   const isArabic = i18n.language === "ar";
 
   const { cart } = useSelector(selectCart);
+  const { paginatedProducts, paginationLoading } = useSelector(selectProducts);
+  const { categories } = useSelector(selectCategories);
 
   const [selectedCanvas, setSelectedCanvas] = useState(null);
   const [isTrayOpen, setIsTrayOpen] = useState(false);
@@ -208,33 +282,28 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
     return cart.filter((item) => item.shopId === shopIdValue);
   }, [cart, shop]);
 
-  const shopLogoUrl = useMemo(() => getImageUrl(selectedShopImage), [selectedShopImage]);
+  const shopLogoUrl = useMemo(
+    () => getImageUrl(selectedShopImage),
+    [selectedShopImage],
+  );
 
-  const seoMetadata = useMemo(() => {
-    const shopTitle = shop.name === "AURAS FORGE" ? "AURAS LAB" : (shop.name || "AURAS LAB");
-
-    const translations = {
-      en: {
-        title: `${shopTitle} | Create Custom Premium Apparel & Streetwear`,
-        description: `Design and manufacture custom premium apparel at ${shopTitle}. Upload your designs and build your customized streetwear collection on organic open-end cotton blanks.`,
-      },
-      fr: {
-        title: `${shopTitle} | Créez vos Vêtements Personnalisés Haut de Gamme`,
-        description: `Concevez et fabriquez vos vêtements personnalisés haut de gamme avec ${shopTitle}. Importez vos visuels et créez votre collection sur des supports en coton de qualité supérieure.`,
-      },
-      ar: {
-        title: `أوراس لاب ستوديو | صمم ملابسك المخصصة بجودة فاخرة | ${shopTitle}`,
-        description: `صمم وأنتج ملابسك الفاخرة والمخصصة مع معمل ${shopTitle}. ارفع تصاميمك الخاصة وابدأ إنتاج تشكيلتك الفريدة على خامات من القطن الطبيعي مع شحن لكافة الولايات بالجزائر.`,
-      },
-    };
-
-    const currentLang = i18n.language || "en";
-    return translations[currentLang] || translations.en;
-  }, [shop, i18n.language]);
-
-  const handleSelectCanvas = (canvas) => {
-    setSelectedCanvas(canvas);
-  };
+  // Fetch product blanks inside the dashboard to display them on the Catalog
+  useEffect(() => {
+    const shopIdValue = shop?._id || shop?.id;
+    if (shopIdValue && !selectedCanvas) {
+      dispatch(
+        fetchPaginatedProducts({
+          shopId: shopIdValue,
+          page: 1,
+          limit: 12,
+          categoryId: "",
+          search: "",
+          isNewFilter: true,
+          printOnDemand: true,
+        }),
+      );
+    }
+  }, [dispatch, shop, selectedCanvas]);
 
   const handleBackToCatalog = () => {
     setSelectedCanvas(null);
@@ -272,9 +341,26 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
     dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
   };
 
-  const handleEnterWorkspace = () => {
+  const handleScrollToCatalog = () => {
     const el = document.getElementById("canvas-library-anchor");
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // We map raw products to the catalog. We pass RAW products, not adapted canvases.
+  const rawProducts = paginatedProducts || [];
+
+  const handleSelectCanvas = (product) => {
+    if (!product) return;
+
+    // --- COGNITIVE SAFEGUARD: BREAK THE DOUBLE-ADAPTATION LOOP ---
+    if (product.canvasId) {
+      setSelectedCanvas(product);
+      return;
+    }
+
+    // When a product card is clicked, we run the adapter to build the workspace schema
+    const canvas = productToCanvasAdapter(product);
+    if (canvas) setSelectedCanvas(canvas);
   };
 
   const handlePlaceOrder = async (customerDetails) => {
@@ -284,7 +370,6 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
     const activeProducts = customerDetails.healedProducts || shopCartItems;
 
     try {
-      // --- SYNCHRONOUS HANDOFF VALIDATION ---
       const resolvedProducts = await Promise.all(
         activeProducts.map(async (item) => {
           if (!item.podCustomization) return item;
@@ -292,7 +377,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
           const custom = { ...item.podCustomization };
           const stableId = item.variantId;
 
-          if (custom.front && custom.front.imageUrl && custom.front.imageUrl.startsWith("blob:")) {
+          if (custom.front?.imageUrl?.startsWith("blob:") && stableId) {
             const fileBlob = await retrieveFile(`${stableId}_front`);
             if (fileBlob) {
               const permanentUrl = await uploadAssetWithFallback(fileBlob);
@@ -306,7 +391,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
             }
           }
 
-          if (custom.back && custom.back.imageUrl && custom.back.imageUrl.startsWith("blob:")) {
+          if (custom.back?.imageUrl?.startsWith("blob:") && stableId) {
             const fileBlob = await retrieveFile(`${stableId}_back`);
             if (fileBlob) {
               const permanentUrl = await uploadAssetWithFallback(fileBlob);
@@ -324,7 +409,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
             ...item,
             podCustomization: custom,
           };
-        })
+        }),
       );
 
       const orderPayload = {
@@ -334,7 +419,10 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
         deliveryInfo: customerDetails.note || "No note",
         note: customerDetails.note,
         deliveryPricing: customerDetails.deliveryOption?.price || 0,
-        deliveryOptionKeyword: customerDetails.deliveryOption?.type === "STOP_DESK" ? "stop_desk" : "byShop",
+        deliveryOptionKeyword:
+          customerDetails.deliveryOption?.type === "STOP_DESK"
+            ? "stop_desk"
+            : "byShop",
         state: customerDetails.address?.wilaya,
         city: customerDetails.address?.commune,
         addressLine: customerDetails.address?.addressLine || "Home Delivery",
@@ -347,7 +435,8 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
           quantity: item.quantity,
           sellingPrice: item.sellingPrice,
           categoryId: item.categoryId || item.product?.categoryId,
-          supplementary: item.color && item.size ? `${item.color},${item.size}` : undefined,
+          supplementary:
+            item.color && item.size ? `${item.color},${item.size}` : undefined,
           podCustomization: item.podCustomization,
         })),
       };
@@ -358,13 +447,16 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
       setOrderSuccessData({
         orderId: orderResult.orderId,
         customerPhone: customerDetails.customerPhone,
-        shopName: shop.name === "AURAS FORGE" ? "AURAS LAB" : (shop.name || "AURAS LAB"),
+        shopName:
+          shop.name === "AURAS FORGE" ? "AURAS LAB" : shop.name || "AURAS LAB",
       });
 
       setIsSubmitting("success");
 
       shopCartItems.forEach((item) =>
-        dispatch(updateCartQuantity({ variantId: item.variantId, quantity: 0 }))
+        dispatch(
+          updateCartQuantity({ variantId: item.variantId, quantity: 0 }),
+        ),
       );
     } catch (error) {
       console.error("Global Order Placement Failed:", error);
@@ -384,7 +476,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
   };
 
   const handleEditCustomItem = (cartItem) => {
-    dispatch(closeCart()); 
+    dispatch(closeCart());
     setEditingCartItem(cartItem);
     dispatch(fetchProductById(cartItem.productId))
       .unwrap()
@@ -397,24 +489,29 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
   return (
     <ThemeProvider theme={partnerTheme}>
       <Seo
-        title={seoMetadata.title}
-        description={seoMetadata.description}
+        title={shop.name || "AURAS LAB"}
+        description={
+          shop.description || "Print-On-Demand Custom Streetwear Laboratory"
+        }
         url={`https://hanuut.com/@${shop.username}`}
         image={shopLogoUrl}
         shop={shop}
       />
 
-      <LayoutShell dir={isArabic ? "rtl" : "ltr"}>
+      <LayoutShell dir={isArabic ? "rtl" : "ltr"} className="pod-storefront">
+        <div className="pod-storefront-bg-glow" />
         <MainContent>
           <UnifiedHeaderRow $isArabic={isArabic}>
             <HeaderLeft>
               {selectedCanvas && (
                 <BackButton onClick={handleBackToCatalog}>
                   {isArabic ? <FaArrowRight /> : <FaArrowLeft />}
-                  <span>{t("pod_studio.btn_back")}</span>
+                  <span>{t("pod_studio.btn_back", "Back")}</span>
                 </BackButton>
               )}
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }} >
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              >
                 {shopLogoUrl ? (
                   <StudioLogo src={shopLogoUrl} alt={shop.name} />
                 ) : (
@@ -428,7 +525,11 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
                   />
                 )}
                 <StudioText>
-                  <StudioName>{shop.name === "AURAS FORGE" ? "AURAS LAB" : (shop.name || "AURAS LAB")}</StudioName>
+                  <StudioName>
+                    {shop.name === "AURAS FORGE"
+                      ? "AURAS LAB"
+                      : shop.name || "AURAS LAB"}
+                  </StudioName>
                   <StudioDesc>
                     {shop.description || "Print-On-Demand Studio"}
                   </StudioDesc>
@@ -436,17 +537,33 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
               </div>
             </HeaderLeft>
 
-            {(shopCartItems.length > 0 || !selectedCanvas) && (
-              <FloatingCartPill onClick={() => setIsTrayOpen(true)}>
-                <FaShoppingCart />
-                {shopCartItems.length > 0 && (
-                  <span>
-                    {shopCartItems.reduce((acc, item) => acc + item.quantity, 0)}{" "}
-                    {t("pod_studio.tray_title")}
-                  </span>
-                )}
-              </FloatingCartPill>
-            )}
+            <HeaderRight>
+              {/* Home Link */}
+              <HeaderCircleBtn to="/" title={t("back_home", "Back to Home")}>
+                <img src="/logoPic.png" alt="Hanuut Home" />
+              </HeaderCircleBtn>
+
+              {/* Language Switcher Wrapper */}
+              <LangWrapper>
+                <LanguagesDropDown textColor="#ffffff" />
+              </LangWrapper>
+
+              {/* Shopping Cart Pill */}
+              {(shopCartItems.length > 0 || !selectedCanvas) && (
+                <FloatingCartPill onClick={() => setIsTrayOpen(true)}>
+                  <FaShoppingCart />
+                  {shopCartItems.length > 0 && (
+                    <span>
+                      {shopCartItems.reduce(
+                        (acc, item) => acc + item.quantity,
+                        0,
+                      )}{" "}
+                      {t("pod_studio.tray_title", "Tray")}
+                    </span>
+                  )}
+                </FloatingCartPill>
+              )}
+            </HeaderRight>
           </UnifiedHeaderRow>
 
           {selectedCanvas ? (
@@ -458,16 +575,30 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
               onCommitSuccess={handleCommitSuccess}
             />
           ) : (
-            <>
-              <StudioHero onEnterWorkspace={handleEnterWorkspace} />
-              <div id="canvas-library-anchor" style={{ width: "100%", paddingTop: "1rem" }} >
+            <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "5rem" }}>
+              <HeroSection 
+                onScrollToCatalog={handleScrollToCatalog} 
+                sampleProducts={rawProducts}
+              />
+              
+              
+              
+              <div id="canvas-library-anchor" style={{ scrollMarginTop: "100px" }}>
+                {/* Notice we pass the exact old props back into the exact old component layout */}
                 <CanvasLibrary
                   shopId={shop._id || shop.id}
                   onSelectCanvas={handleSelectCanvas}
                   shop={shop}
                 />
               </div>
-            </>
+
+              <CreativePossibilities
+                products={rawProducts}
+                onSelectCanvas={handleSelectCanvas}
+              />
+
+              <CTASection onStartDesign={handleScrollToCatalog} />
+            </div>
           )}
         </MainContent>
 
@@ -510,12 +641,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
 };
 
 PodStudioDashboard.propTypes = {
-  shop: PropTypes.shape({
-    _id: PropTypes.string,
-    id: PropTypes.string,
-    name: PropTypes.string,
-    description: PropTypes.string,
-  }).isRequired,
+  shop: PropTypes.object.isRequired,
   selectedShopImage: PropTypes.object,
 };
 

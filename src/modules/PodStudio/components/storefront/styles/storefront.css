@@ -1,0 +1,194 @@
+
+/* Isolated Storefront Stylesheet for AURAS LAB */
+
+.auras-showroom {
+  background-color: #050505;
+  color: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Category Filter Bar */
+.auras-pills-row {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  width: 100%;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.auras-pills-row::-webkit-scrollbar {
+  display: none;
+}
+
+.auras-category-pill {
+  padding: 0.6rem 1.2rem;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: #a1a1aa;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-family: 'Tajawal', sans-serif;
+}
+
+.auras-category-pill:hover,
+.auras-category-pill.active {
+  background: rgba(240, 122, 72, 0.08);
+  border-color: #f07a48;
+  color: #ffffff;
+}
+
+/* THE 5-4 ASYMMETRIC GRID SYSTEM */
+.auras-5-4-grid {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* Row 1: 5 items (20 / 4 = 5) */
+.auras-5-4-item:nth-child(9n + 1),
+.auras-5-4-item:nth-child(9n + 2),
+.auras-5-4-item:nth-child(9n + 3),
+.auras-5-4-item:nth-child(9n + 4),
+.auras-5-4-item:nth-child(9n + 5) {
+  grid-column: span 4;
+}
+
+/* Row 2: 4 items (20 / 5 = 4) */
+.auras-5-4-item:nth-child(9n + 6),
+.auras-5-4-item:nth-child(9n + 7),
+.auras-5-4-item:nth-child(9n + 8),
+.auras-5-4-item:nth-child(9n + 9) {
+  grid-column: span 5;
+}
+
+/* Responsive Fallbacks for the Grid */
+@media (max-width: 1200px) {
+  .auras-5-4-grid { grid-template-columns: repeat(3, 1fr); }
+  .auras-5-4-item { grid-column: span 1 !important; }
+}
+
+@media (max-width: 768px) {
+  .auras-5-4-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .auras-5-4-grid { grid-template-columns: 1fr; }
+}
+
+/* RTL Helpers */
+[dir="rtl"] .auras-align {
+  text-align: right;
+}
+
+[dir="ltr"] .auras-align {
+  text-align: left;
+}
+
+/* Tabular browser container */
+.auras-catalog-split {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 2.5rem;
+  width: 100%;
+  align-items: start;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .auras-catalog-split {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Dual-sided visual preview box */
+.auras-blueprint-stage {
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: #111214;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+}
+
+.auras-blueprint-stage img {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+}
+
+
+.pod-storefront {
+  background-color: #050505;
+  color: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Exact Hero Background from your Screenshot */
+.hero-blueprint-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: center center;
+}
+
+/* Category Rails */
+.category-pills-rail {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding: 0.5rem 0 1rem 0;
+  width: 100%;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.category-pills-rail::-webkit-scrollbar { display: none; }
+
+/* Dynamic Editorial Bento Grid */
+.editorial-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Create the asymmetric masonry layout dynamically */
+@media (min-width: 768px) {
+  .editorial-bento-grid .bento-card:nth-child(5n + 1) {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .editorial-bento-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .editorial-bento-grid .bento-card {
+    grid-column: span 1 !important;
+  }
+}

@@ -366,7 +366,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
             activeProductId={activeProduct?._id}
             hasActive={!!activeProduct}
             imageOverrides={imageOverrides}
-            layoutType={isPodShop ? 'list' : 'grid'} // --- RESTORED COEXISTING LAYOUT RULES ---
+            layoutType={isPodShop ? 'list' : 'grid'} 
             isPodShop={isPodShop} 
           />
         </div>
@@ -389,7 +389,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
         activeProductId={activeProduct?._id}
         hasActive={!!activeProduct}
         imageOverrides={imageOverrides}
-        layoutType={isPodShop ? 'list' : 'grid'} // --- RESTORED COEXISTING LAYOUT RULES ---
+        layoutType={isPodShop ? 'list' : 'grid'} 
         isPodShop={isPodShop} 
       />
     </>
