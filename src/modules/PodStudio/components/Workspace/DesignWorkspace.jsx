@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { usePalette } from "color-thief-react";
-import { FaBookOpen } from "react-icons/fa";
+import { FaBookOpen, FaUndo, FaRedo } from "react-icons/fa";
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
 import PreviewStage from "./PreviewStage";
@@ -15,6 +15,7 @@ import {
   getGarmentDimensions,
   getTemplateConfig,
 } from "../../hooks/usePrintableArea";
+import { useDesignHistory } from "../../hooks/useDesignHistory";
 
 const WorkspaceGrid = styled.div`
   display: grid;
@@ -168,6 +169,39 @@ const SizingScrollButton = styled.button`
   }
 `;
 
+const ActionToolbar = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+`;
+
+const ToolbarBtn = styled.button`
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Tajawal", sans-serif;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #f07a48;
+    color: #f07a48;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+`;
+
 const COLOR_MAP = {
   black: "#000000",
   noir: "#000000",
@@ -218,7 +252,9 @@ const DesignWorkspace = ({
   editingCartItem,
   onCommitSuccess,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
+
   const [selectedColor, setSelectedColor] = useState(
     canvas.availableColors[0]?.colorName || "",
   );
@@ -235,7 +271,8 @@ const DesignWorkspace = ({
   const [showSolidBg, setShowSolidBg] = useState(false);
   const [solidBgColor, setSolidBgColor] = useState("#FFFFFF");
 
-  const [frontDesign, setFrontDesign] = useState({
+  // --- S2: INCORPORATING CONTINUOUS HISTORY TRACKING HOOKS ---
+  const [frontDesign, setFrontDesign, undoFront, redoFront, canUndoFront, canRedoFront, resetFront] = useDesignHistory({
     file: null,
     previewUrl: null,
     x: 50,
@@ -243,7 +280,8 @@ const DesignWorkspace = ({
     scale: 50,
     rotation: 0,
   });
-  const [backDesign, setBackDesign] = useState({
+
+  const [backDesign, setBackDesign, undoBack, redoBack, canUndoBack, canRedoBack, resetBack] = useDesignHistory({
     file: null,
     previewUrl: null,
     x: 50,
@@ -253,8 +291,36 @@ const DesignWorkspace = ({
   });
 
   const activeDesignState = activeSide === "back" ? backDesign : frontDesign;
-  const setActiveDesignState =
-    activeSide === "back" ? setBackDesign : setFrontDesign;
+  const setActiveDesignState = activeSide === "back" ? setBackDesign : setFrontDesign;
+
+  // KEYBOARD EVENT LISTENERS FOR FLUID UNDO/REDO HOTKEYS
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const isUndo = (e.ctrlKey || e.metaKey) && e.key?.toLowerCase() === "z" && !e.shiftKey;
+      const isRedo = 
+        ((e.ctrlKey || e.metaKey) && e.key?.toLowerCase() === "y") || 
+        ((e.ctrlKey || e.metaKey) && e.key?.toLowerCase() === "z" && e.shiftKey);
+
+      if (isUndo) {
+        e.preventDefault();
+        if (activeSide === "front") {
+          if (canUndoFront) undoFront();
+        } else {
+          if (canUndoBack) undoBack();
+        }
+      } else if (isRedo) {
+        e.preventDefault();
+        if (activeSide === "front") {
+          if (canRedoFront) redoFront();
+        } else {
+          if (canRedoBack) redoBack();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeSide, undoFront, undoBack, redoFront, redoBack, canUndoFront, canUndoBack, canRedoFront, canRedoBack]);
 
   // Enforce scrolling viewport directly to the top on page load
   useEffect(() => {
@@ -401,7 +467,7 @@ const DesignWorkspace = ({
           const backScale = resolveInitialScale(custom.back);
 
           if (isMounted) {
-            setFrontDesign(
+            resetFront(
               custom.front
                 ? {
                     file: "existing",
@@ -421,7 +487,7 @@ const DesignWorkspace = ({
                   },
             );
 
-            setBackDesign(
+            resetBack(
               custom.back
                 ? {
                     file: "existing",
@@ -448,7 +514,7 @@ const DesignWorkspace = ({
         loadDesignUrls();
       }
     } else {
-      setFrontDesign({
+      resetFront({
         file: null,
         previewUrl: null,
         scale: 50,
@@ -456,7 +522,7 @@ const DesignWorkspace = ({
         y: 50,
         rotation: 0,
       });
-      setBackDesign({
+      resetBack({
         file: null,
         previewUrl: null,
         scale: 50,
@@ -472,7 +538,7 @@ const DesignWorkspace = ({
       if (freshFrontUrl) URL.revokeObjectURL(freshFrontUrl);
       if (freshBackUrl) URL.revokeObjectURL(freshBackUrl);
     };
-  }, [editingCartItem, canvas]);
+  }, [editingCartItem, canvas, resetFront, resetBack]);
 
   const activeColorObj = useMemo(() => {
     if (!canvas?.availableColors || !selectedColor) return null;
@@ -510,6 +576,12 @@ const DesignWorkspace = ({
     }
   }, [hasBackTemplate, activeSide]);
 
+  // Dynamic values resolved based on current active print surface
+  const canUndoActive = activeSide === "front" ? canUndoFront : canUndoBack;
+  const canRedoActive = activeSide === "front" ? canRedoFront : canRedoBack;
+  const activeUndoHandler = activeSide === "front" ? undoFront : undoBack;
+  const activeRedoHandler = activeSide === "front" ? redoFront : redoBack;
+
   return (
     <div style={{ width: "100%" }}>
       <WorkspaceGrid>
@@ -529,31 +601,45 @@ const DesignWorkspace = ({
         />
 
         <ControlPanel>
-          <div>
-            <h2
-              style={{
-                fontSize: "1.45rem",
-                fontWeight: 800,
-                fontFamily: "Tajawal",
-                marginBottom: "0.15rem",
-                color: "white",
-              }}
-            >
-              {canvas.title}
-            </h2>
-            <span
-              style={{
-                fontFamily: "monospace",
-                color: "#F07A48",
-                fontWeight: 700,
-                fontSize: "0.85rem",
-              }}
-            >
-              {canvas.serialNumber}
-            </span>
-            <SizingScrollButton onClick={handleScrollToSizeChart}>
-              <FaBookOpen /> {t("pod_studio.blank_specifications")}
-            </SizingScrollButton>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h2
+                style={{
+                  fontSize: "1.45rem",
+                  fontWeight: 800,
+                  fontFamily: "Tajawal",
+                  marginBottom: "0.15rem",
+                  color: "white",
+                }}
+              >
+                {canvas.title}
+              </h2>
+              <span
+                style={{
+                  fontFamily: "monospace",
+                  color: "#F07A48",
+                  fontWeight: 700,
+                  fontSize: "0.85rem",
+                }}
+              >
+                {canvas.serialNumber}
+              </span>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <SizingScrollButton onClick={handleScrollToSizeChart}>
+                  <FaBookOpen /> {t("pod_studio.blank_specifications")}
+                </SizingScrollButton>
+              </div>
+            </div>
+
+            {/* Desktop Action Toolbar for Undo / Redo */}
+            <ActionToolbar style={{ direction: isArabic ? 'rtl' : 'ltr' }}>
+              <ToolbarBtn disabled={!canUndoActive} onClick={activeUndoHandler} title="Undo (Ctrl+Z)">
+                <FaUndo /> {isArabic ? "تراجع" : "Undo"}
+              </ToolbarBtn>
+              <ToolbarBtn disabled={!canRedoActive} onClick={activeRedoHandler} title="Redo (Ctrl+Y)">
+                <FaRedo /> {isArabic ? "إعادة" : "Redo"}
+              </ToolbarBtn>
+            </ActionToolbar>
           </div>
 
           <OptionRow>
@@ -641,7 +727,7 @@ const DesignWorkspace = ({
           />
         </ControlPanel>
       </WorkspaceGrid>
-      <PartnerSizingWidget canvas={canvas} selectedSize={selectedSize} />
+      <PartnerSizingWidget canvas={canvas} />
     </div>
   );
 };

@@ -14,13 +14,13 @@ import {
 } from "../../../Cart/state/reducers";
 import { partnerTheme } from "../../../../config/Themes";
 import { getImageUrl } from "../../../../utils/imageUtils";
-
+import { retrieveFile, garbageCollectKeys } from "../../utils/indexedDbHelper";
 import DesignWorkspace from "../Workspace/DesignWorkspace";
 import CreationTray from "../CreationTray/CreationTray";
 import Cart from "../../../Partners/components/Cart";
 import OrderSuccessModal from "../../../Partners/components/OrderSuccessModal";
 import { AnimatePresence, motion } from "framer-motion";
-import { retrieveFile } from "../../utils/indexedDbHelper";
+
 import CanvasLibrary from "./CanvasLibrary";
 import LanguagesDropDown from "../../../../components/LanguagesDropDown";
 

@@ -82,3 +82,42 @@ export const removeFile = async (key) => {
     console.error("IndexedDB delete failed:", err);
   }
 };
+
+// --- NEW: SYSTEM STORAGE GARBAGE COLLECTION ENGINE ---
+export const garbageCollectKeys = async (activeKeys) => {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      
+      const request = store.getAllKeys();
+      request.onsuccess = (event) => {
+        const keysInDb = event.target.result || [];
+        // Detect keys that do not belong to active items in the cart
+        const orphanedKeys = keysInDb.filter(key => !activeKeys.includes(key));
+
+        if (orphanedKeys.length === 0) {
+          resolve(true);
+          return;
+        }
+
+        const deletePromises = orphanedKeys.map(key => {
+          return new Promise((res) => {
+            const delReq = store.delete(key);
+            delReq.onsuccess = () => res();
+            delReq.onerror = () => res(); // Silently resolve to prevent blockages
+          });
+        });
+
+        Promise.all(deletePromises).then(() => {
+          console.log(`[IndexedDB GC] Purged ${orphanedKeys.length} orphaned binary assets.`);
+          resolve(true);
+        });
+      };
+      request.onerror = (event) => reject(event.target.error);
+    });
+  } catch (err) {
+    console.error("IndexedDB garbage collection failed:", err);
+  }
+};

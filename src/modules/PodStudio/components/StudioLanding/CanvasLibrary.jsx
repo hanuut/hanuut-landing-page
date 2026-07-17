@@ -461,6 +461,29 @@ const CustomRotatingMockup = ({
   );
 };
 
+// --- OPTIMIZED MEMOIZED MARQUEE ITEM COMPONENT ---
+const MemoizedMarqueeItem = React.memo(({ canvas, idx, popoverState, onSelect, onMouseEnter }) => {
+  return (
+    <MarqueeItem 
+      onClick={() => onSelect(canvas)}
+      onMouseEnter={(e) => onMouseEnter(e, canvas)}
+    >
+      <CircleBg />
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%' }}>
+        <CustomRotatingMockup 
+          colorObj={canvas.availableColors?.[0]} 
+          title={canvas.title} 
+          isHovered={popoverState.canvas?.canvasId === canvas.canvasId} 
+          isMarquee={true} 
+        />
+      </div>
+    </MarqueeItem>
+  );
+});
+
+MemoizedMarqueeItem.displayName = "MemoizedMarqueeItem";
+
+
 const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
   const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
@@ -582,38 +605,17 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
         <MarqueeWrapper>
           <MarqueeTrack
             animate={{ x: ["0%", "-50%"] }}
-            transition={{
-              repeat: Infinity,
-              ease: "linear",
-              duration: marqueeItems.length * 2.5,
-            }}
+            transition={{ repeat: Infinity, ease: "linear", duration: marqueeItems.length * 2.5 }}
           >
-            {/* Duplicated arrays to ensure a seamless infinite loop */}
             {[...marqueeItems, ...marqueeItems].map((canvas, idx) => (
-              <MarqueeItem
+              <MemoizedMarqueeItem 
                 key={`${canvas.canvasId}-${idx}`}
-                onClick={() => onSelectCanvas(canvas)}
-                onMouseEnter={(e) => handleMouseEnter(e, canvas)}
-              >
-                <CircleBg />
-                <div
-                  style={{
-                    position: "relative",
-                    zIndex: 1,
-                    width: "100%",
-                    height: "100%",
-                  }}
-                >
-                  <CustomRotatingMockup
-                    colorObj={canvas.availableColors?.[0]}
-                    title={canvas.title}
-                    isHovered={
-                      popoverState.canvas?.canvasId === canvas.canvasId
-                    }
-                    isMarquee={true}
-                  />
-                </div>
-              </MarqueeItem>
+                canvas={canvas}
+                idx={idx}
+                popoverState={popoverState}
+                onSelect={onSelectCanvas}
+                onMouseEnter={handleMouseEnter}
+              />
             ))}
           </MarqueeTrack>
         </MarqueeWrapper>
