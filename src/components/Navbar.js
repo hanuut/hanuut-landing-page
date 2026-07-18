@@ -352,7 +352,7 @@ const Navbar = () => {
   const selectedShopImage = useSelector(selectSelectedShopImage);
 
   const path = location.pathname;
-  const isShopMode = /^(@[^/]+|shop\/[^/]+)/.test(path.substring(1));
+  const isShopMode = /^(@[^/]+|shop\/[^/]+)/.test(path.substring(1)) || path.startsWith("/auras");
   const isTawsilaMode = path.startsWith("/abrid");
   const navigate = useNavigate();
 

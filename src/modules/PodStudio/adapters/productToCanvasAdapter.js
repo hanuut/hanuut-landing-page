@@ -61,6 +61,8 @@ export const productToCanvasAdapter = (product) => {
     sizes: defaultAvailability.sizes?.map(s => ({
       sizeCode: s.size,
       baseCost: s.sellingPrice
-    })) || []
+    })) || [],
+
+    sizeChart: product.sizeChart || null
   };
 };
