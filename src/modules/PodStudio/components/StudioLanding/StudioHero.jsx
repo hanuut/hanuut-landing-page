@@ -265,10 +265,10 @@ const StudioHero = ({ onEnterWorkspace }) => {
     <HeroContainer dir={isArabic ? "rtl" : "ltr"}>
       <LeftCol $isArabic={isArabic}>
         <CrosshairTarget />
-        <Title>{t("pod_studio.hero_create_once")}</Title>
-        <Description>{t("pod_studio.hero_desc")}</Description>
+        <Title>{t("pod_studio_hero_create_once")}</Title>
+        <Description>{t("pod_studio_hero_desc")}</Description>
         <EnterButton onClick={onEnterWorkspace}>
-          {t("pod_studio.btn_enter_workspace")}
+          {t("pod_studio_btn_enter_workspace")}
         </EnterButton>
       </LeftCol>
       <RightCol onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>

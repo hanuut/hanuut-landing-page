@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -21,7 +27,7 @@ import {
   selectCart,
   addToCart,
   updateCartQuantity,
-  closeCart, 
+  closeCart,
 } from "../../Cart/state/reducers";
 
 import ProductShowcase from "../../Product/components/landing/ProductShowcase";
@@ -30,7 +36,7 @@ import InlineProductDetails from "../../Product/components/landing/InlineProduct
 
 const ContentWrapper = styled.div`
   width: 100%;
-  background: ${props => props.theme.body};
+  background: ${(props) => props.theme.body};
 `;
 
 const Container = styled.div`
@@ -47,17 +53,23 @@ const StudioHero = styled(motion.header)`
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
-  direction: ${props => props.$isArabic ? 'rtl' : 'ltr'};
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
   position: relative;
   overflow: hidden;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
-    top: -50%; left: 50%;
+    top: -50%;
+    left: 50%;
     transform: translateX(-50%);
-    width: 60%; height: 100%;
-    background: radial-gradient(circle, rgba(57, 161, 112, 0.08) 0%, transparent 70%);
+    width: 60%;
+    height: 100%;
+    background: radial-gradient(
+      circle,
+      rgba(57, 161, 112, 0.08) 0%,
+      transparent 70%
+    );
     filter: blur(50px);
     pointer-events: none;
   }
@@ -66,7 +78,7 @@ const StudioHero = styled(motion.header)`
 const HeroTag = styled.span`
   font-family: monospace;
   font-size: 0.8rem;
-  color: ${props => props.theme.primaryColor};
+  color: ${(props) => props.theme.primaryColor};
   letter-spacing: 2px;
   text-transform: uppercase;
   font-weight: 700;
@@ -77,7 +89,7 @@ const HeroTitle = styled.h1`
   font-weight: 900;
   color: white;
   margin: 1rem 0;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   letter-spacing: -1px;
 `;
 
@@ -87,7 +99,7 @@ const HeroSubtitle = styled.p`
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
   white-space: pre-line;
 `;
 
@@ -96,11 +108,10 @@ const SplitGrid = styled.div`
   flex-direction: column;
   gap: 2rem;
 
-  @media(min-width: 1024px) {
+  @media (min-width: 1024px) {
     display: grid;
-    grid-template-columns: ${props => props.$isFocused 
-      ? "1fr" 
-      : (props.$isArabic ? "1fr 1.5fr" : "1.5fr 1fr")}; 
+    grid-template-columns: ${(props) =>
+      props.$isFocused ? "1fr" : props.$isArabic ? "1fr 1.5fr" : "1.5fr 1fr"};
     align-items: start;
     transition: grid-template-columns 0.4s ease-in-out;
   }
@@ -108,29 +119,31 @@ const SplitGrid = styled.div`
 
 const DesktopPane = styled.div`
   display: none;
-  
-  @media(min-width: 1024px) {
+
+  @media (min-width: 1024px) {
     display: block;
     position: sticky;
     top: 100px;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
     width: 100%;
-    &::-webkit-scrollbar { display: none; }
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 `;
 
 const MobilePane = styled.div`
   display: none;
-  
-  @media(max-width: 1024px) {
+
+  @media (max-width: 1024px) {
     display: block;
   }
 `;
 
 const ProductsListPane = styled.div`
   width: 100%;
-  display: ${props => props.$hidden ? 'none' : 'block'}; 
+  display: ${(props) => (props.$hidden ? "none" : "block")};
 `;
 
 const LoadMoreTrigger = styled.div`
@@ -146,16 +159,23 @@ const Spinner = styled.div`
   width: 32px;
   height: 32px;
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: ${props => props.theme.primaryColor};
+  border-top-color: ${(props) => props.theme.primaryColor};
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
-const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEditingCartItem }) => {
+const GlobalShopLandingPage = ({
+  shop,
+  isOrderingEnabled,
+  editingCartItem,
+  setEditingCartItem,
+}) => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -164,7 +184,8 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
   const normalizedShopId = useMemo(() => shop?._id || shop?.id, [shop]);
 
   // Detect POD mode from shop configurations
-  const isPodShop = shop?.shopSettings?.printOnDemand === true || shop?.printOnDemand === true;
+  const isPodShop =
+    shop?.shopSettings?.printOnDemand === true || shop?.printOnDemand === true;
 
   const [activeWizardStep, setActiveWizardStep] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -172,10 +193,14 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
   const [activeProduct, setActiveProduct] = useState(null);
   const [imageOverrides, setImageOverrides] = useState({});
 
-  const paginatedList = useSelector((state) => state.products.paginatedProducts);
-  const paginatedLoading = useSelector((state) => state.products.paginationLoading);
+  const paginatedList = useSelector(
+    (state) => state.products.paginatedProducts,
+  );
+  const paginatedLoading = useSelector(
+    (state) => state.products.paginationLoading,
+  );
   const paginationMeta = useSelector((state) => state.products.paginationMeta);
-  
+
   const { featuredProducts } = useSelector(selectProducts);
   const { categories } = useSelector(selectCategories);
   const { cart } = useSelector(selectCart);
@@ -199,7 +224,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
           categoryId: "",
           search: "",
           isNewFilter: true,
-          printOnDemand: isPodShop 
+          printOnDemand: isPodShop,
         }),
       );
     }
@@ -209,20 +234,22 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
   useEffect(() => {
     if (paginatedList.length > 0) {
       const extractedCategoryIds = paginatedList
-        .map(p => {
+        .map((p) => {
           if (!p.categoryId) return null;
-          if (typeof p.categoryId === 'object') {
+          if (typeof p.categoryId === "object") {
             return p.categoryId._id || p.categoryId.id;
           }
           return p.categoryId;
         })
-        .filter(id => id && typeof id === 'string');
-      
+        .filter((id) => id && typeof id === "string");
+
       const uniqueIds = Array.from(new Set(extractedCategoryIds));
-      const missingIds = uniqueIds.filter(id => !categories.some(cat => cat.id === id));
+      const missingIds = uniqueIds.filter(
+        (id) => !categories.some((cat) => cat.id === id),
+      );
 
       if (missingIds.length > 0) {
-         dispatch(fetchCategories(missingIds));
+        dispatch(fetchCategories(missingIds));
       }
     }
   }, [paginatedList, categories, dispatch]);
@@ -238,7 +265,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
           categoryId: selectedCategory || "",
           search: searchQuery,
           isNewFilter: true,
-          printOnDemand: isPodShop 
+          printOnDemand: isPodShop,
         }),
       );
     }, 400);
@@ -261,11 +288,13 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
   useEffect(() => {
     if (activeProduct) {
       if (window.innerWidth < 1024) {
-        window.scrollTo({ top: 300, behavior: 'smooth' });
+        window.scrollTo({ top: 300, behavior: "smooth" });
       } else {
-        const element = document.getElementById(`product-card-${activeProduct._id}`);
+        const element = document.getElementById(
+          `product-card-${activeProduct._id}`,
+        );
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }
     }
@@ -285,14 +314,22 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
               categoryId: selectedCategory || "",
               search: searchQuery,
               isNewFilter: false,
-              printOnDemand: isPodShop 
+              printOnDemand: isPodShop,
             }),
           );
         }
       });
       if (node) observer.current.observe(node);
     },
-    [paginatedLoading, paginationMeta.hasMore, normalizedShopId, selectedCategory, searchQuery, dispatch, isPodShop],
+    [
+      paginatedLoading,
+      paginationMeta.hasMore,
+      normalizedShopId,
+      selectedCategory,
+      searchQuery,
+      dispatch,
+      isPodShop,
+    ],
   );
 
   const observer = useRef();
@@ -306,24 +343,26 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
 
     setActiveProduct(product);
     setSearchParams({ product: product._id });
-    setActiveWizardStep(1); 
+    setActiveWizardStep(1);
 
     if (quickAdd && isOrderingEnabled) {
       const defaultAvail = product.availabilities?.[0];
       const defaultSize = defaultAvail?.sizes?.[0];
       if (defaultSize) {
-        dispatch(addToCart({
-          product,
-          productId: product._id, 
-          title: product.name, 
-          variantId: `${product._id}_${defaultAvail.color}_${defaultSize.size}`,
-          color: defaultAvail.color,
-          size: defaultSize.size,
-          sellingPrice: defaultSize.sellingPrice,
-          imageId: defaultAvail.imageId,
-          quantity: 1,
-          shopId: normalizedShopId,
-        }));
+        dispatch(
+          addToCart({
+            product,
+            productId: product._id,
+            title: product.name,
+            variantId: `${product._id}_${defaultAvail.color}_${defaultSize.size}`,
+            color: defaultAvail.color,
+            size: defaultSize.size,
+            sellingPrice: defaultSize.sellingPrice,
+            imageId: defaultAvail.imageId,
+            quantity: 1,
+            shopId: normalizedShopId,
+          }),
+        );
       }
     }
   };
@@ -332,7 +371,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
     setActiveProduct(null);
     setSearchParams({});
     setActiveWizardStep(1);
-    setEditingCartItem(null); 
+    setEditingCartItem(null);
   };
 
   const handleAddToCart = (variant) => {
@@ -344,13 +383,14 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
   };
 
   const handleImageChange = useCallback((productId, imageId) => {
-    setImageOverrides(prev => {
-      if (prev[productId] === imageId) return prev; 
+    setImageOverrides((prev) => {
+      if (prev[productId] === imageId) return prev;
       return { ...prev, [productId]: imageId };
     });
   }, []);
 
-  const isHomeView = !searchQuery && !selectedCategory && paginationMeta.page === 1;
+  const isHomeView =
+    !searchQuery && !selectedCategory && paginationMeta.page === 1;
 
   const renderCatalogContent = () => (
     <>
@@ -366,8 +406,8 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
             activeProductId={activeProduct?._id}
             hasActive={!!activeProduct}
             imageOverrides={imageOverrides}
-            layoutType={isPodShop ? 'list' : 'grid'} 
-            isPodShop={isPodShop} 
+            layoutType={isPodShop ? "list" : "grid"}
+            isPodShop={isPodShop}
           />
         </div>
       )}
@@ -389,8 +429,8 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
         activeProductId={activeProduct?._id}
         hasActive={!!activeProduct}
         imageOverrides={imageOverrides}
-        layoutType={isPodShop ? 'list' : 'grid'} 
-        isPodShop={isPodShop} 
+        layoutType={isPodShop ? "list" : "grid"}
+        isPodShop={isPodShop}
       />
     </>
   );
@@ -407,7 +447,7 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
             categories={categories}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
-            isPodShop={isPodShop} 
+            isPodShop={isPodShop}
           />
         )}
 
@@ -418,9 +458,9 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <HeroTag>{t("pod_studio.hero_tag")}</HeroTag>
-            <HeroTitle>{t("pod_studio.hero_title")}</HeroTitle>
-            <HeroSubtitle>{t("pod_studio.hero_subtitle")}</HeroSubtitle>
+            <HeroTag>{t("pod_studio_hero_tag")}</HeroTag>
+            <HeroTitle>{t("pod_studio_hero_title")}</HeroTitle>
+            <HeroSubtitle>{t("pod_studio_hero_subtitle")}</HeroSubtitle>
           </StudioHero>
         )}
 
@@ -430,16 +470,16 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
               <MobilePane>
                 <InlineProductDetails
                   product={activeProduct}
-                  isPodShop={isPodShop} 
+                  isPodShop={isPodShop}
                   cartItems={shopCartItems}
                   onAddToCart={handleAddToCart}
                   onUpdateQuantity={handleUpdateQuantity}
                   isOrderingEnabled={isOrderingEnabled}
                   onClose={handleClose}
                   onImageChange={handleImageChange}
-                  onWizardStepChange={setActiveWizardStep} 
-                  editingCartItem={editingCartItem} 
-                  setEditingCartItem={setEditingCartItem} 
+                  onWizardStepChange={setActiveWizardStep}
+                  editingCartItem={editingCartItem}
+                  setEditingCartItem={setEditingCartItem}
                 />
               </MobilePane>
             </AnimatePresence>
@@ -455,16 +495,16 @@ const GlobalShopLandingPage = ({ shop, isOrderingEnabled, editingCartItem, setEd
               <DesktopPane>
                 <InlineProductDetails
                   product={activeProduct}
-                  isPodShop={isPodShop} 
+                  isPodShop={isPodShop}
                   cartItems={shopCartItems}
                   onAddToCart={handleAddToCart}
                   onUpdateQuantity={handleUpdateQuantity}
                   isOrderingEnabled={isOrderingEnabled}
                   onClose={handleClose}
                   onImageChange={handleImageChange}
-                  onWizardStepChange={setActiveWizardStep} 
-                  editingCartItem={editingCartItem} 
-                  setEditingCartItem={setEditingCartItem} 
+                  onWizardStepChange={setActiveWizardStep}
+                  editingCartItem={editingCartItem}
+                  setEditingCartItem={setEditingCartItem}
                 />
               </DesktopPane>
             </AnimatePresence>

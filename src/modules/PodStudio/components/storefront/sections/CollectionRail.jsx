@@ -18,21 +18,21 @@ const SectionHeader = styled.div`
   align-items: flex-end;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding-bottom: 0.75rem;
-  direction: ${props => props.$isArabic ? 'rtl' : 'ltr'};
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 `;
 
 const Title = styled.h3`
   font-size: 1.25rem;
   font-weight: 800;
   color: #fff;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   margin: 0;
 `;
 
 const SubText = styled.span`
   font-size: 0.85rem;
   color: #71717a;
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
 `;
 
 const CardContainer = styled.div`
@@ -64,7 +64,7 @@ const CollectionRail = ({ title, products, onSelectCanvas }) => {
     <Container>
       <SectionHeader $isArabic={isArabic}>
         <Title>{title}</Title>
-        <SubText>{t("pod_store.swipe_to_view", "Swipe to view")}</SubText>
+        <SubText>{t("pod_store_swipe_to_view", "Swipe to view")}</SubText>
       </SectionHeader>
       <CardContainer style={{ direction: isArabic ? "rtl" : "ltr" }}>
         {cleanProducts.map((product, index) => (
@@ -83,7 +83,7 @@ const CollectionRail = ({ title, products, onSelectCanvas }) => {
 CollectionRail.propTypes = {
   title: PropTypes.string.isRequired,
   products: PropTypes.array.isRequired,
-  onSelectCanvas: PropTypes.func.isRequired
+  onSelectCanvas: PropTypes.func.isRequired,
 };
 
 export default CollectionRail;

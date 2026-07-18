@@ -29,7 +29,11 @@ const CardWrapper = styled.div`
 const ImageStage = styled.div`
   width: 100%;
   aspect-ratio: 1;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 85%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.01) 85%
+  );
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.04);
   display: flex;
@@ -71,7 +75,7 @@ const ProductName = styled.h3`
   font-size: 1.05rem;
   font-weight: 800;
   color: #ffffff;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -91,7 +95,7 @@ const SpecBadge = styled.span`
   color: #a1a1aa;
   padding: 2px 6px;
   border-radius: 4px;
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
 `;
 
 const PricingActionRow = styled.div`
@@ -118,7 +122,7 @@ const CustomizeBtn = styled.button`
   font-weight: 800;
   font-size: 0.82rem;
   cursor: pointer;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   transition: all 0.2s ease;
 
   &:hover {
@@ -138,26 +142,39 @@ const ProductCard = ({ product, index, onSelect }) => {
   useEffect(() => {
     let isMounted = true;
     if (imageId) {
-      getImage(imageId).then((res) => {
-        if (isMounted && res?.data) {
-          setImageBuffer(res.data);
-        }
-      }).catch((err) => console.error("Error loading substrate image:", err));
+      getImage(imageId)
+        .then((res) => {
+          if (isMounted && res?.data) {
+            setImageBuffer(res.data);
+          }
+        })
+        .catch((err) => console.error("Error loading substrate image:", err));
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [imageId]);
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
 
   // --- ARRAYS TYPE PROTECTION ENFORCED ---
   const gsmValue = useMemo(() => {
-    if (!product.specifications || !Array.isArray(product.specifications)) return null;
-    return product.specifications.find(spec => spec.name?.toLowerCase() === "gsm")?.value || null;
+    if (!product.specifications || !Array.isArray(product.specifications))
+      return null;
+    return (
+      product.specifications.find((spec) => spec.name?.toLowerCase() === "gsm")
+        ?.value || null
+    );
   }, [product.specifications]);
 
   const materialValue = useMemo(() => {
-    if (!product.specifications || !Array.isArray(product.specifications)) return null;
-    return product.specifications.find(spec => spec.name?.toLowerCase() === "material")?.value || null;
+    if (!product.specifications || !Array.isArray(product.specifications))
+      return null;
+    return (
+      product.specifications.find(
+        (spec) => spec.name?.toLowerCase() === "material",
+      )?.value || null
+    );
   }, [product.specifications]);
 
   return (
@@ -171,13 +188,16 @@ const ProductCard = ({ product, index, onSelect }) => {
       </ImageStage>
       <InfoBlock>
         <CategoryBadge>
-          {t("pod_store.base_label", "CANVAS")} / {String(index + 1).padStart(3, "0")}
+          {t("pod_store_base_label", "CANVAS")} /{" "}
+          {String(index + 1).padStart(3, "0")}
         </CategoryBadge>
         <ProductName onClick={onSelect}>{product.name}</ProductName>
         <SpecRow>
           {gsmValue && <SpecBadge>{gsmValue} GSM</SpecBadge>}
           {materialValue && <SpecBadge>{materialValue}</SpecBadge>}
-          {product.hasBackPrintSurface && <SpecBadge>{t("pod_store.double_sided", "Double-Sided")}</SpecBadge>}
+          {product.hasBackPrintSurface && (
+            <SpecBadge>{t("pod_store_double_sided", "Double-Sided")}</SpecBadge>
+          )}
         </SpecRow>
       </InfoBlock>
       <PricingActionRow>
@@ -185,7 +205,7 @@ const ProductCard = ({ product, index, onSelect }) => {
           {parseInt(defaultSize?.sellingPrice || 0)} {t("dzd", "DA")}
         </PriceValue>
         <CustomizeBtn onClick={onSelect}>
-          {t("pod_store.start_designing_btn", "Design")}
+          {t("pod_store_start_designing_btn", "Design")}
         </CustomizeBtn>
       </PricingActionRow>
     </CardWrapper>
@@ -195,7 +215,7 @@ const ProductCard = ({ product, index, onSelect }) => {
 ProductCard.propTypes = {
   product: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired,
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
 };
 
 export default ProductCard;

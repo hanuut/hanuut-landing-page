@@ -421,7 +421,7 @@ const PremiumProductCard = ({
 
         <Content $layoutType="list">
           <SerialTag>
-            {t("pod_studio.base_label")} / {String(index + 1).padStart(3, "0")}
+            {t("pod_studio_base_label")} / {String(index + 1).padStart(3, "0")}
           </SerialTag>
           <ProductName $layoutType="list">{productName}</ProductName>
           {renderSpecs()}
@@ -436,7 +436,7 @@ const PremiumProductCard = ({
             onClick={handleCardSelect}
             $layoutType="list"
           >
-            <FaTshirt /> {t("pod_studio.design_button")}
+            <FaTshirt /> {t("pod_studio_design_button")}
           </StudioActionBtn>
         </RightActionColumn>
       </CardWrapper>
@@ -456,7 +456,7 @@ const PremiumProductCard = ({
       <Content $layoutType="grid">
         {isPodShop ? (
           <SerialTag>
-            {t("pod_studio.base_label")} / {String(index + 1).padStart(3, "0")}
+            {t("pod_studio_base_label")} / {String(index + 1).padStart(3, "0")}
           </SerialTag>
         ) : (
           product.brand && <Brand>{product.brand}</Brand>
@@ -499,7 +499,7 @@ const PremiumProductCard = ({
             onClick={handleCardSelect}
             $layoutType="grid"
           >
-            <FaTshirt /> {t("pod_studio.design_button")}
+            <FaTshirt /> {t("pod_studio_design_button")}
           </StudioActionBtn>
         )}
       </Content>

@@ -264,7 +264,7 @@ const PartnerSizingWidget = ({ canvas, selectedSize }) => {
       <WidgetTitle>
         {isArabic
           ? "جدول المقاسات والمواصفات الفنية"
-          : t("pod_studio.blank_specifications")}
+          : t("pod_studio_blank_specifications")}
       </WidgetTitle>
       <WidgetSplit>
         <DiagramWrapper>

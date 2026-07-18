@@ -36,7 +36,7 @@ const CanvasPreviewArea = styled.div`
     max-width: 90%;
     max-height: 90%;
     object-fit: contain;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
     transition: transform 0.4s ease;
   }
 
@@ -70,7 +70,7 @@ const CanvasTitle = styled.h3`
   font-weight: 800;
   color: #fff;
   margin: 0 0 0.5rem 0;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   cursor: pointer;
 `;
 
@@ -85,13 +85,13 @@ const TechList = styled.div`
 const TechMetric = styled.span`
   font-size: 0.85rem;
   color: #a1a1aa;
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
   display: flex;
   align-items: center;
   gap: 6px;
 
   &::before {
-    content: '•';
+    content: "•";
     color: ${(props) => props.theme.primaryColor || "#F07A48"};
     font-weight: bold;
   }
@@ -108,7 +108,7 @@ const ActionButton = styled.button`
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
 
   &:hover {
     background-color: ${(props) => props.theme.primaryColor || "#F07A48"};
@@ -129,9 +129,13 @@ const CanvasCard = ({ canvas, onSelect }) => {
             setImageUrl(getImageUrl(res.data));
           }
         })
-        .catch((err) => console.error("Error fetching canvas image preview:", err));
+        .catch((err) =>
+          console.error("Error fetching canvas image preview:", err),
+        );
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [canvas.previewImageId]);
 
   return (
@@ -145,17 +149,20 @@ const CanvasCard = ({ canvas, onSelect }) => {
         )}
       </CanvasPreviewArea>
       <ContentBlock>
-        <CanvasTitle onClick={() => onSelect(canvas)}>{canvas.title}</CanvasTitle>
+        <CanvasTitle onClick={() => onSelect(canvas)}>
+          {canvas.title}
+        </CanvasTitle>
         <TechList>
           <TechMetric>{canvas.specifications.gsm} GSM</TechMetric>
           <TechMetric>{canvas.specifications.composition}</TechMetric>
           <TechMetric>{canvas.specifications.fit}</TechMetric>
           <TechMetric>
-            {t("pod_studio.printable_surface")}: {canvas.specifications.printableSurfaces.join(" + ").toUpperCase()}
+            {t("pod_studio_printable_surface")}:{" "}
+            {canvas.specifications.printableSurfaces.join(" + ").toUpperCase()}
           </TechMetric>
         </TechList>
         <ActionButton onClick={() => onSelect(canvas)}>
-          {t("pod_studio.start_designing_cta")}
+          {t("pod_studio_start_designing_cta")}
         </ActionButton>
       </ContentBlock>
     </CardContainer>
@@ -172,10 +179,10 @@ CanvasCard.propTypes = {
       gsm: PropTypes.string,
       composition: PropTypes.string,
       fit: PropTypes.string,
-      printableSurfaces: PropTypes.arrayOf(PropTypes.string)
-    }).isRequired
+      printableSurfaces: PropTypes.arrayOf(PropTypes.string),
+    }).isRequired,
   }).isRequired,
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
 };
 
 export default CanvasCard;

@@ -142,8 +142,8 @@ const GridLines = ({ visible, ratios }) => {
   if (!visible) return null;
 
   // Calculate the horizontal line coordinate to align exactly with S2 print center
-  const centerY = ratios 
-    ? ratios.absolutePrintArea.top + (ratios.absolutePrintArea.height / 2) 
+  const centerY = ratios
+    ? ratios.absolutePrintArea.top + ratios.absolutePrintArea.height / 2
     : 50;
 
   return (
@@ -151,26 +151,75 @@ const GridLines = ({ visible, ratios }) => {
       {/* Vertical Subdivision lines */}
       {[20, 40, 60, 80].map((pct) => (
         <React.Fragment key={`v-${pct}`}>
-          <line x1={`${pct}%`} y1="0" x2={`${pct}%`} y2="100%" stroke="#000" strokeWidth="3" />
-          <line x1={`${pct}%`} y1="0" x2={`${pct}%`} y2="100%" stroke={pct === 40 || pct === 60 ? "#397FF9" : "#FF4D4D"} strokeWidth="1" />
+          <line
+            x1={`${pct}%`}
+            y1="0"
+            x2={`${pct}%`}
+            y2="100%"
+            stroke="#000"
+            strokeWidth="3"
+          />
+          <line
+            x1={`${pct}%`}
+            y1="0"
+            x2={`${pct}%`}
+            y2="100%"
+            stroke={pct === 40 || pct === 60 ? "#397FF9" : "#FF4D4D"}
+            strokeWidth="1"
+          />
         </React.Fragment>
       ))}
-      
+
       {/* Horizontal Subdivision lines */}
       {[20, 40, 60, 80].map((pct) => (
         <React.Fragment key={`h-${pct}`}>
-          <line x1="0" y1={`${pct}%`} x2="100%" y2={`${pct}%`} stroke="#000" strokeWidth="3" />
-          <line x1="0" y1={`${pct}%`} x2="100%" y2={`${pct}%`} stroke={pct === 40 || pct === 60 ? "#397FF9" : "#FF4D4D"} strokeWidth="1" />
+          <line
+            x1="0"
+            y1={`${pct}%`}
+            x2="100%"
+            y2={`${pct}%`}
+            stroke="#000"
+            strokeWidth="3"
+          />
+          <line
+            x1="0"
+            y1={`${pct}%`}
+            x2="100%"
+            y2={`${pct}%`}
+            stroke={pct === 40 || pct === 60 ? "#397FF9" : "#FF4D4D"}
+            strokeWidth="1"
+          />
         </React.Fragment>
       ))}
 
       {/* Main Vertical Axis (Always 50%) */}
       <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#000" strokeWidth="4" />
-      <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#397FF9" strokeWidth="2" />
+      <line
+        x1="50%"
+        y1="0"
+        x2="50%"
+        y2="100%"
+        stroke="#397FF9"
+        strokeWidth="2"
+      />
 
       {/* Main Horizontal Axis (Spatially Aligned with S2 Print Center) */}
-      <line x1="0" y1={`${centerY}%`} x2="100%" y2={`${centerY}%`} stroke="#000" strokeWidth="4" />
-      <line x1="0" y1={`${centerY}%`} x2="100%" y2={`${centerY}%`} stroke="#397FF9" strokeWidth="2" />
+      <line
+        x1="0"
+        y1={`${centerY}%`}
+        x2="100%"
+        y2={`${centerY}%`}
+        stroke="#000"
+        strokeWidth="4"
+      />
+      <line
+        x1="0"
+        y1={`${centerY}%`}
+        x2="100%"
+        y2={`${centerY}%`}
+        stroke="#397FF9"
+        strokeWidth="2"
+      />
     </GridSvg>
   );
 };
@@ -202,32 +251,47 @@ const PreviewStage = ({
       <SolidColorBackground $active={showSolidBg} $color={solidBgColor} />
 
       <StageFloatingControls onClick={(e) => e.stopPropagation()}>
-        <FloatingToggleBtn type="button" $active={showGrid} onClick={() => setShowGrid(!showGrid)}>
-          <FaBorderAll /> {t("pod_studio.toggle_grid")}
+        <FloatingToggleBtn
+          type="button"
+          $active={showGrid}
+          onClick={() => setShowGrid(!showGrid)}
+        >
+          <FaBorderAll /> {t("pod_studio_toggle_grid")}
         </FloatingToggleBtn>
-        <FloatingToggleBtn type="button" $active={showSolidBg} onClick={() => setShowSolidBg(!showSolidBg)}>
-          <FaFillDrip /> {t("pod_studio.toggle_bg")}
+        <FloatingToggleBtn
+          type="button"
+          $active={showSolidBg}
+          onClick={() => setShowSolidBg(!showSolidBg)}
+        >
+          <FaFillDrip /> {t("pod_studio_toggle_bg")}
         </FloatingToggleBtn>
 
         {showSolidBg && (
           <FloatingColorWheel>
-            <input type="color" value={solidBgColor} onChange={(e) => setSolidBgColor(e.target.value)} />
+            <input
+              type="color"
+              value={solidBgColor}
+              onChange={(e) => setSolidBgColor(e.target.value)}
+            />
           </FloatingColorWheel>
         )}
       </StageFloatingControls>
 
       <WorkspaceContainer>
         {activeTemplateUrl ? (
-          <BackgroundTemplate src={activeTemplateUrl} alt="Active Substrate Template" />
+          <BackgroundTemplate
+            src={activeTemplateUrl}
+            alt="Active Substrate Template"
+          />
         ) : (
           <div style={{ color: "#333", fontSize: "4rem", zIndex: 3 }}>👕</div>
         )}
         <BoundingBox>
-          <PrintableArea 
-            ratios={ratios} 
-            designState={designState} 
-            setDesignState={setDesignState} 
-            activeTemplateUrl={activeTemplateUrl} 
+          <PrintableArea
+            ratios={ratios}
+            designState={designState}
+            setDesignState={setDesignState}
+            activeTemplateUrl={activeTemplateUrl}
           />
           <GridLines visible={showGrid} ratios={ratios} />
         </BoundingBox>

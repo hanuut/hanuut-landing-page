@@ -506,7 +506,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
               {selectedCanvas && (
                 <BackButton onClick={handleBackToCatalog}>
                   {isArabic ? <FaArrowRight /> : <FaArrowLeft />}
-                  <span>{t("pod_studio.btn_back", "Back")}</span>
+                  <span>{t("pod_studio_btn_back", "Back")}</span>
                 </BackButton>
               )}
               <div
@@ -558,7 +558,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
                         (acc, item) => acc + item.quantity,
                         0,
                       )}{" "}
-                      {t("pod_studio.tray_title", "Tray")}
+                      {t("pod_studio_tray_title", "Tray")}
                     </span>
                   )}
                 </FloatingCartPill>
@@ -575,15 +575,23 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
               onCommitSuccess={handleCommitSuccess}
             />
           ) : (
-            <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "5rem" }}>
-              <HeroSection 
-                onScrollToCatalog={handleScrollToCatalog} 
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: "5rem",
+              }}
+            >
+              <HeroSection
+                onScrollToCatalog={handleScrollToCatalog}
                 sampleProducts={rawProducts}
               />
-              
-              
-              
-              <div id="canvas-library-anchor" style={{ scrollMarginTop: "100px" }}>
+
+              <div
+                id="canvas-library-anchor"
+                style={{ scrollMarginTop: "100px" }}
+              >
                 {/* Notice we pass the exact old props back into the exact old component layout */}
                 <CanvasLibrary
                   shopId={shop._id || shop.id}

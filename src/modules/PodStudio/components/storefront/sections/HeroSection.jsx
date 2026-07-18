@@ -52,8 +52,16 @@ const CrosshairTarget = styled.div`
   background-image:
     linear-gradient(rgba(255, 255, 255, 1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 1) 1px, transparent 1px),
-    radial-gradient(circle, transparent 25%, rgba(255, 255, 255, 1) 26%, transparent 28%);
-  background-size: 80px 80px, 80px 80px, 300px 300px;
+    radial-gradient(
+      circle,
+      transparent 25%,
+      rgba(255, 255, 255, 1) 26%,
+      transparent 28%
+    );
+  background-size:
+    80px 80px,
+    80px 80px,
+    300px 300px;
   background-position: center;
 `;
 
@@ -216,23 +224,44 @@ const ProductTitle = styled.div`
 
 const StackProductImage = ({ product }) => {
   const [url, setUrl] = useState(null);
-  
+
   useEffect(() => {
     let isMounted = true;
     const imgId = product?.availabilities?.[0]?.imageId || product?.imageId;
     if (imgId) {
-      getImage(imgId).then(res => {
-        if (isMounted && res.data) setUrl(getImageUrl(res.data));
-      }).catch(() => {});
+      getImage(imgId)
+        .then((res) => {
+          if (isMounted && res.data) setUrl(getImageUrl(res.data));
+        })
+        .catch(() => {});
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [product]);
 
   return url ? (
     <img src={url} alt={product.name || "Product"} loading="lazy" />
   ) : (
-    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ width: '40px', height: '40px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#f07a48', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          width: "40px",
+          height: "40px",
+          border: "3px solid rgba(255,255,255,0.1)",
+          borderTopColor: "#f07a48",
+          borderRadius: "50%",
+          animation: "spin 1s linear infinite",
+        }}
+      />
     </div>
   );
 };
@@ -251,9 +280,21 @@ const HeroSection = ({ onScrollToCatalog, sampleProducts }) => {
       }));
     }
     return [
-      { productObj: { name: "PREMIUM HOODIE" }, title: "PREMIUM HOODIE", label: "PROTOTYPE_084" },
-      { productObj: { name: "HEAVY BOX TEE" }, title: "HEAVYWEIGHT TEE", label: "CORE_ITEM_042" },
-      { productObj: { name: "STUDIO TOTE" }, title: "STUDIO TOTE", label: "CANVAS_121" },
+      {
+        productObj: { name: "PREMIUM HOODIE" },
+        title: "PREMIUM HOODIE",
+        label: "PROTOTYPE_084",
+      },
+      {
+        productObj: { name: "HEAVY BOX TEE" },
+        title: "HEAVYWEIGHT TEE",
+        label: "CORE_ITEM_042",
+      },
+      {
+        productObj: { name: "STUDIO TOTE" },
+        title: "STUDIO TOTE",
+        label: "CANVAS_121",
+      },
     ];
   }, [sampleProducts]);
 
@@ -275,28 +316,46 @@ const HeroSection = ({ onScrollToCatalog, sampleProducts }) => {
     <HeroContainer dir={isArabic ? "rtl" : "ltr"} $isArabic={isArabic}>
       <LeftCol $isArabic={isArabic}>
         <CrosshairTarget />
-        <Title $isArabic={isArabic} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          {t("pod_studio.hero_title")}
+        <Title
+          $isArabic={isArabic}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {t("pod_studio_hero_title")}
         </Title>
-        <Description $isArabic={isArabic} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          {t("pod_studio.hero_desc")}
+        <Description
+          $isArabic={isArabic}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          {t("pod_studio_hero_desc")}
         </Description>
-        <EnterButton onClick={onScrollToCatalog} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          {t("pod_studio.btn_enter_workspace")}
+        <EnterButton
+          onClick={onScrollToCatalog}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          {t("pod_studio_btn_enter_workspace")}
         </EnterButton>
       </LeftCol>
-      
-      <RightCol 
+
+      <RightCol
         onMouseMove={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           x.set(e.clientX / rect.width - 0.5);
           y.set(e.clientY / rect.height - 0.5);
-        }} 
-        onMouseLeave={() => { x.set(0); y.set(0); }}
+        }}
+        onMouseLeave={() => {
+          x.set(0);
+          y.set(0);
+        }}
       >
         <StackWrapper style={{ rotateX, rotateY }}>
           {displayItems.map((item, index) => {
-            const offset = (index - activeIdx + displayItems.length) % displayItems.length;
+            const offset =
+              (index - activeIdx + displayItems.length) % displayItems.length;
             const isFront = offset === 0;
             const isMiddle = offset === 1;
 
@@ -308,9 +367,14 @@ const HeroSection = ({ onScrollToCatalog, sampleProducts }) => {
                   scale: isFront ? 1 : isMiddle ? 0.92 : 0.84,
                   opacity: isFront ? 1 : isMiddle ? 0.6 : 0.2,
                   rotateZ: isFront ? 0 : isMiddle ? -2 : 3,
-                  zIndex: isFront ? 3 : isMiddle ? 2 : 1
+                  zIndex: isFront ? 3 : isMiddle ? 2 : 1,
                 }}
-                transition={{ type: "spring", stiffness: 120, damping: 18, mass: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 18,
+                  mass: 1,
+                }}
                 style={{ pointerEvents: isFront ? "auto" : "none" }}
               >
                 <GlowingGrid />
@@ -322,9 +386,9 @@ const HeroSection = ({ onScrollToCatalog, sampleProducts }) => {
                   <StackProductImage product={item.productObj} />
                 </GarmentVisual>
                 <CoordinateOverlay>
-                  <CoordText>COORD_X: {isFront ? '42.09' : '---'}</CoordText>
-                  <CoordText>COORD_Y: {isFront ? '80.11' : '---'}</CoordText>
-                  <CoordText>Z_DEPTH: {isFront ? '0.25' : '---'}</CoordText>
+                  <CoordText>COORD_X: {isFront ? "42.09" : "---"}</CoordText>
+                  <CoordText>COORD_Y: {isFront ? "80.11" : "---"}</CoordText>
+                  <CoordText>Z_DEPTH: {isFront ? "0.25" : "---"}</CoordText>
                 </CoordinateOverlay>
               </ShowcaseCard>
             );
@@ -335,9 +399,9 @@ const HeroSection = ({ onScrollToCatalog, sampleProducts }) => {
   );
 };
 
-HeroSection.propTypes = { 
+HeroSection.propTypes = {
   onScrollToCatalog: PropTypes.func.isRequired,
-  sampleProducts: PropTypes.array
+  sampleProducts: PropTypes.array,
 };
 
 export default HeroSection;

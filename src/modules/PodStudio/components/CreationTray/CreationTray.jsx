@@ -196,7 +196,7 @@ const CreationTray = ({
                 style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
                 <FaShoppingCart style={{ color: "#F07A48" }} />
-                <TrayTitle>{t("pod_studio.tray_title")}</TrayTitle>
+                <TrayTitle>{t("pod_studio_tray_title")}</TrayTitle>
               </div>
               <ActionButton onClick={onClose} style={{ fontSize: "1.5rem" }}>
                 &times;
@@ -312,14 +312,14 @@ const CreationTray = ({
               ) : (
                 <EmptyState>
                   <FaBoxOpen size={36} />
-                  <span>{t("pod_studio.empty_tray")}</span>
+                  <span>{t("pod_studio_empty_tray")}</span>
                 </EmptyState>
               )}
             </ScrollableContainer>
 
             {trayItems.length > 0 && (
               <ProductionButton onClick={onSubmit}>
-                {t("pod_studio.btn_submit_production")}
+                {t("pod_studio_btn_submit_production")}
               </ProductionButton>
             )}
           </TrayWrapper>

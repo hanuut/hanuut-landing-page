@@ -23,27 +23,50 @@ const CTASection = ({ onStartDesign }) => {
 
   return (
     <CTAContainer $isArabic={isArabic}>
-      <h2 style={{ fontSize: '2.5rem', margin: 0, color: 'white', fontFamily: 'Tajawal' }}>
-        {t("pod_studio.ready_to_create")}
-      </h2>
-      <p style={{ color: '#a1a1aa', maxWidth: '500px', margin: 0, fontFamily: 'Cairo', lineHeight: 1.6 }}>
-        {t("pod_studio.ready_cta_sub")}
-      </p>
-      <button 
-        onClick={onStartDesign}
+      <h2
         style={{
-          marginTop: '1rem', background: '#fff', color: '#000', border: 'none',
-          padding: '1rem 2rem', borderRadius: '50px', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', fontFamily: 'Tajawal'
+          fontSize: "2.5rem",
+          margin: 0,
+          color: "white",
+          fontFamily: "Tajawal",
         }}
       >
-        {t("pod_studio.start_designing_cta")}
+        {t("pod_studio_ready_to_create")}
+      </h2>
+      <p
+        style={{
+          color: "#a1a1aa",
+          maxWidth: "500px",
+          margin: 0,
+          fontFamily: "Cairo",
+          lineHeight: 1.6,
+        }}
+      >
+        {t("pod_studio_ready_cta_sub")}
+      </p>
+      <button
+        onClick={onStartDesign}
+        style={{
+          marginTop: "1rem",
+          background: "#fff",
+          color: "#000",
+          border: "none",
+          padding: "1rem 2rem",
+          borderRadius: "50px",
+          fontWeight: 800,
+          fontSize: "1rem",
+          cursor: "pointer",
+          fontFamily: "Tajawal",
+        }}
+      >
+        {t("pod_studio_start_designing_cta")}
       </button>
     </CTAContainer>
   );
 };
 
 CTASection.propTypes = {
-  onStartDesign: PropTypes.func.isRequired
+  onStartDesign: PropTypes.func.isRequired,
 };
 
 export default CTASection;

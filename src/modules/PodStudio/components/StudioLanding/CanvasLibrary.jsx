@@ -462,27 +462,35 @@ const CustomRotatingMockup = ({
 };
 
 // --- OPTIMIZED MEMOIZED MARQUEE ITEM COMPONENT ---
-const MemoizedMarqueeItem = React.memo(({ canvas, idx, popoverState, onSelect, onMouseEnter }) => {
-  return (
-    <MarqueeItem 
-      onClick={() => onSelect(canvas)}
-      onMouseEnter={(e) => onMouseEnter(e, canvas)}
-    >
-      <CircleBg />
-      <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%' }}>
-        <CustomRotatingMockup 
-          colorObj={canvas.availableColors?.[0]} 
-          title={canvas.title} 
-          isHovered={popoverState.canvas?.canvasId === canvas.canvasId} 
-          isMarquee={true} 
-        />
-      </div>
-    </MarqueeItem>
-  );
-});
+const MemoizedMarqueeItem = React.memo(
+  ({ canvas, idx, popoverState, onSelect, onMouseEnter }) => {
+    return (
+      <MarqueeItem
+        onClick={() => onSelect(canvas)}
+        onMouseEnter={(e) => onMouseEnter(e, canvas)}
+      >
+        <CircleBg />
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          <CustomRotatingMockup
+            colorObj={canvas.availableColors?.[0]}
+            title={canvas.title}
+            isHovered={popoverState.canvas?.canvasId === canvas.canvasId}
+            isMarquee={true}
+          />
+        </div>
+      </MarqueeItem>
+    );
+  },
+);
 
 MemoizedMarqueeItem.displayName = "MemoizedMarqueeItem";
-
 
 const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
   const dispatch = useDispatch();
@@ -605,10 +613,14 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
         <MarqueeWrapper>
           <MarqueeTrack
             animate={{ x: ["0%", "-50%"] }}
-            transition={{ repeat: Infinity, ease: "linear", duration: marqueeItems.length * 2.5 }}
+            transition={{
+              repeat: Infinity,
+              ease: "linear",
+              duration: marqueeItems.length * 2.5,
+            }}
           >
             {[...marqueeItems, ...marqueeItems].map((canvas, idx) => (
-              <MemoizedMarqueeItem 
+              <MemoizedMarqueeItem
                 key={`${canvas.canvasId}-${idx}`}
                 canvas={canvas}
                 idx={idx}
@@ -622,7 +634,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
       )}
 
       <SectionHeader style={{ marginTop: "1rem" }}>
-        <h3>{t("pod_store.catalog_heading", "Explore Blank Canvases")}</h3>
+        <h3>{t("pod_studio_catalog_heading", "Explore Blank")}</h3>
         <div className="line" />
       </SectionHeader>
 
@@ -739,7 +751,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
                   fontFamily: "Tajawal",
                 }}
               >
-                {t("pod_studio.blank_specifications", "MATERIAL BLUEPRINT")}
+                {t("pod_studio_blank_specifications", "MATERIAL BLUEPRINT")}
               </h4>
               <SpecBadge>{popoverState.canvas.sku}</SpecBadge>
             </div>

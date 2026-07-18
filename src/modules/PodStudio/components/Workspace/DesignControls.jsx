@@ -444,8 +444,8 @@ const DesignControls = ({
       {!designState.previewUrl ? (
         <UploadZone>
           <FaCloudUploadAlt style={{ fontSize: "1.75rem", color: "#a1a1aa" }} />
-          <UploadLabel>{t("pod_studio.upload_design_title")}</UploadLabel>
-          <UploadSub>{t("pod_studio.upload_requirements")}</UploadSub>
+          <UploadLabel>{t("pod_studio_upload_design_title")}</UploadLabel>
+          <UploadSub>{t("pod_studio_upload_requirements")}</UploadSub>
           <input
             type="file"
             ref={fileInputRef}
@@ -515,12 +515,12 @@ const DesignControls = ({
                 ) : (
                   <FaExclamationTriangle />
                 )}
-                {t("pod_studio.printable_surface")}
+                {t("pod_studio_printable_surface")}
               </span>
               <span>
                 {dpiValue} DPI (
                 {dpiValue >= 150
-                  ? t("pod_studio.status_artwork_ok")
+                  ? t("pod_studio_status_artwork_ok")
                   : "Low Quality"}
                 )
               </span>
@@ -528,7 +528,7 @@ const DesignControls = ({
           )}
 
           <OptionSection>
-            <SectionLabel>{t("pod_studio.scale_percentage")}</SectionLabel>
+            <SectionLabel>{t("pod_studio_scale_percentage")}</SectionLabel>
             <DimensionSegment>
               <SegmentButton
                 type="button"
@@ -584,7 +584,7 @@ const DesignControls = ({
 
           <SliderGroup>
             <label>
-              <span>{t("pod_studio.x_alignment")}</span>
+              <span>{t("pod_studio_x_alignment")}</span>
               <span>{designState.x}%</span>
             </label>
             <div className="range-row">
@@ -601,7 +601,7 @@ const DesignControls = ({
 
           <SliderGroup>
             <label>
-              <span>{t("pod_studio.y_alignment")}</span>
+              <span>{t("pod_studio_y_alignment")}</span>
               <span>{designState.y}%</span>
             </label>
             <div className="range-row">
@@ -618,7 +618,7 @@ const DesignControls = ({
 
           <SliderGroup>
             <label>
-              <span>{t("pod_studio.angle_rotation")}</span>
+              <span>{t("pod_studio_angle_rotation")}</span>
               <span>{designState.rotation}°</span>
             </label>
             <div className="range-row">

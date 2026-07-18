@@ -17,13 +17,13 @@ import {
   FaTimes,
   FaTrash,
 } from "react-icons/fa";
-import { 
-  getGarmentDimensions, 
-  getTemplateConfig, 
-  getRawPrintCost, 
+import {
+  getGarmentDimensions,
+  getTemplateConfig,
+  getRawPrintCost,
   getFittedPrintZoneRatios,
   calculatePhysicalMetrics,
-  calculateScaleFromPhysicalWidth
+  calculateScaleFromPhysicalWidth,
 } from "../../../PodStudio/hooks/usePrintableArea";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -35,19 +35,19 @@ const TemplateContentArea = styled.div`
   position: absolute;
   z-index: 2;
   overflow: hidden; /* THE PHYSICAL PRODUCT BOUNDARY CLIPPING CONTAINER */
-  top: ${props => props.$area.top}%;
-  left: ${props => props.$area.left}%;
-  width: ${props => props.$area.width}%;
-  height: ${props => props.$area.height}%;
+  top: ${(props) => props.$area.top}%;
+  left: ${(props) => props.$area.left}%;
+  width: ${(props) => props.$area.width}%;
+  height: ${(props) => props.$area.height}%;
   pointer-events: none;
 `;
 
 const InteractivePrintArea = styled.div`
   position: absolute;
-  top: ${props => props.$area.top}%;
-  left: ${props => props.$area.left}%;
-  width: ${props => props.$area.width}%;
-  height: ${props => props.$area.height}%;
+  top: ${(props) => props.$area.top}%;
+  left: ${(props) => props.$area.left}%;
+  width: ${(props) => props.$area.width}%;
+  height: ${(props) => props.$area.height}%;
   pointer-events: auto;
   z-index: 3;
 `;
@@ -106,18 +106,32 @@ const PodCanvasContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: 
-    radial-gradient(circle at center, rgba(240, 122, 72, 0.1) 0%, rgba(12, 12, 14, 0.98) 100%),
-    linear-gradient(45deg, #141416 25%, transparent 25%), 
-    linear-gradient(-45deg, #141416 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #141416 75%), 
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(240, 122, 72, 0.1) 0%,
+      rgba(12, 12, 14, 0.98) 100%
+    ),
+    linear-gradient(45deg, #141416 25%, transparent 25%),
+    linear-gradient(-45deg, #141416 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #141416 75%),
     linear-gradient(-45deg, transparent 75%, #141416 75%);
-  background-size: 100% 100%, 16px 16px, 16px 16px, 16px 16px, 16px 16px;
-  background-position: center, 0 0, 0 8px, 8px -8px, -8px 0px;
+  background-size:
+    100% 100%,
+    16px 16px,
+    16px 16px,
+    16px 16px,
+    16px 16px;
+  background-position:
+    center,
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0px;
   background-color: #0c0c0e;
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 
+  box-shadow:
     inset 0 0 40px rgba(0, 0, 0, 0.85),
     0 20px 40px rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -267,7 +281,7 @@ const CanvasLegend = styled.div`
   flex-direction: column;
   gap: 6px;
   z-index: 100;
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
   pointer-events: none;
   text-align: left;
   direction: ltr;
@@ -279,24 +293,24 @@ const LegendItem = styled.div`
   gap: 8px;
   font-size: 0.72rem;
   color: #a1a1aa;
-  
+
   .dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: ${props => props.$color || "#fff"};
+    background: ${(props) => props.$color || "#fff"};
   }
-  
+
   .label {
     font-weight: 700;
     color: #ffffff;
-    font-family: 'Tajawal', sans-serif;
+    font-family: "Tajawal", sans-serif;
   }
 
   .value {
     font-family: monospace;
     font-weight: 700;
-    color: ${props => props.$valColor || "#a1a1aa"};
+    color: ${(props) => props.$valColor || "#a1a1aa"};
   }
 `;
 
@@ -414,7 +428,7 @@ const SegmentBtn = styled.button`
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
 `;
 
 const OptionSegment = styled.div`
@@ -573,20 +587,24 @@ const ArtworkThumbnailWrap = styled.div`
   height: 46px;
   border-radius: 10px;
   overflow: hidden;
-  background-image: 
-    linear-gradient(45deg, #18181b 25%, transparent 25%), 
-    linear-gradient(-45deg, #18181b 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #18181b 75%), 
+  background-image:
+    linear-gradient(45deg, #18181b 25%, transparent 25%),
+    linear-gradient(-45deg, #18181b 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #18181b 75%),
     linear-gradient(-45deg, transparent 75%, #18181b 75%);
   background-size: 10px 10px;
-  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+  background-position:
+    0 0,
+    0 5px,
+    5px -5px,
+    -5px 0px;
   background-color: #27272a; /* Checkered grid pattern */
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  
+
   img {
     max-width: 90%;
     max-height: 90%;
@@ -642,13 +660,17 @@ const LightboxCard = styled(motion.div)`
   width: 90%;
   max-width: 450px;
   aspect-ratio: 1;
-  background-image: 
-    linear-gradient(45deg, #18181b 25%, transparent 25%), 
-    linear-gradient(-45deg, #18181b 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #18181b 75%), 
+  background-image:
+    linear-gradient(45deg, #18181b 25%, transparent 25%),
+    linear-gradient(-45deg, #18181b 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #18181b 75%),
     linear-gradient(-45deg, transparent 75%, #18181b 75%);
   background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0px;
   background-color: #27272a;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -657,7 +679,7 @@ const LightboxCard = styled(motion.div)`
   justify-content: center;
   padding: 2rem;
   box-sizing: border-box;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
   position: relative;
 
   img {
@@ -692,7 +714,13 @@ const PodStepIndicator = ({ currentStep, isArabic }) => {
   );
 };
 
-const PodCanvasPreview = ({ baseImageUrl, podState, setPodState, productName, selectedSize = "M" }) => {
+const PodCanvasPreview = ({
+  baseImageUrl,
+  podState,
+  setPodState,
+  productName,
+  selectedSize = "M",
+}) => {
   const [showGrid, setShowGrid] = useState(false);
   const containerRef = useRef(null);
   const interactionRef = useRef({
@@ -764,8 +792,14 @@ const PodCanvasPreview = ({ baseImageUrl, podState, setPodState, productName, se
         ...prev,
         [currentSide]: {
           ...prev[currentSide],
-          x: Math.min(100, Math.max(0, Math.round(startXVal + percentageChangeX))),
-          y: Math.min(100, Math.max(0, Math.round(startYVal + percentageChangeY))),
+          x: Math.min(
+            100,
+            Math.max(0, Math.round(startXVal + percentageChangeX)),
+          ),
+          y: Math.min(
+            100,
+            Math.max(0, Math.round(startYVal + percentageChangeY)),
+          ),
         },
       }));
     } else if (type === "scale") {
@@ -774,13 +808,22 @@ const PodCanvasPreview = ({ baseImageUrl, podState, setPodState, productName, se
         ...prev,
         [currentSide]: {
           ...prev[currentSide],
-          scale: Math.min(100, Math.max(15, Math.round(startScale * scaleFactor))),
+          scale: Math.min(
+            100,
+            Math.max(15, Math.round(startScale * scaleFactor)),
+          ),
         },
       }));
     } else if (type === "rotate") {
-      const center = { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 };
-      const angle = Math.atan2(e.clientY - center.y, e.clientX - center.x) * (180 / Math.PI);
-      const startAngle = Math.atan2(startY - center.y, startX - center.x) * (180 / Math.PI);
+      const center = {
+        x: bounds.left + bounds.width / 2,
+        y: bounds.top + bounds.height / 2,
+      };
+      const angle =
+        Math.atan2(e.clientY - center.y, e.clientX - center.x) *
+        (180 / Math.PI);
+      const startAngle =
+        Math.atan2(startY - center.y, startX - center.x) * (180 / Math.PI);
 
       setPodState((prev) => ({
         ...prev,
@@ -801,7 +844,7 @@ const PodCanvasPreview = ({ baseImageUrl, podState, setPodState, productName, se
   return (
     <PodCanvasContainer>
       <GarmentWorkspace ref={containerRef}>
-        <ToggleGridBtn type="button" onClick={() => setShowGrid(!showGrid)} >
+        <ToggleGridBtn type="button" onClick={() => setShowGrid(!showGrid)}>
           <FaBorderAll /> Grid
         </ToggleGridBtn>
 
@@ -813,14 +856,16 @@ const PodCanvasPreview = ({ baseImageUrl, podState, setPodState, productName, se
 
         {/* 1. VISUAL PORTION (Sits inside the TemplateContentArea clipping container) */}
         <TemplateContentArea $area={ratios.contentArea}>
-          <div style={{
-            position: "absolute",
-            top: `${ratios.printArea.top}%`,
-            left: `${ratios.printArea.left}%`,
-            width: `${ratios.printArea.width}%`,
-            height: `${ratios.printArea.height}%`,
-            overflow: "visible"
-          }}>
+          <div
+            style={{
+              position: "absolute",
+              top: `${ratios.printArea.top}%`,
+              left: `${ratios.printArea.left}%`,
+              width: `${ratios.printArea.width}%`,
+              height: `${ratios.printArea.height}%`,
+              overflow: "visible",
+            }}
+          >
             {config.previewUrl && (
               <img
                 src={config.previewUrl}
@@ -832,7 +877,7 @@ const PodCanvasPreview = ({ baseImageUrl, podState, setPodState, productName, se
                   width: `${config.scale}%`,
                   transform: `translate(-50%, -50%) rotate(${config.rotation || 0}deg)`,
                   objectFit: "contain",
-                  pointerEvents: "none"
+                  pointerEvents: "none",
                 }}
               />
             )}
@@ -840,7 +885,10 @@ const PodCanvasPreview = ({ baseImageUrl, podState, setPodState, productName, se
         </TemplateContentArea>
 
         {/* 2. INTERACTIVE CONTROLS OVERLAY LAYER (Crisp figma-like selection guidelines and handles) */}
-        <InteractivePrintArea ref={containerRef} $area={ratios.absolutePrintArea}>
+        <InteractivePrintArea
+          ref={containerRef}
+          $area={ratios.absolutePrintArea}
+        >
           <GridOverlay $visible={showGrid} />
           {config.previewUrl && (
             <TransformableBox
@@ -855,8 +903,12 @@ const PodCanvasPreview = ({ baseImageUrl, podState, setPodState, productName, se
             >
               {/* Fully transparent touch target hitbox */}
               <div style={{ width: "100%", height: "100%", opacity: 0 }} />
-              <ScaleHandle onPointerDown={(e) => handlePointerDown(e, "scale")} />
-              <RotateHandle onPointerDown={(e) => handlePointerDown(e, "rotate")} />
+              <ScaleHandle
+                onPointerDown={(e) => handlePointerDown(e, "scale")}
+              />
+              <RotateHandle
+                onPointerDown={(e) => handlePointerDown(e, "rotate")}
+              />
             </TransformableBox>
           )}
         </InteractivePrintArea>
@@ -867,12 +919,18 @@ const PodCanvasPreview = ({ baseImageUrl, podState, setPodState, productName, se
             <LegendItem $color="#ffffff" $valColor="#ffffff">
               <span className="dot" />
               <span className="label">Garment (Body):</span>
-              <span className="value">A: {garmentDims.A}cm {garmentDims.B ? `× B: ${garmentDims.B}cm` : ""}</span>
+              <span className="value">
+                A: {garmentDims.A}cm{" "}
+                {garmentDims.B ? `× B: ${garmentDims.B}cm` : ""}
+              </span>
             </LegendItem>
             <LegendItem $color="#39a170" $valColor="#39a170">
               <span className="dot" />
               <span className="label">Print Area (Zone):</span>
-              <span className="value">{(cfg.printW_ref / cfg.B_ref * garmentDims.B).toFixed(1)}cm × {(cfg.printH_ref / cfg.A_ref * garmentDims.A).toFixed(1)}cm</span>
+              <span className="value">
+                {((cfg.printW_ref / cfg.B_ref) * garmentDims.B).toFixed(1)}cm ×{" "}
+                {((cfg.printH_ref / cfg.A_ref) * garmentDims.A).toFixed(1)}cm
+              </span>
             </LegendItem>
           </CanvasLegend>
         )}
@@ -899,7 +957,10 @@ const PodStepTwoControls = ({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const cfg = useMemo(() => getTemplateConfig(product.name), [product.name]);
-  const garmentDims = useMemo(() => getGarmentDimensions(product.name, "M"), [product.name]);
+  const garmentDims = useMemo(
+    () => getGarmentDimensions(product.name, "M"),
+    [product.name],
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -916,14 +977,23 @@ const PodStepTwoControls = ({
     } else {
       setAspectRatio(1);
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [config.previewUrl]);
 
   // Compute live real-world physical coordinates scaled EXACTLY to the print zone limits
   const physicalMetrics = useMemo(() => {
     const printWidthRatio = cfg.printW_ref / cfg.B_ref;
     const printHeightRatio = cfg.printH_ref / cfg.A_ref;
-    return calculatePhysicalMetrics(config.scale, garmentDims.B, garmentDims.A, printWidthRatio, printHeightRatio, aspectRatio);
+    return calculatePhysicalMetrics(
+      config.scale,
+      garmentDims.B,
+      garmentDims.A,
+      printWidthRatio,
+      printHeightRatio,
+      aspectRatio,
+    );
   }, [config.scale, garmentDims, cfg, aspectRatio]);
 
   const handleFileChange = (e) => {
@@ -948,14 +1018,18 @@ const PodStepTwoControls = ({
   const handlePhysicalSizeChange = (e) => {
     const val = parseFloat(e.target.value) || 0;
     const printWidthRatio = cfg.printW_ref / cfg.B_ref;
-    const targetScalePct = calculateScaleFromPhysicalWidth(val, garmentDims.B, printWidthRatio);
+    const targetScalePct = calculateScaleFromPhysicalWidth(
+      val,
+      garmentDims.B,
+      printWidthRatio,
+    );
 
     setPodState((prev) => ({
       ...prev,
       [currentSide]: {
         ...prev[currentSide],
-        scale: Math.min(100, Math.max(15, Math.round(targetScalePct)))
-      }
+        scale: Math.min(100, Math.max(15, Math.round(targetScalePct))),
+      },
     }));
   };
 
@@ -983,7 +1057,8 @@ const PodStepTwoControls = ({
     }
   }, [refDimension, physicalMetrics]);
 
-  const currentActiveVal = refDimension === "width" ? physicalMetrics.width : physicalMetrics.height;
+  const currentActiveVal =
+    refDimension === "width" ? physicalMetrics.width : physicalMetrics.height;
 
   // Real-time linear print cost calculation (fully continuous)
   const livePrintCost = useMemo(() => {
@@ -1031,23 +1106,30 @@ const PodStepTwoControls = ({
               <ArtworkThumbnailWrap>
                 <img src={config.previewUrl} alt="Thumbnail" />
               </ArtworkThumbnailWrap>
-              <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "#FFF" }}>
-                {config.file?.name ? (
-                  config.file.name.substring(0, 12) + (config.file.name.length > 12 ? "..." : "")
-                ) : "Artwork File"}
+              <span
+                style={{
+                  fontSize: "0.85rem",
+                  fontWeight: "700",
+                  color: "#FFF",
+                }}
+              >
+                {config.file?.name
+                  ? config.file.name.substring(0, 12) +
+                    (config.file.name.length > 12 ? "..." : "")
+                  : "Artwork File"}
               </span>
             </ArtworkInfo>
             <ActionRow>
-              <MiniActionButton 
-                type="button" 
-                title={t("view", "View Alone")} 
+              <MiniActionButton
+                type="button"
+                title={t("view", "View Alone")}
                 onClick={() => setIsLightboxOpen(true)}
               >
                 <FaEye />
               </MiniActionButton>
-              <MiniActionButton 
-                type="button" 
-                title={t("change", "Replace Image")} 
+              <MiniActionButton
+                type="button"
+                title={t("change", "Replace Image")}
                 onClick={() => replacementInputRef.current.click()}
               >
                 <FaUpload />
@@ -1059,10 +1141,10 @@ const PodStepTwoControls = ({
                   style={{ display: "none" }}
                 />
               </MiniActionButton>
-              <MiniActionButton 
-                type="button" 
-                className="danger" 
-                title={t("delete", "Remove Design")} 
+              <MiniActionButton
+                type="button"
+                className="danger"
+                title={t("delete", "Remove Design")}
                 onClick={clearSide}
               >
                 <FaTrash />
@@ -1091,7 +1173,7 @@ const PodStepTwoControls = ({
           </LiveSpecsCard>
 
           <OptionSection>
-            <SectionLabel>{t("pod_studio.scale_percentage")}</SectionLabel>
+            <SectionLabel>{t("pod_studio_scale_percentage")}</SectionLabel>
             <DimensionSegment>
               <SegmentBtn
                 type="button"
@@ -1111,7 +1193,11 @@ const PodStepTwoControls = ({
 
             <SliderGroup>
               <label>
-                <span>{refDimension === "width" ? t("width_prefix", "Width") : t("height_prefix", "Height")}</span>
+                <span>
+                  {refDimension === "width"
+                    ? t("width_prefix", "Width")
+                    : t("height_prefix", "Height")}
+                </span>
                 <span>{currentActiveVal} cm</span>
               </label>
               <div className="row-input">
@@ -1211,7 +1297,7 @@ const PodStepTwoControls = ({
               onClick={(e) => e.stopPropagation()}
             >
               <img src={config.previewUrl} alt="Bespoke Design view" />
-              <button 
+              <button
                 onClick={() => setIsLightboxOpen(false)}
                 style={{
                   position: "absolute",
@@ -1226,7 +1312,7 @@ const PodStepTwoControls = ({
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  justifyContent: "center",
                 }}
               >
                 <FaTimes />
@@ -1239,7 +1325,7 @@ const PodStepTwoControls = ({
   );
 };
 
-const PodStepThreeControls = ({ 
+const PodStepThreeControls = ({
   podState,
   product,
   selectedColor,
@@ -1289,7 +1375,7 @@ const PodStepThreeControls = ({
           alignItems: "center",
           gap: "8px",
           color: "white",
-          fontFamily: "Tajawal"
+          fontFamily: "Tajawal",
         }}
       >
         <FaEye style={{ color: "#39A170" }} /> Billing Breakdown

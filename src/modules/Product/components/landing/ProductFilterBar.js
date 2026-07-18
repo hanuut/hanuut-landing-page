@@ -133,7 +133,7 @@ const ProductFilterBar = ({
           type="text"
           placeholder={
             isPodShop
-              ? t("pod_studio.search_placeholder")
+              ? t("pod_studio_search_placeholder")
               : t("search_products", "Search products...")
           }
           value={searchQuery}
@@ -154,7 +154,7 @@ const ProductFilterBar = ({
             onClick={() => setSelectedCategory(null)}
             whileTap={{ scale: 0.95 }}
           >
-            {isPodShop ? t("pod_studio.all_items") : t("all_products", "All")}
+            {isPodShop ? t("pod_studio_all_items") : t("all_products", "All")}
           </CategoryPill>
 
           {categories.map((cat) => (

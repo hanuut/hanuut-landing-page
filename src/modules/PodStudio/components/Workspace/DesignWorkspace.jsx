@@ -272,7 +272,15 @@ const DesignWorkspace = ({
   const [solidBgColor, setSolidBgColor] = useState("#FFFFFF");
 
   // --- S2: INCORPORATING CONTINUOUS HISTORY TRACKING HOOKS ---
-  const [frontDesign, setFrontDesign, undoFront, redoFront, canUndoFront, canRedoFront, resetFront] = useDesignHistory({
+  const [
+    frontDesign,
+    setFrontDesign,
+    undoFront,
+    redoFront,
+    canUndoFront,
+    canRedoFront,
+    resetFront,
+  ] = useDesignHistory({
     file: null,
     previewUrl: null,
     x: 50,
@@ -281,7 +289,15 @@ const DesignWorkspace = ({
     rotation: 0,
   });
 
-  const [backDesign, setBackDesign, undoBack, redoBack, canUndoBack, canRedoBack, resetBack] = useDesignHistory({
+  const [
+    backDesign,
+    setBackDesign,
+    undoBack,
+    redoBack,
+    canUndoBack,
+    canRedoBack,
+    resetBack,
+  ] = useDesignHistory({
     file: null,
     previewUrl: null,
     x: 50,
@@ -291,15 +307,19 @@ const DesignWorkspace = ({
   });
 
   const activeDesignState = activeSide === "back" ? backDesign : frontDesign;
-  const setActiveDesignState = activeSide === "back" ? setBackDesign : setFrontDesign;
+  const setActiveDesignState =
+    activeSide === "back" ? setBackDesign : setFrontDesign;
 
   // KEYBOARD EVENT LISTENERS FOR FLUID UNDO/REDO HOTKEYS
   useEffect(() => {
     const handleKeyDown = (e) => {
-      const isUndo = (e.ctrlKey || e.metaKey) && e.key?.toLowerCase() === "z" && !e.shiftKey;
-      const isRedo = 
-        ((e.ctrlKey || e.metaKey) && e.key?.toLowerCase() === "y") || 
-        ((e.ctrlKey || e.metaKey) && e.key?.toLowerCase() === "z" && e.shiftKey);
+      const isUndo =
+        (e.ctrlKey || e.metaKey) && e.key?.toLowerCase() === "z" && !e.shiftKey;
+      const isRedo =
+        ((e.ctrlKey || e.metaKey) && e.key?.toLowerCase() === "y") ||
+        ((e.ctrlKey || e.metaKey) &&
+          e.key?.toLowerCase() === "z" &&
+          e.shiftKey);
 
       if (isUndo) {
         e.preventDefault();
@@ -320,7 +340,17 @@ const DesignWorkspace = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeSide, undoFront, undoBack, redoFront, redoBack, canUndoFront, canUndoBack, canRedoFront, canRedoBack]);
+  }, [
+    activeSide,
+    undoFront,
+    undoBack,
+    redoFront,
+    redoBack,
+    canUndoFront,
+    canUndoBack,
+    canRedoFront,
+    canRedoBack,
+  ]);
 
   // Enforce scrolling viewport directly to the top on page load
   useEffect(() => {
@@ -601,7 +631,15 @@ const DesignWorkspace = ({
         />
 
         <ControlPanel>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              flexWrap: "wrap",
+              gap: "1rem",
+            }}
+          >
             <div>
               <h2
                 style={{
@@ -624,19 +662,27 @@ const DesignWorkspace = ({
               >
                 {canvas.serialNumber}
               </span>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 <SizingScrollButton onClick={handleScrollToSizeChart}>
-                  <FaBookOpen /> {t("pod_studio.blank_specifications")}
+                  <FaBookOpen /> {t("pod_studio_blank_specifications")}
                 </SizingScrollButton>
               </div>
             </div>
 
             {/* Desktop Action Toolbar for Undo / Redo */}
-            <ActionToolbar style={{ direction: isArabic ? 'rtl' : 'ltr' }}>
-              <ToolbarBtn disabled={!canUndoActive} onClick={activeUndoHandler} title="Undo (Ctrl+Z)">
+            <ActionToolbar style={{ direction: isArabic ? "rtl" : "ltr" }}>
+              <ToolbarBtn
+                disabled={!canUndoActive}
+                onClick={activeUndoHandler}
+                title="Undo (Ctrl+Z)"
+              >
                 <FaUndo /> {isArabic ? "تراجع" : "Undo"}
               </ToolbarBtn>
-              <ToolbarBtn disabled={!canRedoActive} onClick={activeRedoHandler} title="Redo (Ctrl+Y)">
+              <ToolbarBtn
+                disabled={!canRedoActive}
+                onClick={activeRedoHandler}
+                title="Redo (Ctrl+Y)"
+              >
                 <FaRedo /> {isArabic ? "إعادة" : "Redo"}
               </ToolbarBtn>
             </ActionToolbar>
@@ -644,7 +690,7 @@ const DesignWorkspace = ({
 
           <OptionRow>
             <OptionSection>
-              <SectionLabel>{t("pod_studio.colors_title")}</SectionLabel>
+              <SectionLabel>{t("pod_studio_colors_title")}</SectionLabel>
               <CollapsiblePills $expanded={colorsExpanded}>
                 {canvas.availableColors.map((col) => {
                   const hex = getDisplayColorHex(col.colorName);
@@ -667,7 +713,7 @@ const DesignWorkspace = ({
             </OptionSection>
 
             <OptionSection>
-              <SectionLabel>{t("pod_studio.sizes_title")}</SectionLabel>
+              <SectionLabel>{t("pod_studio_sizes_title")}</SectionLabel>
               <CollapsiblePills $expanded={sizesExpanded}>
                 {canvas.sizes.map((s) => (
                   <SizePill
@@ -690,19 +736,19 @@ const DesignWorkspace = ({
           {canvas.specifications.printableSurfaces.length > 1 &&
             hasBackTemplate && (
               <OptionSection>
-                <SectionLabel>{t("pod_studio.print_side")}</SectionLabel>
+                <SectionLabel>{t("pod_studio_print_side")}</SectionLabel>
                 <SegmentedSideControl>
                   <SegmentButton
                     $active={activeSide === "front"}
                     onClick={() => setActiveSide("front")}
                   >
-                    {t("pod_studio.front_side")}
+                    {t("pod_studio_front_side")}
                   </SegmentButton>
                   <SegmentButton
                     $active={activeSide === "back"}
                     onClick={() => setActiveSide("back")}
                   >
-                    {t("pod_studio.back_side")}
+                    {t("pod_studio_back_side")}
                   </SegmentButton>
                 </SegmentedSideControl>
               </OptionSection>
