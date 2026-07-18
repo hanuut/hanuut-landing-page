@@ -16,9 +16,12 @@ export const useDesignHistory = (initialPresent) => {
       const p = prev.present;
       const n = typeof newPresent === "function" ? newPresent(p) : newPresent;
       
-      // If the placement is identical, skip recording history to prevent spam
-      if (p.x === n.x && p.y === n.y && p.scale === n.scale && p.rotation === n.rotation) {
-        return prev;
+      // S2: SYSTEM 2 SAFETY GUARD - Only check layout coords if the uploaded asset itself is identical
+      if (p.previewUrl === n.previewUrl && p.file === n.file) {
+        // If the design image is identical and layout positions haven't moved, skip to prevent spam
+        if (p.x === n.x && p.y === n.y && p.scale === n.scale && p.rotation === n.rotation) {
+          return prev;
+        }
       }
 
       return {
