@@ -1,26 +1,109 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+} from "framer-motion";
 import { getImage } from "../../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../../utils/imageUtils";
 
-const HeroContainer = styled.div`
+// ==========================================================
+// STYLED COMPONENTS - BLUEPRINT NEON NETWORK & MATRICES
+// ==========================================================
+
+const HeroContainer = styled.section`
   width: 100%;
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 4rem;
-  margin-bottom: 1.5rem;
-  box-sizing: border-box;
   min-height: 80vh;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 3rem;
+  padding: 3rem 0;
+  box-sizing: border-box;
+  position: relative;
+  overflow: visible;
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    gap: 3rem;
+    gap: 4rem;
     min-height: auto;
-    padding-top: 2rem;
+    padding-top: 1rem;
+  }
+`;
+
+const CrosshairTarget = styled(motion.div)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 130%;
+  height: 130%;
+  pointer-events: none;
+  z-index: 4; /* Below active card, above background queue */
+  
+  /* Strictly Static Blueprint Grid lines (no scaling or shifts) */
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 1) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(255, 255, 255, 1) 1.5px, transparent 1px),
+    radial-gradient(circle, transparent 25%, rgba(255, 255, 255, 1) 26%, transparent 28%);
+  background-size: 80px 80px, 80px 80px, 300px 300px;
+  background-position: center center;
+`;
+
+const StitchMatrixCanvas = styled.div`
+  position: absolute;
+  inset: -10% -20%;
+  pointer-events: none;
+  z-index: 0; /* Locked at bottom of everything */
+  overflow: hidden;
+  background-color: #050505;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      rgba(255, 255, 255, 0.08) 1.2px,
+      transparent 1.2px
+    );
+    background-size: 24px 24px;
+    background-position: center center;
+    mask-image: radial-gradient(
+      circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      black 20%,
+      transparent 60%
+    );
+    -webkit-mask-image: radial-gradient(
+      circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      black 20%,
+      transparent 60%
+    );
+    transition: opacity 0.5s ease;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: calc(var(--mouse-y, 50%) - 180px);
+    left: calc(var(--mouse-x, 50%) - 180px);
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      ${(props) => props.$glowColor || "rgba(240, 122, 72, 0.15)"} 0%,
+      transparent 70%
+    );
+    filter: blur(40px);
+    opacity: 0.85;
+    transition: background 0.8s ease-in-out;
   }
 `;
 
@@ -28,9 +111,9 @@ const LeftCol = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1.75rem;
+  gap: 1.5rem;
   position: relative;
-  z-index: 2;
+  z-index: 8; /* Above background cards, below front card */
   text-align: ${(props) => (props.$isArabic ? "right" : "left")};
 
   @media (max-width: 900px) {
@@ -39,41 +122,25 @@ const LeftCol = styled.div`
   }
 `;
 
-const CrosshairTarget = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 130%;
-  height: 130%;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.04;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 1) 1px, transparent 1px),
-    radial-gradient(
-      circle,
-      transparent 25%,
-      rgba(255, 255, 255, 1) 26%,
-      transparent 28%
-    );
-  background-size:
-    80px 80px,
-    80px 80px,
-    300px 300px;
-  background-position: center;
-`;
-
 const Title = styled(motion.h1)`
-  font-size: clamp(2rem, 4.5vw, 4rem);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
   font-weight: 900;
   color: #ffffff;
   line-height: 1.15;
   margin: 0;
   font-family: "Tajawal", sans-serif;
   letter-spacing: -0.5px;
-  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+
+  span {
+    background: linear-gradient(
+      135deg,
+      #ffffff 40%,
+      ${(props) => props.$accent || "#f07a48"} 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.8s ease-in-out;
+  }
 `;
 
 const Description = styled(motion.p)`
@@ -83,11 +150,10 @@ const Description = styled(motion.p)`
   font-family: "Cairo", sans-serif;
   max-width: 90%;
   margin: 0;
-  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 `;
 
 const EnterButton = styled(motion.button)`
-  background: ${(props) => props.theme.primaryColor || "#F07A48"};
+  background: ${(props) => props.$accent || "#F07A48"};
   color: #050505;
   border: none;
   padding: 1.1rem 2.2rem;
@@ -98,13 +164,15 @@ const EnterButton = styled(motion.button)`
   width: fit-content;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  transition: all 0.2s;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   font-family: "Tajawal", sans-serif;
-  box-shadow: 0 10px 25px rgba(240, 122, 72, 0.25);
+  box-shadow: 0 10px 25px
+    ${(props) => props.$accent || "rgba(240, 122, 72, 0.25)"};
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(240, 122, 72, 0.35);
+    box-shadow: 0 15px 30px
+      ${(props) => props.$accent || "rgba(240, 122, 72, 0.35)"};
   }
 `;
 
@@ -113,23 +181,27 @@ const RightCol = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 460px;
-  perspective: 1200px;
+  min-height: 400px;
+  perspective: 1500px;
   transform-style: preserve-3d;
+  z-index: 5;
 `;
 
-const StackWrapper = styled(motion.div)`
-  position: relative;
-  width: 100%;
-  max-width: 360px;
-  height: 420px;
+// --- FULL-BLEED FLOW WRAPPER ---
+const CardsFlowContainer = styled.div`
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   transform-style: preserve-3d;
 `;
 
 const ShowcaseCard = styled(motion.div)`
   position: absolute;
-  inset: 0;
-  background: rgba(28, 28, 30, 0.55);
+  top: 50%;
+  left: 50%;
+  width: 290px;
+  height: 350px;
+  background: rgba(18, 18, 20, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   display: flex;
@@ -139,31 +211,35 @@ const ShowcaseCard = styled(motion.div)`
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   transform-style: preserve-3d;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
   overflow: hidden;
+  
+  filter: ${props => props.$isFront ? "none" : `blur(${props.$blur}px)`};
 `;
 
 const GlowingGrid = styled.div`
   position: absolute;
   inset: -10%;
   background-image:
-    linear-gradient(rgba(240, 122, 72, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(240, 122, 72, 0.08) 1px, transparent 1px);
-  background-size: 30px 30px;
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
   background-position: center;
   transform: translateZ(20px);
   pointer-events: none;
 `;
 
 const GarmentVisual = styled.div`
-  width: 65%;
+  width: 80%;
   height: 65%;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.65));
   transform: translateZ(45px);
   user-select: none;
+  position: relative;
+  top: -15px;
 
   img {
     max-width: 100%;
@@ -172,7 +248,19 @@ const GarmentVisual = styled.div`
   }
 `;
 
-const CoordinateOverlay = styled.div`
+const NeonFlickerText = styled(motion.div)`
+  @keyframes neonFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      opacity: 0.99;
+    }
+    20%, 24%, 55% {
+      opacity: 0.25;
+    }
+  }
+  animation: neonFlicker 3s infinite alternate;
+`;
+
+const CoordinateOverlay = styled(NeonFlickerText)`
   position: absolute;
   bottom: 1.5rem;
   left: 1.5rem;
@@ -185,14 +273,15 @@ const CoordinateOverlay = styled.div`
 `;
 
 const CoordText = styled.span`
-  color: #f07a48;
+  color: ${(props) => props.$color || "#f07a48"};
   font-family: monospace;
   font-size: 0.75rem;
   font-weight: 700;
-  text-shadow: 0 0 8px rgba(240, 122, 72, 0.45);
+  text-shadow: 0 0 8px ${(props) => props.$color || "rgba(240, 122, 72, 0.45)"};
+  transition: all 0.8s ease-in-out;
 `;
 
-const TagInfo = styled.div`
+const TagInfo = styled(NeonFlickerText)`
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
@@ -205,29 +294,39 @@ const TagInfo = styled.div`
 `;
 
 const CoreTag = styled.div`
-  background: ${(props) => props.theme.primaryColor || "#F07A48"};
+  background: ${(props) => props.$accent || "#F07A48"};
   color: #050505;
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   font-family: monospace;
   font-size: 0.65rem;
   font-weight: 800;
+  box-shadow: 0 0 12px ${(props) => props.$accent || "rgba(240, 122, 72, 0.3)"};
+  transition: all 0.8s ease-in-out;
 `;
 
 const ProductTitle = styled.div`
   color: #ffffff;
   font-weight: 900;
   font-family: "Tajawal", sans-serif;
-  font-size: 1.1rem;
+  font-size: 1rem;
   text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
 `;
 
-const StackProductImage = ({ product }) => {
+// ============================================================================
+// AUXILIARY UTILITIES & ADAPTERS
+// ============================================================================
+
+const StackProductImage = ({ availability }) => {
   const [url, setUrl] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
-    const imgId = product?.availabilities?.[0]?.imageId || product?.imageId;
+    const imgId = availability?.imageId;
     if (imgId) {
       getImage(imgId)
         .then((res) => {
@@ -238,10 +337,10 @@ const StackProductImage = ({ product }) => {
     return () => {
       isMounted = false;
     };
-  }, [product]);
+  }, [availability]);
 
   return url ? (
-    <img src={url} alt={product.name || "Product"} loading="lazy" />
+    <img src={url} alt="Variant Substrate" loading="lazy" />
   ) : (
     <div
       style={{
@@ -254,8 +353,8 @@ const StackProductImage = ({ product }) => {
     >
       <div
         style={{
-          width: "40px",
-          height: "40px",
+          width: "32px",
+          height: "32px",
           border: "3px solid rgba(255,255,255,0.1)",
           borderTopColor: "#f07a48",
           borderRadius: "50%",
@@ -266,134 +365,312 @@ const StackProductImage = ({ product }) => {
   );
 };
 
-const HeroSection = ({ onScrollToCatalog, sampleProducts }) => {
+const HeroSection = ({ onScrollToCatalog, sampleProducts, onSelectCanvas }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
+  const containerRef = useRef(null);
+
   const [activeIdx, setActiveIdx] = useState(0);
 
+  // Dynamic Cursor Coordinates Tracker
+  const handleMouseMove = (e) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    el.style.setProperty("--mouse-x", `${x}px`);
+    el.style.setProperty("--mouse-y", `${y}px`);
+  };
+
+  // --- DYNAMIC VARIATIONS EXPANDER ---
   const displayItems = useMemo(() => {
-    if (sampleProducts && sampleProducts.length >= 3) {
-      return sampleProducts.slice(0, 3).map((p) => ({
-        productObj: p,
-        title: p.name,
-        label: p.sku || "AURAS_LAB",
-      }));
+    if (!sampleProducts || sampleProducts.length === 0) {
+      return [
+        {
+          title: "PREMIUM HOODIE",
+          label: "AURAS_LAB_01",
+          colorHex: "#39A170",
+          availability: null,
+          productObj: null
+        },
+        {
+          title: "HEAVY STREET TEE",
+          label: "AURAS_LAB_02",
+          colorHex: "#F07A48",
+          availability: null,
+          productObj: null
+        },
+        {
+          title: "THE STUDIO TOTE",
+          label: "AURAS_LAB_03",
+          colorHex: "#397FF9",
+          availability: null,
+          productObj: null
+        },
+      ];
     }
-    return [
-      {
-        productObj: { name: "PREMIUM HOODIE" },
-        title: "PREMIUM HOODIE",
-        label: "PROTOTYPE_084",
-      },
-      {
-        productObj: { name: "HEAVY BOX TEE" },
-        title: "HEAVYWEIGHT TEE",
-        label: "CORE_ITEM_042",
-      },
-      {
-        productObj: { name: "STUDIO TOTE" },
-        title: "STUDIO TOTE",
-        label: "CANVAS_121",
-      },
-    ];
+
+    const items = [];
+    sampleProducts.forEach((product) => {
+      if (product.availabilities && Array.isArray(product.availabilities)) {
+        product.availabilities.forEach((av) => {
+          items.push({
+            title: product.name,
+            label: product.sku || "AURAS_LAB",
+            colorName: av.color || "white",
+            availability: av,
+            productObj: product
+          });
+        });
+      }
+    });
+
+    return items.sort(() => 0.5 - Math.random()).slice(0, 10);
   }, [sampleProducts]);
 
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const mouseXSpring = useSpring(x, { stiffness: 120, damping: 18 });
-  const mouseYSpring = useSpring(y, { stiffness: 120, damping: 18 });
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], [12, -12]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], [-12, 12]);
-
   useEffect(() => {
+    if (displayItems.length === 0) return;
     const timer = setInterval(() => {
       setActiveIdx((prev) => (prev + 1) % displayItems.length);
     }, 4500);
     return () => clearInterval(timer);
   }, [displayItems.length]);
 
+  // --- LIGHTNESS/CONTRAST SAFEGUARD ---
+  const activeColorTheme = useMemo(() => {
+    const activeItem = displayItems[activeIdx];
+    if (!activeItem)
+      return { hex: "#F07A48", rgba: "rgba(240, 122, 72, 0.15)" };
+
+    const color = String(activeItem.colorName).toLowerCase();
+    if (
+      color.includes("black") ||
+      color.includes("noir") ||
+      color.includes("charcoal")
+    ) {
+      return { hex: "#60A5FA", rgba: "rgba(96, 165, 250, 0.18)" };
+    }
+    if (color.includes("navy")) {
+      return { hex: "#38BDF8", rgba: "rgba(56, 189, 248, 0.18)" };
+    }
+    if (color.includes("green") || color.includes("vert"))
+      return { hex: "#1D9E75", rgba: "rgba(29, 158, 117, 0.15)" };
+    if (color.includes("blue") || color.includes("bleu"))
+      return { hex: "#397FF9", rgba: "rgba(57, 127, 249, 0.15)" };
+    if (color.includes("grey") || color.includes("gris"))
+      return { hex: "#A1A1AA", rgba: "rgba(161, 161, 170, 0.12)" };
+    if (color.includes("rose") || color.includes("pink"))
+      return { hex: "#EC4899", rgba: "rgba(236, 72, 153, 0.15)" };
+    if (color.includes("yellow") || color.includes("jaune"))
+      return { hex: "#F59E0B", rgba: "rgba(245, 158, 11, 0.15)" };
+    if (color.includes("red") || color.includes("rouge") || color.includes("bordeaux") || color.includes("grenat"))
+      return { hex: "#EF4444", rgba: "rgba(239, 68, 68, 0.15)" };
+
+    return { hex: "#F07A48", rgba: "rgba(240, 122, 72, 0.15)" };
+  }, [displayItems, activeIdx]);
+
   return (
-    <HeroContainer dir={isArabic ? "rtl" : "ltr"} $isArabic={isArabic}>
+    <HeroContainer
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      dir={isArabic ? "rtl" : "ltr"}
+      $isArabic={isArabic}
+    >
+      {/* Dynamic pointer-tracking grid canvas background */}
+      <StitchMatrixCanvas $glowColor={activeColorTheme.rgba} />
+      
+      {/* Blueprint Net is locked at z-index: 4, fanned-out underneath front card */}
+      <CrosshairTarget
+        key={activeIdx}
+        $accent={activeColorTheme.hex}
+        initial={{ opacity: 0.04 }}
+        animate={{
+          opacity: [0.04, 0.12, 0.04], // Subtle 5-12% static water-flow ripple
+        }}
+        transition={{ duration: 2.0, ease: "easeInOut" }}
+      />
+
       <LeftCol $isArabic={isArabic}>
-        <CrosshairTarget />
         <Title
           $isArabic={isArabic}
-          initial={{ opacity: 0, y: 20 }}
+          $accent={activeColorTheme.hex}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          {t("pod_studio_hero_title")}
+          {i18n.language === "ar" ? (
+            <>
+              اصنع شيئاً يوجد لمرة <br />
+              <span>واحدة فقط في العمر.</span>
+            </>
+          ) : (
+            <>
+              CREATE SOMETHING <br />
+              <span>THAT EXISTS ONCE.</span>
+            </>
+          )}
         </Title>
         <Description
           $isArabic={isArabic}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.1, duration: 0.6 }}
         >
           {t("pod_studio_hero_desc")}
         </Description>
         <EnterButton
           onClick={onScrollToCatalog}
-          initial={{ opacity: 0, y: 20 }}
+          $accent={activeColorTheme.hex}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
         >
           {t("pod_studio_btn_enter_workspace")}
         </EnterButton>
       </LeftCol>
 
-      <RightCol
-        onMouseMove={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          x.set(e.clientX / rect.width - 0.5);
-          y.set(e.clientY / rect.height - 0.5);
-        }}
-        onMouseLeave={() => {
-          x.set(0);
-          y.set(0);
-        }}
-      >
-        <StackWrapper style={{ rotateX, rotateY }}>
-          {displayItems.map((item, index) => {
-            const offset =
-              (index - activeIdx + displayItems.length) % displayItems.length;
-            const isFront = offset === 0;
-            const isMiddle = offset === 1;
+      <RightCol>
+        <CardsFlowContainer>
+          <AnimatePresence>
+            {displayItems.map((item, index) => {
+              const offset =
+                (index - activeIdx + displayItems.length) % displayItems.length;
+              const isFront = offset === 0;
+              const isMiddle = offset === 1;
+              const isBack = offset === 2;
+              const isLayer3 = offset === 3;
+              const isLast = offset === 4;
 
-            return (
-              <ShowcaseCard
-                key={index}
-                animate={{
-                  y: isFront ? 0 : isMiddle ? -35 : -70,
-                  scale: isFront ? 1 : isMiddle ? 0.92 : 0.84,
-                  opacity: isFront ? 1 : isMiddle ? 0.6 : 0.2,
-                  rotateZ: isFront ? 0 : isMiddle ? -2 : 3,
-                  zIndex: isFront ? 3 : isMiddle ? 2 : 1,
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 120,
-                  damping: 18,
-                  mass: 1,
-                }}
-                style={{ pointerEvents: isFront ? "auto" : "none" }}
-              >
-                <GlowingGrid />
-                <TagInfo>
-                  <CoreTag>{item.label}</CoreTag>
-                  <ProductTitle>{item.title}</ProductTitle>
-                </TagInfo>
-                <GarmentVisual>
-                  <StackProductImage product={item.productObj} />
-                </GarmentVisual>
-                <CoordinateOverlay>
-                  <CoordText>COORD_X: {isFront ? "42.09" : "---"}</CoordText>
-                  <CoordText>COORD_Y: {isFront ? "80.11" : "---"}</CoordText>
-                  <CoordText>Z_DEPTH: {isFront ? "0.25" : "---"}</CoordText>
-                </CoordinateOverlay>
-              </ShowcaseCard>
-            );
-          })}
-        </StackWrapper>
+              if (offset > 4) return null; // --- RENDER ALL 5 CARDS FOR FLOW ---
+
+              // --- S3 ALIGNED VISUAL DIRECTION: RIGHT-TO-LEFT ---
+              // Starts far-right, moves in one single direction to left active forefront
+              const targetX = isArabic 
+                ? (isFront ? "-70%" : isMiddle ? "10%" : "90%") // RTL Coords
+                : (isFront ? "-30%" : isMiddle ? "-90%" : "-150%"); // LTR Coords
+                
+              const targetY = isFront 
+                ? "-50%" 
+                : isMiddle 
+                  ? "-55%" 
+                  : isBack 
+                    ? "-60%" 
+                    : isLayer3 
+                      ? "-65%" 
+                      : "-70%";
+
+              // Back is facing right of the screen (in Arabic and LTR), decrementing to 0 at forefront
+              const rotateYVal = isFront 
+                ? 0 
+                : isMiddle 
+                  ? (isArabic ? 12 : -12) 
+                  : isBack 
+                    ? (isArabic ? 24 : -24) 
+                    : isLayer3 
+                      ? (isArabic ? 36 : -36) 
+                      : (isArabic ? 48 : -48);
+
+              const cardScale = isFront 
+                ? 1.0 
+                : isMiddle 
+                  ? 1.12 
+                  : isBack 
+                    ? 1.24 
+                    : isLayer3 
+                      ? 1.36 
+                      : 1.48; // S3: Background cards are larger
+
+              const cardBlur = isFront 
+                ? 0 
+                : isMiddle 
+                  ? 3 
+                  : isBack 
+                    ? 6 
+                    : isLayer3 
+                      ? 10 
+                      : 14; // S3: Highest blur at the back
+
+              return (
+                <ShowcaseCard
+                  key={index}
+                  initial={{ opacity: 0, scale: 1.48, x: isArabic ? "95%" : "-150%", y: "-70%", rotateY: isArabic ? 48 : -48 }}
+                  
+                  // Sequential keyframes to execute your 1.5s grow and 0.5s fade/drop timing!
+                  animate={isFront ? {
+                    y: ["-50%", "-50%", "-50%", "-10%"], // Drops down slightly at exit
+                    x: ["-45%", "-45%", "-45%", "-120%"],
+                    scale: [0.95, 1.05, 0.95, 0.5], // Grows for first 1.5s, then drops/shrinks
+                    opacity: [1.0, 1.0, 1.0, 0], // Fades out in the last 0.5s of cycle
+                    rotateY: 0,
+                    zIndex: 15, // --- FIXED: Sits completely on top of all lines ---
+                  } : {
+                    y: targetY,
+                    x: targetX,
+                    scale: cardScale,
+                    opacity: isMiddle ? 0.55 : isBack ? 0.35 : isLayer3 ? 0.2 : 0.08,
+                    rotateY: rotateYVal, 
+                    zIndex: isMiddle ? 3 : isBack ? 2 : isLayer3 ? 1 : 0, // Sits completely under the lines
+                  }}
+                  $isFront={isFront}
+                  $blur={cardBlur}
+                  exit={{ opacity: 0, scale: 0.7, x: isArabic ? "-150%" : "90%" }}
+                  transition={{
+                    duration: 4.5, // Synchronized with displayItems loop timer
+                    times: [0, 0.33, 0.88, 1], // Accurate transition breakpoints
+                    ease: "easeInOut"
+                  }}
+                  style={{ pointerEvents: isFront ? "auto" : "none" }}
+                  onClick={() => {
+                    if (isFront && onSelectCanvas && item.productObj) {
+                      onSelectCanvas(item.productObj);
+                    }
+                  }}
+                >
+                  <GlowingGrid />
+                  
+                  {/* Neon Information overlay displays with a 300ms delayed flicker */}
+                  <AnimatePresence>
+                    {isFront && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3, duration: 0.3 }}
+                      >
+                        <TagInfo $accent={activeColorTheme.hex}>
+                          <CoreTag $accent={activeColorTheme.hex}>
+                            {item.label}
+                          </CoreTag>
+                          <ProductTitle>{item.title}</ProductTitle>
+                        </TagInfo>
+                        <CoordinateOverlay>
+                          <CoordText $color={activeColorTheme.hex}>
+                            COORD_X: 50.00%
+                          </CoordText>
+                          <CoordText $color={activeColorTheme.hex}>
+                            COORD_Y: 50.00%
+                          </CoordText>
+                          <CoordText $color={activeColorTheme.hex}>
+                            SCALE: 80.0%
+                          </CoordText>
+                        </CoordinateOverlay>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <GarmentVisual>
+                    {item.availability ? (
+                      <StackProductImage availability={item.availability} />
+                    ) : (
+                      <div style={{ fontSize: "5rem" }}>👕</div>
+                    )}
+                  </GarmentVisual>
+                </ShowcaseCard>
+              );
+            })}
+          </AnimatePresence>
+        </CardsFlowContainer>
       </RightCol>
     </HeroContainer>
   );
@@ -402,6 +679,7 @@ const HeroSection = ({ onScrollToCatalog, sampleProducts }) => {
 HeroSection.propTypes = {
   onScrollToCatalog: PropTypes.func.isRequired,
   sampleProducts: PropTypes.array,
+  onSelectCanvas: PropTypes.func
 };
 
 export default HeroSection;

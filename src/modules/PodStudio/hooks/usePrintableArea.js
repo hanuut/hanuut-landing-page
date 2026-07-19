@@ -337,3 +337,34 @@ const usePrintableArea = (
   }, [canvas, containerWidth, containerHeight, activeSide, selectedSize]);
 };
 export default usePrintableArea;
+
+/**
+ * Resolves the preferred display image based on a defensive priority chain:
+ * product.previewImages[index] ➔ active mockup template ➔ default availability image ➔ fallback
+ */
+export const getPreferredProductImageId = (product, index = 0, selectedColor = null) => {
+  const previews = product?.previewImages ?? [];
+  
+  // 1. Primary: Expose premium marketing preview images first
+  if (previews.length > index) {
+    return previews[index];
+  }
+
+  // Find active or fallback availability block
+  const availability = selectedColor
+    ? product?.availabilities?.find(av => String(av.color).toLowerCase() === String(selectedColor).toLowerCase())
+    : product?.availabilities?.[0];
+
+  // 2. Secondary: Fallback to existing mockup template image
+  if (availability?.podFrontTemplateId) {
+    return availability.podFrontTemplateId;
+  }
+
+  // 3. Tertiary: Fallback to standard product thumbnail
+  if (availability?.imageId) {
+    return availability.imageId;
+  }
+
+  // 4. Quaternary: Fallback to the first standard catalog image
+  return product?.images?.[0] || null;
+};

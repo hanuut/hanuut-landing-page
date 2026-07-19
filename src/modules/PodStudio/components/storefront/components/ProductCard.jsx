@@ -2,8 +2,10 @@ import React, { useEffect, useState, useMemo } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { AnimatePresence, motion } from "framer-motion";
 import { getImage } from "../../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../../utils/imageUtils";
+import { getPreferredProductImageId } from "../../../hooks/usePrintableArea";
 
 const CardWrapper = styled.div`
   background-color: #111214;
@@ -18,6 +20,7 @@ const CardWrapper = styled.div`
   scroll-snap-align: start;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-sizing: border-box;
+  position: relative;
 
   &:hover {
     transform: translateY(-4px);
@@ -43,11 +46,15 @@ const ImageStage = styled.div`
   position: relative;
 
   img {
-    max-width: 85%;
-    max-height: 85%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.45));
     transition: transform 0.4s ease;
+    position: absolute;
+    inset: 0;
+    padding: 1rem;
+    box-sizing: border-box;
   }
 
   ${CardWrapper}:hover & img {
@@ -134,15 +141,22 @@ const CustomizeBtn = styled.button`
 const ProductCard = ({ product, index, onSelect }) => {
   const { t } = useTranslation();
   const [imageBuffer, setImageBuffer] = useState(null);
+  const [hoverImageBuffer, setHoverImageBuffer] = useState(null);
+  const [isCardHovered, setIsCardHovered] = useState(false);
 
   const defaultAvailability = product?.availabilities?.[0];
   const defaultSize = defaultAvailability?.sizes?.[0];
-  const imageId = defaultAvailability?.imageId;
+
+  // --- S3: INCORPORATING DYNAMIC OPTIONAL PREVIEW IMAGES FALLBACKS ---
+  const previews = product?.previewImages ?? [];
+  const activeImageId = getPreferredProductImageId(product, 0);
+  const hoverImageId =
+    previews.length > 1 ? getPreferredProductImageId(product, 1) : null;
 
   useEffect(() => {
     let isMounted = true;
-    if (imageId) {
-      getImage(imageId)
+    if (activeImageId) {
+      getImage(activeImageId)
         .then((res) => {
           if (isMounted && res?.data) {
             setImageBuffer(res.data);
@@ -150,14 +164,30 @@ const ProductCard = ({ product, index, onSelect }) => {
         })
         .catch((err) => console.error("Error loading substrate image:", err));
     }
+    if (hoverImageId) {
+      getImage(hoverImageId)
+        .then((res) => {
+          if (isMounted && res?.data) {
+            setHoverImageBuffer(res.data);
+          }
+        })
+        .catch((err) =>
+          console.error("Error loading hover substrate image:", err),
+        );
+    } else {
+      setHoverImageBuffer(null);
+    }
     return () => {
       isMounted = false;
     };
-  }, [imageId]);
+  }, [activeImageId, hoverImageId]);
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
+  const hoverImageUrl = useMemo(
+    () => getImageUrl(hoverImageBuffer),
+    [hoverImageBuffer],
+  );
 
-  // --- ARRAYS TYPE PROTECTION ENFORCED ---
   const gsmValue = useMemo(() => {
     if (!product.specifications || !Array.isArray(product.specifications))
       return null;
@@ -178,17 +208,41 @@ const ProductCard = ({ product, index, onSelect }) => {
   }, [product.specifications]);
 
   return (
-    <CardWrapper className="pod-card-wrapper">
+    <CardWrapper
+      className="pod-card-wrapper"
+      onMouseEnter={() => setIsCardHovered(true)}
+      onMouseLeave={() => setIsCardHovered(false)}
+    >
       <ImageStage onClick={onSelect}>
-        {imageUrl ? (
-          <img src={imageUrl} alt={product.name} loading="lazy" />
-        ) : (
-          <div style={{ fontSize: "2.5rem" }}>👕</div>
-        )}
+        <AnimatePresence mode="wait">
+          {isCardHovered && hoverImageUrl ? (
+            <motion.img
+              key="hover-image"
+              src={hoverImageUrl}
+              alt={product.name}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            />
+          ) : (
+            imageUrl && (
+              <motion.img
+                key="main-image"
+                src={imageUrl}
+                alt={product.name}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+              />
+            )
+          )}
+        </AnimatePresence>
       </ImageStage>
       <InfoBlock>
         <CategoryBadge>
-          {t("pod_store_base_label", "CANVAS")} /{" "}
+          {t("pod_store.base_label", "CANVAS")} /{" "}
           {String(index + 1).padStart(3, "0")}
         </CategoryBadge>
         <ProductName onClick={onSelect}>{product.name}</ProductName>
@@ -196,7 +250,7 @@ const ProductCard = ({ product, index, onSelect }) => {
           {gsmValue && <SpecBadge>{gsmValue} GSM</SpecBadge>}
           {materialValue && <SpecBadge>{materialValue}</SpecBadge>}
           {product.hasBackPrintSurface && (
-            <SpecBadge>{t("pod_store_double_sided", "Double-Sided")}</SpecBadge>
+            <SpecBadge>{t("pod_store.double_sided", "Double-Sided")}</SpecBadge>
           )}
         </SpecRow>
       </InfoBlock>
@@ -205,7 +259,7 @@ const ProductCard = ({ product, index, onSelect }) => {
           {parseInt(defaultSize?.sellingPrice || 0)} {t("dzd", "DA")}
         </PriceValue>
         <CustomizeBtn onClick={onSelect}>
-          {t("pod_store_start_designing_btn", "Design")}
+          {t("pod_store.start_designing_btn", "Design")}
         </CustomizeBtn>
       </PricingActionRow>
     </CardWrapper>

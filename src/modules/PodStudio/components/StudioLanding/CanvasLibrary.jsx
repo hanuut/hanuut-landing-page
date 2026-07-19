@@ -1,10 +1,18 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import PropTypes from "prop-types";
-import styled from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaSearch, FaPalette, FaTshirt } from "react-icons/fa";
+import {
+  FaSearch,
+  FaPalette,
+  FaTshirt,
+} from "react-icons/fa";
 import {
   fetchPaginatedProducts,
   selectProducts,
@@ -15,26 +23,55 @@ import Loader from "../../../../components/Loader";
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
 
-// --- TEXT PARSER FOR BILINGUAL DESCRIPTIONS ---
+// --- TEXT PARSER ---
 const parseBilingualText = (text, targetLang) => {
   if (!text) return "";
-  if (targetLang === "ar") return text;
   return text;
 };
 
-// --- STYLED COMPONENTS ---
+// Global in-memory image cache dictionary (Zero-fetch lag)
+const imageCache = {};
+
+// ==========================================================
+// STYLED COMPONENTS - GLASS STITCH INTERACTIVE WORKSPACE
+// ==========================================================
+
 const LibraryContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
   position: relative;
+  z-index: 2;
+`;
+
+const FluidGasBackdrop = styled(motion.div)`
+  position: absolute;
+  width: ${(props) => props.$size || "220px"};
+  height: ${(props) => props.$size || "220px"};
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    ${(props) => props.$color || "rgba(240, 122, 72, 0.18)"} 0%,
+    transparent 70%
+  );
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: screen;
+  transition:
+    background 0.8s ease-in-out,
+    width 0.8s ease,
+    height 0.8s ease;
 `;
 
 const SectionHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  position: relative;
+  z-index: 2;
+
   h3 {
     font-size: 1.35rem;
     font-weight: 800;
@@ -46,7 +83,11 @@ const SectionHeader = styled.div`
   .line {
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.12), transparent);
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.12),
+      transparent
+    );
   }
 `;
 
@@ -57,6 +98,8 @@ const FilterRow = styled.div`
   gap: 2rem;
   flex-wrap: wrap;
   width: 100%;
+  position: relative;
+  z-index: 2;
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 `;
 
@@ -88,74 +131,165 @@ const SearchBox = styled.div`
   }
 `;
 
-// --- NEW BREAKOUT INFINITE MARQUEE COMPONENTS ---
+// --- MULTI-RAIL CAROUSEL WRAPPERS ---
 const MarqueeWrapper = styled.div`
   width: 100vw;
-  margin-left: calc(-50vw + 50%); /* Full bleed breakout */
+  margin-left: calc(-50vw + 50%);
   overflow: hidden;
-  padding: 3rem 0; /* Extra padding to allow images to break out */
+  padding: 3rem 0; /* --- FIXED: Extra clearance room prevents clips --- */
   mask-image: linear-gradient(
     to right,
     transparent,
-    black 10%,
-    black 90%,
+    black 15%,
+    black 85%,
     transparent
   );
   -webkit-mask-image: linear-gradient(
     to right,
     transparent,
-    black 10%,
-    black 90%,
+    black 15%,
+    black 85%,
     transparent
   );
-  direction: ltr; /* Force LTR for predictable mathematical scrolling */
+  direction: ltr;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 `;
 
-const MarqueeTrack = styled(motion.div)`
+// GPU-Accelerated Marquee Keyframes
+const scrollLeft = keyframes`
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+`;
+
+const scrollRight = keyframes`
+  0% { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+`;
+
+const MarqueeTrack = styled.div`
   display: flex;
   gap: 3rem;
   width: max-content;
   align-items: center;
+  
+  /* Apply fluid braking via animation parameters */
+  animation: ${(props) => (props.$reverse ? scrollRight : scrollLeft)} 
+             ${(props) => props.$speed}s linear infinite;
+  animation-play-state: ${(props) => (props.$isPaused ? "paused" : "running")};
+  will-change: transform;
 `;
 
 const MarqueeItem = styled.div`
-  width: 160px;
-  height: 160px;
+  /* Sized bigger (85px default scale, expands to 130px on hover) */
+  width: ${(props) => (props.$isLineActive ? "130px" : "85px")};
+  height: ${(props) => (props.$isLineActive ? "130px" : "85px")};
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
   position: relative;
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &:hover {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
     z-index: 10;
   }
+`;
+
+// Expanding Neon Pulse Ring
+const expandPulse = keyframes`
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.35);
+    opacity: 0;
+  }
+`;
+
+const CirclePulseRing = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 105%;
+  height: 105%;
+  pointer-events: none;
+  z-index: 0;
+  animation: ${expandPulse} 2s infinite cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: ${(props) => (props.$active ? "block" : "none")};
+  
+  /* Shape variety injection matching background */
+  ${(props) => {
+    if (props.$shape === "diamond") {
+      return css`
+        border: 1.5px solid ${props.$color || "#f07a48"};
+        transform: translate(-50%, -50%) rotate(45deg);
+        border-radius: 14px;
+      `;
+    }
+    if (props.$shape === "squircle") {
+      return css`
+        border: 1.5px solid ${props.$color || "#f07a48"};
+        border-radius: 18px;
+      `;
+    }
+    return css`
+      border: 1.5px solid ${props.$color || "#f07a48"};
+      border-radius: 50%;
+    `;
+  }}
 `;
 
 const CircleBg = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
+  width: 92%;
+  height: 95%;
   background: #111214;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.5),
-    inset 0 0 15px rgba(255, 255, 255, 0.02);
   z-index: 0;
   transition: all 0.3s ease;
 
+  /* Spatially-aware geometry pool styling */
+  ${(props) => {
+    if (props.$shape === "diamond") {
+      return css`
+        transform: translate(-50%, -50%) rotate(45deg);
+        border-radius: 14px;
+        border: 1.5px solid ${props.$active ? props.$color || "#f07a48" : "rgba(255, 255, 255, 0.05)"};
+      `;
+    }
+    if (props.$shape === "squircle") {
+      return css`
+        transform: translate(-50%, -50%);
+        border-radius: 18px;
+        border: 1.5px solid ${props.$active ? props.$color || "#f07a48" : "rgba(255, 255, 255, 0.05)"};
+      `;
+    }
+    // Circle
+    return css`
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1.5px solid ${props.$active ? props.$color || "#f07a48" : "rgba(255, 255, 255, 0.05)"};
+    `;
+  }}
+
+  box-shadow: ${(props) =>
+    props.$active
+      ? `0 0 25px ${props.$color || "rgba(240, 122, 72, 0.35)"}, inset 0 0 10px rgba(255, 255, 255, 0.02)`
+      : "0 10px 25px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.02)"};
+
   ${MarqueeItem}:hover & {
-    border-color: #f07a48;
+    border-color: ${(props) => props.$color || "#f07a48"};
     box-shadow:
-      0 15px 40px rgba(240, 122, 72, 0.2),
-      inset 0 0 20px rgba(240, 122, 72, 0.05);
+      0 15px 35px ${(props) => props.$color || "rgba(240, 122, 72, 0.25)"},
+      inset 0 0 15px rgba(240, 122, 72, 0.05);
   }
 `;
 
@@ -170,6 +304,8 @@ const GridCard = styled.div`
   cursor: pointer;
   transition: all 0.3s ease;
   height: 100%;
+  position: relative;
+  z-index: 2;
 
   &:hover {
     border-color: #f07a48;
@@ -263,7 +399,7 @@ const FloatingPopover = styled(motion.div)`
   box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
   width: 380px;
   z-index: 9999;
-  pointer-events: none; /* Crucial: Prevents flickering when hovering */
+  pointer-events: none;
 `;
 
 const BlueprintStage = styled.div`
@@ -315,7 +451,7 @@ const TagInfo = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.3rem;
+  gap: 0.3;
   text-align: right;
   z-index: 5;
 `;
@@ -365,20 +501,37 @@ const CustomRotatingMockup = ({
 
   useEffect(() => {
     let isMounted = true;
-    if (colorObj?.podFrontTemplateId || colorObj?.imageId) {
-      getImage(colorObj.podFrontTemplateId || colorObj.imageId)
-        .then((res) => {
-          if (isMounted && res.data) setFrontUrl(getImageUrl(res.data));
-        })
-        .catch(() => {});
+    const imgId = colorObj?.podFrontTemplateId || colorObj?.imageId;
+    if (!imgId) return;
+
+    // 1. Read from static memory cache (Prevents double API requests)
+    if (imageCache[imgId]) {
+      setFrontUrl(imageCache[imgId]);
+    } else {
+      getImage(imgId).then((res) => {
+        if (res.data) {
+          const url = getImageUrl(res.data);
+          imageCache[imgId] = url; // Cache it!
+          if (isMounted) setFrontUrl(url);
+        }
+      }).catch(() => {});
     }
+
     if (colorObj?.podBackTemplateId) {
-      getImage(colorObj.podBackTemplateId)
-        .then((res) => {
-          if (isMounted && res.data) setBackUrl(getImageUrl(res.data));
-        })
-        .catch(() => {});
+      const bImgId = colorObj.podBackTemplateId;
+      if (imageCache[bImgId]) {
+        setBackUrl(imageCache[bImgId]);
+      } else {
+        getImage(bImgId).then((res) => {
+          if (res.data) {
+            const url = getImageUrl(res.data);
+            imageCache[bImgId] = url; // Cache it!
+            if (isMounted) setBackUrl(url);
+          }
+        }).catch(() => {});
+      }
     }
+    
     return () => {
       isMounted = false;
     };
@@ -395,9 +548,8 @@ const CustomRotatingMockup = ({
 
   const hasBack = !!backUrl;
 
-  // Calculate dynamic scaling. Marquee images break out of their container.
-  const imgScaleActive = isMarquee ? 1.2 : isLarge ? 1.05 : 0.95;
-  const imgScaleInactive = isMarquee ? 0.9 : isLarge ? 0.88 : 0.8;
+  const imgScaleActive = isMarquee ? 1.05 : isLarge ? 1.05 : 0.95;
+  const imgScaleInactive = isMarquee ? 0.82 : isLarge ? 0.88 : 0.8;
 
   return (
     <div
@@ -463,13 +615,16 @@ const CustomRotatingMockup = ({
 
 // --- OPTIMIZED MEMOIZED MARQUEE ITEM COMPONENT ---
 const MemoizedMarqueeItem = React.memo(
-  ({ canvas, idx, popoverState, onSelect, onMouseEnter }) => {
+  ({ canvas, popoverState, onSelect, onMouseEnter, activeColor, shape, isLineActive }) => {
+    const isFocused = popoverState.canvas?.canvasId === canvas.canvasId;
     return (
       <MarqueeItem
         onClick={() => onSelect(canvas)}
         onMouseEnter={(e) => onMouseEnter(e, canvas)}
+        $isLineActive={isLineActive}
       >
-        <CircleBg />
+        <CirclePulseRing $active={isFocused} $color={activeColor} $shape={shape} />
+        <CircleBg $active={isFocused} $color={activeColor} $shape={shape} />
         <div
           style={{
             position: "relative",
@@ -481,7 +636,7 @@ const MemoizedMarqueeItem = React.memo(
           <CustomRotatingMockup
             colorObj={canvas.availableColors?.[0]}
             title={canvas.title}
-            isHovered={popoverState.canvas?.canvasId === canvas.canvasId}
+            isHovered={isFocused}
             isMarquee={true}
           />
         </div>
@@ -506,6 +661,18 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
   });
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // --- INTERACTIVE AMBIENT FLUID GAS BACKDROP STATE ---
+  const [gasState, setGasState] = useState({
+    x: 0,
+    y: 0,
+    size: "200px",
+    color: "rgba(240, 122, 72, 0.15)",
+  });
+
+  // Track which line/rail is hovered: null, 0 (top), 1 (middle)
+  const [hoveredLineIdx, setHoveredLineIdx] = useState(null);
+  const [isItemHovered, setIsItemHovered] = useState(false);
 
   useEffect(() => {
     dispatch(
@@ -555,13 +722,16 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
       .filter(Boolean);
   }, [paginatedProducts]);
 
-  // Top 1/3 Marquee Data (Random 15 items max, shuffled)
-  const marqueeItems = useMemo(() => {
-    const shuffled = [...canvasList].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 15);
+  // Splits catalog into 2 distinct, parallel mockup lanes (Bigger sizes, 2 rows only)
+  const railsData = useMemo(() => {
+    const list = [...canvasList];
+    const segmentSize = Math.ceil(list.length / 2);
+    return [
+      list.slice(0, segmentSize),
+      list.slice(segmentSize),
+    ];
   }, [canvasList]);
 
-  // Bottom 2/3 Grid Data (Filtered)
   const filteredList = useMemo(() => {
     return canvasList.filter((canvas) => {
       const canvasCatId =
@@ -576,62 +746,135 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
     });
   }, [canvasList, selectedCategory, searchQuery]);
 
-  // Hover Handlers for Popover
-  const handleMouseEnter = (e, canvas) => {
+  // Color theme resolver
+  const getColorHex = (canvasObj) => {
+    if (!canvasObj) return "#F07A48";
+    const color = String(canvasObj.availableColors?.[0]?.colorName || "").toLowerCase();
+    if (color.includes("green") || color.includes("vert")) return "#1D9E75";
+    if (color.includes("blue") || color.includes("bleu") || color.includes("navy")) return "#397FF9";
+    if (color.includes("grey") || color.includes("gris")) return "#A1A1AA";
+    if (color.includes("rose") || color.includes("pink")) return "#EC4899";
+    if (color.includes("yellow") || color.includes("jaune")) return "#F59E0B";
+    if (color.includes("red") || color.includes("rouge") || color.includes("bordeaux")) return "#EF4444";
+    return "#F07A48";
+  };
+
+  // --- AMBIENT FLUID GAS INTERACTION HANDLERS ---
+  const handleMouseEnter = (e, canvas, lineIdx) => {
     const rect = e.currentTarget.getBoundingClientRect();
+    const parentRect = e.currentTarget.offsetParent.getBoundingClientRect();
     setPopoverState({ canvas, rect });
+    setIsItemHovered(true);
+    setHoveredLineIdx(lineIdx);
+
+    const x = rect.left - parentRect.left + rect.width / 2;
+    const y = rect.top - parentRect.top + rect.height / 2;
+    const themeColor = getColorHex(canvas);
+
+    setGasState({
+      x,
+      y,
+      size: "260px",
+      color: `${themeColor}25`,
+    });
   };
 
   const handleMouseLeave = () => {
     setPopoverState({ canvas: null, rect: null });
+    setIsItemHovered(false);
+    setHoveredLineIdx(null);
+    setGasState((prev) => ({
+      ...prev,
+      size: "180px",
+    }));
   };
 
-  // Popover Positioning Math
   const popoverStyle = useMemo(() => {
     if (!popoverState.rect) return {};
     const { top, left, right, height } = popoverState.rect;
     const isLeftHalf = left < window.innerWidth / 2;
 
-    // Vertical alignment: align center of popover with center of card, clamp to screen
     let popTop = top + height / 2 - 500 / 2;
     popTop = Math.max(20, Math.min(popTop, window.innerHeight - 520));
 
-    if (isLeftHalf) {
-      return { top: popTop, left: right + 20 };
-    } else {
-      return { top: popTop, right: window.innerWidth - left + 20 };
-    }
+    return isLeftHalf ? { top: popTop, left: right + 20 } : { top: popTop, right: window.innerWidth - left + 20 };
   }, [popoverState.rect]);
+
+  // Shape variety lookup based on element index
+  const getShapeType = (index) => {
+    const remainder = index % 3;
+    if (remainder === 1) return "squircle";
+    if (remainder === 2) return "diamond";
+    return "circle";
+  };
 
   if (paginationLoading && canvasList.length === 0)
     return <Loader fullscreen={false} />;
 
+  // Dynamic animation speeds:
+  // - default: 24s / 30s
+  // - 10% speed on line hover: 240s / 300s
+  // - complete pause handled via 'isItemHovered' playState rule
+  const speedScaleTopBottom = hoveredLineIdx !== null ? 240 : 24;
+  const speedScaleMiddle = hoveredLineIdx !== null ? 300 : 30;
+
   return (
     <LibraryContainer onMouseLeave={handleMouseLeave}>
-      {/* 1. INFINITE 3D MARQUEE (Top 1/3 Breakout Effect) */}
-      {marqueeItems.length > 0 && (
-        <MarqueeWrapper>
-          <MarqueeTrack
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{
-              repeat: Infinity,
-              ease: "linear",
-              duration: marqueeItems.length * 2.5,
-            }}
-          >
-            {[...marqueeItems, ...marqueeItems].map((canvas, idx) => (
-              <MemoizedMarqueeItem
-                key={`${canvas.canvasId}-${idx}`}
-                canvas={canvas}
-                idx={idx}
-                popoverState={popoverState}
-                onSelect={onSelectCanvas}
-                onMouseEnter={handleMouseEnter}
-              />
-            ))}
-          </MarqueeTrack>
-        </MarqueeWrapper>
-      )}
+      {/* Dynamic ambient fluid gas backdrop layer */}
+      <FluidGasBackdrop
+        animate={{
+          left: gasState.x - 120,
+          top: gasState.y - 120,
+          scale: [1, 1.15, 0.9, 1],
+          opacity: [0.75, 0.9, 0.65, 0.75],
+        }}
+        transition={{
+          left: { type: "spring", stiffness: 90, damping: 20 },
+          top: { type: "spring", stiffness: 90, damping: 20 },
+          scale: { repeat: Infinity, duration: 8, ease: "easeInOut" },
+          opacity: { repeat: Infinity, duration: 8, ease: "easeInOut" },
+        }}
+        $size={gasState.size}
+        $color={gasState.color}
+      />
+
+      {/* 1. DUAL SCROLLING LANES (Alternating directions, responsive scales) */}
+      <MarqueeWrapper>
+        {railsData.map((railItems, lineIdx) => {
+          if (railItems.length === 0) return null;
+          const isLineActive = hoveredLineIdx === lineIdx;
+          const isReverse = lineIdx === 1; // Middle rail scrolls right-to-left
+
+          return (
+            <div 
+              key={lineIdx} 
+              onMouseEnter={() => setHoveredLineIdx(lineIdx)}
+              onMouseLeave={() => setHoveredLineIdx(null)}
+              style={{ overflow: "hidden", width: "100%" }}
+            >
+              <MarqueeTrack
+                $reverse={isReverse}
+                $speed={isReverse ? speedScaleMiddle : speedScaleTopBottom}
+                $isPaused={isItemHovered && hoveredLineIdx === lineIdx}
+              >
+                {/* 4X duplication guarantees and endless visual flow on all screens */}
+                {[...railItems, ...railItems, ...railItems, ...railItems].map((canvas, idx) => (
+                  <MemoizedMarqueeItem
+                    key={`${canvas.canvasId}-${lineIdx}-${idx}`}
+                    canvas={canvas}
+                    popoverState={popoverState}
+                    onSelect={onSelectCanvas}
+                    onMouseEnter={(e) => handleMouseEnter(e, canvas, lineIdx)}
+                    activeColor={getColorHex(canvas)}
+                    shape={getShapeType(idx)}
+                    isLineActive={isLineActive}
+                  />
+                ))}
+              </MarqueeTrack>
+            </div>
+          );
+        })}
+      </MarqueeWrapper>
 
       <SectionHeader style={{ marginTop: "1rem" }}>
         <h3>{t("pod_studio_catalog_heading", "Explore Blank")}</h3>
@@ -675,7 +918,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
             key={canvas.canvasId}
             className="auras-5-4-item"
             onClick={() => onSelectCanvas(canvas)}
-            onMouseEnter={(e) => handleMouseEnter(e, canvas)}
+            onMouseEnter={(e) => handleMouseEnter(e, canvas, null)}
           >
             <GridImageStage>
               <CustomRotatingMockup

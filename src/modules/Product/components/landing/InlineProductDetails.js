@@ -1,21 +1,42 @@
-// src/modules/Product/components/landing/InlineProductDetails.js
-
 import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
-import { FaTimes, FaExpand, FaEye, FaBookmark, FaChevronDown, FaChevronRight, FaChevronLeft, FaChevronUp, FaCheck, FaPalette } from "react-icons/fa";
+import {
+  FaTimes,
+  FaExpand,
+  FaEye,
+  FaBookmark,
+  FaChevronRight,
+  FaChevronLeft,
+  FaCheck,
+  FaPalette,
+} from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import axios from "axios";
-import { getTemplateConfig, getGarmentDimensions, getRawPrintCost } from "../../../PodStudio/hooks/usePrintableArea";
+import {
+  getTemplateConfig,
+  getGarmentDimensions,
+  getRawPrintCost,
+} from "../../../PodStudio/hooks/usePrintableArea";
 
 // --- Redux ---
 import { updateCartQuantity } from "../../../Cart/state/reducers";
 
-import { PodCanvasPreview, PodStepIndicator, PodStepTwoControls, PodStepThreeControls, NavigationRow, WizardBtn } from "./PodCustomizer";
-import { retrieveFile, persistFile } from "../../../PodStudio/utils/indexedDbHelper"; // <-- PERSISTED FILE UTILITIES
+import {
+  PodCanvasPreview,
+  PodStepIndicator,
+  PodStepTwoControls,
+  PodStepThreeControls,
+  NavigationRow,
+  WizardBtn,
+} from "./PodCustomizer";
+import {
+  retrieveFile,
+  persistFile,
+} from "../../../PodStudio/utils/indexedDbHelper";
 
 const DetailContainer = styled(motion.div)`
   width: 100%;
@@ -53,7 +74,7 @@ const GradientOverlay = styled.div`
     to bottom,
     rgba(17, 18, 20, 0.4) 0%,
     rgba(17, 18, 20, 0.85) 50%,
-    #111214 100%
+    #111214 100
   );
   z-index: 1;
   pointer-events: none;
@@ -82,7 +103,7 @@ const SplitGrid = styled.div`
 const GallerySection = styled.div`
   width: 100%;
   height: 350px;
-  background: #E5E5E5; 
+  background: #e5e5e5;
   border-radius: 20px;
   overflow: hidden;
   position: relative;
@@ -130,7 +151,7 @@ const AltThumbnail = styled.div`
   height: 36px;
   border-radius: 6px;
   overflow: hidden;
-  background: #E5E5E5;
+  background: #e5e5e5;
   border: 2px solid
     ${(props) => (props.$active ? props.theme.primaryColor : "transparent")};
   cursor: pointer;
@@ -178,7 +199,7 @@ const ImageOverlayScrim = styled.div`
     to top,
     rgba(17, 18, 20, 0.95) 0%,
     rgba(17, 18, 20, 0.4) 60%,
-    transparent 100%
+    transparent 100
   );
   padding: 3rem 1.25rem 1.25rem 1.25rem;
   display: flex;
@@ -311,8 +332,10 @@ const ColorSwatch = styled.button`
   justify-content: center;
   flex-shrink: 0;
   background-color: ${(props) => props.$colorCode || "#27272a"};
-  border: 2px solid ${(props) => (props.$active ? "white" : "rgba(255,255,255,0.1)")};
-  box-shadow: ${(props) => props.$active ? `0 0 8px ${props.theme.primaryColor}` : "none"};
+  border: 2px solid
+    ${(props) => (props.$active ? "white" : "rgba(255,255,255,0.1)")};
+  box-shadow: ${(props) =>
+    props.$active ? `0 0 8px ${props.theme.primaryColor}` : "none"};
 
   &:hover {
     transform: scale(1.15);
@@ -327,13 +350,18 @@ const SizePill = styled.button`
   cursor: pointer;
   transition: all 0.2s;
   flex-shrink: 0;
-  background: ${(props) => props.$active ? "white" : "rgba(255,255,255,0.03)"};
-  border: 1px solid ${(props) => props.$active ? props.theme.primaryColor : "rgba(255,255,255,0.1)"};
+  background: ${(props) =>
+    props.$active ? "white" : "rgba(255,255,255,0.03)"};
+  border: 1px solid
+    ${(props) =>
+      props.$active ? props.theme.primaryColor : "rgba(255,255,255,0.1)"};
   color: ${(props) => (props.$active ? "#000" : "#D4D4D8")};
-  box-shadow: ${(props) => props.$active ? `0 0 8px ${props.theme.primaryColor}50` : "none"};
+  box-shadow: ${(props) =>
+    props.$active ? `0 0 8px ${props.theme.primaryColor}50` : "none"};
 
   &:hover {
-    background: ${(props) => props.$active ? "white" : "rgba(255,255,255,0.08)"};
+    background: ${(props) =>
+      props.$active ? "white" : "rgba(255,255,255,0.08)"};
   }
 `;
 
@@ -459,9 +487,16 @@ const LightboxOverlay = styled(motion.div)`
 `;
 
 const COLOR_MAP = {
-  black: "#000000", white: "#FFFFFF", red: "#EF4444", blue: "#3B82F6",
-  green: "#10B981", yellow: "#F59E0B", purple: "#8B5CF6", pink: "#EC4899",
-  grey: "#6B7280", beige: "#F5F5DC",
+  black: "#000000",
+  white: "#FFFFFF",
+  red: "#EF4444",
+  blue: "#3B82F6",
+  green: "#10B981",
+  yellow: "#F59E0B",
+  purple: "#8B5CF6",
+  pink: "#EC4899",
+  grey: "#6B7280",
+  beige: "#F5F5DC",
 };
 
 const SelectorGrid = styled.div`
@@ -480,8 +515,8 @@ const InlineProductDetails = ({
   onClose,
   onImageChange,
   onWizardStepChange,
-  editingCartItem, 
-  setEditingCartItem 
+  editingCartItem,
+  setEditingCartItem,
 }) => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
@@ -496,13 +531,27 @@ const InlineProductDetails = ({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isDescOpen, setIsDescOpen] = useState(false);
 
-  const [wizardStep, setWizardStep] = useState(1); 
+  const [wizardStep, setWizardStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [podState, setPodState] = useState({
-    side: 'front',
-    front: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
-    back: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
+    side: "front",
+    front: {
+      file: null,
+      previewUrl: null,
+      scale: 80,
+      x: 50,
+      y: 50,
+      rotation: 0,
+    },
+    back: {
+      file: null,
+      previewUrl: null,
+      scale: 80,
+      x: 50,
+      y: 50,
+      rotation: 0,
+    },
   });
 
   useEffect(() => {
@@ -510,7 +559,7 @@ const InlineProductDetails = ({
   }, [wizardStep, onWizardStepChange]);
 
   // STABLE SCHEMA RESOLVER: Adapts and normalizes both raw Redux Cart & Creation Tray structures on the fly
-useEffect(() => {
+  useEffect(() => {
     let isMounted = true;
     let freshFrontUrl = null;
     let freshBackUrl = null;
@@ -518,31 +567,56 @@ useEffect(() => {
     if (editingCartItem) {
       const rawCustom = editingCartItem.podCustomization;
       const adaptedCustom = editingCartItem.customization;
-      
-      const custom = rawCustom || (adaptedCustom ? {
-        printSide: adaptedCustom.printSide,
-        front: adaptedCustom.front ? {
-          originalImageUrl: adaptedCustom.front.artworkUrl || adaptedCustom.front.originalImageUrl,
-          width: adaptedCustom.front.widthPercent ?? adaptedCustom.front.width,
-          x: adaptedCustom.front.xOffsetPercent ?? adaptedCustom.front.x,
-          y: adaptedCustom.front.yOffsetPercent ?? adaptedCustom.front.y,
-          rotation: adaptedCustom.front.rotation
-        } : null,
-        back: adaptedCustom.back ? {
-          originalImageUrl: adaptedCustom.back.artworkUrl || adaptedCustom.back.originalImageUrl,
-          width: adaptedCustom.back.widthPercent ?? adaptedCustom.back.width,
-          x: adaptedCustom.back.xOffsetPercent ?? adaptedCustom.back.x,
-          y: adaptedCustom.back.yOffsetPercent ?? adaptedCustom.back.y,
-          rotation: adaptedCustom.back.rotation
-        } : null,
-      } : null);
+
+      const custom =
+        rawCustom ||
+        (adaptedCustom
+          ? {
+              printSide: adaptedCustom.printSide,
+              front: adaptedCustom.front
+                ? {
+                    originalImageUrl:
+                      adaptedCustom.front.artworkUrl ||
+                      adaptedCustom.front.originalImageUrl,
+                    width:
+                      adaptedCustom.front.widthPercent ??
+                      adaptedCustom.front.width,
+                    x:
+                      adaptedCustom.front.xOffsetPercent ??
+                      adaptedCustom.front.x,
+                    y:
+                      adaptedCustom.front.yOffsetPercent ??
+                      adaptedCustom.front.y,
+                    rotation: adaptedCustom.front.rotation,
+                  }
+                : null,
+              back: adaptedCustom.back
+                ? {
+                    originalImageUrl:
+                      adaptedCustom.back.artworkUrl ||
+                      adaptedCustom.back.originalImageUrl,
+                    width:
+                      adaptedCustom.back.widthPercent ??
+                      adaptedCustom.back.width,
+                    x:
+                      adaptedCustom.back.xOffsetPercent ?? adaptedCustom.back.x,
+                    y:
+                      adaptedCustom.back.yOffsetPercent ?? adaptedCustom.back.y,
+                    rotation: adaptedCustom.back.rotation,
+                  }
+                : null,
+            }
+          : null);
 
       if (custom) {
-        const stableId = editingCartItem.variantId || editingCartItem.lineItemId;
-        setWizardStep(2); 
+        const stableId =
+          editingCartItem.variantId || editingCartItem.lineItemId;
+        setWizardStep(2);
 
         const loadDesignUrls = async () => {
-          let frontPreview = custom.front ? custom.front.originalImageUrl : null;
+          let frontPreview = custom.front
+            ? custom.front.originalImageUrl
+            : null;
           let backPreview = custom.back ? custom.back.originalImageUrl : null;
 
           if (custom.front?.originalImageUrl?.startsWith("blob:") && stableId) {
@@ -563,23 +637,41 @@ useEffect(() => {
 
           if (isMounted) {
             setPodState({
-              side: custom.printSide === 'back' ? 'back' : 'front',
-              front: custom.front ? {
-                file: 'existing',
-                previewUrl: frontPreview,
-                scale: custom.front.width || 50, // --- DETERMINISTIC DIRECT MAPPING ---
-                x: custom.front.x,
-                y: custom.front.y,
-                rotation: custom.front.rotation || 0
-              } : { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
-              back: custom.back ? {
-                file: 'existing',
-                previewUrl: backPreview,
-                scale: custom.back.width || 50, // --- DETERMINISTIC DIRECT MAPPING ---
-                x: custom.back.x,
-                y: custom.back.y,
-                rotation: custom.back.rotation || 0
-              } : { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
+              side: custom.printSide === "back" ? "back" : "front",
+              front: custom.front
+                ? {
+                    file: "existing",
+                    previewUrl: frontPreview,
+                    scale: custom.front.width,
+                    x: custom.front.x,
+                    y: custom.front.y,
+                    rotation: custom.front.rotation || 0,
+                  }
+                : {
+                    file: null,
+                    previewUrl: null,
+                    scale: 80,
+                    x: 50,
+                    y: 50,
+                    rotation: 0,
+                  },
+              back: custom.back
+                ? {
+                    file: "existing",
+                    previewUrl: backPreview,
+                    scale: custom.back.width,
+                    x: custom.back.x,
+                    y: custom.back.y,
+                    rotation: custom.back.rotation || 0,
+                  }
+                : {
+                    file: null,
+                    previewUrl: null,
+                    scale: 80,
+                    x: 50,
+                    y: 50,
+                    rotation: 0,
+                  },
             });
           }
         };
@@ -602,7 +694,10 @@ useEffect(() => {
       if (firstAvail.sizes?.length > 0) {
         setSelectedSize(firstAvail.sizes[0].size);
       }
-      setActiveImageId(firstAvail.imageId);
+
+      // --- S3: INITIAL IMAGE RESOLUTION (Prepend dynamic marketing previews if present) ---
+      const previews = product?.previewImages ?? [];
+      setActiveImageId(previews.length > 0 ? previews[0] : firstAvail.imageId);
     }
   }, [product]);
 
@@ -622,9 +717,18 @@ useEffect(() => {
       if (!sizeExists && currentAvailability.sizes?.length > 0) {
         setSelectedSize(currentAvailability.sizes[0].size);
       }
-      setActiveImageId(currentAvailability.imageId);
+      // On manual color toggles, prioritize mockups or previews
+      const previews = product?.previewImages ?? [];
+      setActiveImageId(
+        previews.length > 0 ? previews[0] : currentAvailability.imageId,
+      );
     }
-  }, [selectedColor, currentAvailability, selectedSize]);
+  }, [
+    selectedColor,
+    currentAvailability,
+    selectedSize,
+    product?.previewImages,
+  ]);
 
   useEffect(() => {
     if (activeImageId && onImageChange) {
@@ -633,20 +737,23 @@ useEffect(() => {
   }, [activeImageId, onImageChange, product._id]);
 
   const activePodTemplateId = useMemo(() => {
-    if (!isPod || !currentAvailability) return null; 
-    return podState.side === 'back' 
-      ? currentAvailability.podBackTemplateId 
+    if (!isPod || !currentAvailability) return null;
+    return podState.side === "back"
+      ? currentAvailability.podBackTemplateId
       : currentAvailability.podFrontTemplateId;
   }, [isPod, currentAvailability, podState.side]);
 
+  // Considers both mockups AND product.previewImages to safely cache all image files
   const allImageIds = useMemo(() => {
-    const ids = [];
-    product.availabilities.forEach((av) => {
-      if (av.imageId) ids.push(av.imageId);
-      if (av.altImageIds) ids.push(...av.altImageIds);
-      if (av.podFrontTemplateId) ids.push(av.podFrontTemplateId);
-      if (av.podBackTemplateId) ids.push(av.podBackTemplateId);
-    });
+    const ids = [...(product?.previewImages ?? [])];
+    if (product?.availabilities) {
+      product.availabilities.forEach((av) => {
+        if (av.imageId) ids.push(av.imageId);
+        if (av.altImageIds) ids.push(...av.altImageIds);
+        if (av.podFrontTemplateId) ids.push(av.podFrontTemplateId);
+        if (av.podBackTemplateId) ids.push(av.podBackTemplateId);
+      });
+    }
     return Array.from(new Set(ids));
   }, [product]);
 
@@ -670,8 +777,8 @@ useEffect(() => {
     if (!currentSizeDetails) return;
     onAddToCart({
       product,
-      productId: product._id, 
-      title: product.name, 
+      productId: product._id,
+      title: product.name,
       variantId: currentVariantId,
       color: selectedColor,
       size: selectedSize,
@@ -681,50 +788,67 @@ useEffect(() => {
     });
   };
 
+  // Prepend optional high-quality photoshoots to the gallery thumbnail strip natively
   const galleryImages = useMemo(() => {
-    if (!currentAvailability) return [];
-    return [
-      currentAvailability.imageId,
-      ...(currentAvailability.altImageIds || []),
-    ];
-  }, [currentAvailability]);
+    const previews = product?.previewImages ?? [];
+    const mockups = [];
+    if (currentAvailability) {
+      if (currentAvailability.imageId)
+        mockups.push(currentAvailability.imageId);
+      if (currentAvailability.altImageIds)
+        mockups.push(...currentAvailability.altImageIds);
+    }
+    return Array.from(new Set([...previews, ...mockups]));
+  }, [product?.previewImages, currentAvailability]);
 
   const showViews = !!(product.viewsCount && product.viewsCount > 0);
   const showSaves = !!(product.savesCount && product.savesCount > 0);
 
   const handleFinalSubmit = async (finalPrice) => {
-    if ((!podState.front.file && !podState.back.file) || !currentSizeDetails) return;
+    if ((!podState.front.file && !podState.back.file) || !currentSizeDetails)
+      return;
     setIsSubmitting(true);
 
-    const oldId = editingCartItem ? (editingCartItem.variantId || editingCartItem.lineItemId) : null;
+    const oldId = editingCartItem
+      ? editingCartItem.variantId || editingCartItem.lineItemId
+      : null;
     const targetVariantId = oldId || `${currentVariantId}_custom_${Date.now()}`;
 
     try {
-      let frontImageId = podState.front.file === 'existing' ? podState.front.previewUrl : null;
-      let backImageId = podState.back.file === 'existing' ? podState.back.previewUrl : null;
+      let frontImageId =
+        podState.front.file === "existing" ? podState.front.previewUrl : null;
+      let backImageId =
+        podState.back.file === "existing" ? podState.back.previewUrl : null;
 
-      if (podState.front.file && podState.front.file !== 'existing') {
+      if (podState.front.file && podState.front.file !== "existing") {
         const frontForm = new FormData();
-        frontForm.append('file', podState.front.file);
-        const frontRes = await axios.post(`${process.env.REACT_APP_API_PROD_URL}/image/upload`, frontForm);
+        frontForm.append("file", podState.front.file);
+        const frontRes = await axios.post(
+          `${process.env.REACT_APP_API_PROD_URL}/image/upload`,
+          frontForm,
+        );
         frontImageId = frontRes.data.url;
-        
+
         await persistFile(`${targetVariantId}_front`, podState.front.file);
       }
 
-      if (podState.back.file && podState.back.file !== 'existing') {
+      if (podState.back.file && podState.back.file !== "existing") {
         const backForm = new FormData();
-        backForm.append('file', podState.back.file);
-        const backRes = await axios.post(`${process.env.REACT_APP_API_PROD_URL}/image/upload`, backForm);
+        backForm.append("file", podState.back.file);
+        const backRes = await axios.post(
+          `${process.env.REACT_APP_API_PROD_URL}/image/upload`,
+          backForm,
+        );
         backImageId = backRes.data.url;
-        
+
         await persistFile(`${targetVariantId}_back`, podState.back.file);
       }
 
       const hasFront = !!frontImageId;
       const hasBack = !!backImageId;
 
-      const printSideKeyword = (hasFront && hasBack) ? 'double' : (hasBack ? 'back' : 'front');
+      const printSideKeyword =
+        hasFront && hasBack ? "double" : hasBack ? "back" : "front";
 
       // --- CALCULATE APPAREL & PRINTING COSTS ---
       const baseApparelCost = currentSizeDetails?.sellingPrice || 0;
@@ -760,7 +884,7 @@ useEffect(() => {
       const getPhysicalMetrics = (designState) => {
         const scaleFactor = designState.scale / 100;
         const containerWidthCm = scaleFactor * totalWorkspacePhysicalCm;
-        return { width: containerWidthCm, height: containerWidthCm }; 
+        return { width: containerWidthCm, height: containerWidthCm };
       };
 
       const frontMetrics = getPhysicalMetrics(podState.front);
@@ -770,30 +894,38 @@ useEffect(() => {
         printSide: printSideKeyword,
         baseGarmentCost: baseApparelCost,
         printCost: frontPrintCost + backPrintCost,
-        front: hasFront ? {
-          imageId: frontImageId,
-          imageUrl: frontImageId,
-          originalImageId: frontImageId,
-          originalImageUrl: frontImageId,
-          x: podState.front.x,
-          y: podState.front.y,
-          width: podState.front.scale,   // Scale percentage (0-100)
-          height: podState.front.scale,  // Scale percentage (0-100)
-          rotation: podState.front.rotation,
-          templateUrl: currentAvailability?.podFrontTemplateId ? `${process.env.REACT_APP_API_PROD_URL}/image/raw/${currentAvailability.podFrontTemplateId}` : null
-        } : null,
-        back: hasBack ? {
-          imageId: backImageId,
-          imageUrl: backImageId,
-          originalImageId: backImageId,
-          originalImageUrl: backImageId,
-          x: podState.back.x,
-          y: podState.back.y,
-          width: podState.back.scale,   // Scale percentage (0-100)
-          height: podState.back.scale,  // Scale percentage (0-100)
-          rotation: podState.back.rotation,
-          templateUrl: currentAvailability?.podBackTemplateId ? `${process.env.REACT_APP_API_PROD_URL}/image/raw/${currentAvailability.podBackTemplateId}` : null
-        } : null
+        front: hasFront
+          ? {
+              imageId: frontImageId,
+              imageUrl: frontImageId,
+              originalImageId: frontImageId,
+              originalImageUrl: frontImageId,
+              x: podState.front.x,
+              y: podState.front.y,
+              width: parseFloat(frontMetrics.width.toFixed(1)),
+              height: parseFloat(frontMetrics.height.toFixed(1)),
+              rotation: podState.front.rotation,
+              templateUrl: currentAvailability?.podFrontTemplateId
+                ? `${process.env.REACT_APP_API_PROD_URL}/image/raw/${currentAvailability.podFrontTemplateId}`
+                : null,
+            }
+          : null,
+        back: hasBack
+          ? {
+              imageId: backImageId,
+              imageUrl: backImageId,
+              originalImageId: backImageId,
+              originalImageUrl: backImageId,
+              x: podState.back.x,
+              y: podState.back.y,
+              width: parseFloat(backMetrics.width.toFixed(1)),
+              height: parseFloat(backMetrics.height.toFixed(1)),
+              rotation: podState.back.rotation,
+              templateUrl: currentAvailability?.podBackTemplateId
+                ? `${process.env.REACT_APP_API_PROD_URL}/image/raw/${currentAvailability.podBackTemplateId}`
+                : null,
+            }
+          : null,
       };
 
       if (editingCartItem) {
@@ -804,22 +936,36 @@ useEffect(() => {
         product,
         productId: product._id,
         title: product.name,
-        variantId: targetVariantId, 
+        variantId: targetVariantId,
         color: selectedColor,
         size: selectedSize,
-        sellingPrice: finalPrice, 
-        imageId: currentAvailability.imageId, 
+        sellingPrice: finalPrice,
+        imageId: currentAvailability.imageId,
         quantity: editingCartItem ? editingCartItem.quantity : 1,
-        podCustomization: customizationData 
+        podCustomization: customizationData,
       });
 
       setPodState({
-        side: 'front',
-        front: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 },
-        back: { file: null, previewUrl: null, scale: 80, x: 50, y: 50, rotation: 0 }
+        side: "front",
+        front: {
+          file: null,
+          previewUrl: null,
+          scale: 80,
+          x: 50,
+          y: 50,
+          rotation: 0,
+        },
+        back: {
+          file: null,
+          previewUrl: null,
+          scale: 80,
+          x: 50,
+          y: 50,
+          rotation: 0,
+        },
       });
       setWizardStep(1);
-      setEditingCartItem(null); 
+      setEditingCartItem(null);
       if (onClose) onClose();
     } catch (error) {
       console.error("Customization failed:", error);
@@ -829,7 +975,6 @@ useEffect(() => {
     }
   };
 
-
   return (
     <>
       <DetailContainer
@@ -837,20 +982,28 @@ useEffect(() => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <BlurredBackdrop $imgUrl={imagesMap[activePodTemplateId] || imagesMap[activeImageId]} />
+        <BlurredBackdrop
+          $imgUrl={imagesMap[activePodTemplateId] || imagesMap[activeImageId]}
+        />
         <GradientOverlay />
 
         <RelativeContent>
-          {isPod && <PodStepIndicator currentStep={wizardStep} isArabic={isArabic} />}
+          {isPod && (
+            <PodStepIndicator currentStep={wizardStep} isArabic={isArabic} />
+          )}
 
           <SplitGrid>
             {/* LEFT SIDE */}
             <div>
-              {isPod ? (
-                <PodCanvasPreview 
-                  baseImageUrl={imagesMap[activePodTemplateId] || imagesMap[activeImageId]} 
-                  podState={podState} 
+              {isPod && wizardStep >= 2 ? (
+                <PodCanvasPreview
+                  baseImageUrl={
+                    imagesMap[activePodTemplateId] || imagesMap[activeImageId]
+                  }
+                  podState={podState}
                   setPodState={setPodState}
+                  productName={product.name}
+                  selectedSize={selectedSize}
                 />
               ) : (
                 <GallerySection>
@@ -887,11 +1040,14 @@ useEffect(() => {
                       {product.brand && <Brand>{product.brand}</Brand>}
                       <ProductName>{product.name}</ProductName>
                       <Price>
-                        {parseInt(currentSizeDetails?.sellingPrice || 0)} {t("dzd")}
+                        {parseInt(currentSizeDetails?.sellingPrice || 0)}{" "}
+                        {t("zd", "DA")}
                       </Price>
                     </ImageOverlayScrim>
 
-                    <ZoomHint><FaExpand /></ZoomHint>
+                    <ZoomHint>
+                      <FaExpand />
+                    </ZoomHint>
                   </MainImageWrapper>
 
                   {galleryImages.length > 1 && (
@@ -924,7 +1080,9 @@ useEffect(() => {
                           <ColorSwatch
                             key={av.color}
                             $active={selectedColor === av.color}
-                            $colorCode={COLOR_MAP[av.color.toLowerCase()] || av.color}
+                            $colorCode={
+                              COLOR_MAP[av.color.toLowerCase()] || av.color
+                            }
                             onClick={() => setSelectedColor(av.color)}
                           />
                         ))}
@@ -953,23 +1111,43 @@ useEffect(() => {
                   </AddToCartBtn>
                 </InfoSection>
               ) : (
-                <div style={{ minHeight: '350px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div
+                  style={{
+                    minHeight: "350px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                  }}
+                >
                   {wizardStep === 1 && (
                     <InfoSection style={{ padding: 0 }}>
-                      <div style={{ marginBottom: '1rem' }}>
+                      <div style={{ marginBottom: "1rem" }}>
                         <Brand>{product.brand}</Brand>
-                        <ProductName style={{ fontSize: '1.6rem', marginTop: '4px' }}>{product.name}</ProductName>
-                        <Price style={{ fontSize: '1.4rem', marginTop: '4px' }}>{currentSizeDetails?.sellingPrice} DA</Price>
+                        <ProductName
+                          style={{ fontSize: "1.6rem", marginTop: "4px" }}
+                        >
+                          {product.name}
+                        </ProductName>
+                        <Price style={{ fontSize: "1.4rem", marginTop: "4px" }}>
+                          {currentSizeDetails?.sellingPrice} DA
+                        </Price>
                       </div>
 
                       <ActionPanelRow>
                         <PanelSection>
-                          <SectionLabel style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <SectionLabel
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "6px",
+                            }}
+                          >
                             <FaPalette /> Colors
                           </SectionLabel>
                           <PillsContainer>
                             {product.availabilities.map((av) => {
-                              const hex = COLOR_MAP[av.color.toLowerCase()] || av.color;
+                              const hex =
+                                COLOR_MAP[av.color.toLowerCase()] || av.color;
                               return (
                                 <ColorSwatch
                                   key={av.color}
@@ -978,7 +1156,14 @@ useEffect(() => {
                                   onClick={() => setSelectedColor(av.color)}
                                 >
                                   {selectedColor === av.color && (
-                                    <FaCheck size={10} color={av.color.toLowerCase() === "white" ? "#000" : "#fff"} />
+                                    <FaCheck
+                                      size={10}
+                                      color={
+                                        av.color.toLowerCase() === "white"
+                                          ? "#000"
+                                          : "#fff"
+                                      }
+                                    />
                                   )}
                                 </ColorSwatch>
                               );
@@ -1004,16 +1189,21 @@ useEffect(() => {
                         )}
                       </ActionPanelRow>
 
-                      <NavigationRow style={{ marginTop: '2rem' }}>
-                        <WizardBtn type="button" $primary onClick={() => setWizardStep(2)}>
-                          Customize Garment {isArabic ? <FaChevronLeft /> : <FaChevronRight />}
+                      <NavigationRow style={{ marginTop: "2rem" }}>
+                        <WizardBtn
+                          type="button"
+                          $primary
+                          onClick={() => setWizardStep(2)}
+                        >
+                          Customize Garment{" "}
+                          {isArabic ? <FaChevronLeft /> : <FaChevronRight />}
                         </WizardBtn>
                       </NavigationRow>
                     </InfoSection>
                   )}
 
                   {wizardStep === 2 && (
-                    <PodStepTwoControls 
+                    <PodStepTwoControls
                       podState={podState}
                       setPodState={setPodState}
                       product={product}
@@ -1024,7 +1214,7 @@ useEffect(() => {
                   )}
 
                   {wizardStep === 3 && (
-                    <PodStepThreeControls 
+                    <PodStepThreeControls
                       podState={podState}
                       product={product}
                       selectedColor={selectedColor}
@@ -1050,7 +1240,7 @@ useEffect(() => {
       </DetailContainer>
 
       <AnimatePresence>
-        {isLightboxOpen && imagesMap[activeImageId] && !isPod && (
+        {isLightboxOpen && imagesMap[activeImageId] && (
           <LightboxOverlay
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { getImageUrl } from "../../../../utils/imageUtils";
 import { getImage } from "../../../Images/services/imageServices";
 import { FaMinus, FaPlus, FaTshirt } from "react-icons/fa";
+import { getPreferredProductImageId } from "../../../PodStudio/hooks/usePrintableArea";
 
 const formatSpecification = (spec) => {
   if (!spec || !spec.value) return "";
@@ -60,7 +61,6 @@ const CardWrapper = styled(motion.div)`
   }
 `;
 
-// --- FIX: APPLIED CHROME GLASSMORPHISM AND BLURRED HIGHLIGHT ---
 const ImageContainer = styled.div`
   position: relative;
   cursor: pointer;
@@ -68,7 +68,6 @@ const ImageContainer = styled.div`
   align-items: center;
   justify-content: center;
 
-  /* Glassmorphic Layering & Radial Spotlight */
   background:
     radial-gradient(
       circle at center,
@@ -79,7 +78,6 @@ const ImageContainer = styled.div`
 
   backdrop-filter: blur(25px) saturate(140%);
   -webkit-backdrop-filter: blur(25px) saturate(140%);
-
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.03);
 
@@ -109,9 +107,13 @@ const ImageContainer = styled.div`
     object-fit: contain;
     transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.45));
+    position: absolute;
+    inset: 0;
+    padding: 1rem;
+    box-sizing: border-box;
   }
 
-  ${CardWrapper}:hover img {
+  ${CardWrapper}:hover & img {
     transform: scale(1.04) translateY(-4px);
   }
 `;
@@ -302,13 +304,23 @@ const PremiumProductCard = ({
   layoutType = "grid",
   imageOverrideId = null,
 }) => {
-  const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === "ar";
+  const { t } = useTranslation();
   const [imageBuffer, setImageBuffer] = useState(null);
+  const [hoverImageBuffer, setHoverImageBuffer] = useState(null);
+  const [isCardHovered, setIsCardHovered] = useState(false);
 
   const defaultAvailability = product?.availabilities?.[0];
   const defaultSize = defaultAvailability?.sizes?.[0];
-  const activeImageId = imageOverrideId || defaultAvailability?.imageId;
+
+  // --- S3: INCORPORATING DYNAMIC OPTIONAL PREVIEW IMAGES FALLBACKS ---
+  const previews = product?.previewImages ?? [];
+  const activeImageId =
+    imageOverrideId ||
+    getPreferredProductImageId(product, 0, defaultAvailability?.color);
+  const hoverImageId =
+    previews.length > 1
+      ? getPreferredProductImageId(product, 1, defaultAvailability?.color)
+      : null;
 
   useEffect(() => {
     let isMounted = true;
@@ -317,12 +329,23 @@ const PremiumProductCard = ({
         if (isMounted && res.data) setImageBuffer(res.data);
       });
     }
+    if (hoverImageId) {
+      getImage(hoverImageId).then((res) => {
+        if (isMounted && res.data) setHoverImageBuffer(res.data);
+      });
+    } else {
+      setHoverImageBuffer(null);
+    }
     return () => {
       isMounted = false;
     };
-  }, [activeImageId]);
+  }, [activeImageId, hoverImageId]);
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
+  const hoverImageUrl = useMemo(
+    () => getImageUrl(hoverImageBuffer),
+    [hoverImageBuffer],
+  );
   const productName = product.name;
 
   const activeCartItemForThisProduct = useMemo(() => {
@@ -414,9 +437,35 @@ const PremiumProductCard = ({
         onClick={handleCardSelect}
         $isActive={$isActive}
         $layoutType="list"
+        onMouseEnter={() => setIsCardHovered(true)}
+        onMouseLeave={() => setIsCardHovered(false)}
       >
         <ImageContainer $layoutType="list">
-          {imageUrl && <img src={imageUrl} alt={productName} loading="lazy" />}
+          <AnimatePresence mode="wait">
+            {isCardHovered && hoverImageUrl ? (
+              <motion.img
+                key="hover"
+                src={hoverImageUrl}
+                alt={productName}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              />
+            ) : (
+              imageUrl && (
+                <motion.img
+                  key="main"
+                  src={imageUrl}
+                  alt={productName}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                />
+              )
+            )}
+          </AnimatePresence>
         </ImageContainer>
 
         <Content $layoutType="list">
@@ -448,9 +497,35 @@ const PremiumProductCard = ({
       onClick={handleCardSelect}
       $isActive={$isActive}
       $layoutType="grid"
+      onMouseEnter={() => setIsCardHovered(true)}
+      onMouseLeave={() => setIsCardHovered(false)}
     >
       <ImageContainer $layoutType="grid">
-        {imageUrl && <img src={imageUrl} alt={productName} loading="lazy" />}
+        <AnimatePresence mode="wait">
+          {isCardHovered && hoverImageUrl ? (
+            <motion.img
+              key="hover"
+              src={hoverImageUrl}
+              alt={productName}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+          ) : (
+            imageUrl && (
+              <motion.img
+                key="main"
+                src={imageUrl}
+                alt={productName}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              />
+            )
+          )}
+        </AnimatePresence>
       </ImageContainer>
 
       <Content $layoutType="grid">
