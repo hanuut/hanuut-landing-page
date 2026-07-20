@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { getImage } from "../../../Images/services/imageServices";
@@ -41,7 +41,9 @@ const BentoContainer = styled(motion.div)`
 `;
 
 const GallerySection = styled.div`
-  background: #000;
+  background: rgba(24, 24, 27, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -59,6 +61,18 @@ const GallerySection = styled.div`
   }
 `;
 
+const BlurBackground = styled.div`
+  position: absolute;
+  inset: 0;
+  background-image: url(${(props) => props.$imgUrl});
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(0.6);
+  opacity: 0.35;
+  z-index: 1;
+  pointer-events: none;
+`;
+
 const MainImageWrapper = styled.div`
   width: 100%;
   height: 280px;
@@ -67,6 +81,7 @@ const MainImageWrapper = styled.div`
   justify-content: center;
   position: relative;
   cursor: zoom-in;
+  z-index: 2;
 
   img {
     max-width: 100%;
@@ -87,6 +102,7 @@ const AltImagesRow = styled.div`
   overflow-x: auto;
   width: 100%;
   justify-content: center;
+  z-index: 2;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -342,8 +358,8 @@ const ProductDetailsModal = ({
     if (!currentSizeDetails) return;
     onAddToCart({
       product,
-      productId: product._id, // --- ADDED ---
-      title: product.name, // --- ADDED ---
+      productId: product._id,
+      title: product.name,
       variantId: currentVariantId,
       color: selectedColor,
       size: selectedSize,
@@ -375,6 +391,9 @@ const ProductDetailsModal = ({
         onClick={(e) => e.stopPropagation()}
       >
         <GallerySection>
+          {imagesMap[activeImageId] && (
+            <BlurBackground $imgUrl={imagesMap[activeImageId]} />
+          )}
           <MainImageWrapper>
             <AnimatePresence mode="wait">
               {imagesMap[activeImageId] && (
@@ -413,34 +432,34 @@ const ProductDetailsModal = ({
 
           <SelectorGrid>
             <SectionLabel>{t("color_prefix")}</SectionLabel>
-            <PillsContainer>
-              {product.availabilities.map((av) => (
-                <Pill
-                  key={av.color}
-                  $active={selectedColor === av.color}
-                  onClick={() => setSelectedColor(av.color)}
-                >
-                  {av.colorLabel || av.color}
-                </Pill>
-              ))}
-            </PillsContainer>
-          </SelectorGrid>
+             <PillsContainer>
+               {product.availabilities.map((av) => (
+                 <Pill
+                   key={av.color}
+                   $active={selectedColor === av.color}
+                   onClick={() => setSelectedColor(av.color)}
+                 >
+                   {av.colorLabel || av.color}
+                 </Pill>
+               ))}
+             </PillsContainer>
+           </SelectorGrid>
 
           {currentAvailability && (
             <SelectorGrid>
               <SectionLabel>{t("size_prefix")}</SectionLabel>
-              <PillsContainer>
-                {currentAvailability.sizes.map((s) => (
-                  <Pill
-                    key={s.size}
-                    $active={selectedSize === s.size}
-                    onClick={() => setSelectedSize(s.size)}
-                  >
-                    {s.size}
-                  </Pill>
-                ))}
-              </PillsContainer>
-            </SelectorGrid>
+               <PillsContainer>
+                 {currentAvailability.sizes.map((s) => (
+                   <Pill
+                     key={s.size}
+                     $active={selectedSize === s.size}
+                     onClick={() => setSelectedSize(s.size)}
+                   >
+                     {s.size}
+                   </Pill>
+                 ))}
+               </PillsContainer>
+             </SelectorGrid>
           )}
 
           {product.specifications?.length > 0 && (

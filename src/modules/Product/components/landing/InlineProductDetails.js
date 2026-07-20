@@ -22,7 +22,6 @@ import {
   getRawPrintCost,
 } from "../../../PodStudio/hooks/usePrintableArea";
 
-// --- Redux ---
 import { updateCartQuantity } from "../../../Cart/state/reducers";
 
 import {
@@ -74,7 +73,7 @@ const GradientOverlay = styled.div`
     to bottom,
     rgba(17, 18, 20, 0.4) 0%,
     rgba(17, 18, 20, 0.85) 50%,
-    #111214 100
+    #111214 100%
   );
   z-index: 1;
   pointer-events: none;
@@ -103,14 +102,28 @@ const SplitGrid = styled.div`
 const GallerySection = styled.div`
   width: 100%;
   height: 350px;
-  background: #e5e5e5;
+  background: rgba(24, 24, 27, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
   overflow: hidden;
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+const BlurBackground = styled.div`
+  position: absolute;
+  inset: 0;
+  background-image: url(${(props) => props.$imgUrl});
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(0.6);
+  opacity: 0.35;
+  z-index: 1;
+  pointer-events: none;
 `;
 
 const SharpForegroundImage = styled.img`
@@ -199,7 +212,7 @@ const ImageOverlayScrim = styled.div`
     to top,
     rgba(17, 18, 20, 0.95) 0%,
     rgba(17, 18, 20, 0.4) 60%,
-    transparent 100
+    transparent 100%
   );
   padding: 3rem 1.25rem 1.25rem 1.25rem;
   display: flex;
@@ -231,7 +244,7 @@ const Price = styled.div`
   font-size: 1.25rem;
   font-weight: 900;
   color: ${(props) => props.theme.primaryColor};
-  margin-top: 0.2rem;
+  margin-top: 0.2/rem;
 `;
 
 const ZoomHint = styled.div`
@@ -393,39 +406,6 @@ const SpecItem = styled.div`
   }
 `;
 
-const AccordionContainer = styled.div`
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.01);
-`;
-
-const AccordionHeader = styled.button`
-  width: 100%;
-  padding: 1rem 1.25rem;
-  background: transparent;
-  border: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: white;
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  font-family: "Tajawal", sans-serif;
-  &:hover {
-    background: rgba(255, 255, 255, 0.02);
-  }
-`;
-
-const AccordionBody = styled(motion.div)`
-  overflow: hidden;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: #a1a1aa;
-  font-family: "Cairo", sans-serif;
-`;
-
 const QtyBox = styled.div`
   display: flex;
   align-items: center;
@@ -558,7 +538,6 @@ const InlineProductDetails = ({
     if (onWizardStepChange) onWizardStepChange(wizardStep);
   }, [wizardStep, onWizardStepChange]);
 
-  // STABLE SCHEMA RESOLVER: Adapts and normalizes both raw Redux Cart & Creation Tray structures on the fly
   useEffect(() => {
     let isMounted = true;
     let freshFrontUrl = null;
@@ -660,7 +639,7 @@ const InlineProductDetails = ({
                     file: "existing",
                     previewUrl: backPreview,
                     scale: custom.back.width,
-                    x: custom.back.x,
+                    x: custom.back.y,
                     y: custom.back.y,
                     rotation: custom.back.rotation || 0,
                   }
@@ -695,7 +674,6 @@ const InlineProductDetails = ({
         setSelectedSize(firstAvail.sizes[0].size);
       }
 
-      // --- S3: INITIAL IMAGE RESOLUTION (Prepend dynamic marketing previews if present) ---
       const previews = product?.previewImages ?? [];
       setActiveImageId(previews.length > 0 ? previews[0] : firstAvail.imageId);
     }
@@ -717,7 +695,6 @@ const InlineProductDetails = ({
       if (!sizeExists && currentAvailability.sizes?.length > 0) {
         setSelectedSize(currentAvailability.sizes[0].size);
       }
-      // On manual color toggles, prioritize mockups or previews
       const previews = product?.previewImages ?? [];
       setActiveImageId(
         previews.length > 0 ? previews[0] : currentAvailability.imageId,
@@ -743,7 +720,6 @@ const InlineProductDetails = ({
       : currentAvailability.podFrontTemplateId;
   }, [isPod, currentAvailability, podState.side]);
 
-  // Considers both mockups AND product.previewImages to safely cache all image files
   const allImageIds = useMemo(() => {
     const ids = [...(product?.previewImages ?? [])];
     if (product?.availabilities) {
@@ -788,7 +764,6 @@ const InlineProductDetails = ({
     });
   };
 
-  // Prepend optional high-quality photoshoots to the gallery thumbnail strip natively
   const galleryImages = useMemo(() => {
     const previews = product?.previewImages ?? [];
     const mockups = [];
@@ -850,7 +825,6 @@ const InlineProductDetails = ({
       const printSideKeyword =
         hasFront && hasBack ? "double" : hasBack ? "back" : "front";
 
-      // --- CALCULATE APPAREL & PRINTING COSTS ---
       const baseApparelCost = currentSizeDetails?.sellingPrice || 0;
 
       const frontPrintCost = (() => {
@@ -875,7 +849,6 @@ const InlineProductDetails = ({
         return getRawPrintCost(wCm, hCm) + 50 + 60;
       })();
 
-      // --- RESOLVE REAL-WORLD DIMENSIONS ---
       const cfg = getTemplateConfig(product.name);
       const garmentDims = getGarmentDimensions(product.name, selectedSize);
       const productHeightPct = 1 - cfg.topPadding - cfg.bottomPadding;
@@ -1007,6 +980,9 @@ const InlineProductDetails = ({
                 />
               ) : (
                 <GallerySection>
+                  {imagesMap[activeImageId] && (
+                    <BlurBackground $imgUrl={imagesMap[activeImageId]} />
+                  )}
                   {(showViews || showSaves) && (
                     <FloatingSocialProof>
                       {showViews ? (

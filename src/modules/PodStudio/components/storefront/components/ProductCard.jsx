@@ -7,6 +7,20 @@ import { getImage } from "../../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../../utils/imageUtils";
 import { getPreferredProductImageId } from "../../../hooks/usePrintableArea";
 
+// Deterministic apparel emoji mapping
+const APPAREL_EMOJIS = ["👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽"];
+
+const getStableEmoji = (id) => {
+  if (!id) return "👕";
+  const str = String(id);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % APPAREL_EMOJIS.length;
+  return APPAREL_EMOJIS[index];
+};
+
 const CardWrapper = styled.div`
   background-color: #111214;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -147,11 +161,11 @@ const ProductCard = ({ product, index, onSelect }) => {
   const defaultAvailability = product?.availabilities?.[0];
   const defaultSize = defaultAvailability?.sizes?.[0];
 
-  // --- S3: INCORPORATING DYNAMIC OPTIONAL PREVIEW IMAGES FALLBACKS ---
   const previews = product?.previewImages ?? [];
-  const activeImageId = getPreferredProductImageId(product, 0);
+  const activeImageId =
+    getPreferredProductImageId(product, 0, defaultAvailability?.color);
   const hoverImageId =
-    previews.length > 1 ? getPreferredProductImageId(product, 1) : null;
+    previews.length > 1 ? getPreferredProductImageId(product, 1, defaultAvailability?.color) : null;
 
   useEffect(() => {
     let isMounted = true;
@@ -194,7 +208,7 @@ const ProductCard = ({ product, index, onSelect }) => {
     return (
       product.specifications.find((spec) => spec.name?.toLowerCase() === "gsm")
         ?.value || null
-    );
+    ); 
   }, [product.specifications]);
 
   const materialValue = useMemo(() => {
@@ -225,18 +239,32 @@ const ProductCard = ({ product, index, onSelect }) => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
             />
+          ) : imageUrl ? (
+            <motion.img
+              key="main-image"
+              src={imageUrl}
+              alt={product.name}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            />
           ) : (
-            imageUrl && (
-              <motion.img
-                key="main-image"
-                src={imageUrl}
-                alt={product.name}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-              />
-            )
+            <motion.div
+              key="emoji-placeholder"
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                fontSize: "3.5rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "absolute",
+                inset: 0,
+              }}
+            >
+              {getStableEmoji(product._id)}
+            </motion.div>
           )}
         </AnimatePresence>
       </ImageStage>

@@ -172,6 +172,7 @@ const CustomRouter = ({ appConfig, location }) => {
           <Route path="/shop/:username" element={<ShopRedirector />} />
 
         <Route path="/track" element={<TrackingPage />} />
+        <Route path="/track/:phone/:orderId" element={<TrackingPage />} />
 
           {/* Tawsila related routes
           <Route path="/tawsila" element={<Tawsila />} />

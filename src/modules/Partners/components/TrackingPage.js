@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaSearch, FaCheck, FaBox, FaMotorcycle, FaHome, FaArrowLeft, FaTimesCircle } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import {
+  FaSearch,
+  FaCheck,
+  FaBox,
+  FaMotorcycle,
+  FaHome,
+  FaArrowLeft,
+  FaTimesCircle,
+} from "react-icons/fa";
+import { Link, useParams } from "react-router-dom";
 import Seo from "../../../components/Seo";
 // --- Imports ---
 import { partnerTheme } from "../../../config/Themes";
@@ -21,7 +29,7 @@ const PageWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   padding-top: calc(${(props) => props.theme.navHeight} + 2rem);
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   direction: ${(props) => (props.isArabic ? "rtl" : "ltr")};
 `;
 
@@ -105,16 +113,25 @@ const TrackButton = styled.button`
   font-weight: 700;
   font-size: 1.1rem;
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   transition: all 0.2s;
 
-  &:hover { transform: scale(1.02); filter: brightness(1.1); }
-  &:disabled { opacity: 0.6; cursor: not-allowed; }
+  &:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `;
 
 // --- Result Area ---
 const ResultCard = styled(motion.div)`
-  background: #18181B;
+  background: #18181b;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 2rem;
@@ -127,7 +144,7 @@ const OrderHeader = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 2rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 1.5rem;
 `;
 
@@ -166,8 +183,10 @@ const TimelineWrapper = styled.div`
   position: relative;
   padding-left: ${(props) => (props.isArabic ? "0" : "1.5rem")};
   padding-right: ${(props) => (props.isArabic ? "1.5rem" : "0")};
-  border-left: ${(props) => (props.isArabic ? "none" : "2px solid rgba(255,255,255,0.1)")};
-  border-right: ${(props) => (props.isArabic ? "2px solid rgba(255,255,255,0.1)" : "none")};
+  border-left: ${(props) =>
+    props.isArabic ? "none" : "2px solid rgba(255,255,255,0.1)"};
+  border-right: ${(props) =>
+    props.isArabic ? "2px solid rgba(255,255,255,0.1)" : "none"};
 `;
 
 const TimelineItem = styled.div`
@@ -175,22 +194,26 @@ const TimelineItem = styled.div`
   padding-bottom: 2.5rem;
   padding-left: ${(props) => (props.isArabic ? "0" : "1.5rem")};
   padding-right: ${(props) => (props.isArabic ? "1.5rem" : "0")};
-  
-  &:last-child { padding-bottom: 0; }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     ${(props) => (props.isArabic ? "right: -9px;" : "left: -9px;")}
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background-color: ${(props) => (props.$active ? props.theme.primaryColor : "#27272A")};
-    border: 3px solid #18181B;
+    background-color: ${(props) =>
+      props.$active ? props.theme.primaryColor : "#27272A"};
+    border: 3px solid #18181b;
     z-index: 2;
     transition: all 0.5s ease;
-    box-shadow: ${(props) => (props.$active ? `0 0 15px ${props.theme.primaryColor}` : "none")};
+    box-shadow: ${(props) =>
+      props.$active ? `0 0 15px ${props.theme.primaryColor}` : "none"};
   }
 `;
 
@@ -211,7 +234,7 @@ const ProductList = styled.ul`
   list-style: none;
   margin-top: 2rem;
   padding: 1.5rem;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
 `;
 
@@ -220,11 +243,20 @@ const ProductItem = styled.li`
   justify-content: space-between;
   margin-bottom: 0.8rem;
   padding-bottom: 0.8rem;
-  border-bottom: 1px dashed rgba(255,255,255,0.1);
-  &:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-  
-  span.name { font-weight: 500; color: #E4E4E7; }
-  span.price { color: #A1A1AA; }
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  span.name {
+    font-weight: 500;
+    color: #e4e4e7;
+  }
+  span.price {
+    color: #a1a1aa;
+  }
 `;
 
 const TotalRow = styled.div`
@@ -232,7 +264,7 @@ const TotalRow = styled.div`
   justify-content: space-between;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 1.2rem;
   font-weight: 800;
   color: ${(props) => props.theme.primaryColor};
@@ -240,7 +272,8 @@ const TotalRow = styled.div`
 
 const TrackingPage = () => {
   const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === 'ar';
+  const isArabic = i18n.language === "ar";
+  const { phone, orderId } = useParams();
 
   const [searchId, setSearchId] = useState("");
   const [searchPhone, setSearchPhone] = useState("");
@@ -248,166 +281,263 @@ const TrackingPage = () => {
   const [orderData, setOrderData] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
 
+  const executeTracking = useCallback(
+    async (phoneVal, idVal) => {
+      if (!phoneVal || !idVal) return;
+
+      setStatus("loading");
+      setErrorMsg("");
+      setOrderData(null);
+
+      try {
+        const data = await trackOrder(phoneVal, idVal);
+        setOrderData(data);
+        setStatus("success");
+      } catch (err) {
+        console.error(err);
+        setStatus("error");
+        setErrorMsg(
+          t(
+            "order_not_found",
+            "Order not found. Please check your ID and Phone number.",
+          ),
+        );
+      }
+    },
+    [t],
+  );
+
+  // Handle auto-prefill and track on mount when url params are set
+  useEffect(() => {
+    if (phone && orderId) {
+      setSearchPhone(phone);
+      setSearchId(orderId);
+      executeTracking(phone, orderId);
+    }
+  }, [phone, orderId, executeTracking]);
+
   const handleTrack = async (e) => {
     e.preventDefault();
-    if (!searchId || !searchPhone) return;
-
-    setStatus("loading");
-    setErrorMsg("");
-    setOrderData(null);
-
-    try {
-      const data = await trackOrder(searchPhone, searchId);
-      setOrderData(data);
-      setStatus("success");
-    } catch (err) {
-      console.error(err);
-      setStatus("error");
-      setErrorMsg(t("order_not_found", "Order not found. Please check your ID and Phone number."));
-    }
+    executeTracking(searchPhone, searchId);
   };
 
   // Helper to determine active step
   const getStepStatus = (orderState) => {
-    const steps = ['pending', 'prepared', 'onDelivery', 'done'];
+    const steps = ["pending", "prepared", "onDelivery", "done"];
     const currentIndex = steps.indexOf(orderState);
-    if (orderState === 'canceled') return -1;
-    // Default to pending if unknown
+    if (orderState === "canceled") return -1;
     return currentIndex === -1 ? 0 : currentIndex;
   };
 
   const currentStepIndex = orderData ? getStepStatus(orderData.state) : 0;
-  const isCanceled = orderData?.state === 'canceled';
+  const isCanceled = orderData?.state === "canceled";
 
   return (
     <ThemeProvider theme={partnerTheme}>
       <PageWrapper isArabic={isArabic}>
-        <Seo title={`${t("track_order_title")} | Hanuut`} description={t("track_order_subtitle")} url="https://hanuut.com/track" />
+        <Seo
+          title={`${t("track_order_title")} | Hanuut`}
+          description={t("track_order_subtitle")}
+          url="https://hanuut.com/track"
+        />
         <Container>
-          
           <Header>
-            <Title>{t("track_order_title", "Track Your Order")}</Title>
-            <Subtitle>{t("track_order_subtitle", "Enter your details to see the latest status.")}</Subtitle>
+            <Title>{t("track_order_title", "Track Your Order")}</Title>{" "}
+            <Subtitle>
+              {t(
+                "track_order_subtitle",
+                "Enter your details to see the latest status.",
+              )}
+            </Subtitle>
           </Header>
 
           {/* Search Form */}
-          <SearchCard 
-             layout
-             transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          <SearchCard
+            layout
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             <form onSubmit={handleTrack}>
-                <InputGroup>
-                    <Label>{t("payment_order_id", "Order ID")}</Label>
-                    <Input 
-                        placeholder="e.g. A001" 
-                        value={searchId} 
-                        onChange={(e) => setSearchId(e.target.value)} 
-                        required
-                    />
-                </InputGroup>
-                <div style={{height: '1rem'}}></div>
-                <InputGroup>
-                    <Label>{t("form_phone_number", "Phone Number")}</Label>
-                    <Input 
-                        placeholder="e.g. 0550..." 
-                        type="tel"
-                        value={searchPhone} 
-                        onChange={(e) => setSearchPhone(e.target.value)} 
-                        required
-                    />
-                </InputGroup>
-                <div style={{height: '2rem'}}></div>
-                <TrackButton type="submit" disabled={status === 'loading'}>
-                    {status === 'loading' ? <Loader fullscreen={false} /> : <><FaSearch /> {t("track_btn", "Track Order")}</>}
-                </TrackButton>
+              <InputGroup>
+                <Label>{t("payment_order_id", "Order ID")}</Label>
+                <Input
+                  placeholder="e.g. A001"
+                  value={searchId}
+                  onChange={(e) => setSearchId(e.target.value)}
+                  required
+                />
+              </InputGroup>
+              <div style={{ height: "1rem" }}></div>
+              <InputGroup>
+                <Label>{t("form_phone_number", "Phone Number")}</Label>
+                <Input
+                  placeholder="e.g. 0550..."
+                  type="tel"
+                  value={searchPhone}
+                  onChange={(e) => setSearchPhone(e.target.value)}
+                  required
+                />
+              </InputGroup>
+              <div style={{ height: "2rem" }}></div>
+              <TrackButton type="submit" disabled={status === "loading"}>
+                {status === "loading" ? (
+                  <Loader fullscreen={false} />
+                ) : (
+                  <>
+                    <FaSearch /> {t("track_btn", "Track Order")}
+                  </>
+                )}
+              </TrackButton>
             </form>
-            
-            {status === 'error' && (
-                <ErrorBanner initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    {errorMsg}
-                </ErrorBanner>
+
+            {status === "error" && (
+              <ErrorBanner initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                {errorMsg}
+              </ErrorBanner>
             )}
           </SearchCard>
 
           {/* Result Section */}
           <AnimatePresence>
-            {status === 'success' && orderData && (
-                <ResultCard
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 50 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                >
-                    <OrderHeader>
-                        <div>
-                            <ShopName>{orderData.shop?.name || t("shop_name", "Shop")}</ShopName>
-                            <span style={{color: '#aaa', fontSize: '0.9rem'}}>
-                                {new Date(orderData.createdAt).toLocaleDateString()}
-                            </span>
-                        </div>
-                        <OrderIdBadge>#{orderData.orderId}</OrderIdBadge>
-                    </OrderHeader>
+            {status === "success" && orderData && (
+              <ResultCard
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 50 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              >
+                <OrderHeader>
+                  <div>
+                    <ShopName>
+                      {orderData.shop?.name || t("shop_name", "Shop")}
+                    </ShopName>
+                    <span style={{ color: "#aaa", fontSize: "0.9rem" }}>
+                      {new Date(orderData.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <OrderIdBadge>#{orderData.orderId}</OrderIdBadge>
+                </OrderHeader>
 
-                    {isCanceled ? (
-                        <ErrorBanner style={{background: 'rgba(239,68,68,0.1)', color: '#EF4444', border: 'none'}}>
-                            <FaTimesCircle size={24} style={{marginBottom:'10px'}}/> <br/>
-                            {t("order_canceled", "This order has been canceled.")}
-                        </ErrorBanner>
-                    ) : (
-                        <TimelineWrapper isArabic={isArabic}>
-                            {/* Step 1: Received */}
-                            <TimelineItem $active={currentStepIndex >= 0} isArabic={isArabic}>
-                                <ItemTitle $active={currentStepIndex >= 0}>{t("status_pending", "Order Received")}</ItemTitle>
-                                <ItemDesc $active={currentStepIndex >= 0}>{t("desc_pending", "The shop has received your order.")}</ItemDesc>
-                            </TimelineItem>
+                {isCanceled ? (
+                  <ErrorBanner
+                    style={{
+                      background: "rgba(239,68,68,0.1)",
+                      color: "#EF4444",
+                      border: "none",
+                    }}
+                  >
+                    <FaTimesCircle size={24} style={{ marginBottom: "10px" }} />{" "}
+                    <br />
+                    {t("order_canceled", "This order has been canceled.")}
+                  </ErrorBanner>
+                ) : (
+                  <TimelineWrapper isArabic={isArabic}>
+                    {/* Step 1: Received */}
+                    <TimelineItem
+                      $active={currentStepIndex >= 0}
+                      isArabic={isArabic}
+                    >
+                      <ItemTitle $active={currentStepIndex >= 0}>
+                        {t("status_pending", "Order Received")}
+                      </ItemTitle>
+                      <ItemDesc $active={currentStepIndex >= 0}>
+                        {t("desc_pending", "The shop has received your order.")}
+                      </ItemDesc>
+                    </TimelineItem>
 
-                            {/* Step 2: Preparing */}
-                            <TimelineItem $active={currentStepIndex >= 1} isArabic={isArabic}>
-                                <ItemTitle $active={currentStepIndex >= 1}>{t("status_prepared", "Preparing")}</ItemTitle>
-                                <ItemDesc $active={currentStepIndex >= 1}>{t("desc_prepared", "Your items are being packed.")}</ItemDesc>
-                            </TimelineItem>
+                    {/* Step 2: Preparing */}
+                    <TimelineItem
+                      $active={currentStepIndex >= 1}
+                      isArabic={isArabic}
+                    >
+                      <ItemTitle $active={currentStepIndex >= 1}>
+                        {t("status_prepared", "Preparing")}
+                      </ItemTitle>{" "}
+                      <ItemDesc $active={currentStepIndex >= 1}>
+                        {t("desc_prepared", "Your items are being packed.")}
+                      </ItemDesc>
+                    </TimelineItem>
 
-                            {/* Step 3: On Delivery */}
-                            <TimelineItem $active={currentStepIndex >= 2} isArabic={isArabic}>
-                                <ItemTitle $active={currentStepIndex >= 2}>{t("status_onDelivery", "Out for Delivery")}</ItemTitle>
-                                <ItemDesc $active={currentStepIndex >= 2}>{t("desc_onDelivery", "Driver is on the way.")}</ItemDesc>
-                            </TimelineItem>
+                    {/* Step 3: On Delivery */}
+                    <TimelineItem
+                      $active={currentStepIndex >= 2}
+                      isArabic={isArabic}
+                    >
+                      <ItemTitle $active={currentStepIndex >= 2}>
+                        {t("status_onDelivery", "Out for Delivery")}
+                      </ItemTitle>
+                      <ItemDesc $active={currentStepIndex >= 2}>
+                        {t("desc_onDelivery", "Driver is on the way.")}
+                      </ItemDesc>
+                    </TimelineItem>
 
-                            {/* Step 4: Done */}
-                            <TimelineItem $active={currentStepIndex >= 3} isArabic={isArabic}>
-                                <ItemTitle $active={currentStepIndex >= 3}>{t("status_done", "Delivered")}</ItemTitle>
-                                <ItemDesc $active={currentStepIndex >= 3}>{t("desc_done", "Enjoy your purchase!")}</ItemDesc>
-                            </TimelineItem>
-                        </TimelineWrapper>
-                    )}
+                    {/* Step 4: Done */}
+                    <TimelineItem
+                      $active={currentStepIndex >= 3}
+                      isArabic={isArabic}
+                    >
+                      <ItemTitle $active={currentStepIndex >= 3}>
+                        {t("status_done", "Delivered")}
+                      </ItemTitle>
+                      <ItemDesc $active={currentStepIndex >= 3}>
+                        {t("desc_done", "Enjoy your purchase!")}
+                      </ItemDesc>
+                    </TimelineItem>
+                  </TimelineWrapper>
+                )}
 
-                    <ProductList>
-                        {orderData.products.map((p, i) => (
-                            <ProductItem key={i}>
-                                <span className="name">{p.quantity}x {p.title}</span>
-                                <span className="price">{parseInt(p.sellingPrice * p.quantity)} {t("dzd")}</span>
-                            </ProductItem>
-                        ))}
-                         <div style={{display:'flex', justifyContent:'space-between', color: '#888', fontSize: '0.9rem', marginTop: '10px'}}>
-                            <span>{t("delivery_fees", "Delivery")}</span>
-                            <span>{parseInt(orderData.deliveryPricing || 0)} {t("dzd")}</span>
-                        </div>
-                        <TotalRow>
-                            <span>{t("total", "Total")}</span>
-                            <span>{parseInt(orderData.totalPrice + (orderData.deliveryPricing || 0))} {t("dzd")}</span>
-                        </TotalRow>
-                    </ProductList>
+                <ProductList>
+                  {orderData.products.map((p, i) => (
+                    <ProductItem key={i}>
+                      <span className="name">
+                        {p.quantity}x {p.title}
+                      </span>
+                      <span className="price">
+                        {parseInt(p.sellingPrice * p.quantity)} {t("dzd")}
+                      </span>
+                    </ProductItem>
+                  ))}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      color: "#888",
+                      fontSize: "0.9rem",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <span>{t("delivery_fees", "Delivery")}</span>
+                    <span>
+                      {parseInt(orderData.deliveryPricing || 0)} {t("dzd")}
+                    </span>
+                  </div>
+                  <TotalRow>
+                    <span>{t("total", "Total")}</span>
+                    <span>
+                      {parseInt(
+                        orderData.totalPrice + (orderData.deliveryPricing || 0),
+                      )}{" "}
+                      {t("dzd")}
+                    </span>
+                  </TotalRow>
+                </ProductList>
 
-                    <div style={{marginTop: '2rem', textAlign:'center'}}>
-                        <Link to="/" style={{color: '#A1A1AA', display:'inline-flex', alignItems:'center', gap:'8px', textDecoration:'none'}}>
-                            <FaArrowLeft /> {t("back_home", "Back to Home")}
-                        </Link>
-                    </div>
-
-                </ResultCard>
+                <div style={{ marginTop: "2rem", textAlign: "center" }}>
+                  <Link
+                    to="/"
+                    style={{
+                      color: "#A1A1AA",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <FaArrowLeft /> {t("back_home", "Back to Home")}
+                  </Link>
+                </div>
+              </ResultCard>
             )}
           </AnimatePresence>
-
         </Container>
       </PageWrapper>
     </ThemeProvider>

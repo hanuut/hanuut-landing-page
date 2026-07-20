@@ -7,6 +7,20 @@ import { getImage } from "../../../Images/services/imageServices";
 import { FaMinus, FaPlus, FaTshirt } from "react-icons/fa";
 import { getPreferredProductImageId } from "../../../PodStudio/hooks/usePrintableArea";
 
+// Stable apparel emoji hashing map
+const APPAREL_EMOJIS = ["👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽"];
+
+const getStableEmoji = (id) => {
+  if (!id) return "👕";
+  const str = String(id);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % APPAREL_EMOJIS.length;
+  return APPAREL_EMOJIS[index];
+};
+
 const formatSpecification = (spec) => {
   if (!spec || !spec.value) return "";
   const value = spec.value.toString().trim();
@@ -85,13 +99,13 @@ const ImageContainer = styled.div`
     props.$layoutType === "grid"
       ? `
     width: 100%;
-    padding: 1.5rem 0;
+    padding-top: 100%; /* Restored aspect ratio mapping */
   `
       : `
     width: 110px;
     height: 110px;
     border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
     padding: 0.5rem;
 
@@ -312,7 +326,6 @@ const PremiumProductCard = ({
   const defaultAvailability = product?.availabilities?.[0];
   const defaultSize = defaultAvailability?.sizes?.[0];
 
-  // --- S3: INCORPORATING DYNAMIC OPTIONAL PREVIEW IMAGES FALLBACKS ---
   const previews = product?.previewImages ?? [];
   const activeImageId =
     imageOverrideId ||
@@ -512,18 +525,32 @@ const PremiumProductCard = ({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             />
+          ) : imageUrl ? (
+            <motion.img
+              key="main"
+              src={imageUrl}
+              alt={productName}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
           ) : (
-            imageUrl && (
-              <motion.img
-                key="main"
-                src={imageUrl}
-                alt={productName}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              />
-            )
+            <motion.div
+              key="emoji"
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                fontSize: "4rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "absolute",
+                inset: 0,
+              }}
+            >
+              {getStableEmoji(product._id)}
+            </motion.div>
           )}
         </AnimatePresence>
       </ImageContainer>

@@ -850,7 +850,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
               key={lineIdx} 
               onMouseEnter={() => setHoveredLineIdx(lineIdx)}
               onMouseLeave={() => setHoveredLineIdx(null)}
-              style={{ overflow: "hidden", width: "100%" }}
+              style={{ overflow: "visible", width: "100%" }}
             >
               <MarqueeTrack
                 $reverse={isReverse}

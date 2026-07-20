@@ -23,6 +23,7 @@ import { getImageUrl } from "../../../utils/imageUtils";
 import { getImage } from "../../Images/services/imageServices";
 import { motion, AnimatePresence } from "framer-motion";
 import Loader from "../../../components/Loader";
+import { useNavigate } from "react-router-dom";
 import {
   FaTimes,
   FaLocationArrow,
@@ -33,6 +34,11 @@ import {
   FaEdit,
   FaExpand,
   FaShieldAlt,
+  FaHistory,
+  FaEye,
+  FaTrashAlt,
+  FaArrowLeft,
+  FaArrowRight,
 } from "react-icons/fa";
 import {
   detectUserLocation,
@@ -54,7 +60,7 @@ import "swiper/css";
 import "swiper/css/autoplay";
 
 // ============================================================================
-// STYLED COMPONENTS (NATIVELY COMPLIANT WITH OUR PREMIUM THEME TOKENS)
+// STYLED COMPONENTS
 // ============================================================================
 
 const ModalBackdrop = styled(motion.div)`
@@ -63,62 +69,110 @@ const ModalBackdrop = styled(motion.div)`
   background-color: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
   z-index: 1300;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
-const ModalContent = styled(motion.div)`
-  width: 90%;
-  max-width: 850px;
+const DrawerContainer = styled.div`
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: auto;
+  display: flex;
+  z-index: 1310;
+  pointer-events: none;
+  flex-direction: ${(props) => (props.$isArabic ? "row-reverse" : "row")};
+  ${(props) => (props.$isArabic ? "left: 0;" : "right: 0;")}
+`;
+
+const MainCartPanel = styled(motion.div)`
+  width: 380px;
+  height: 100%;
   background-color: rgba(24, 24, 27, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  padding: 2.5rem;
-  max-height: 90vh;
-  overflow-y: auto;
+  border-left: ${(props) => (props.$isArabic ? "none" : "1px solid rgba(255, 255, 255, 0.1)")};
+  border-right: ${(props) => (props.$isArabic ? "1px solid rgba(255, 255, 255, 0.1)" : "none")};
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
   color: #ffffff;
-  position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  z-index: 1320;
+
+  @media (max-width: 480px) {
+    width: 100%;
+    padding: 1.5rem;
+  }
+`;
+
+const FormPanel = styled(motion.div)`
+  width: 380px;
+  height: 100%;
+  background-color: rgba(20, 20, 22, 0.98);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-left: ${(props) => (props.$isArabic ? "none" : "1px solid rgba(255, 255, 255, 0.08)")};
+  border-right: ${(props) => (props.$isArabic ? "1px solid rgba(255, 255, 255, 0.08)" : "none")};
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  box-shadow: -15px 0 35px rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  pointer-events: auto;
+  overflow-y: auto;
+  z-index: 1315;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   @media (max-width: 768px) {
-    padding: 1.5rem;
-    max-height: 95vh;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    z-index: 1330;
   }
 `;
 
 const FormWrapper = styled.form`
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 3rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   width: 100%;
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 2rem;
+`;
+
+const ScrollableFormBody = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 4px 0 4px; /* Added top and side padding to prevent clipping on hover */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Reduced from 1.5rem (24px) to 16px for a tighter layout */
+  &::-webkit-scrollbar {
+    display: none;
   }
 `;
 
 const Column = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem; /* Strict 24px vertical grid */
 `;
 
 const CartHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem; /* Reduced from 1.5rem */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 1rem;
+  padding-bottom: 0.75rem; /* Reduced from 1rem */
+  flex-shrink: 0;
 `;
 
 const CartTitle = styled.h2`
-  font-size: 1.5rem;
+  font-size: 1.15rem; /* Reduced from 1.3rem */
   font-weight: 800;
   color: #fff;
   font-family: "Tajawal", sans-serif;
@@ -130,6 +184,9 @@ const CloseButton = styled.button`
   font-size: 1.5rem;
   cursor: pointer;
   color: #a1a1aa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   &:hover {
     color: #fff;
   }
@@ -154,6 +211,7 @@ const ItemInfo = styled.div`
 const ItemTextDetails = styled.div`
   display: flex;
   flex-direction: column;
+  text-align: start;
 `;
 
 const ItemName = styled.p`
@@ -201,11 +259,12 @@ const QuantityButton = styled.button`
 const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem; /* Reduced from 0.5rem */
+  text-align: start;
 `;
 
 const InputLabel = styled.label`
-  font-size: 0.85rem;
+  font-size: 0.75rem; /* Reduced from 0.85rem */
   font-weight: 700;
   color: #a1a1aa;
   text-transform: uppercase;
@@ -214,12 +273,12 @@ const InputLabel = styled.label`
 
 const Input = styled.input`
   width: 100%;
-  padding: 0.9rem 1rem;
-  font-size: 0.95rem;
+  padding: 0.65rem 0.85rem; /* Reduced from 0.9rem 1rem */
+  font-size: 0.85rem; /* Reduced from 0.95rem */
   border: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(0, 0, 0, 0.3);
   color: white;
-  border-radius: 12px;
+  border-radius: 10px; /* Adjusted slightly */
   box-sizing: border-box;
   &:focus {
     outline: none;
@@ -229,15 +288,15 @@ const Input = styled.input`
 
 const TextArea = styled.textarea`
   width: 100%;
-  padding: 0.9rem 1rem;
-  font-size: 0.95rem;
+  padding: 0.65rem 0.85rem; /* Reduced from 0.9rem 1rem */
+  font-size: 0.85rem; /* Reduced from 0.95rem */
   border: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(0, 0, 0, 0.3);
   color: white;
-  border-radius: 12px;
+  border-radius: 10px;
   box-sizing: border-box;
   resize: vertical;
-  min-height: 80px;
+  min-height: 60px; /* Reduced from 80px */
   &:focus {
     outline: none;
     border-color: ${(props) => props.theme.primaryColor};
@@ -273,14 +332,14 @@ const DeliveryCard = styled.div`
   border: 1px solid
     ${(props) => (props.$error ? "#EF4444" : "rgba(255, 255, 255, 0.05)")};
   border-radius: 16px;
-  padding: 1rem;
+  padding: 0.75rem; /* Reduced from 1rem */
 `;
 
 const DeliveryOptionRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.8rem;
+  padding: 0.6rem 0.75rem; /* Reduced from 0.8rem */
   border-radius: 12px;
   background: ${(props) =>
     props.$selected ? "rgba(240, 122, 72, 0.15)" : "transparent"};
@@ -288,7 +347,7 @@ const DeliveryOptionRow = styled.div`
     ${(props) => (props.$selected ? "#F07A48" : "rgba(255, 255, 255, 0.05)")};
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem; /* Reduced from 0.5rem */
   &:last-child {
     margin-bottom: 0;
   }
@@ -311,6 +370,7 @@ const OptionIcon = styled.div`
 const OptionText = styled.div`
   display: flex;
   flex-direction: column;
+  text-align: start;
 `;
 
 const OptionTitle = styled.span`
@@ -378,35 +438,39 @@ const TotalContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1rem;
-  padding-top: 1rem;
+  margin-top: 0.75rem; /* Reduced from 1rem */
+  padding-top: 0.75rem; /* Reduced from 1rem */
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 `;
 
 const TotalLabel = styled.p`
-  font-size: 1.2rem;
+  font-size: 1.1rem; /* Reduced from 1.25rem */
   font-weight: 700;
   color: white;
+  margin: 0;
 `;
 
 const TotalValue = styled.p`
-  font-size: 1.5rem;
+  font-size: 1.35rem; /* Reduced from 1.55rem */
   font-weight: 700;
   color: ${(props) => props.theme.primaryColor};
+  margin: 0;
 `;
 
 const SubmitButton = styled.button`
   width: 100%;
-  padding: 1.1rem;
-  font-size: 1.1rem;
+  padding: 0.85rem; /* Reduced from 1.1rem */
+  font-size: 1rem; /* Reduced from 1.1rem */
   font-weight: 700;
   background-color: ${(props) => props.theme.primaryColor};
   color: #111;
   border: none;
   border-radius: 16px;
   cursor: pointer;
-  margin-top: 1.5rem;
+  margin-top: 1rem; /* Reduced from 1.5rem */
   transition: all 0.3s ease;
+  flex-shrink: 0;
   &:hover {
     filter: brightness(1.1);
     transform: translateY(-2px);
@@ -435,6 +499,134 @@ const StatusTitle = styled.h2`
 
 const StatusMessage = styled.p`
   color: #a1a1aa;
+`;
+
+const GrowableImageWrapper = styled.div`
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #e5e5e5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: zoom-in;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+`;
+
+const ZoomOverlayIcon = styled.div`
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 0.6rem;
+  padding: 2px;
+  border-radius: 4px;
+  z-index: 5;
+`;
+
+const CustomItemEditBtn = styled.button`
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  width: fit-content;
+  font-family: "Tajawal", sans-serif;
+  transition: all 0.2s;
+
+  &:hover {
+    background: ${(props) => props.theme.primaryColor};
+    color: #000;
+    border-color: transparent;
+  }
+`;
+
+// --- CACHED ORDER HISTORY STYLES ---
+
+const HistorySection = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const HistoryHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  color: #a1a1aa;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: 'Tajawal', sans-serif;
+  &:hover {
+    color: #fff;
+  }
+`;
+
+const HistoryList = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  overflow: hidden;
+`;
+
+const HistoryItem = styled.div`
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+`;
+
+const HistoryText = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: start;
+  span.shop { font-weight: 700; color: white; }
+  span.meta { font-size: 0.72rem; color: #a1a1aa; }
+`;
+
+const HistoryActions = styled.div`
+  display: flex;
+  gap: 0.4rem;
+`;
+
+const HistoryButton = styled.button`
+  background: ${(props) => props.$primary ? props.theme.primaryColor : "rgba(255, 255, 255, 0.05)"};
+  color: ${(props) => props.$primary ? "#000" : "#ef4444"};
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    opacity: 0.9;
+  }
 `;
 
 const LightboxOverlay = styled(motion.div)`
@@ -467,74 +659,6 @@ const LightboxPreviewsRow = styled.div`
   flex-wrap: wrap;
 `;
 
-const GrowableImageWrapper = styled.div`
-  width: 54px;
-  height: 54px;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #e5e5e5;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: zoom-in;
-  flex-shrink: 0;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-`;
-
-const MiniWorkspace = styled.div`
-  position: relative;
-  width: 54px;
-  height: 54px;
-  background-color: #0c0c0e;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const MiniBaseShirt = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-  z-index: 1;
-`;
-
-const DynamicMiniPrintArea = styled.div`
-  position: absolute;
-  z-index: 2;
-  overflow: hidden;
-  pointer-events: none;
-
-  /* Precision positioning and sizing based on getFittedPrintZoneRatios output */
-  top: ${(props) => props.$top}%;
-  left: ${(props) => props.$left}%;
-  width: ${(props) => props.$width}%;
-  height: ${(props) => props.$height}%;
-`;
-
-const MiniDesign = styled.img`
-  position: absolute;
-  transform: translate(-50%, -50%);
-  object-fit: contain;
-`;
-
-const ZoomOverlayIcon = styled.div`
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  font-size: 0.6rem;
-  padding: 2px;
-  border-radius: 4px;
-  z-index: 5;
-`;
-
 const LbWorkspace = styled.div`
   position: relative;
   width: 380px;
@@ -554,20 +678,6 @@ const LbWorkspace = styled.div`
   }
 `;
 
-const DynamicLbPrintArea = styled.div`
-  position: absolute;
-  border: 1px dashed rgba(57, 161, 112, 0.4);
-  z-index: 2;
-  overflow: hidden;
-  pointer-events: none;
-
-  /* Precision positioning and sizing */
-  top: ${(props) => props.$top}%;
-  left: ${(props) => props.$left}%;
-  width: ${(props) => props.$width}%;
-  height: ${(props) => props.$height}%;
-`;
-
 const LightboxActions = styled.div`
   display: flex;
   gap: 1rem;
@@ -575,30 +685,6 @@ const LightboxActions = styled.div`
   justify-content: center;
   z-index: 10;
   pointer-events: auto;
-`;
-
-const CustomItemEditBtn = styled.button`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 8px;
-  width: fit-content;
-  font-family: "Tajawal", sans-serif;
-  transition: all 0.2s;
-
-  &:hover {
-    background: ${(props) => props.theme.primaryColor};
-    color: #000;
-    border-color: transparent;
-  }
 `;
 
 const LbButton = styled.button`
@@ -634,204 +720,133 @@ const LbButton = styled.button`
   `}
 `;
 
-// ============================================================================
-// NEW STYLED COMPONENTS FOR CONFIRMATION & POLICY MODALS
-// ============================================================================
+const TrashAltIcon = () => <FaTrashAlt style={{ fontSize: "0.8rem" }} />;
 
-const ConfirmModalBackdrop = styled(ModalBackdrop)`
-  z-index: 1400; /* Must sit on top of Cart modal */
-`;
+const formVariants = {
+  hidden: (isArabic) => ({
+    x: isArabic ? "-100%" : "100%",
+    opacity: 0,
+    width: 0,
+    transition: { type: "spring", stiffness: 300, damping: 30 }
+  }),
+  visible: {
+    x: 0,
+    opacity: 1,
+    width: 380,
+    transition: { type: "spring", stiffness: 300, damping: 30 }
+  }
+};
 
-const ConfirmModalContent = styled(ModalContent)`
-  max-width: 600px;
-  z-index: 1450;
-  background-color: #0c0c0e;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+const slideVariants = {
+  hidden: (isArabic) => ({
+    x: isArabic ? "-100%" : "100%",
+    transition: { type: "tween", duration: 0.3, ease: "easeInOut" }
+  }),
+  visible: {
+    x: 0,
+    transition: { type: "tween", duration: 0.3, ease: "easeInOut" }
+  }
+};
+
+// --- NEW COMPACT SUMMARY CARD DESIGN SYSTEM TOKENS ---
+
+const SummaryCardButton = styled.button`
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0.85rem 1rem; /* Reduced from 1.25rem */
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 2.25rem;
-`;
-
-const ConfirmCard = styled.div`
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
-  padding: 1.25rem;
-  display: flex;
-  gap: 1.5rem;
   align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  text-align: left;
-  direction: ltr; /* Force LTR for layout alignment consistency */
-`;
-
-const ConfirmDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-
-  .name {
-    font-size: 1rem;
-    font-weight: 800;
-    color: white;
-    font-family: "Tajawal", sans-serif;
-    margin: 0;
-  }
-  .variant {
-    font-size: 0.8rem;
-    color: #a1a1aa;
-    margin: 0;
-  }
-  .price-details {
-    font-size: 0.78rem;
-    color: #39a170;
-    margin: 2px 0 0 0;
-    line-height: 1.4;
-  }
-  .total-price {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #f07a48;
-    margin: 4px 0 0 0;
-  }
-`;
-
-const PolicyCheckboxRow = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(240, 122, 72, 0.04);
-  border: 1px solid rgba(240, 122, 72, 0.15);
-  padding: 1rem;
-  border-radius: 12px;
-  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
-  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
-
-  input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    accent-color: #f07a48;
-    cursor: pointer;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  label {
-    font-size: 0.85rem;
-    color: #e4e4e7;
-    line-height: 1.5;
-    font-family: "Cairo", sans-serif;
-
-    button.policy-link {
-      background: none;
-      border: none;
-      color: #f07a48;
-      font-weight: 800;
-      text-decoration: underline;
-      cursor: pointer;
-      padding: 0;
-      font-family: inherit;
-      margin: 0 4px;
-    }
-  }
-`;
-
-const PolicyModalBackdrop = styled(ModalBackdrop)`
-  z-index: 1500; /* Sits on top of Confirmation Modal */
-`;
-
-const PolicyModalContent = styled(ModalContent)`
-  max-width: 650px;
-  z-index: 1550;
-  background-color: #111214;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 2.5rem;
-  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
-  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
-`;
-
-const PolicyScrollBlock = styled.div`
-  max-height: 50vh;
-  overflow-y: auto;
-  padding-right: 10px;
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-  }
-`;
-
-const PolicySection = styled.div`
-  h4 {
-    font-size: 1rem;
-    font-weight: 800;
-    color: #f07a48;
-    margin: 0 0 0.5rem 0;
-    font-family: "Tajawal", sans-serif;
-  }
-  p {
-    font-size: 0.88rem;
-    color: #a1a1aa;
-    line-height: 1.6;
-    margin: 0;
-    font-family: "Cairo", sans-serif;
-  }
-`;
-
-const NavigationRow = styled.div`
-  display: flex;
-  gap: 1rem;
-  width: 100%;
-  margin-top: 1rem;
-`;
-
-const WizardBtn = styled.button`
-  flex: 1;
-  padding: 0.9rem;
-  border-radius: 12px;
-  font-weight: 800;
-  font-size: 0.95rem;
+  gap: 1rem; /* Reduced from 1.25rem */
   cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  pointer-events: auto;
+  text-decoration: none;
+  box-sizing: border-box;
+  margin: 0;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
+    transform: translateY(-2px);
+  }
+`;
+
+const ImageStackContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: all 0.2s;
-  font-family: "Tajawal", sans-serif;
-  border: none;
+  width: 68px; /* Reduced from 80px */
+  height: 68px; /* Reduced from 80px */
+  position: relative;
+  flex-shrink: 0;
+`;
 
-  ${(props) =>
-    props.$primary
-      ? `
-    background: ${props.theme.primaryColor || "#F07A48"};
-    color: #000;
-    &:hover { transform: translateY(-2px); filter: brightness(1.1); }
-  `
-      : `
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.08);
-    &:hover { background: rgba(255, 255, 255, 0.1); }
-  `}
+const StackedImage = styled.img`
+  position: absolute;
+  width: 48px; /* Reduced from 56px */
+  height: 48px; /* Reduced from 56px */
+  border-radius: 8px; /* Proportional corner radius */
+  object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  background-color: #1c1c1e;
+  transition: transform 0.2s ease;
+  
+  transform: translate(${(props) => props.$offsetX}px, ${(props) => props.$offsetY}px) rotate(${(props) => props.$rotation}deg);
+  z-index: ${(props) => props.$zIndex};
+`;
 
-  &:disabled {
-    background: #27272a;
-    color: #71717a;
-    border-color: transparent;
-    cursor: not-allowed;
-    transform: none;
+const SummaryCardText = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  flex-grow: 1;
+  text-align: start;
+
+  span.count {
+    font-size: 0.85rem;
+    color: #a1a1aa;
+    font-weight: 700;
+    font-family: "Tajawal", sans-serif;
+  }
+
+  span.total {
+    font-size: 1.35rem; /* Strong price emphasis */
+    color: ${(props) => props.theme.primaryColor || "#F07A48"};
+    font-weight: 800;
+    font-family: "Tajawal", sans-serif;
   }
 `;
+
+const HintArrow = styled.div`
+  color: ${(props) => props.theme.primaryColor || "#F07A48"};
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+
+  ${SummaryCardButton}:hover & {
+    transform: ${(props) => (props.$isArabic ? "translateX(-4px)" : "translateX(4px)")};
+  }
+`;
+
+const HeaderSpacer = styled.div`
+  height: 44px; /* Reduced from 52px */
+  margin-bottom: 1rem; /* Reduced from 1.5rem */
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+// ============================================================================
+// COMPONENT CLASS
+// ============================================================================
 
 const Cart = ({
   items,
@@ -847,6 +862,7 @@ const Cart = ({
 }) => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isCartOpen = useSelector(selectIsCartOpen);
   const locationState = useSelector(selectLocation);
   const isArabic = i18n.language === "ar";
@@ -862,14 +878,44 @@ const Cart = ({
   const [zoomedItem, setZoomedItem] = useState(null);
   const [manualAddressLine, setManualAddressLine] = useState("");
 
-  const [zoomFrontUrl, setZoomFrontUrl] = useState(null);
-  const [zoomBackUrl, setZoomBackUrl] = useState(null);
+  // --- DUAL-PANEL FOCUS SPLIT STATE ---
+  const [isCheckoutFormOpen, setIsCheckoutFormOpen] = useState(false);
 
-  // --- CONFIRMATION & POLICY MODAL STATE HOOKS ---
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showPolicyModal, setShowPolicyModal] = useState(false);
-  const [policyConsent, setPolicyConsent] = useState(false);
-  const [pendingOrderDetails, setPendingOrderDetails] = useState(null);
+  // --- CACHED HISTORY STATES ---
+  const [orderHistory, setOrderHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Lock body scroll of main page while modal is open
+  useEffect(() => {
+    if (isCartOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isCartOpen]);
+
+  // Clean out the form state once cart resets
+  useEffect(() => {
+    if (!isCartOpen) {
+      setIsCheckoutFormOpen(false);
+    }
+  }, [isCartOpen]);
+
+  useEffect(() => {
+    if (isCartOpen) {
+      try {
+        const cached = localStorage.getItem("hanuut_order_history");
+        if (cached) {
+          setOrderHistory(JSON.parse(cached));
+        }
+      } catch (err) {
+        console.error("Failed to parse cached order history:", err);
+      }
+    }
+  }, [isCartOpen]);
 
   const cleanItems = useMemo(() => {
     if (!items || items.length === 0) return [];
@@ -945,6 +991,28 @@ const Cart = ({
     }
   };
 
+  const handleTrackHistoryItem = (phoneVal, idVal) => {
+    dispatch(closeCart());
+    navigate(`/track/${phoneVal}/${idVal}`);
+  };
+
+  const handleHideHistoryItem = (e, orderId) => {
+    e.stopPropagation();
+    try {
+      const updated = orderHistory.filter((item) => item.orderId !== orderId);
+      setOrderHistory(updated);
+      localStorage.setItem("hanuut_order_history", JSON.stringify(updated));
+    } catch (err) {
+      console.error("Failed to delete order entry from history:", err);
+    }
+  };
+
+  const handleBackNavigation = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsCheckoutFormOpen(false);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const finalNote =
@@ -956,7 +1024,7 @@ const Cart = ({
       typeof locationState.lat === "number" &&
       typeof locationState.lng === "number";
 
-    const orderDetails = {
+    onSubmitOrder({
       customerName,
       customerPhone,
       note: finalNote,
@@ -975,18 +1043,7 @@ const Cart = ({
             addressLine: manualAddressLine || "Home Delivery",
           },
       healedProducts: cleanItems,
-    };
-
-    // Intercept checkout and prompt the mandatory Design Policy confirmation overlay
-    setPendingOrderDetails(orderDetails);
-    setPolicyConsent(false);
-    setShowConfirmModal(true);
-  };
-
-  const handleConfirmOrder = () => {
-    if (!policyConsent || !pendingOrderDetails) return;
-    setShowConfirmModal(false);
-    onSubmitOrder(pendingOrderDetails);
+    });
   };
 
   function renderDeliverySection() {
@@ -1189,6 +1246,30 @@ const Cart = ({
     return null;
   }
 
+  // Multi-photo isometric offset coordinate calculator
+  const getStackTransform = (index, totalCount) => {
+    if (totalCount === 1) {
+      return { rotation: 0, offsetX: 0, offsetY: 0, zIndex: 10 };
+    }
+    const configs = [
+      { rotation: -6, offsetX: -8, offsetY: -6, zIndex: 10 },
+      { rotation: 4, offsetX: 0, offsetY: 0, zIndex: 20 },
+      { rotation: -3, offsetX: 8, offsetY: 4, zIndex: 30 },
+      { rotation: 2, offsetX: 16, offsetY: 8, zIndex: 40 }
+    ];
+    return configs[index % configs.length];
+  };
+
+  const resolvedImages = useMemo(() => {
+    return cleanItems
+      .map((item) => {
+        if (item.imageId) return getImageUrl(item.imageId);
+        return null;
+      })
+      .filter(Boolean)
+      .slice(0, 4); // Display up to 4 stacked photos
+  }, [cleanItems]);
+
   function renderContent() {
     if (isSubmitting === "submitting") {
       return (
@@ -1210,168 +1291,290 @@ const Cart = ({
 
     return (
       <FormWrapper onSubmit={handleSubmit}>
-        <Column>
-          {cleanItems.map((item) => (
-            <CartItem key={item.dish ? item.dish._id : item.variantId}>
-              <ItemInfo>
-                {shopDomain === "global" && item.podCustomization ? (
-                  <MiniMockupPreview
-                    item={item}
-                    onClick={() => {
-                      setZoomedItem(item);
-                    }}
-                  />
-                ) : (
-                  shopDomain === "global" &&
-                  item.imageId && (
-                    <GrowableImageWrapper
-                      onClick={() =>
-                        setZoomedItem({ singleUrl: getImageUrl(item.imageId) })
-                      }
-                    >
-                      <ZoomOverlayIcon>
-                        <FaExpand />
-                      </ZoomOverlayIcon>
-                      <img
-                        src={getImageUrl(item.imageId)}
-                        alt={item.title || item.product?.name}
-                      />
-                    </GrowableImageWrapper>
-                  )
+        <AnimatePresence mode="wait">
+          {!isCheckoutFormOpen ? (
+            /* ======================================================================== */
+            /* VIEW 1: PRODUCT LIST & CART STATE                                         */
+            /* ======================================================================== */
+            <motion.div
+              key="cart-view"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", overflow: "hidden" }}
+            >
+              <ScrollableFormBody>
+                {orderHistory.length > 0 && (
+                  <HistorySection>
+                    <HistoryHeader onClick={() => setShowHistory(!showHistory)}>
+                      <span><FaHistory style={{ marginRight: '6px', marginLeft: '6px' }} /> {t("recent_orders_title", "Recent Orders")} ({orderHistory.length})</span>
+                      <span>{showHistory ? "▲" : "▼"}</span>
+                    </HistoryHeader>
+                    {showHistory && (
+                      <HistoryList>
+                        {orderHistory.map((hOrder) => (
+                          <HistoryItem key={hOrder.orderId}>
+                            <HistoryText>
+                              <span className="shop">{hOrder.shopName}</span>
+                              <span className="meta">{t("payment_order_id")}: {hOrder.orderId}</span>
+                              <span className="meta">{hOrder.totalPrice} DA • {new Date(hOrder.createdAt).toLocaleDateString()}</span>
+                            </HistoryText>
+                            <HistoryActions>
+                              <HistoryButton type="button" $primary onClick={() => handleTrackHistoryItem(hOrder.customerPhone, hOrder.orderId)}>
+                                <FaEye />
+                              </HistoryButton>
+                              <HistoryButton type="button" onClick={(e) => handleHideHistoryItem(e, hOrder.orderId)}>
+                                <TrashAltIcon />
+                              </HistoryButton>
+                            </HistoryActions>
+                          </HistoryItem>
+                        ))}
+                      </HistoryList>
+                    )}
+                  </HistorySection>
                 )}
-                <ItemTextDetails>
-                  <ItemName>
-                    {item.dish
-                      ? item.dish.name
-                      : item.title || item.product?.name}
-                  </ItemName>
-                  {shopDomain === "global" && (
-                    <ItemVariant>
-                      {t("color_prefix")}: {item.color}, {t("size_prefix")}:{" "}
-                      {item.size}
-                      {item.podCustomization && (
-                        <span
-                          style={{
-                            display: "block",
-                            color: "#39A170",
-                            fontWeight: "bold",
-                            marginTop: "4px",
-                            fontSize: "0.75rem",
-                          }}
-                        >
-                          ✨ Custom Print ({item.podCustomization.printSide})
-                        </span>
-                      )}
-                      {item.podCustomization && onEditCustomItem && (
-                        <CustomItemEditBtn
+
+                <Column>
+                  <div style={{ paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                    <TotalValue style={{ fontSize: '1.8rem', color: '#39A170' }}>
+                      zd {finalTotal}
+                    </TotalValue>
+                    <span style={{ fontSize: '0.85rem', color: '#a1a1aa', fontWeight: '700' }}>
+                      {t("total", "Total")} • {cleanItems.reduce((acc, item) => acc + item.quantity, 0)} {t("cart_items_count", "Items")}
+                    </span>
+                  </div>
+
+                  {cleanItems.map((item) => (
+                    <CartItem key={item.dish ? item.dish._id : item.variantId}>
+                      <ItemInfo>
+                        {shopDomain === "global" && item.podCustomization ? (
+                          <MiniMockupPreview
+                            item={item}
+                            onClick={() => {
+                              setZoomedItem(item);
+                            }}
+                          />
+                        ) : (
+                          shopDomain === "global" &&
+                          item.imageId && (
+                            <GrowableImageWrapper
+                              onClick={() =>
+                                setZoomedItem({ singleUrl: getImageUrl(item.imageId) })
+                              }
+                            >
+                              <ZoomOverlayIcon>
+                                <FaExpand />
+                              </ZoomOverlayIcon>
+                              <img
+                                src={getImageUrl(item.imageId)}
+                                alt={item.title || item.product?.name}
+                              />
+                            </GrowableImageWrapper>
+                          )
+                        )}
+                        <ItemTextDetails>
+                          <ItemName>
+                            {item.dish
+                              ? item.dish.name
+                              : item.title || item.product?.name}
+                          </ItemName>
+                          {shopDomain === "global" && (
+                            <ItemVariant>
+                              {t("color_prefix")}: {item.color}, {t("size_prefix")}:{" "}
+                              {item.size}
+                              {item.podCustomization && (
+                                <span
+                                  style={{
+                                    display: "block",
+                                    color: "#39A170",
+                                    fontWeight: "bold",
+                                    marginTop: "4px",
+                                    fontSize: "0.75rem",
+                                  }}
+                                >
+                                  ✨ Custom Print ({item.podCustomization.printSide})
+                                </span>
+                              )}
+                              {item.podCustomization && onEditCustomItem && (
+                                <CustomItemEditBtn
+                                  type="button"
+                                  onClick={() => onEditCustomItem(item)}
+                                >
+                                  <FaEdit /> Edit Design
+                                </CustomItemEditBtn>
+                              )}
+                            </ItemVariant>
+                          )}
+
+                          {item.podCustomization ? (
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "2px",
+                                marginTop: "4px",
+                              }}
+                            >
+                              <span style={{ fontSize: "0.8rem", color: "#888" }}>
+                                {t("pod_studio_apparel_base")}:{" "}
+                                {parseInt(item.podCustomization.baseGarmentCost || 0)}{" "}
+                                {t("zd")}
+                              </span>
+                              <span style={{ fontSize: "0.8rem", color: "#39A170" }}>
+                                {t("pod_studio_custom_print")}: +
+                                {parseInt(item.podCustomization.printCost || 0)}{" "}
+                                {t("zd")}
+                              </span>
+                            </div>
+                          ) : null}
+
+                          <ItemPrice style={{ marginTop: "6px" }}>
+                            {parseInt(item.sellingPrice)} {t("zd")}
+                          </ItemPrice>
+                        </ItemTextDetails>
+                      </ItemInfo>
+                      <QuantityControl>
+                        <QuantityButton
                           type="button"
-                          onClick={() => onEditCustomItem(item)}
+                          onClick={() =>
+                            onUpdateQuantity(
+                              item.dish ? item.dish._id : item.variantId,
+                              item.quantity - 1,
+                            )
+                          }
                         >
-                          <FaEdit /> Edit Design
-                        </CustomItemEditBtn>
-                      )}
-                    </ItemVariant>
-                  )}
+                          −
+                        </QuantityButton>
+                        <span>{item.quantity}</span>
+                        <QuantityButton
+                          type="button"
+                          onClick={() =>
+                            onUpdateQuantity(
+                              item.dish ? item.dish._id : item.variantId,
+                              item.quantity + 1,
+                            )
+                          }
+                        >
+                          +
+                        </QuantityButton>
+                      </QuantityControl>
+                    </CartItem>
+                  ))}
+                </Column>
+              </ScrollableFormBody>
 
-                  {/* PRINT SIZING & ITEM PRICING BREAKDOWN DETAILS UNDER TOTAL */}
-                  {item.podCustomization ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "2px",
-                        marginTop: "4px",
-                      }}
-                    >
-                      <span style={{ fontSize: "0.8rem", color: "#888" }}>
-                        {t("pod_studio_apparel_base")}:{" "}
-                        {parseInt(item.podCustomization.baseGarmentCost || 0)}{" "}
-                        {t("zd")}
-                      </span>
-                      <span style={{ fontSize: "0.8rem", color: "#39A170" }}>
-                        {t("pod_studio_custom_print")}: +
-                        {parseInt(item.podCustomization.printCost || 0)}{" "}
-                        {t("zd")}
-                      </span>
-                    </div>
-                  ) : null}
+              <SubmitButton
+                type="button"
+                onClick={() => setIsCheckoutFormOpen(true)}
+                disabled={cleanItems.length === 0}
+                style={{ marginTop: 'auto' }}
+              >
+                {t("place_order_button", "Confirm Order")}
+              </SubmitButton>
+            </motion.div>
+          ) : (
+            /* ======================================================================== */
+            /* VIEW 2: CHECKOUT FULFILLMENT FORM STATE                                   */
+            /* ======================================================================== */
+            <motion.div
+              key="checkout-view"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", overflow: "hidden" }}
+            >
+              <ScrollableFormBody>
+                {/* Clickable Order Summary Card (Fulfillment Step Entrypoint) */}
+                <SummaryCardButton
+                  type="button"
+                  $isArabic={isArabic}
+                  onClick={handleBackNavigation}
+                >
+                  <ImageStackContainer>
+                    {resolvedImages.length > 0 ? (
+                      resolvedImages.map((imgUrl, idx) => {
+                        const transform = getStackTransform(idx, resolvedImages.length);
+                        return (
+                          <StackedImage
+                            key={idx}
+                            src={imgUrl}
+                            alt="Custom print stack"
+                            $offsetX={transform.offsetX}
+                            $offsetY={transform.offsetY}
+                            $rotation={transform.rotation}
+                            $zIndex={transform.zIndex}
+                          />
+                        );
+                      })
+                    ) : (
+                      <span style={{ fontSize: "2rem" }}>👕</span>
+                    )}
+                  </ImageStackContainer>
+                  <SummaryCardText>
+                    <span className="count">
+                      {cleanItems.reduce((acc, item) => acc + item.quantity, 0)} {t("cart_items_count", "Items")}
+                    </span>
+                    <span className="total">
+                      {finalTotal} {t("dzd", "DA")}
+                    </span>
+                  </SummaryCardText>
+                  <HintArrow $isArabic={isArabic}>
+                    {isArabic ? <FaArrowLeft size={14} /> : <FaArrowRight size={14} />}
+                  </HintArrow>
+                </SummaryCardButton>
 
-                  <ItemPrice style={{ marginTop: "6px" }}>
-                    {parseInt(item.sellingPrice)} {t("zd")}
-                  </ItemPrice>
-                </ItemTextDetails>
-              </ItemInfo>
-              <QuantityControl>
-                <QuantityButton
-                  type="button"
-                  onClick={() =>
-                    onUpdateQuantity(
-                      item.dish ? item.dish._id : item.variantId,
-                      item.quantity - 1,
-                    )
-                  }
-                >
-                  −
-                </QuantityButton>
-                <span>{item.quantity}</span>
-                <QuantityButton
-                  type="button"
-                  onClick={() =>
-                    onUpdateQuantity(
-                      item.dish ? item.dish._id : item.variantId,
-                      item.quantity + 1,
-                    )
-                  }
-                >
-                  +
-                </QuantityButton>
-              </QuantityControl>
-            </CartItem>
-          ))}
-          <FormGroup style={{ marginTop: "auto" }}>
-            <InputLabel>{t("form_preparation_note")}</InputLabel>
-            <TextArea value={note} onChange={(e) => setNote(e.target.value)} />
-          </FormGroup>
-        </Column>
-        <Column>
-          <FormGroup>
-            <InputLabel>{t("form_full_name")}</InputLabel>
-            <Input
-              type="text"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              required
-            />
-          </FormGroup>
-          <FormGroup>
-            <InputLabel>{t("form_phone_number")}</InputLabel>
-            <Input
-              type="tel"
-              value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
-              required
-            />
-          </FormGroup>
-          {renderDeliverySection()}
-          <TotalContainer>
-            <TotalLabel>{t("total")}</TotalLabel>
-            <TotalValue>
-              {finalTotal} {t("zd")}
-            </TotalValue>
-          </TotalContainer>
-          <SubmitButton
-            type="submit"
-            disabled={
-              isSubmitting ||
-              calcError ||
-              (!isDineIn && !isCalculated && shopDomain !== "global")
-            }
-          >
-            {isSubmitting === "submitting"
-              ? t("placing_order")
-              : t("place_order_button")}
-          </SubmitButton>
-        </Column>
+                {/* Form Inputs (Rhythm Spacing: 24px) */}
+                <Column style={{ marginTop: "0" }}>
+                  <FormGroup>
+                    <InputLabel>{t("form_full_name")}</InputLabel>
+                    <Input
+                      type="text"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      required
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <InputLabel>{t("form_phone_number")}</InputLabel>
+                    <Input
+                      type="tel"
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      required
+                    />
+                  </FormGroup>
+                  {renderDeliverySection()}
+                  <FormGroup>
+                    <InputLabel>{t("form_preparation_note")}</InputLabel>
+                    <TextArea value={note} onChange={(e) => setNote(e.target.value)} />
+                  </FormGroup>
+                </Column>
+              </ScrollableFormBody>
+
+              <TotalContainer>
+                <TotalLabel>{t("total")}</TotalLabel>
+                <TotalValue>
+                  {finalTotal} {t("zd")}
+                </TotalValue>
+              </TotalContainer>
+
+              <SubmitButton
+                type="submit"
+                disabled={
+                  isSubmitting ||
+                  calcError ||
+                  (!isDineIn && !isCalculated && shopDomain !== "global")
+                }
+              >
+                {isSubmitting === "submitting"
+                  ? t("placing_order")
+                  : t("place_order_button")}
+              </SubmitButton>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </FormWrapper>
     );
   }
@@ -1485,87 +1688,10 @@ const Cart = ({
     );
   }
 
-  // --- REUSED INFINITE SWIPER CAROUSEL ELEMENT RENDERER ---
-  const renderConfirmationItemCard = (item) => {
-    const custom = item.podCustomization;
-    return (
-      <ConfirmCard key={item.variantId}>
-        {custom ? (
-          <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-            {custom.front && (
-              <PodMockupPreview
-                item={item}
-                side="front"
-                width="110px"
-                height="110px"
-                borderRadius="14px"
-              />
-            )}
-            {custom.back && (
-              <PodMockupPreview
-                item={item}
-                side="back"
-                width="110px"
-                height="110px"
-                borderRadius="14px"
-              />
-            )}
-          </div>
-        ) : (
-          item.imageId && (
-            <div
-              style={{
-                width: "110px",
-                height: "110px",
-                borderRadius: "14px",
-                overflow: "hidden",
-                border: "1px solid rgba(255,255,255,0.05)",
-                flexShrink: 0,
-              }}
-            >
-              <img
-                src={getImageUrl(item.imageId)}
-                alt={item.title}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </div>
-          )
-        )}
-
-        <ConfirmDetails>
-          <span className="name">{item.title || item.product?.name}</span>
-          <span className="variant">
-            {t("color_prefix")}: {item.color} / {t("size_prefix")}: {item.size}
-          </span>
-          <span className="variant">
-            {t("pod_studio_quantity_label")}: {item.quantity}
-          </span>
-
-          {custom ? (
-            <div className="price-details">
-              <div>
-                {t("pod_studio_apparel_base")}:{" "}
-                {parseInt(custom.baseGarmentCost || 0)} {t("zd")}
-              </div>
-              <div>
-                {t("pod_studio_custom_print")}: +
-                {parseInt(custom.printCost || 0)} {t("zd")}
-              </div>
-            </div>
-          ) : (
-            <div className="price-details">
-              {t("pod_studio_unit_price")}: {parseInt(item.sellingPrice)}{" "}
-              {t("zd")}
-            </div>
-          )}
-
-          <span className="total-price">
-            {t("pod_studio_total_price")}:{" "}
-            {parseInt(item.sellingPrice) * item.quantity} {t("zd")}
-          </span>
-        </ConfirmDetails>
-      </ConfirmCard>
-    );
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
   };
 
   return (
@@ -1576,21 +1702,27 @@ const Cart = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={handleClose}
+            onClick={handleBackdropClick}
+            $isArabic={isArabic}
           >
-            <ModalContent
-              className="hanuut-cart-modal"
-              onClick={(e) => e.stopPropagation()}
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 50, opacity: 0 }}
-            >
-              <CartHeader>
-                <CartTitle>{t("your_order")}</CartTitle>
-                <CloseButton onClick={handleClose}>&times;</CloseButton>
-              </CartHeader>
-              {renderContent()}
-            </ModalContent>
+            <DrawerContainer $isArabic={isArabic}>
+              <MainCartPanel
+                className="hanuut-cart-modal"
+                onClick={(e) => e.stopPropagation()}
+                variants={slideVariants}
+                custom={isArabic}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                $isArabic={isArabic}
+              >
+                <CartHeader>
+                  <CartTitle>{t("your_order")}</CartTitle>
+                  <CloseButton onClick={handleClose}>&times;</CloseButton>
+                </CartHeader>
+                {renderContent()}
+              </MainCartPanel>
+            </DrawerContainer>
           </ModalBackdrop>
         )}
       </AnimatePresence>
@@ -1605,200 +1737,6 @@ const Cart = ({
           >
             {renderLightboxContent()}
           </LightboxOverlay>
-        )}
-      </AnimatePresence>
-
-      {/* ===================================================================== */}
-      {/* MANDATORY ORDER CONFIRMATION MODAL (System-Interception Layer) */}
-      {/* ===================================================================== */}
-      <AnimatePresence>
-        {showConfirmModal && (
-          <ConfirmModalBackdrop
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowConfirmModal(false)}
-          >
-            <ConfirmModalContent
-              onClick={(e) => e.stopPropagation()}
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 30, opacity: 0 }}
-            >
-              <CartHeader style={{ marginBottom: "1rem" }}>
-                <CartTitle>
-                  {t("pod_studio_confirm_order_title", "Confirm your order")}
-                </CartTitle>
-                <CloseButton onClick={() => setShowConfirmModal(false)}>
-                  &times;
-                </CloseButton>
-              </CartHeader>
-
-              <p
-                style={{
-                  color: "#a1a1aa",
-                  fontSize: "0.92rem",
-                  lineHeight: "1.5",
-                  margin: 0,
-                  fontFamily: "Cairo, sans-serif",
-                  textAlign: isArabic ? "right" : "left",
-                }}
-              >
-                {t(
-                  "pod_studio_confirm_order_desc",
-                  "Before we start producing your products, please verify your order and confirm that your uploaded designs respect our policies.",
-                )}
-              </p>
-
-              {/* Renders dynamic Infinte Autoplay Swiper Carousel if multiple items exist */}
-              <div style={{ width: "100%", overflow: "hidden" }}>
-                {cleanItems.length > 1 ? (
-                  <Swiper
-                    modules={[Autoplay]}
-                    loop={true}
-                    autoplay={{ delay: 3500, disableOnInteraction: false }}
-                    speed={1200}
-                    slidesPerView={1}
-                    spaceBetween={20}
-                  >
-                    {cleanItems.map((item) => (
-                      <SwiperSlide key={item.variantId}>
-                        {renderConfirmationItemCard(item)}
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                ) : (
-                  cleanItems.length === 1 &&
-                  renderConfirmationItemCard(cleanItems[0])
-                )}
-              </div>
-
-              {/* Mandatory Policy Consent Box */}
-              <PolicyCheckboxRow $isArabic={isArabic}>
-                <input
-                  type="checkbox"
-                  id="policy-consent"
-                  checked={policyConsent}
-                  onChange={(e) => setPolicyConsent(e.target.checked)}
-                />
-                <label htmlFor="policy-consent">
-                  {t(
-                    "pod_studio_design_policy_agreement",
-                    "I confirm that every uploaded design follows AURAS LAB Design Policy.",
-                  )}
-                  <button
-                    type="button"
-                    className="policy-link"
-                    onClick={() => setShowPolicyModal(true)}
-                  >
-                    ({t("pod_studio_read_design_policy", "Read Design Policy")})
-                  </button>
-                </label>
-              </PolicyCheckboxRow>
-
-              <NavigationRow style={{ direction: isArabic ? "rtl" : "ltr" }}>
-                <WizardBtn
-                  type="button"
-                  onClick={() => setShowConfirmModal(false)}
-                >
-                  {t("pod_studio_cancel", "Cancel")}
-                </WizardBtn>
-                <WizardBtn
-                  type="button"
-                  $primary
-                  disabled={!policyConsent}
-                  onClick={handleConfirmOrder}
-                >
-                  {t("pod_studio_create_order", "Create Order")}
-                </WizardBtn>
-              </NavigationRow>
-            </ConfirmModalContent>
-          </ConfirmModalBackdrop>
-        )}
-      </AnimatePresence>
-
-      {/* ===================================================================== */}
-      {/* D2C SUB-MODAL DESIGN POLICY (Intellectual Property & Content Guidelines) */}
-      {/* ===================================================================== */}
-      <AnimatePresence>
-        {showPolicyModal && (
-          <PolicyModalBackdrop
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowPolicyModal(false)}
-          >
-            <PolicyModalContent
-              $isArabic={isArabic}
-              onClick={(e) => e.stopPropagation()}
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-            >
-              <CartHeader style={{ marginBottom: "0.5rem" }}>
-                <CartTitle style={{ fontSize: "1.3rem" }}>
-                  {t(
-                    "pod_studio_policy_title",
-                    "AURAS LAB | Design Policy & Guidelines",
-                  )}
-                </CartTitle>
-                <CloseButton onClick={() => setShowPolicyModal(false)}>
-                  &times;
-                </CloseButton>
-              </CartHeader>
-
-              <PolicyScrollBlock>
-                <PolicySection>
-                  <h4>{t("pod_studio_policy_sec1_title")}</h4>
-                  <p>{t("pod_studio_policy_sec1_text")}</p>
-                </PolicySection>
-
-                <PolicySection>
-                  <h4>{t("pod_studio_policy_sec2_title")}</h4>
-                  <p>{t("pod_studio_policy_sec2_text")}</p>
-                </PolicySection>
-
-                <PolicySection>
-                  <h4>{t("pod_studio_policy_sec3_title")}</h4>
-                  <p>{t("pod_studio_policy_sec3_text")}</p>
-                </PolicySection>
-
-                <PolicySection>
-                  <h4>{t("pod_studio_policy_sec4_title")}</h4>
-                  <p>{t("pod_studio_policy_sec4_text")}</p>
-                </PolicySection>
-
-                <PolicySection>
-                  <h4>{t("pod_studio_policy_sec5_title")}</h4>
-                  <p>{t("pod_studio_policy_sec5_text")}</p>
-                </PolicySection>
-
-                <PolicySection>
-                  <h4>{t("pod_studio_policy_sec6_title")}</h4>
-                  <p>{t("pod_studio_policy_sec6_text")}</p>
-                </PolicySection>
-
-                <PolicySection>
-                  <h4>{t("pod_studio_policy_sec7_title")}</h4>
-                  <p>{t("pod_studio_policy_sec7_text")}</p>
-                </PolicySection>
-
-                <PolicySection>
-                  <h4>{t("pod_studio_policy_sec8_title")}</h4>
-                  <p>{t("pod_studio_policy_sec8_text")}</p>
-                </PolicySection>
-              </PolicyScrollBlock>
-
-              <WizardBtn
-                type="button"
-                $primary
-                onClick={() => setShowPolicyModal(false)}
-                style={{ marginTop: "2rem", width: "100%" }}
-              >
-                {isArabic ? "موافق" : "Close"}
-              </WizardBtn>
-            </PolicyModalContent>
-          </PolicyModalBackdrop>
         )}
       </AnimatePresence>
     </>
