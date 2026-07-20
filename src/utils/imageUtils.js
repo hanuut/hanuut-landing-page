@@ -7,7 +7,6 @@ export const getImageUrl = (imageInput) => {
   const prodUrl = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
 
   // --- 1. HANDLE CONSOLE LOG CASE: buffer is a base64 string ---
-  // This matches your directory API exactly
   if (imageInput.buffer && typeof imageInput.buffer === 'string') {
     const extension = imageInput.originalname?.split('.').pop()?.toLowerCase() || 'jpeg';
     const mimeType = `image/${extension === 'jpg' ? 'jpeg' : extension}`;

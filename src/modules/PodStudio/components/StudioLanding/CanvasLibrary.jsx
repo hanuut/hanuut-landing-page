@@ -487,6 +487,22 @@ const TechRow = styled.div`
   }
 `;
 
+// ==========================================================
+// STABLE APPAREL PLACEHOLDER HELPERS
+// ==========================================================
+
+const APPAREL_EMOJIS = ["👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽", "👗", "👘", "🥻", "👠", "👡", "👢", "🧣", "🧤", "🎩", "👑", "🎒", "💼"];
+
+const getStableEmoji = (id, index) => {
+  const str = String(id || index || "");
+  let sum = 0;
+  for (let i = 0; i < str.length; i++) {
+    sum += str.charCodeAt(i);
+  }
+  const emojiIndex = (sum + (index || 0)) % APPAREL_EMOJIS.length;
+  return APPAREL_EMOJIS[emojiIndex];
+};
+
 // --- CUSTOM 3D MOCKUP RENDERER ---
 const CustomRotatingMockup = ({
   colorObj,
@@ -504,33 +520,37 @@ const CustomRotatingMockup = ({
     const imgId = colorObj?.podFrontTemplateId || colorObj?.imageId;
     if (!imgId) return;
 
-    // 1. Read from static memory cache (Prevents double API requests)
-    if (imageCache[imgId]) {
-      setFrontUrl(imageCache[imgId]);
-    } else {
-      getImage(imgId).then((res) => {
-        if (res.data) {
-          const url = getImageUrl(res.data);
-          imageCache[imgId] = url; // Cache it!
-          if (isMounted) setFrontUrl(url);
-        }
-      }).catch(() => {});
-    }
-
-    if (colorObj?.podBackTemplateId) {
-      const bImgId = colorObj.podBackTemplateId;
-      if (imageCache[bImgId]) {
-        setBackUrl(imageCache[bImgId]);
+    const loadImages = async () => {
+      // 1. Read from memory cache (Fast fallback)
+      if (imageCache[imgId]) {
+        if (isMounted) setFrontUrl(imageCache[imgId]);
       } else {
-        getImage(bImgId).then((res) => {
+        getImage(imgId).then((res) => {
           if (res.data) {
             const url = getImageUrl(res.data);
-            imageCache[bImgId] = url; // Cache it!
-            if (isMounted) setBackUrl(url);
+            imageCache[imgId] = url; // Cache it!
+            if (isMounted) setFrontUrl(url);
           }
         }).catch(() => {});
       }
-    }
+
+      if (colorObj?.podBackTemplateId) {
+        const bImgId = colorObj.podBackTemplateId;
+        if (imageCache[bImgId]) {
+          if (isMounted) setBackUrl(imageCache[bImgId]);
+        } else {
+          getImage(bImgId).then((res) => {
+            if (res.data) {
+              const url = getImageUrl(res.data);
+              imageCache[bImgId] = url; // Cache it!
+              if (isMounted) setBackUrl(url);
+            }
+          }).catch(() => {});
+        }
+      }
+    };
+
+    loadImages();
     
     return () => {
       isMounted = false;
@@ -585,7 +605,7 @@ const CustomRotatingMockup = ({
         />
       ) : (
         <div style={{ zIndex: 3, fontSize: isLarge ? "4rem" : "2.5rem" }}>
-          👕
+          {getStableEmoji(title)}
         </div>
       )}
       {hasBack && (
@@ -850,7 +870,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
               key={lineIdx} 
               onMouseEnter={() => setHoveredLineIdx(lineIdx)}
               onMouseLeave={() => setHoveredLineIdx(null)}
-              style={{ overflow: "visible", width: "100%" }}
+              style={{ overflow: "visible", width: "100%" }} /* Added overflow visible to fix hover clipping */
             >
               <MarqueeTrack
                 $reverse={isReverse}

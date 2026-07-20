@@ -27,7 +27,7 @@ const App = () => {
       const browserLang = navigator.language.split("-")[0];
       const supported = ["ar", "en", "fr"];
       const defaultLang = supported.includes(browserLang) ? browserLang : "ar";
-      
+
       i18n.changeLanguage(defaultLang);
       localStorage.setItem("preferredLanguage", defaultLang);
     };
@@ -42,7 +42,9 @@ const App = () => {
   }, [i18n.language]);
 
   // --- Logic to determine which footer to show ---
-  const isShopPage = /^\/(@[^/]+|shop\/[^/]+)/.test(location.pathname);
+  const isShopPage =
+    /^\/(@[^/]+|shop\/[^/]+)/.test(location.pathname) ||
+    location.pathname.toLowerCase() === "/auraslab";
 
   return (
     <div className="App">

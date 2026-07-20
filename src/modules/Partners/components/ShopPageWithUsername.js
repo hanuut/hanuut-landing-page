@@ -316,6 +316,16 @@ const ShopPageWithUsername = () => {
   const selectedShopImage = useSelector(selectSelectedShopImage);
   const { cart: cartItems } = useSelector(selectCart);
 
+
+// Normalize only "aurasLab" to support its specific non-@ alias
+  const cleanUsername = useMemo(() => {
+    if (!username) return "";
+    if (username.toLowerCase() === "auraslab") {
+      return "@aurasLab";
+    }
+    return username;
+  }, [username]);
+
   const [domainKeyWord, setDomainKeyWord] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
   const [showAllLinks, setShowAllLinks] = useState(false);
@@ -635,9 +645,8 @@ const ShopPageWithUsername = () => {
     }
     const shopTitle = selectedShop.name || "HANUUT";
     const shopImage = getImageUrl(selectedShop.imageId);
-    const cleanUsername = selectedShop.username?.startsWith("@")
-      ? selectedShop.username
-      : `@${selectedShop.username}`;
+    
+    
     const currentUrl = `https://hanuut.com/${cleanUsername}${isLinksRoute ? "/links" : ""}`;
     const commune = selectedShop.addressId?.commune || "Algeria";
     const wilaya = selectedShop.addressId?.wilaya || "Algeria";

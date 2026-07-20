@@ -7,18 +7,17 @@ import { getImage } from "../../../Images/services/imageServices";
 import { FaMinus, FaPlus, FaTshirt } from "react-icons/fa";
 import { getPreferredProductImageId } from "../../../PodStudio/hooks/usePrintableArea";
 
-// Stable apparel emoji hashing map
-const APPAREL_EMOJIS = ["👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽"];
+// Expanded pool of apparel emojis
+const APPAREL_EMOJIS = ["%#24375;", "👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽", "👗", "👘", "🥻", "👠", "👡", "👢", "🧣", "🧤", "🎩", "👑", "🎒", "💼"];
 
-const getStableEmoji = (id) => {
-  if (!id) return "👕";
-  const str = String(id);
-  let hash = 0;
+const getStableEmoji = (id, index) => {
+  const str = String(id || index || "");
+  let sum = 0;
   for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    sum += str.charCodeAt(i);
   }
-  const index = Math.abs(hash) % APPAREL_EMOJIS.length;
-  return APPAREL_EMOJIS[index];
+  const emojiIndex = (sum + (index || 0)) % APPAREL_EMOJIS.length;
+  return APPAREL_EMOJIS[emojiIndex];
 };
 
 const formatSpecification = (spec) => {
@@ -99,7 +98,7 @@ const ImageContainer = styled.div`
     props.$layoutType === "grid"
       ? `
     width: 100%;
-    padding-top: 100%; /* Restored aspect ratio mapping */
+    padding-top: 100%;
   `
       : `
     width: 110px;
@@ -337,28 +336,34 @@ const PremiumProductCard = ({
 
   useEffect(() => {
     let isMounted = true;
+    if (!activeImageId) return;
+
     if (activeImageId) {
       getImage(activeImageId).then((res) => {
-        if (isMounted && res.data) setImageBuffer(res.data);
+        if (isMounted && res.data) {
+          setImageBuffer(res.data);
+        }
       });
     }
+
     if (hoverImageId) {
       getImage(hoverImageId).then((res) => {
-        if (isMounted && res.data) setHoverImageBuffer(res.data);
+        if (isMounted && res.data) {
+          setHoverImageBuffer(res.data);
+        }
       });
     } else {
-      setHoverImageBuffer(null);
+      if (isMounted) setHoverImageBuffer(null);
     }
+
     return () => {
       isMounted = false;
     };
   }, [activeImageId, hoverImageId]);
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
-  const hoverImageUrl = useMemo(
-    () => getImageUrl(hoverImageBuffer),
-    [hoverImageBuffer],
-  );
+  const hoverImageUrl = useMemo(() => getImageUrl(hoverImageBuffer), [hoverImageBuffer]);
+  
   const productName = product.name;
 
   const activeCartItemForThisProduct = useMemo(() => {
@@ -444,66 +449,9 @@ const PremiumProductCard = ({
     return null;
   };
 
-  if (isPodShop && layoutType === "list") {
-    return (
-      <CardWrapper
-        onClick={handleCardSelect}
-        $isActive={$isActive}
-        $layoutType="list"
-        onMouseEnter={() => setIsCardHovered(true)}
-        onMouseLeave={() => setIsCardHovered(false)}
-      >
-        <ImageContainer $layoutType="list">
-          <AnimatePresence mode="wait">
-            {isCardHovered && hoverImageUrl ? (
-              <motion.img
-                key="hover"
-                src={hoverImageUrl}
-                alt={productName}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              />
-            ) : (
-              imageUrl && (
-                <motion.img
-                  key="main"
-                  src={imageUrl}
-                  alt={productName}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                />
-              )
-            )}
-          </AnimatePresence>
-        </ImageContainer>
-
-        <Content $layoutType="list">
-          <SerialTag>
-            {t("pod_studio_base_label")} / {String(index + 1).padStart(3, "0")}
-          </SerialTag>
-          <ProductName $layoutType="list">{productName}</ProductName>
-          {renderSpecs()}
-        </Content>
-
-        <RightActionColumn>
-          <Price>
-            {parseInt(defaultSize?.sellingPrice || 0)} {t("dzd")}
-          </Price>
-          <StudioActionBtn
-            type="button"
-            onClick={handleCardSelect}
-            $layoutType="list"
-          >
-            <FaTshirt /> {t("pod_studio_design_button")}
-          </StudioActionBtn>
-        </RightActionColumn>
-      </CardWrapper>
-    );
-  }
+  const targetId = useMemo(() => {
+    return product?._id || product?.id || product?.productId || product?.name || "";
+  }, [product]);
 
   return (
     <CardWrapper
@@ -549,7 +497,7 @@ const PremiumProductCard = ({
                 inset: 0,
               }}
             >
-              {getStableEmoji(product._id)}
+              {getStableEmoji(targetId, index)}
             </motion.div>
           )}
         </AnimatePresence>
@@ -568,7 +516,7 @@ const PremiumProductCard = ({
 
         <PriceRow $layoutType="grid">
           <Price>
-            {parseInt(defaultSize?.sellingPrice || 0)} {t("dzd")}
+            {parseInt(defaultSize?.sellingPrice || 0)} {t("zd", "DA")}
           </Price>
           {isOrderingEnabled &&
             defaultSize &&

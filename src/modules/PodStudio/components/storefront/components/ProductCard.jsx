@@ -7,18 +7,17 @@ import { getImage } from "../../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../../utils/imageUtils";
 import { getPreferredProductImageId } from "../../../hooks/usePrintableArea";
 
-// Deterministic apparel emoji mapping
-const APPAREL_EMOJIS = ["👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽"];
+// Expanded pool of apparel emojis
+const APPAREL_EMOJIS = ["👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽", "👗", "👘", "🥻", "👠", "👡", "👢", "🧣", "🧤", "🎩", "👑", "🎒", "💼"];
 
-const getStableEmoji = (id) => {
-  if (!id) return "👕";
-  const str = String(id);
-  let hash = 0;
+const getStableEmoji = (id, index) => {
+  const str = String(id || index || "");
+  let sum = 0;
   for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    sum += str.charCodeAt(i);
   }
-  const index = Math.abs(hash) % APPAREL_EMOJIS.length;
-  return APPAREL_EMOJIS[index];
+  const emojiIndex = (sum + (index || 0)) % APPAREL_EMOJIS.length;
+  return APPAREL_EMOJIS[emojiIndex];
 };
 
 const CardWrapper = styled.div`
@@ -169,6 +168,8 @@ const ProductCard = ({ product, index, onSelect }) => {
 
   useEffect(() => {
     let isMounted = true;
+    if (!activeImageId) return;
+
     if (activeImageId) {
       getImage(activeImageId)
         .then((res) => {
@@ -178,6 +179,7 @@ const ProductCard = ({ product, index, onSelect }) => {
         })
         .catch((err) => console.error("Error loading substrate image:", err));
     }
+
     if (hoverImageId) {
       getImage(hoverImageId)
         .then((res) => {
@@ -185,22 +187,18 @@ const ProductCard = ({ product, index, onSelect }) => {
             setHoverImageBuffer(res.data);
           }
         })
-        .catch((err) =>
-          console.error("Error loading hover substrate image:", err),
-        );
+        .catch((err) => console.error("Error loading hover substrate image:", err));
     } else {
-      setHoverImageBuffer(null);
+      if (isMounted) setHoverImageBuffer(null);
     }
+
     return () => {
       isMounted = false;
     };
   }, [activeImageId, hoverImageId]);
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
-  const hoverImageUrl = useMemo(
-    () => getImageUrl(hoverImageBuffer),
-    [hoverImageBuffer],
-  );
+  const hoverImageUrl = useMemo(() => getImageUrl(hoverImageBuffer), [hoverImageBuffer]);
 
   const gsmValue = useMemo(() => {
     if (!product.specifications || !Array.isArray(product.specifications))
@@ -220,6 +218,10 @@ const ProductCard = ({ product, index, onSelect }) => {
       )?.value || null
     );
   }, [product.specifications]);
+
+  const targetId = useMemo(() => {
+    return product?._id || product?.id || product?.productId || product?.name || "";
+  }, [product]);
 
   return (
     <CardWrapper
@@ -263,7 +265,7 @@ const ProductCard = ({ product, index, onSelect }) => {
                 inset: 0,
               }}
             >
-              {getStableEmoji(product._id)}
+              {getStableEmoji(targetId, index)}
             </motion.div>
           )}
         </AnimatePresence>
