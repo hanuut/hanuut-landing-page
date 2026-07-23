@@ -773,7 +773,7 @@ const DesignWorkspace = ({
           />
         </ControlPanel>
       </WorkspaceGrid>
-      <PartnerSizingWidget canvas={canvas} />
+      <PartnerSizingWidget canvas={canvas} selectedSize={selectedSize} />
     </div>
   );
 };

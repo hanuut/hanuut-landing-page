@@ -123,93 +123,12 @@ const Td = styled.td`
   }
 `;
 
-const LOCAL_WIDGET_FALLBACKS = {
-  "canvas 170": {
-    referenceImageId: "6a53719234375f0d37a15e06",
-    sizes: [
-      { size: "XS", measurements: { A: 56, B: 49, C: 32 } },
-      { size: "S", measurements: { A: 59, B: 51, C: 33 } },
-      { size: "M", measurements: { A: 62, B: 53, C: 35 } },
-      { size: "L", measurements: { A: 64, B: 55, C: 37 } },
-      { size: "XL", measurements: { A: 67, B: 57, C: 38 } },
-      { size: "XXL", measurements: { A: 68, B: 60, C: 40 } },
-      { size: "XXXL", measurements: { A: 70, B: 62, C: 42 } },
-    ],
-  },
-  "oversize street tee": {
-    referenceImageId: "6a54342534375f0d37a16f6d",
-    sizes: [
-      { size: "S", measurements: { A: 67, B: 47, C: 23 } },
-      { size: "M", measurements: { A: 64, B: 49, C: 23 } },
-      { size: "L", measurements: { A: 65, B: 52, C: 23 } },
-      { size: "XL", measurements: { A: 70, B: 55, C: 23 } },
-    ],
-  },
-  backpack: {
-    referenceImageId: "6a543e9834375f0d37a17237",
-    sizes: [{ size: "Standard", measurements: { A: 34, B: 27, C: 15 } }],
-  },
-  "sac à dos": {
-    referenceImageId: "6a543e9834375f0d37a17237",
-    sizes: [{ size: "Standard", measurements: { A: 34, B: 27, C: 15 } }],
-  },
-  hoodie: {
-    referenceImageId: "6a5437d934375f0d37a1702b",
-    sizes: [
-      { size: "S", measurements: { A: 60, B: 54, C: 63 } },
-      { size: "M", measurements: { A: 60, B: 58, C: 65 } },
-      { size: "L", measurements: { A: 60, B: 60, C: 65 } },
-      { size: "XL", measurements: { A: 60, B: 62, C: 68 } },
-      { size: "XXL", measurements: { A: 62, B: 64, C: 69 } },
-    ],
-  },
-  "manches longues": {
-    referenceImageId: "6a543d5434375f0d37a171f3",
-    sizes: [
-      { size: "S", measurements: { A: 61, B: 49, C: 62 } },
-      { size: "M", measurements: { A: 62, B: 51, C: 65 } },
-      { size: "L", measurements: { A: 63, B: 54, C: 66 } },
-      { size: "XL", measurements: { A: 65, B: 56, C: 69 } },
-    ],
-  },
-  "sweat classic": {
-    referenceImageId: "6a543b0e34375f0d37a17110",
-    sizes: [
-      { size: "S", measurements: { A: 60, B: 34, C: 59 } },
-      { size: "M", measurements: { A: 62, B: 36, C: 60 } },
-      { size: "L", measurements: { A: 63, B: 39, C: 61 } },
-      { size: "XL", measurements: { A: 64, B: 40, C: 63 } },
-      { size: "XXL", measurements: { A: 67, B: 43, C: 65 } },
-      { size: "XXXL", measurements: { A: 69, B: 45, C: 65 } },
-    ],
-  },
-  "acid oversize": {
-    referenceImageId: "6a5323e5d21b7704643ae1c4",
-    sizes: [
-      { size: "S", measurements: { A: 65, B: 48, C: 42 } },
-      { size: "M", measurements: { A: 66, B: 50, C: 43 } },
-      { size: "L", measurements: { A: 67, B: 52, C: 44 } },
-      { size: "XL", measurements: { A: 68, B: 52, C: 45 } },
-    ],
-  },
-};
-
 const PartnerSizingWidget = ({ canvas, selectedSize }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const [referenceImgSrc, setReferenceImgSrc] = useState(null);
 
-  let sizeChart = canvas?.sizeChart;
-
-  if (!sizeChart && canvas?.title) {
-    const titleLower = String(canvas.title).toLowerCase();
-    const matchedKey = Object.keys(LOCAL_WIDGET_FALLBACKS).find((key) =>
-      titleLower.includes(key),
-    );
-    if (matchedKey) {
-      sizeChart = LOCAL_WIDGET_FALLBACKS[matchedKey];
-    }
-  }
+  const sizeChart = canvas?.sizeChart;
 
   useEffect(() => {
     let isMounted = true;
@@ -229,6 +148,13 @@ const PartnerSizingWidget = ({ canvas, selectedSize }) => {
     };
   }, [sizeChart?.referenceImageId]);
 
+  const getMeasurementVal = (s, key) => {
+    if (!s || !s.measurements) return "N/A";
+    const val = s.measurements instanceof Map ? s.measurements.get(key) : s.measurements[key];
+    return val !== undefined && val !== null ? `${val} cm` : "N/A";
+  };
+
+  // --- STRICT EXIT GUARD: Render nothing if DB Sizing Data is absent ---
   if (
     !sizeChart ||
     !sizeChart.sizes ||
@@ -285,21 +211,21 @@ const PartnerSizingWidget = ({ canvas, selectedSize }) => {
               </tr>
             </thead>
             <tbody>
-              {sizeChart.sizes.map((s) => {
+              {sizeChart.sizes.map((s, index) => {
+                const sizeLabel = s.sizeLabel || s.size || "";
                 const isActive =
-                  String(s.size).toUpperCase() ===
-                  String(selectedSize).toUpperCase();
+                  selectedSize &&
+                  sizeLabel &&
+                  String(sizeLabel).toUpperCase() === String(selectedSize).toUpperCase();
                 return (
-                  <Tr key={s.size} $active={isActive}>
+                  <Tr key={sizeLabel || index} $active={isActive}>
                     <Td>
-                      {s.size}
+                      {sizeLabel}
                       {isActive && <span className="badge">Active</span>}
                     </Td>
-                    <Td>{s.measurements.A} cm</Td>
-                    <Td>{s.measurements.B} cm</Td>
-                    <Td>
-                      {s.measurements.C ? `${s.measurements.C} cm` : "N/A"}
-                    </Td>
+                    <Td>{getMeasurementVal(s, "A")}</Td>
+                    <Td>{getMeasurementVal(s, "B")}</Td>
+                    <Td>{getMeasurementVal(s, "C")}</Td>
                   </Tr>
                 );
               })}
@@ -313,7 +239,7 @@ const PartnerSizingWidget = ({ canvas, selectedSize }) => {
 
 PartnerSizingWidget.propTypes = {
   canvas: PropTypes.object.isRequired,
-  selectedSize: PropTypes.string.isRequired,
+  selectedSize: PropTypes.string,
 };
 
 export default PartnerSizingWidget;

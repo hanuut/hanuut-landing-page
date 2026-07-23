@@ -304,7 +304,7 @@ const uploadAssetWithFallback = async (fileBlob) => {
 };
 
 const ShopPageWithUsername = () => {
-  const { username } = useParams();
+  const { username, ProductSku } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -640,6 +640,7 @@ const ShopPageWithUsername = () => {
         <PodStudioDashboard
           shop={selectedShop}
           selectedShopImage={selectedShopImage}
+          initialSku={ProductSku}
         />
       );
     }

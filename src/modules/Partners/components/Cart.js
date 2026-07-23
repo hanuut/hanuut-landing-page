@@ -39,6 +39,9 @@ import {
   FaTrashAlt,
   FaArrowLeft,
   FaArrowRight,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaGift
 } from "react-icons/fa";
 import {
   detectUserLocation,
@@ -53,10 +56,12 @@ import {
 } from "../../PodStudio/hooks/usePrintableArea";
 import PodMockupPreview from "../../PodStudio/components/Workspace/PodMockupPreview";
 
-// Swiper.js Imports (Reused from MyHanuutAppCarousel)
+// Swiper.js Imports
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import "swiper/css/autoplay";
 
 // ============================================================================
@@ -146,10 +151,10 @@ const FormWrapper = styled.form`
 const ScrollableFormBody = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 4px 4px 0 4px; /* Added top and side padding to prevent clipping on hover */
+  padding: 4px 4px 0 4px;
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* Reduced from 1.5rem (24px) to 16px for a tighter layout */
+  gap: 1rem;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -158,21 +163,21 @@ const ScrollableFormBody = styled.div`
 const Column = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* Strict 24px vertical grid */
+  gap: 1rem;
 `;
 
 const CartHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem; /* Reduced from 1.5rem */
+  margin-bottom: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 0.75rem; /* Reduced from 1rem */
+  padding-bottom: 0.75rem;
   flex-shrink: 0;
 `;
 
 const CartTitle = styled.h2`
-  font-size: 1.15rem; /* Reduced from 1.3rem */
+  font-size: 1.15rem;
   font-weight: 800;
   color: #fff;
   font-family: "Tajawal", sans-serif;
@@ -259,12 +264,12 @@ const QuantityButton = styled.button`
 const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.35rem; /* Reduced from 0.5rem */
+  gap: 0.35rem;
   text-align: start;
 `;
 
 const InputLabel = styled.label`
-  font-size: 0.75rem; /* Reduced from 0.85rem */
+  font-size: 0.75rem;
   font-weight: 700;
   color: #a1a1aa;
   text-transform: uppercase;
@@ -273,12 +278,12 @@ const InputLabel = styled.label`
 
 const Input = styled.input`
   width: 100%;
-  padding: 0.65rem 0.85rem; /* Reduced from 0.9rem 1rem */
-  font-size: 0.85rem; /* Reduced from 0.95rem */
+  padding: 0.65rem 0.85rem;
+  font-size: 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(0, 0, 0, 0.3);
   color: white;
-  border-radius: 10px; /* Adjusted slightly */
+  border-radius: 10px;
   box-sizing: border-box;
   &:focus {
     outline: none;
@@ -288,15 +293,15 @@ const Input = styled.input`
 
 const TextArea = styled.textarea`
   width: 100%;
-  padding: 0.65rem 0.85rem; /* Reduced from 0.9rem 1rem */
-  font-size: 0.85rem; /* Reduced from 0.95rem */
+  padding: 0.65rem 0.85rem;
+  font-size: 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(0, 0, 0, 0.3);
   color: white;
   border-radius: 10px;
   box-sizing: border-box;
   resize: vertical;
-  min-height: 60px; /* Reduced from 80px */
+  min-height: 60px;
   &:focus {
     outline: none;
     border-color: ${(props) => props.theme.primaryColor};
@@ -309,7 +314,7 @@ const SegmentedControl = styled.div`
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 4px;
-  border-radius: 14px;
+  border-radius: 10px;
   margin-bottom: 0.5rem;
 `;
 
@@ -319,7 +324,7 @@ const SegmentButton = styled.button`
   color: ${(props) => (props.$active ? "#000" : "white")};
   border: none;
   padding: 0.75rem;
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: 800;
   cursor: pointer;
   font-size: 0.9rem;
@@ -332,14 +337,14 @@ const DeliveryCard = styled.div`
   border: 1px solid
     ${(props) => (props.$error ? "#EF4444" : "rgba(255, 255, 255, 0.05)")};
   border-radius: 16px;
-  padding: 0.75rem; /* Reduced from 1rem */
+  padding: 0.75rem;
 `;
 
 const DeliveryOptionRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.6rem 0.75rem; /* Reduced from 0.8rem */
+  padding: 0.6rem 0.75rem;
   border-radius: 12px;
   background: ${(props) =>
     props.$selected ? "rgba(240, 122, 72, 0.15)" : "transparent"};
@@ -347,7 +352,7 @@ const DeliveryOptionRow = styled.div`
     ${(props) => (props.$selected ? "#F07A48" : "rgba(255, 255, 255, 0.05)")};
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-bottom: 0.35rem; /* Reduced from 0.5rem */
+  margin-bottom: 0.35rem;
   &:last-child {
     margin-bottom: 0;
   }
@@ -438,21 +443,21 @@ const TotalContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0.75rem; /* Reduced from 1rem */
-  padding-top: 0.75rem; /* Reduced from 1rem */
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 `;
 
 const TotalLabel = styled.p`
-  font-size: 1.1rem; /* Reduced from 1.25rem */
+  font-size: 1.1rem;
   font-weight: 700;
   color: white;
   margin: 0;
 `;
 
 const TotalValue = styled.p`
-  font-size: 1.35rem; /* Reduced from 1.55rem */
+  font-size: 1.35rem;
   font-weight: 700;
   color: ${(props) => props.theme.primaryColor};
   margin: 0;
@@ -460,15 +465,15 @@ const TotalValue = styled.p`
 
 const SubmitButton = styled.button`
   width: 100%;
-  padding: 0.85rem; /* Reduced from 1.1rem */
-  font-size: 1rem; /* Reduced from 1.1rem */
+  padding: 0.85rem;
+  font-size: 1rem;
   font-weight: 700;
   background-color: ${(props) => props.theme.primaryColor};
   color: #111;
   border: none;
   border-radius: 16px;
   cursor: pointer;
-  margin-top: 1rem; /* Reduced from 1.5rem */
+  margin-top: 1rem;
   transition: all 0.3s ease;
   flex-shrink: 0;
   &:hover {
@@ -722,21 +727,6 @@ const LbButton = styled.button`
 
 const TrashAltIcon = () => <FaTrashAlt style={{ fontSize: "0.8rem" }} />;
 
-const formVariants = {
-  hidden: (isArabic) => ({
-    x: isArabic ? "-100%" : "100%",
-    opacity: 0,
-    width: 0,
-    transition: { type: "spring", stiffness: 300, damping: 30 }
-  }),
-  visible: {
-    x: 0,
-    opacity: 1,
-    width: 380,
-    transition: { type: "spring", stiffness: 300, damping: 30 }
-  }
-};
-
 const slideVariants = {
   hidden: (isArabic) => ({
     x: isArabic ? "-100%" : "100%",
@@ -748,17 +738,15 @@ const slideVariants = {
   }
 };
 
-// --- NEW COMPACT SUMMARY CARD DESIGN SYSTEM TOKENS ---
-
 const SummaryCardButton = styled.button`
   width: 100%;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  padding: 0.85rem 1rem; /* Reduced from 1.25rem */
+  padding: 0.85rem 1rem;
   display: flex;
   align-items: center;
-  gap: 1rem; /* Reduced from 1.25rem */
+  gap: 1rem;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
   pointer-events: auto;
@@ -778,17 +766,17 @@ const ImageStackContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 68px; /* Reduced from 80px */
-  height: 68px; /* Reduced from 80px */
+  width: 68px;
+  height: 68px;
   position: relative;
   flex-shrink: 0;
 `;
 
 const StackedImage = styled.img`
   position: absolute;
-  width: 48px; /* Reduced from 56px */
-  height: 48px; /* Reduced from 56px */
-  border-radius: 8px; /* Proportional corner radius */
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
   object-fit: cover;
   border: 1.5px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -815,7 +803,7 @@ const SummaryCardText = styled.div`
   }
 
   span.total {
-    font-size: 1.35rem; /* Strong price emphasis */
+    font-size: 1.35rem;
     color: ${(props) => props.theme.primaryColor || "#F07A48"};
     font-weight: 800;
     font-family: "Tajawal", sans-serif;
@@ -834,18 +822,195 @@ const HintArrow = styled.div`
   }
 `;
 
-const HeaderSpacer = styled.div`
-  height: 44px; /* Reduced from 52px */
-  margin-bottom: 1rem; /* Reduced from 1.5rem */
-  flex-shrink: 0;
+// --- NEW COMPONENT STYLES FOR RECOVERY & PROMO SYSTEM ---
 
-  @media (max-width: 768px) {
-    display: none;
+const PromoSection = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 1rem;
+`;
+
+const PromoInput = styled(Input)`
+  flex: 1;
+`;
+
+const PromoButton = styled.button`
+  background: ${(props) => props.$applied ? "rgba(239, 68, 68, 0.1)" : "rgba(255, 255, 255, 0.05)"};
+  color: ${(props) => props.$applied ? "#ef4444" : "white"};
+  border: 1px solid ${(props) => props.$applied ? "#ef4444" : "rgba(255, 255, 255, 0.1)"};
+  border-radius: 10px;
+  padding: 0.65rem 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  font-family: "Tajawal", sans-serif;
+
+  &:hover:not(:disabled) {
+    background: ${(props) => props.$applied ? "rgba(239, 68, 68, 0.15)" : "rgba(255, 255, 255, 0.1)"};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
+const PromoFeedback = styled.div`
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  text-align: start;
+  font-weight: 600;
+  color: ${(props) => props.$isError ? "#ef4444" : "#39A170"};
+`;
+
+const PolicyConfirmModalBackdrop = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  pointer-events: auto;
+`;
+
+const PolicyConfirmCard = styled(motion.div)`
+  width: 100%;
+  max-width: 520px;
+  background-color: #141416;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  max-h: 90vh;
+  color: #fff;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+`;
+
+const PolicyConfirmHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+`;
+
+const PolicyConfirmBody = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+const PolicyConfirmFooter = styled.div`
+  padding: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.15);
+`;
+
+const PolicySwiperWrapper = styled.div`
+  width: 100%;
+  padding: 1rem 0;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+`;
+
+const PolicySlideCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+`;
+
+const PolicySlideImage = styled.div`
+  width: 140px;
+  height: 140px;
+  background: #09090b;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 1.25rem;
+  background: rgba(240, 122, 72, 0.04);
+  border: 1px solid rgba(240, 122, 72, 0.12);
+  border-radius: 16px;
+  text-align: start;
+
+  input[type="checkbox"] {
+    accent-color: #f07a48;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    cursor: pointer;
+  }
+
+  label {
+    font-size: 0.85rem;
+    color: #e4e4e7;
+    line-height: 1.4;
+    cursor: pointer;
+    font-family: "Tajawal", sans-serif;
+  }
+`;
+
+const NestedPolicyOverlay = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 2200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  pointer-events: auto;
+`;
+
+const NestedPolicyCard = styled(motion.div)`
+  width: 100%;
+  max-width: 550px;
+  background: #111215;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  max-h: 85vh;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+`;
+
+const PolicyScrollBlock = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: start;
+`;
+
 // ============================================================================
-// COMPONENT CLASS
+// MAIN COMPONENT CLASS
 // ============================================================================
 
 const Cart = ({
@@ -878,14 +1043,24 @@ const Cart = ({
   const [zoomedItem, setZoomedItem] = useState(null);
   const [manualAddressLine, setManualAddressLine] = useState("");
 
-  // --- DUAL-PANEL FOCUS SPLIT STATE ---
   const [isCheckoutFormOpen, setIsCheckoutFormOpen] = useState(false);
 
-  // --- CACHED HISTORY STATES ---
+  // --- RECOVERY AUDIT HISTORY CACHE ---
   const [orderHistory, setOrderHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
 
-  // Lock body scroll of main page while modal is open
+  // --- RECOVERY AUDIT DESIGN POLICY STATES ---
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
+  const [designPolicyChecked, setDesignPolicyChecked] = useState(false);
+
+  // --- PROMO / INFLUENCER CODE STATE ---
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedCode, setAppliedCode] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState(null); // { type: 'percent'|'flat', value: number }
+  const [isVerifyingPromo, setIsVerifyingPromo] = useState(false);
+  const [promoError, setPromoError] = useState("");
+
   useEffect(() => {
     if (isCartOpen) {
       document.body.style.overflow = "hidden";
@@ -897,13 +1072,13 @@ const Cart = ({
     };
   }, [isCartOpen]);
 
-  // Clean out the form state once cart resets
   useEffect(() => {
     if (!isCartOpen) {
       setIsCheckoutFormOpen(false);
     }
   }, [isCartOpen]);
 
+  // Load history list securely
   useEffect(() => {
     if (isCartOpen) {
       try {
@@ -916,6 +1091,31 @@ const Cart = ({
       }
     }
   }, [isCartOpen]);
+
+  // Intercept orderSuccessData to cache order parameters natively
+  useEffect(() => {
+    if (orderSuccessData) {
+      try {
+        const history = JSON.parse(localStorage.getItem("hanuut_order_history")) || [];
+        const orderId = orderSuccessData.orderId || orderSuccessData.id || '';
+        
+        if (orderId && !history.some(item => item.orderId === orderId)) {
+          const newEntry = {
+            orderId,
+            customerPhone: customerPhone || orderSuccessData.customerPhone || '',
+            shopName: orderSuccessData.shopName || 'AURAS LAB',
+            totalPrice: finalTotal,
+            createdAt: new Date().toISOString(),
+          };
+          const updatedHistory = [newEntry, ...history].slice(0, 20);
+          localStorage.setItem("hanuut_order_history", JSON.stringify(updatedHistory));
+          setOrderHistory(updatedHistory);
+        }
+      } catch (err) {
+        console.error("Failed to parse cached order history:", err);
+      }
+    }
+  }, [orderSuccessData]);
 
   const cleanItems = useMemo(() => {
     if (!items || items.length === 0) return [];
@@ -967,10 +1167,18 @@ const Cart = ({
   }, [filteredDeliveryOptions]);
 
   const selectedDeliveryOption = filteredDeliveryOptions[selectedDeliveryIndex];
-  const deliveryPrice = selectedDeliveryOption
-    ? selectedDeliveryOption.price
-    : 0;
-  const finalTotal = itemsTotal + (isDineIn ? 0 : deliveryPrice);
+  const deliveryPrice = selectedDeliveryOption ? selectedDeliveryOption.price : 0;
+
+  // Recalculate billing using optional promo code variables
+  const discountAmount = useMemo(() => {
+    if (!appliedDiscount) return 0;
+    if (appliedDiscount.type === "percent") {
+      return itemsTotal * (appliedDiscount.value / 100);
+    }
+    return appliedDiscount.value;
+  }, [appliedDiscount, itemsTotal]);
+
+  const finalTotal = Math.max(0, itemsTotal + (isDineIn ? 0 : deliveryPrice) - discountAmount);
 
   const handleClose = () => dispatch(closeCart());
   const handleLocationRequest = (e) => {
@@ -1013,8 +1221,55 @@ const Cart = ({
     setIsCheckoutFormOpen(false);
   };
 
-  const handleSubmit = (event) => {
+  // --- PROMO CODE INTEGRATION ---
+  const handleApplyPromo = async (e) => {
+    e.preventDefault();
+    if (!promoCode.trim()) return;
+    
+    setIsVerifyingPromo(true);
+    setPromoError("");
+    setAppliedDiscount(null);
+    setAppliedCode("");
+
+    try {
+      const response = await fetch(`/api/gift-card/verify/${promoCode.trim().toUpperCase()}`);
+      if (response.ok) {
+        const data = await response.json(); // Expected: { type: 'percent' | 'flat', value: number }
+        setAppliedDiscount(data);
+        setAppliedCode(promoCode.trim().toUpperCase());
+      } else {
+        setPromoError(isArabic ? "رمز ترويجي غير صالح" : "Code promo invalide");
+      }
+    } catch (err) {
+      setPromoError(isArabic ? "حدث خطأ في الاتصال بالخادم" : "Connection error checking promo code");
+    } finally {
+      setIsVerifyingPromo(false);
+    }
+  };
+
+  const handleRemovePromo = (e) => {
+    e.preventDefault();
+    setAppliedDiscount(null);
+    setAppliedCode("");
+    setPromoCode("");
+    setPromoError("");
+  };
+
+  // --- CHECKOUT SUBMISSION WITH VERIFICATION MODAL INTERACTION ---
+  const handleCheckoutSubmit = (event) => {
     event.preventDefault();
+    if (!customerName || !customerPhone || (!isDineIn && !manualAddressLine && shopDomain === "global")) {
+      alert(isArabic ? "يرجى ملء جميع البيانات الأساسية." : "Please fill in all required shipping fields.");
+      return;
+    }
+    
+    // Intercept checkout to open the Design Policy confirmation step
+    setIsConfirmModalOpen(true);
+  };
+
+  const executeOrderCreation = () => {
+    if (!designPolicyChecked) return;
+
     const finalNote =
       selectedDeliveryOption?.type === "STOP_DESK"
         ? `[STOP DESK OFFICE: ${selectedStopDeskOffice}] ${note}`
@@ -1043,7 +1298,11 @@ const Cart = ({
             addressLine: manualAddressLine || "Home Delivery",
           },
       healedProducts: cleanItems,
+      discount: discountAmount,               // 🔴 Priority 2
+      discountCode: appliedCode || undefined,  // 🔴 Priority 2
     });
+
+    setIsConfirmModalOpen(false);
   };
 
   function renderDeliverySection() {
@@ -1246,7 +1505,6 @@ const Cart = ({
     return null;
   }
 
-  // Multi-photo isometric offset coordinate calculator
   const getStackTransform = (index, totalCount) => {
     if (totalCount === 1) {
       return { rotation: 0, offsetX: 0, offsetY: 0, zIndex: 10 };
@@ -1267,7 +1525,7 @@ const Cart = ({
         return null;
       })
       .filter(Boolean)
-      .slice(0, 4); // Display up to 4 stacked photos
+      .slice(0, 4);
   }, [cleanItems]);
 
   function renderContent() {
@@ -1290,7 +1548,7 @@ const Cart = ({
     }
 
     return (
-      <FormWrapper onSubmit={handleSubmit}>
+      <FormWrapper onSubmit={handleCheckoutSubmit}>
         <AnimatePresence mode="wait">
           {!isCheckoutFormOpen ? (
             /* ======================================================================== */
@@ -1486,7 +1744,6 @@ const Cart = ({
               style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", overflow: "hidden" }}
             >
               <ScrollableFormBody>
-                {/* Clickable Order Summary Card (Fulfillment Step Entrypoint) */}
                 <SummaryCardButton
                   type="button"
                   $isArabic={isArabic}
@@ -1525,7 +1782,6 @@ const Cart = ({
                   </HintArrow>
                 </SummaryCardButton>
 
-                {/* Form Inputs (Rhythm Spacing: 24px) */}
                 <Column style={{ marginTop: "0" }}>
                   <FormGroup>
                     <InputLabel>{t("form_full_name")}</InputLabel>
@@ -1551,10 +1807,57 @@ const Cart = ({
                     <TextArea value={note} onChange={(e) => setNote(e.target.value)} />
                   </FormGroup>
                 </Column>
+
+                {/* 🔴 PROMO CODE COMPACT SECTION (Priority 2) */}
+                <PromoSection>
+                  <PromoInput 
+                    type="text"
+                    placeholder={t("promo_code_placeholder", "Code Promo")}
+                    value={promoCode}
+                    disabled={appliedCode.length > 0}
+                    onChange={(e) => {
+                      setPromoCode(e.target.value);
+                      setPromoError("");
+                    }}
+                  />
+                  {appliedCode ? (
+                    <PromoButton 
+                      type="button" 
+                      $applied 
+                      onClick={handleRemovePromo}
+                    >
+                      {isArabic ? "سحب" : "Retirer"}
+                    </PromoButton>
+                  ) : (
+                    <PromoButton 
+                      type="button" 
+                      disabled={isVerifyingPromo || !promoCode.trim()} 
+                      onClick={handleApplyPromo}
+                    >
+                      {isVerifyingPromo ? "..." : (isArabic ? "تطبيق" : "Appliquer")}
+                    </PromoButton>
+                  )}
+                </PromoSection>
+
+                {/* Promo Notifications Feed */}
+                {promoError && <PromoFeedback $isError>{promoError}</PromoFeedback>}
+                {appliedCode && (
+                  <PromoFeedback>
+                    <FaCheckCircle style={{ marginRight: '4px', marginLeft: '4px' }} />
+                    {isArabic ? `تم تطبيق الكود ${appliedCode} بنجاح !` : `Code ${appliedCode} appliqué avec succès !`}
+                  </PromoFeedback>
+                )}
               </ScrollableFormBody>
 
               <TotalContainer>
-                <TotalLabel>{t("total")}</TotalLabel>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <TotalLabel>{t("total")}</TotalLabel>
+                  {discountAmount > 0 && (
+                    <span style={{ fontSize: "0.8rem", color: "#39A170", fontWeight: "bold", marginTop: "2px" }}>
+                      {t("discount_applied")}: -{discountAmount.toFixed(0)} DA
+                    </span>
+                  )}
+                </div>
                 <TotalValue>
                   {finalTotal} {t("zd")}
                 </TotalValue>
@@ -1577,7 +1880,7 @@ const Cart = ({
         </AnimatePresence>
       </FormWrapper>
     );
-  }
+  } 
 
   function renderLightboxContent() {
     if (!zoomedItem) return null;
@@ -1685,7 +1988,7 @@ const Cart = ({
           </LbButton>
         </LightboxActions>
       </LightboxContent>
-    );
+    ); 
   }
 
   const handleBackdropClick = (e) => {
@@ -1738,6 +2041,183 @@ const Cart = ({
             {renderLightboxContent()}
           </LightboxOverlay>
         )}
+      </AnimatePresence>
+
+      {/* 🔴 MANDATORY DESIGN POLICY CONFIRMATION MODAL & SWIPER CAROUSEL (Priority 1) */}
+      <AnimatePresence>
+        {isConfirmModalOpen && (
+          <PolicyConfirmModalBackdrop
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsConfirmModalOpen(false)}
+          >
+            <PolicyConfirmCard
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              $isArabic={isArabic}
+            >
+              <PolicyConfirmHeader>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f07a48' }}>
+                  <FaShieldAlt />
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                    {isArabic ? "مراجعة سياسة التصميم للطلبية" : "Validation de la Charte de Création"}
+                  </h3>
+                </div>
+                <CloseButton onClick={() => setIsConfirmModalOpen(false)}>&times;</CloseButton>
+              </PolicyConfirmHeader>
+
+              <PolicyConfirmBody>
+                <p style={{ fontSize: "0.85rem", color: "#a1a1aa", lineHeight: "1.5" }}>
+                  {isArabic 
+                    ? "يرجى مراجعة تصاميم طلبيتك بعناية للتأكد من خلوها من أي محتوى ينتهك حقوق الملكية الفكرية أو يتنافى مع الآداب العامة." 
+                    : "Veuillez revoir les produits de votre panier ci-dessous. Assurez-vous que chaque illustration ou visuel respecte nos politiques."
+                  }
+                </p>
+
+                {/* swiper carousel rendering customized designs */}
+                <PolicySwiperWrapper>
+                  <Swiper
+                    modules={[Autoplay]}
+                    autoplay={{ delay: 3000, disableOnInteraction: false }}
+                    spaceBetween={16} 
+                    slidesPerView={1}
+                  >
+                    {cleanItems.map((item, idx) => (
+                      <SwiperSlide key={idx}>
+                        <PolicySlideCard>
+                          <PolicySlideImage>
+                            {item.podCustomization ? (
+                              <PodMockupPreview item={item} side="front" width="100px" height="100px" borderRadius="8px" />
+                            ) : (
+                              <img src={getImageUrl(item.imageId)} alt="" style={{ maxWidth: "100px", maxHeight: "100px", objectFit: "contain" }} />
+                            )}
+                          </PolicySlideImage>
+                          <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'white' }}>
+                            {item.title || item.product?.name}
+                          </span>
+                        </PolicySlideCard>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </PolicySwiperWrapper>
+
+                {/* Mandatory Checkbox */}
+                <CheckboxContainer>
+                  <input 
+                    type="checkbox"
+                    id="design-policy-chk"
+                    checked={designPolicyChecked}
+                    onChange={(e) => setDesignPolicyChecked(e.target.checked)}
+                  />
+                  <label htmlFor="design-policy-chk">
+                    {isArabic ? (
+                      <>
+                        أوافق وأصرح بأن كل ملف وتصميم قمت برفعه يتوافق تماماً مع{" "}
+                        <span 
+                          style={{ color: "#f07a48", textDecoration: "underline", fontWeight: "bold", cursor: "pointer" }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsPolicyModalOpen(true);
+                          }}
+                        >
+                          سياسة التصميم وحماية الملكية لأوراس لاب
+                        </span>.
+                      </>
+                    ) : (
+                      <>
+                        Je confirme que chaque visuel personnalisé respecte la{" "}
+                        <span 
+                          style={{ color: "#f07a48", textDecoration: "underline", fontWeight: "bold", cursor: "pointer" }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsPolicyModalOpen(true);
+                          }}
+                        >
+                          Politique de Design d'AURAS LAB
+                        </span>.
+                      </>
+                    )}
+                  </label>
+                </CheckboxContainer>
+              </PolicyConfirmBody>
+
+              <PolicyConfirmFooter>
+                <LbButton 
+                  style={{ flex: 1 }}
+                  onClick={() => setIsConfirmModalOpen(false)}
+                >
+                  {isArabic ? "رجوع" : "Retour"}
+                </LbButton>
+                <LbButton 
+                  $primary 
+                  style={{ flex: 1 }}
+                  disabled={!designPolicyChecked}
+                  onClick={executeOrderCreation}
+                >
+                  {isArabic ? "تأكيد الطلب" : "Confirmer"}
+                </LbButton>
+              </PolicyConfirmFooter>
+            </PolicyConfirmCard>
+          </PolicyConfirmModalBackdrop>
+        )}
+      </AnimatePresence>
+
+      {/* --- NESTED DETAILED DESIGN POLICY DIALOG --- */}
+      <AnimatePresence>
+        {isPolicyModalOpen && (
+          <NestedPolicyOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsPolicyModalOpen(false)}
+          >
+            <NestedPolicyCard
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              $isArabic={isArabic}
+            >
+              <PolicyConfirmHeader>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f07a48' }}>
+                  <FaShieldAlt />
+                  <h4 style={{ fontSize: '1rem', fontWeight: 'bold' }}>
+                    {t('pod_studio_policy_title')}
+                  </h4>
+                </div>
+                <CloseButton onClick={() => setIsPolicyModalOpen(false)}>&times;</CloseButton>
+              </PolicyConfirmHeader>
+
+              <PolicyScrollBlock>
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                  <div key={num} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <h5 style={{ fontWeight: "bold", color: "white", fontSize: "0.9rem" }}>
+                      {t(`pod_studio_policy_sec${num}_title`)}
+                    </h5>
+                    <p style={{ fontSize: "0.8rem", color: "#a1a1aa", lineHeight: "1.5" }}>
+                      {t(`pod_studio_policy_sec${num}_text`)}
+                    </p>
+                  </div>
+                ))}
+              </PolicyScrollBlock>
+
+              <PolicyConfirmFooter>
+                <LbButton 
+                  $primary
+                  style={{ width: "100%" }}
+                  onClick={() => setIsPolicyModalOpen(false)}
+                >
+                  {isArabic ? "موافق" : "Fermer"}
+                </LbButton>
+              </PolicyConfirmFooter>
+            </NestedPolicyCard>
+          </NestedPolicyOverlay>
+        )} 
       </AnimatePresence>
     </>
   );

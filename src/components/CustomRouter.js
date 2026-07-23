@@ -191,6 +191,8 @@ const CustomRouter = ({ appConfig, location }) => {
           {/* This path is now more specific, starting with /@ */}
           <Route path="/:username" element={<ShopPageWithUsername />} />
           <Route path="/:username/links" element={<ShopPageWithUsername />} />
+
+          <Route path="/aurasLab/:ProductSku" element={<ShopPageWithUsername />} />
           {/* Catch all route - must be last */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
-import styled from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
   FaCloudUploadAlt,
@@ -19,6 +19,25 @@ import {
   calculateScaleFromPhysicalWidth,
 } from "../../hooks/usePrintableArea";
 import { motion, AnimatePresence } from "framer-motion";
+
+// ============================================================================
+// KEYFRAMES & STYLED COMPONENTS
+// ============================================================================
+
+const uploadPulse = (color) => keyframes`
+  0% {
+    box-shadow: 0 0 0 0 ${color}00;
+    border-color: ${color}50;
+  }
+  15% {
+    box-shadow: 0 0 20px 4px ${color}50;
+    border-color: ${color};
+  }
+  35%, 100% {
+    box-shadow: 0 0 0 0 ${color}00;
+    border-color: ${color}50;
+  }
+`;
 
 const ControlsCard = styled.div`
   background: rgba(255, 255, 255, 0.02);
@@ -44,6 +63,13 @@ const UploadZone = styled.label`
   cursor: pointer;
   transition: all 0.2s;
   text-align: center;
+
+  ${(props) =>
+    !props.$hasDesign &&
+    css`
+      animation: ${uploadPulse(props.theme.primaryColor || "#F07A48")} 4s
+        infinite ease-in-out;
+    `}
 
   &:hover {
     background: ${(props) => props.theme.primaryColor || "#F07A48"}0a;
@@ -318,6 +344,10 @@ const SectionLabel = styled.span`
   font-family: "Tajawal", sans-serif;
 `;
 
+// ============================================================================
+// COMPONENT CLASS
+// ============================================================================
+
 const DesignControls = ({
   designState,
   setDesignState,
@@ -340,7 +370,6 @@ const DesignControls = ({
     [canvasName, selectedSize],
   );
 
-  // Load natural dimensions of custom design file
   useEffect(() => {
     let isMounted = true;
     if (designState.previewUrl) {
@@ -366,7 +395,6 @@ const DesignControls = ({
     };
   }, [designState.previewUrl]);
 
-  // Dynamic S1 physical sizing projection
   const physicalMetrics = useMemo(() => {
     const printWidthRatio = cfg.printW_ref / cfg.B_ref;
     const printHeightRatio = cfg.printH_ref / cfg.A_ref;
@@ -381,7 +409,6 @@ const DesignControls = ({
     );
   }, [designState.scale, garmentDims, cfg, aspectRatio]);
 
-  // Continuous System 1 Dynamic Resolution Warning Calculation
   const dpiValue = useMemo(() => {
     if (!imgDimensions.width || !physicalMetrics.width) return 0;
     const widthInInches = physicalMetrics.width / 2.54;
@@ -442,7 +469,7 @@ const DesignControls = ({
   return (
     <div style={{ width: "100%" }}>
       {!designState.previewUrl ? (
-        <UploadZone>
+        <UploadZone $hasDesign={!!designState.previewUrl}>
           <FaCloudUploadAlt style={{ fontSize: "1.75rem", color: "#a1a1aa" }} />
           <UploadLabel>{t("pod_studio_upload_design_title")}</UploadLabel>
           <UploadSub>{t("pod_studio_upload_requirements")}</UploadSub>
@@ -506,7 +533,6 @@ const DesignControls = ({
             </ActionRow>
           </ArtworkManager>
 
-          {/* Dynamic i18n DPI Warning */}
           {dpiValue > 0 && (
             <ResolutionWidget $isHigh={dpiValue >= 150}>
               <span className="label">
@@ -518,8 +544,7 @@ const DesignControls = ({
                 {t("pod_studio_printable_surface")}
               </span>
               <span>
-                {dpiValue} DPI (
-                {dpiValue >= 150
+                {dpiValue} DPI ({dpiValue >= 150
                   ? t("pod_studio_status_artwork_ok")
                   : "Low Quality"}
                 )

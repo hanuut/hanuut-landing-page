@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import PropTypes from "prop-types";
+import {useNavigate} from "react-router-dom";
 import styled, { ThemeProvider } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
@@ -29,6 +30,9 @@ import "../storefront/styles/storefront.css";
 import HeroSection from "../storefront/sections/HeroSection";
 import CreativePossibilities from "../storefront/sections/CreativePossibilities";
 import CTASection from "../storefront/sections/CTASection";
+
+// --- CURATED EDITORIAL SHOWCASE IMPORT ---
+import EditorialShowcase from "../storefront/sections/EditorialShowcase";
 
 import {
   fetchPaginatedProducts,
@@ -259,10 +263,11 @@ const uploadAssetWithFallback = async (fileBlob) => {
   );
 };
 
-const PodStudioDashboard = ({ shop, selectedShopImage }) => {
+const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
   const { i18n, t } = useTranslation();
   const dispatch = useDispatch();
   const isArabic = i18n.language === "ar";
+  const navigate = useNavigate();
 
   const { cart } = useSelector(selectCart);
   const { paginatedProducts, paginationLoading } = useSelector(selectProducts);
@@ -287,6 +292,9 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
     [selectedShopImage],
   );
 
+    // We map raw products to the catalog. We pass RAW products, not adapted canvases.
+  const rawProducts = paginatedProducts || [];
+
   // Fetch product blanks inside the dashboard to display them on the Catalog
   useEffect(() => {
     const shopIdValue = shop?._id || shop?.id;
@@ -305,9 +313,36 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
     }
   }, [dispatch, shop, selectedCanvas]);
 
+  useEffect(() => {
+    if (initialSku && !selectedCanvas) {
+      const matched = rawProducts.find(
+        (p) => String(p.sku).toLowerCase() === String(initialSku).toLowerCase()
+      );
+      if (matched) {
+        const canvasObj = productToCanvasAdapter(matched);
+        if (canvasObj) {
+          setSelectedCanvas(canvasObj);
+        }
+      } else {
+        // Fallback: Fetch directly from API if not yet loaded in active pagination state
+        axios
+          .get(`${process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com"}/global-product/slug/${initialSku}`)
+          .then((res) => {
+            if (res.data) {
+              const canvasObj = productToCanvasAdapter(res.data);
+              if (canvasObj) setSelectedCanvas(canvasObj);
+            }
+          })
+          .catch((err) => console.warn("Could not find product matching Sku:", err));
+      }
+    }
+  }, [initialSku, rawProducts, selectedCanvas]);
+
+  // 3. Update go-back navigation to restore default URL:
   const handleBackToCatalog = () => {
     setSelectedCanvas(null);
     setEditingCartItem(null);
+    navigate("/aurasLab", { replace: false });
   };
 
   const handleDeleteItem = (variantId) => {
@@ -346,21 +381,43 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // We map raw products to the catalog. We pass RAW products, not adapted canvases.
-  const rawProducts = paginatedProducts || [];
+
 
   const handleSelectCanvas = (product) => {
     if (!product) return;
 
-    // --- COGNITIVE SAFEGUARD: BREAK THE DOUBLE-ADAPTATION LOOP ---
-    if (product.canvasId) {
+    if (product.sku) {
+      navigate(`/aurasLab/${product.sku}`, { replace: false });
+    } else if (product.canvasId) {
       setSelectedCanvas(product);
-      return;
+    } else {
+      const canvas = productToCanvasAdapter(product);
+      if (canvas) setSelectedCanvas(canvas);
     }
+  };
 
-    // When a product card is clicked, we run the adapter to build the workspace schema
-    const canvas = productToCanvasAdapter(product);
-    if (canvas) setSelectedCanvas(canvas);
+  // --- TRANSITIONAL INTEGRATION FUNNEL ---
+  const handleSelectDesign = (design) => {
+    if (!rawProducts || rawProducts.length === 0) return;
+    const defaultProduct = rawProducts[0];
+    const canvas = productToCanvasAdapter(defaultProduct);
+
+    if (canvas) {
+      const customizedObject = {
+        ...canvas,
+        initialDesignPayload: {
+          front: {
+            previewUrl: `https://api.hanuut.com/image/raw/${design._id || design.id}`,
+            file: "existing",
+            scale: design.podDesignMetadata?.defaultPlacement?.scale || 50,
+            x: design.podDesignMetadata?.defaultPlacement?.x || 50,
+            y: design.podDesignMetadata?.defaultPlacement?.y || 50,
+            rotation: design.podDesignMetadata?.defaultPlacement?.rotation || 0,
+          },
+        },
+      };
+      setSelectedCanvas(customizedObject);
+    }
   };
 
   const handlePlaceOrder = async (customerDetails) => {
@@ -588,6 +645,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
                 sampleProducts={rawProducts}
               />
 
+              
               <div
                 id="canvas-library-anchor"
                 style={{ scrollMarginTop: "100px" }}
@@ -604,6 +662,15 @@ const PodStudioDashboard = ({ shop, selectedShopImage }) => {
                 products={rawProducts}
                 onSelectCanvas={handleSelectCanvas}
               />
+
+              {/* ========================================================== */}
+              {/* 🎨 CURATED ARTWORK & DESIGNER DISCOVERY SHOWCASE SECTION      */}
+              {/* ========================================================== */}
+              {/* <EditorialShowcase
+                shopId={shop._id || shop.id}
+                onSelectDesign={handleSelectDesign}
+              /> */}
+
 
               <CTASection onStartDesign={handleScrollToCatalog} />
             </div>

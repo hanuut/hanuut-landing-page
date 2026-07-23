@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import styled from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {
   motion,
   useMotionValue,
@@ -14,6 +15,16 @@ import AppLogo3D from "../../../../assets/logos/myHanuut/logo_ar.png";
 
 import PlatformDownloadButtons from "../../../Partners/components/PlatformDownloadButtons";
 import DigitalMatrixCanvas from "../../../Partners/components/DigitalMatrixCanvas";
+
+// ============================================================================
+// STYLED COMPONENTS & ANIMATION KEYFRAMES
+// ============================================================================
+
+const lightSweep = keyframes`
+  0% { transform: translateX(-100%) rotate(25deg); }
+  35% { transform: translateX(100%) rotate(25deg); }
+  100% { transform: translateX(100%) rotate(25deg); }
+`;
 
 const HeroContainer = styled.div`
   width: 100%;
@@ -113,7 +124,7 @@ const RightCol = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 460px;
-  perspective: 1200px;
+  perspective: 1500px;
   transform-style: preserve-3d;
 `;
 
@@ -128,7 +139,7 @@ const StackWrapper = styled(motion.div)`
 const ShowcaseCard = styled(motion.div)`
   position: absolute;
   inset: 0;
-  background: rgba(28, 28, 30, 0.55);
+  background: rgba(18, 18, 20, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   display: flex;
@@ -140,18 +151,55 @@ const ShowcaseCard = styled(motion.div)`
   transform-style: preserve-3d;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
   overflow: hidden;
-  transition:
-    opacity 0.5s,
-    transform 0.5s;
+  
+  /* Strict pointer events mapping to guarantee clicks on isFront */
+  cursor: ${(props) => (props.$isFront ? "pointer" : "default")};
+  pointer-events: ${(props) => (props.$isFront ? "auto" : "none")};
+`;
+
+const FluidBlob = styled(motion.div)`
+  position: absolute;
+  width: ${(props) => props.$size}px;
+  height: ${(props) => props.$size}px;
+  border-radius: 50%;
+  background: radial-gradient(circle, ${(props) => props.$color} 0%, transparent 70%);
+  filter: blur(40px);
+  z-index: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+`;
+
+const LightSweepOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.01) 30%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.01) 70%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+
+  ${(props) =>
+    props.$active &&
+    css`
+      animation: ${lightSweep} 2.8s infinite ease-in-out;
+      opacity: 1;
+    `}
 `;
 
 const GlowingGrid = styled.div`
   position: absolute;
   inset: -10%;
   background-image:
-    linear-gradient(rgba(0, 210, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 210, 255, 0.08) 1px, transparent 1px);
-  background-size: 30px 30px;
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 24px 24px;
   background-position: center;
   transform: translateZ(20px);
   pointer-events: none;
@@ -163,9 +211,19 @@ const GarmentVisual = styled.div`
   filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
   transform: translateZ(45px);
   user-select: none;
+  pointer-events: none; /* Let clicks pass to parent Card */
 `;
 
-const CoordinateOverlay = styled.div`
+const NeonFlickerText = styled(motion.div)`
+  pointer-events: none;
+  @keyframes neonFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 0.99; }
+    20%, 24%, 55% { opacity: 0.25; }
+  }
+  animation: neonFlicker 3s infinite alternate;
+`;
+
+const CoordinateOverlay = styled(NeonFlickerText)`
   position: absolute;
   bottom: 1.5rem;
   left: 1.5rem;
@@ -173,7 +231,6 @@ const CoordinateOverlay = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  pointer-events: none;
   text-align: left;
 `;
 
@@ -185,7 +242,7 @@ const CoordText = styled.span`
   text-shadow: 0 0 8px rgba(0, 210, 255, 0.45);
 `;
 
-const TagInfo = styled.div`
+const TagInfo = styled(NeonFlickerText)`
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
@@ -217,16 +274,18 @@ const ProductTitle = styled.div`
 `;
 
 const DEFAULT_STACK = [
-  { emoji: "👕", title: "HEAVYWEIGHT TEE", label: "CORE_ITEM_042" },
-  { emoji: "🧥", title: "PREMIUM HOODIE", label: "PROTOTYPE_084" },
-  { emoji: "🎒", title: "TRAVEL BACKPACK", label: "CORDURA_121" },
+  { emoji: "👕", title: "HEAVYWEIGHT TEE", label: "CORE_ITEM_042", sku: "canvas-170" },
+  { emoji: "🧥", title: "PREMIUM HOODIE", label: "PROTOTYPE_084", sku: "hoodie" },
+  { emoji: "🎒", title: "TRAVEL BACKPACK", label: "CORDURA_121", sku: "backpack" },
 ];
 
 const StudioHero = ({ onEnterWorkspace }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
+  const navigate = useNavigate();
 
   const [activeIdx, setActiveIdx] = useState(0);
+  const timerRef = useRef(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -237,11 +296,30 @@ const StudioHero = ({ onEnterWorkspace }) => {
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], [12, -12]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], [-12, 12]);
 
+  // Zero-Desync Tab visibility watcher loop
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveIdx((prev) => (prev + 1) % DEFAULT_STACK.length);
-    }, 4500);
-    return () => clearInterval(timer);
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        clearInterval(timerRef.current);
+      } else {
+        startTimer();
+      }
+    };
+
+    const startTimer = () => {
+      clearInterval(timerRef.current);
+      timerRef.current = setInterval(() => {
+        setActiveIdx((prev) => (prev + 1) % DEFAULT_STACK.length);
+      }, 4500);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    startTimer();
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      clearInterval(timerRef.current);
+    };
   }, []);
 
   const handleMouseMove = (e) => {
@@ -283,30 +361,89 @@ const StudioHero = ({ onEnterWorkspace }) => {
             let opacity = 0.45;
             let scale = 0.88;
             let yShift = "-40px";
+            let cardBlur = 10;
+
+            // 3D Elliptical trajectory coordinates
+            let xOffset = isArabic ? "110%" : "-110%";
 
             if (isFront) {
               zIndex = 3;
               opacity = 1.0;
               scale = 1.0;
               yShift = "0px";
+              xOffset = "0%";
+              cardBlur = 0;
             } else if (isMiddle) {
               zIndex = 2;
               opacity = 0.7;
               scale = 0.94;
               yShift = "-20px";
+              xOffset = isArabic ? "-110%" : "110%";
+              cardBlur = 5;
             }
 
             return (
               <ShowcaseCard
                 key={index}
-                style={{
+                $isFront={isFront}
+                $zIndex={zIndex}
+                animate={{
                   zIndex,
                   opacity,
                   scale,
                   y: yShift,
-                  pointerEvents: isFront ? "auto" : "none",
+                  x: xOffset,
+                  filter: `blur(${cardBlur}px)`,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 80, // Smooth momentum glide transition
+                  damping: 18,
+                  mass: 1.1,
+                }}
+                onClick={() => {
+                  if (isFront && item.sku) {
+                    navigate(`/aurasLab/${item.sku}`);
+                  }
                 }}
               >
+                {/* Visual Fluid Neon Blobs (Active only when Front) */}
+                {isFront && (
+                  <>
+                    <FluidBlob
+                      $size={240}
+                      $color="rgba(240, 122, 72, 0.35)" // Theme Sunset Coral
+                      animate={{
+                        x: [-60, 60, -30, -60],
+                        y: [-30, 40, 80, -30],
+                        scale: [1, 1.15, 0.9, 1],
+                      }}
+                      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <FluidBlob
+                      $size={280}
+                      $color="rgba(57, 161, 112, 0.25)" // Theme Emerald
+                      animate={{
+                        x: [80, -40, 40, 80],
+                        y: [50, -60, -20, 50],
+                        scale: [1, 0.85, 1.1, 1],
+                      }}
+                      transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <FluidBlob
+                      $size={200}
+                      $color="rgba(57, 127, 249, 0.3)" // Theme Electric Blue
+                      animate={{
+                        x: [-20, 80, -80, -20],
+                        y: [80, -20, 20, 80],
+                        scale: [0.9, 1.1, 0.95, 0.9],
+                      }}
+                      transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  </>
+                )}
+
+                <LightSweepOverlay $active={isFront} />
                 <GlowingGrid />
                 <TagInfo>
                   <CoreTag>{item.label}</CoreTag>{" "}
@@ -327,5 +464,7 @@ const StudioHero = ({ onEnterWorkspace }) => {
     </HeroContainer>
   );
 };
+
 StudioHero.propTypes = { onEnterWorkspace: PropTypes.func.isRequired };
+
 export default StudioHero;
