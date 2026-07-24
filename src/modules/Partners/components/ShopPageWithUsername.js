@@ -1,5 +1,7 @@
+// src/modules/Partners/components/ShopPageWithUsername.js
+
 import React, { useEffect, useState, useMemo } from "react";
-import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
 import {
   useParams,
   useLocation,
@@ -45,7 +47,6 @@ import OrderSuccessModal from "./OrderSuccessModal";
 import BioLinksPage from "./BioLinksPage";
 import PodStudioDashboard from "../../PodStudio/components/StudioLanding/PodStudioDashboard";
 import { retrieveFile } from "../../PodStudio/utils/indexedDbHelper";
-// --- SECURE BINARY STORAGE HOOK ---
 import NotFoundPage from "../../NotFoundPage";
 import { FaShoppingCart, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
@@ -229,7 +230,6 @@ const FloatingCartPill = styled(motion.button)`
   max-width: 400px;
   z-index: 1000;
 
-  /* Matching premium neon glowing style */
   background: rgba(24, 24, 27, 0.85);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
@@ -274,7 +274,6 @@ const uploadAssetWithFallback = async (fileBlob) => {
   const API_URL =
     process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
 
-  // Try S3/Cloudinary first
   try {
     const formData = new FormData();
     formData.append("file", fileBlob);
@@ -289,7 +288,6 @@ const uploadAssetWithFallback = async (fileBlob) => {
     );
   }
 
-  // Fallback: local MongoDB/GridFS
   const fallbackData = new FormData();
   fallbackData.append("image", fileBlob);
   const fallbackRes = await axios.post(`${API_URL}/image`, fallbackData, {
@@ -304,7 +302,7 @@ const uploadAssetWithFallback = async (fileBlob) => {
 };
 
 const ShopPageWithUsername = () => {
-  const { username, ProductSku } = useParams();
+  const { username: routeUsername, ProductSku } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -316,14 +314,25 @@ const ShopPageWithUsername = () => {
   const selectedShopImage = useSelector(selectSelectedShopImage);
   const { cart: cartItems } = useSelector(selectCart);
 
+  // 🔴 FIXED FALLBACK FOR DIRECT DEEP LINKS (No routeUsername inside path)
+  const username = useMemo(() => {
+    if (routeUsername) return routeUsername;
+    
+    // Explicitly parse current window path when route parameter is undefined
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes("/@auraslab")) return "@aurasLab";
+    if (path.includes("/auraslab")) return "aurasLab";
+    
+    return "";
+  }, [routeUsername]);
 
-// Normalize only "aurasLab" to support its specific non-@ alias
   const cleanUsername = useMemo(() => {
     if (!username) return "";
-    if (username.toLowerCase() === "auraslab") {
+    let clean = username.trim();
+    if (clean.toLowerCase() === "auraslab") {
       return "@aurasLab";
     }
-    return username;
+    return clean;
   }, [username]);
 
   const [domainKeyWord, setDomainKeyWord] = useState(null);
@@ -339,19 +348,18 @@ const ShopPageWithUsername = () => {
   const isLinksRoute = location.pathname.endsWith("/links");
 
   useEffect(() => {
-    if (username) dispatch(fetchShopWithUsername(username));
-  }, [dispatch, username]);
+    if (cleanUsername) dispatch(fetchShopWithUsername(cleanUsername));
+  }, [dispatch, cleanUsername]);
 
   useEffect(() => {
     if (error && !loading && retryCount < MAX_RETRIES) {
       const timer = setTimeout(() => {
         setRetryCount((prev) => prev + 1);
-        if (username?.startsWith("@"))
-          dispatch(fetchShopWithUsername(username));
+        if (cleanUsername) dispatch(fetchShopWithUsername(cleanUsername));
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [error, loading, retryCount, dispatch, username]);
+  }, [error, loading, retryCount, dispatch, cleanUsername]);
 
   useEffect(() => {
     if (selectedShop) {
@@ -423,7 +431,7 @@ const ShopPageWithUsername = () => {
       text: onSurfaceColor || baseTheme.text,
       surface: surfaceColor || baseTheme.surface,
     };
-  }, [selectedShop, domainKeyWord, hasCustomization]);
+  }, [selectedShop, domainKeyWord]);
 
   const parsedBioLinks = useMemo(() => {
     if (!selectedShop?.shopSettings?.bioLinks?.isActive) return [];
@@ -479,7 +487,6 @@ const ShopPageWithUsername = () => {
     const activeProducts = customerDetails.healedProducts || shopCartItems;
 
     try {
-      // --- SYNCHRONOUS HANDOFF VALIDATION ---
       const resolvedProducts = await Promise.all(
         activeProducts.map(async (item) => {
           if (!item.podCustomization) return item;
@@ -487,11 +494,7 @@ const ShopPageWithUsername = () => {
           const custom = { ...item.podCustomization };
           const stableId = item.variantId;
 
-          if (
-            custom.front &&
-            custom.front.imageUrl &&
-            custom.front.imageUrl.startsWith("blob:")
-          ) {
+          if (custom.front?.imageUrl?.startsWith("blob:") && stableId) {
             const fileBlob = await retrieveFile(`${stableId}_front`);
             if (fileBlob) {
               const permanentUrl = await uploadAssetWithFallback(fileBlob);
@@ -505,11 +508,7 @@ const ShopPageWithUsername = () => {
             }
           }
 
-          if (
-            custom.back &&
-            custom.back.imageUrl &&
-            custom.back.imageUrl.startsWith("blob:")
-          ) {
+          if (custom.back?.imageUrl?.startsWith("blob:") && stableId) {
             const fileBlob = await retrieveFile(`${stableId}_back`);
             if (fileBlob) {
               const permanentUrl = await uploadAssetWithFallback(fileBlob);
@@ -546,6 +545,7 @@ const ShopPageWithUsername = () => {
         addressLine: customerDetails.address?.addressLine || "Home Delivery",
         gpsLocation: customerDetails.gpsLocation,
         shopDomainKeyword: "global",
+
         products: resolvedProducts.map((item) => ({
           productId: item.productId,
           title: item.title,
@@ -558,14 +558,14 @@ const ShopPageWithUsername = () => {
         })),
       };
       const response = await createGlobalOrder(orderPayload);
-      const orderResult = response.data; // Calculate exact total price of the placed order
+      const orderResult = response.data;
 
       const calculatedTotal =
         activeProducts.reduce(
           (sum, item) => sum + parseInt(item.sellingPrice, 10) * item.quantity,
           0,
         ) + (customerDetails.deliveryOption?.price || 0);
-      // Cache Order to localStorage Order History
+
       try {
         const historyRaw = localStorage.getItem("hanuut_order_history");
         const history = historyRaw ? JSON.parse(historyRaw) : [];
@@ -608,30 +608,38 @@ const ShopPageWithUsername = () => {
       }, 4000);
     }
   };
+
   const handleClearSuccess = () => {
     setIsSubmitting(null);
     setOrderSuccessData(null);
   };
+
   const handleEditCustomItem = (cartItem) => {
     dispatch(closeCart());
     setEditingCartItem(cartItem);
     setSearchParams({ product: cartItem.productId });
   };
+
   const isPodShop =
     selectedShop?.shopSettings?.printOnDemand === true ||
     selectedShop?.printOnDemand === true;
+
   const pageProps = { onCardClick: handleCardClick };
+
   if (loading || (error && retryCount < MAX_RETRIES))
     return (
       <Section>
         <Loader fullscreen={false} />
       </Section>
     );
+
   if (error && retryCount >= MAX_RETRIES) return <NotFoundPage />;
+
+  // 🔴 COGNITIVE RECONSTRUCT: Decoupled selectedShopImage from gating checks
+  // This allows the initial dashboard/workspace elements to mount instantly without holding up the page on reload
   if (
     selectedShop &&
     Object.keys(selectedShop).length > 0 &&
-    selectedShopImage &&
     domainKeyWord
   ) {
     const isPodEnabled = selectedShop?.shopSettings?.printOnDemand === true;
@@ -646,7 +654,6 @@ const ShopPageWithUsername = () => {
     }
     const shopTitle = selectedShop.name || "HANUUT";
     const shopImage = getImageUrl(selectedShop.imageId);
-    
     
     const currentUrl = `https://hanuut.com/${cleanUsername}${isLinksRoute ? "/links" : ""}`;
     const commune = selectedShop.addressId?.commune || "Algeria";
@@ -672,19 +679,18 @@ const ShopPageWithUsername = () => {
     const coverUrl = selectedShop.styles?.coverImageId
       ? `https://api.hanuut.com/image/raw/${selectedShop.styles.coverImageId}`
       : null;
+
     return (
       <ThemeProvider theme={customTheme}>
-        {" "}
-        <DynamicThemeStyles />{" "}
+        <DynamicThemeStyles />
         <Section style={{ backgroundColor: customTheme.body }}>
-          {" "}
           <Seo
             title={metaTitle}
             description={metaDesc}
             url={currentUrl}
             image={shopImage}
             shop={!isLinksRoute ? selectedShop : null}
-          />{" "}
+          />
           {isLinksRoute && selectedShop.shopSettings?.bioLinks?.isActive ? (
             <BioLinksPage shop={selectedShop} />
           ) : (
@@ -701,34 +707,27 @@ const ShopPageWithUsername = () => {
                 case "global":
                   return (
                     <PageWrapper>
-                      {" "}
                       <PremiumHeader>
-                        {" "}
                         {!isPodShop && (
                           <>
-                            {" "}
                             <CoverPhoto
                               $bgUrl={coverUrl}
                               $logoUrl={shopImageUrl}
-                            />{" "}
+                            />
                             <HeaderContent>
-                              {" "}
                               <ShopLogo
                                 src={shopImageUrl}
                                 alt={selectedShop.name}
-                              />{" "}
+                              />
                               <IdentityBlock>
-                                {" "}
-                                <ShopName>{selectedShop.name}</ShopName>{" "}
+                                <ShopName>{selectedShop.name}</ShopName>
                                 <ShopDesc>
                                   {selectedShop.description}
-                                </ShopDesc>{" "}
-                              </IdentityBlock>{" "}
+                                </ShopDesc>
+                              </IdentityBlock>
                               {parsedBioLinks.length > 0 && (
                                 <BioLinksWrapper>
-                                  {" "}
                                   <LinkGrid>
-                                    {" "}
                                     {visibleLinks.map((link, idx) => (
                                       <LinkPill
                                         key={idx}
@@ -737,18 +736,16 @@ const ShopPageWithUsername = () => {
                                         $isPrimary={link.isPrimary}
                                         title={link.label}
                                       >
-                                        {" "}
-                                        {link.icon}{" "}
+                                        {link.icon}
                                       </LinkPill>
-                                    ))}{" "}
-                                  </LinkGrid>{" "}
+                                    ))}
+                                  </LinkGrid>
                                   {parsedBioLinks.length > 4 && (
                                     <MoreLinksButton
                                       onClick={() =>
                                         setShowAllLinks(!showAllLinks)
                                       }
                                     >
-                                      {" "}
                                       {showAllLinks ? (
                                         <>
                                           <FaChevronUp /> Hide Links
@@ -758,15 +755,15 @@ const ShopPageWithUsername = () => {
                                           <FaChevronDown /> View All (
                                           {parsedBioLinks.length})
                                         </>
-                                      )}{" "}
+                                      )}
                                     </MoreLinksButton>
-                                  )}{" "}
+                                  )}
                                 </BioLinksWrapper>
-                              )}{" "}
-                            </HeaderContent>{" "}
+                              )}
+                            </HeaderContent>
                           </>
-                        )}{" "}
-                      </PremiumHeader>{" "}
+                        )}
+                      </PremiumHeader>
                       <GlobalShopLandingPage
                         shop={selectedShop}
                         image={selectedShopImage}
@@ -775,7 +772,7 @@ const ShopPageWithUsername = () => {
                         editingCartItem={editingCartItem}
                         setEditingCartItem={setEditingCartItem}
                         {...pageProps}
-                      />{" "}
+                      />
                       <Cart
                         items={shopCartItems}
                         onUpdateQuantity={handleUpdateQuantity}
@@ -785,16 +782,17 @@ const ShopPageWithUsername = () => {
                         shopId={selectedShop?._id || selectedShop?.id}
                         orderErrorMsg={orderErrorMsg}
                         onEditCustomItem={handleEditCustomItem}
-                      />{" "}
+                        orderSuccessData={orderSuccessData}
+                        onClearSuccess={handleClearSuccess}
+                      />
                       <AnimatePresence>
-                        {" "}
                         {orderSuccessData && (
                           <OrderSuccessModal
                             orderData={orderSuccessData}
                             onClose={handleClearSuccess}
                           />
-                        )}{" "}
-                      </AnimatePresence>{" "}
+                        )}
+                      </AnimatePresence>
                       {shopCartItems.length > 0 && (
                         <FloatingCartPill
                           onClick={() => dispatch(openCart())}
@@ -802,7 +800,6 @@ const ShopPageWithUsername = () => {
                           animate={{ y: 0, scale: 1, x: "-50%" }}
                           exit={{ y: 100, x: "-50%" }}
                         >
-                          {" "}
                           <div
                             style={{
                               display: "flex",
@@ -810,8 +807,7 @@ const ShopPageWithUsername = () => {
                               gap: "8px",
                             }}
                           >
-                            {" "}
-                            <FaShoppingCart />{" "}
+                            <FaShoppingCart />
                             <span
                               style={{
                                 background: "rgba(0, 0, 0, 0.2)",
@@ -820,28 +816,26 @@ const ShopPageWithUsername = () => {
                                 fontSize: "0.85rem",
                               }}
                             >
-                              {" "}
                               {shopCartItems.reduce(
                                 (acc, item) => acc + item.quantity,
                                 0,
-                              )}{" "}
-                            </span>{" "}
-                          </div>{" "}
+                              )}
+                            </span>
+                          </div>
                           <span style={{ fontWeight: "800" }}>
                             {t("view_cart", "View Cart")}
-                          </span>{" "}
+                          </span>
                           <span style={{ fontWeight: "800" }}>
-                            {" "}
                             {shopCartItems.reduce(
                               (acc, item) =>
                                 acc +
                                 parseInt(item.sellingPrice) * item.quantity,
                               0,
-                            )}{" "}
-                            {t("dzd")}{" "}
-                          </span>{" "}
+                            )}
+                            {t("dzd")}
+                          </span>
                         </FloatingCartPill>
-                      )}{" "}
+                      )}
                     </PageWrapper>
                   );
                 case "grocery":
@@ -855,8 +849,8 @@ const ShopPageWithUsername = () => {
                   return <NotFoundPage />;
               }
             })()
-          )}{" "}
-        </Section>{" "}
+          )}
+        </Section>
       </ThemeProvider>
     );
   }
@@ -866,4 +860,5 @@ const ShopPageWithUsername = () => {
     </Section>
   );
 };
+
 export default ShopPageWithUsername;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import styled from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import ButtonWithIcon from "../../../components/ButtonWithIcon";
 import { light } from "../../../config/Themes";
 import CartIcon from "../../../assets/icons/cart.svg";
@@ -41,7 +41,8 @@ import {
   FaArrowRight,
   FaCheckCircle,
   FaExclamationTriangle,
-  FaGift
+  FaGift,
+  FaLock
 } from "react-icons/fa";
 import {
   detectUserLocation,
@@ -107,7 +108,7 @@ const MainCartPanel = styled(motion.div)`
 
   @media (max-width: 480px) {
     width: 100%;
-    padding: 1.5rem;
+    padding: 1.25rem 1rem;
   }
 `;
 
@@ -151,7 +152,7 @@ const FormWrapper = styled.form`
 const ScrollableFormBody = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 4px 4px 0 4px;
+  padding: 4px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -266,6 +267,7 @@ const FormGroup = styled.div`
   flex-direction: column;
   gap: 0.35rem;
   text-align: start;
+  position: relative;
 `;
 
 const InputLabel = styled.label`
@@ -288,6 +290,12 @@ const Input = styled.input`
   &:focus {
     outline: none;
     border-color: ${(props) => props.theme.primaryColor};
+  }
+  &:disabled {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.05);
+    color: #a1a1aa;
+    cursor: not-allowed;
   }
 `;
 
@@ -727,17 +735,6 @@ const LbButton = styled.button`
 
 const TrashAltIcon = () => <FaTrashAlt style={{ fontSize: "0.8rem" }} />;
 
-const slideVariants = {
-  hidden: (isArabic) => ({
-    x: isArabic ? "-100%" : "100%",
-    transition: { type: "tween", duration: 0.3, ease: "easeInOut" }
-  }),
-  visible: {
-    x: 0,
-    transition: { type: "tween", duration: 0.3, ease: "easeInOut" }
-  }
-};
-
 const SummaryCardButton = styled.button`
   width: 100%;
   background: rgba(255, 255, 255, 0.03);
@@ -819,6 +816,16 @@ const HintArrow = styled.div`
 
   ${SummaryCardButton}:hover & {
     transform: ${(props) => (props.$isArabic ? "translateX(-4px)" : "translateX(4px)")};
+  }
+`;
+
+const HeaderSpacer = styled.div`
+  height: 44px;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -1009,9 +1016,31 @@ const PolicyScrollBlock = styled.div`
   text-align: start;
 `;
 
-// ============================================================================
-// MAIN COMPONENT CLASS
-// ============================================================================
+// --- NEW COMPONENT FOR HANDSHAKE SECURE DISPLAY LOCKS ---
+
+const LockBadge = styled.div`
+  position: absolute;
+  ${props => props.$isArabic ? "left: 12px;" : "right: 12px;"}
+  top: calc(50% + 8px);
+  transform: translateY(-50%);
+  color: #39a170;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+`;
+
+const slideVariants = {
+  hidden: (isArabic) => ({
+    x: isArabic ? "-100%" : "100%",
+    transition: { type: "tween", duration: 0.3, ease: "easeInOut" }
+  }),
+  visible: {
+    x: 0,
+    transition: { type: "tween", duration: 0.3, ease: "easeInOut" }
+  }
+};
+
+// src/modules/Partners/components/Cart.js — Batch 2 of 3
 
 const Cart = ({
   items,
@@ -1057,9 +1086,12 @@ const Cart = ({
   // --- PROMO / INFLUENCER CODE STATE ---
   const [promoCode, setPromoCode] = useState("");
   const [appliedCode, setAppliedCode] = useState("");
-  const [appliedDiscount, setAppliedDiscount] = useState(null); // { type: 'percent'|'flat', value: number }
+  const [appliedDiscount, setAppliedDiscount] = useState(null);
   const [isVerifyingPromo, setIsVerifyingPromo] = useState(false);
   const [promoError, setPromoError] = useState("");
+
+  // --- HANDSHAKE LOCK STATE FLAGS ---
+  const [isHandshakeLocked, setIsHandshakeLocked] = useState(false);
 
   useEffect(() => {
     if (isCartOpen) {
@@ -1116,6 +1148,46 @@ const Cart = ({
       }
     }
   }, [orderSuccessData]);
+
+  // --- INTERACTIVE MOBILE HANDSHAKE PARAMETERS LISTENER ---
+  useEffect(() => {
+    if (isCartOpen) {
+      const queryParams = new URLSearchParams(window.location.search);
+      const customerId = queryParams.get("customerId");
+      const firstName = queryParams.get("firstName");
+      const familyName = queryParams.get("familyName");
+      const phone = queryParams.get("phone");
+      const email = queryParams.get("email");
+      const wilaya = queryParams.get("wilaya");
+      const commune = queryParams.get("commune");
+      const addressLine = queryParams.get("addressLine");
+
+      if (phone || firstName || familyName || wilaya || commune || addressLine) {
+        setIsHandshakeLocked(true);
+
+        if (firstName || familyName) {
+          setCustomerName(`${firstName || ""} ${familyName || ""}`.trim());
+        }
+        if (phone) {
+          setCustomerPhone(phone);
+        }
+        if (addressLine) {
+          setManualAddressLine(addressLine);
+        }
+
+        // Set location dynamically in Redux to execute automated delivery rates calculations
+        if (wilaya || commune) {
+          dispatch(
+            setManualLocation({
+              wilayaCode: "", 
+              wilayaName: wilaya || "",
+              communeName: commune || "",
+            })
+          );
+        }
+      }
+    }
+  }, [isCartOpen, dispatch]);
 
   const cleanItems = useMemo(() => {
     if (!items || items.length === 0) return [];
@@ -1234,7 +1306,7 @@ const Cart = ({
     try {
       const response = await fetch(`/api/gift-card/verify/${promoCode.trim().toUpperCase()}`);
       if (response.ok) {
-        const data = await response.json(); // Expected: { type: 'percent' | 'flat', value: number }
+        const data = await response.json();
         setAppliedDiscount(data);
         setAppliedCode(promoCode.trim().toUpperCase());
       } else {
@@ -1298,12 +1370,35 @@ const Cart = ({
             addressLine: manualAddressLine || "Home Delivery",
           },
       healedProducts: cleanItems,
-      discount: discountAmount,               // 🔴 Priority 2
-      discountCode: appliedCode || undefined,  // 🔴 Priority 2
+      discount: discountAmount,
+      discountCode: appliedCode || undefined,
     });
 
     setIsConfirmModalOpen(false);
   };
+
+  const getStackTransform = (index, totalCount) => {
+    if (totalCount === 1) {
+      return { rotation: 0, offsetX: 0, offsetY: 0, zIndex: 10 };
+    }
+    const configs = [
+      { rotation: -6, offsetX: -8, offsetY: -6, zIndex: 10 },
+      { rotation: 4, offsetX: 0, offsetY: 0, zIndex: 20 },
+      { rotation: -3, offsetX: 8, offsetY: 4, zIndex: 30 },
+      { rotation: 2, offsetX: 16, offsetY: 8, zIndex: 40 }
+    ];
+    return configs[index % configs.length];
+  };
+
+  const resolvedImages = useMemo(() => {
+    return cleanItems
+      .map((item) => {
+        if (item.imageId) return getImageUrl(item.imageId);
+        return null;
+      })
+      .filter(Boolean)
+      .slice(0, 4);
+  }, [cleanItems]);
 
   function renderDeliverySection() {
     if (shopDomain === "food") {
@@ -1406,10 +1501,29 @@ const Cart = ({
     if (shopDomain === "global") {
       return (
         <>
-          <AddressesDropDown
-            target="partners"
-            onChooseAddress={handleAddressChange}
-          />
+          {isHandshakeLocked ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <FormGroup>
+                <InputLabel>{t("wiz_label_wilaya")}</InputLabel>
+                <Input type="text" value={locationState.wilayaName || ""} disabled />
+                <LockBadge $isArabic={isArabic} style={{ top: "50%" }}>
+                  <FaLock size={12} />
+                </LockBadge>
+              </FormGroup>
+              <FormGroup>
+                <InputLabel>{t("wiz_label_commune")}</InputLabel>
+                <Input type="text" value={locationState.communeName || ""} disabled />
+                <LockBadge $isArabic={isArabic} style={{ top: "50%" }}>
+                  <FaLock size={12} />
+                </LockBadge>
+              </FormGroup>
+            </div>
+          ) : (
+            <AddressesDropDown
+              target="partners"
+              onChooseAddress={handleAddressChange}
+            />
+          )}
 
           {calcLoading && (
             <div style={{ padding: "1rem", textAlign: "center" }}>
@@ -1430,7 +1544,7 @@ const Cart = ({
               <InputLabel style={{ marginBottom: "0.5rem" }}>
                 {t("delivery_destination_label")}
               </InputLabel>
-              <SegmentedControl>
+              <SegmentedControl style={isHandshakeLocked ? { pointerEvents: "none", opacity: 0.85 } : {}}>
                 <SegmentButton
                   type="button"
                   $active={fulfillmentType === "home"}
@@ -1458,7 +1572,7 @@ const Cart = ({
                     <DeliveryOptionRow
                       key={idx}
                       $selected={selectedDeliveryIndex === idx}
-                      onClick={() => setSelectedDeliveryIndex(idx)}
+                      onClick={() => !isHandshakeLocked && setSelectedDeliveryIndex(idx)}
                     >
                       <OptionLeft>
                         {opt.type === "STOP_DESK" ? (
@@ -1504,29 +1618,6 @@ const Cart = ({
     }
     return null;
   }
-
-  const getStackTransform = (index, totalCount) => {
-    if (totalCount === 1) {
-      return { rotation: 0, offsetX: 0, offsetY: 0, zIndex: 10 };
-    }
-    const configs = [
-      { rotation: -6, offsetX: -8, offsetY: -6, zIndex: 10 },
-      { rotation: 4, offsetX: 0, offsetY: 0, zIndex: 20 },
-      { rotation: -3, offsetX: 8, offsetY: 4, zIndex: 30 },
-      { rotation: 2, offsetX: 16, offsetY: 8, zIndex: 40 }
-    ];
-    return configs[index % configs.length];
-  };
-
-  const resolvedImages = useMemo(() => {
-    return cleanItems
-      .map((item) => {
-        if (item.imageId) return getImageUrl(item.imageId);
-        return null;
-      })
-      .filter(Boolean)
-      .slice(0, 4);
-  }, [cleanItems]);
 
   function renderContent() {
     if (isSubmitting === "submitting") {
@@ -1789,8 +1880,14 @@ const Cart = ({
                       type="text"
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
+                      disabled={isHandshakeLocked}
                       required
                     />
+                    {isHandshakeLocked && (
+                      <LockBadge $isArabic={isArabic}>
+                        <FaLock size={12} />
+                      </LockBadge>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <InputLabel>{t("form_phone_number")}</InputLabel>
@@ -1798,8 +1895,14 @@ const Cart = ({
                       type="tel"
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
+                      disabled={isHandshakeLocked}
                       required
                     />
+                    {isHandshakeLocked && (
+                      <LockBadge $isArabic={isArabic}>
+                        <FaLock size={12} />
+                      </LockBadge>
+                    )}
                   </FormGroup>
                   {renderDeliverySection()}
                   <FormGroup>
@@ -1880,7 +1983,7 @@ const Cart = ({
         </AnimatePresence>
       </FormWrapper>
     );
-  } 
+  }
 
   function renderLightboxContent() {
     if (!zoomedItem) return null;
@@ -1990,6 +2093,8 @@ const Cart = ({
       </LightboxContent>
     ); 
   }
+
+  // src/modules/Partners/components/Cart.js — Batch 3 of 3
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {

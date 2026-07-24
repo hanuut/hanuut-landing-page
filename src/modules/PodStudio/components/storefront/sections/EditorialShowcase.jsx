@@ -490,9 +490,6 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
         <CategoryLabel>
           {t("pod_studio_hero_badge", "CURATED LAB")}
         </CategoryLabel>
-        <Title>
-          {t("discover_artworks_title", "Discover Artists & Collections")}
-        </Title>
       </SectionHeader>
       {renderAdaptiveLayout()}
     </ShowcaseSection>

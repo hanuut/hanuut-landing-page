@@ -1,10 +1,11 @@
+// src/modules/PodStudio/components/StudioLanding/PodStudioDashboard.jsx
+
 import React, { useState, useMemo, useEffect } from "react";
 import PropTypes from "prop-types";
-import {useNavigate} from "react-router-dom";
 import styled, { ThemeProvider } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FaShoppingCart, FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import {
@@ -68,6 +69,11 @@ const MainContent = styled.main`
   align-items: center;
   justify-content: flex-start;
   gap: 2.5rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem 1rem 3rem 1rem;
+    gap: 1.5rem;
+  }
 `;
 
 const UnifiedHeaderRow = styled.div`
@@ -82,9 +88,12 @@ const UnifiedHeaderRow = styled.div`
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.5rem;
+    height: 56px;
+    padding-bottom: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
   }
 `;
 
@@ -93,6 +102,10 @@ const HeaderLeft = styled.div`
   align-items: center;
   gap: 1.5rem;
   text-align: start;
+
+  @media (max-width: 768px) {
+    gap: 0.75rem;
+  }
 `;
 
 const HeaderRight = styled.div`
@@ -102,8 +115,8 @@ const HeaderRight = styled.div`
   flex-wrap: wrap;
 
   @media (max-width: 768px) {
-    width: 100%;
-    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: nowrap;
   }
 `;
 
@@ -130,6 +143,15 @@ const HeaderCircleBtn = styled(Link)`
     height: 22px;
     object-fit: contain;
   }
+
+  @media (max-width: 768px) {
+    height: 36px;
+    width: 36px;
+    img {
+      width: 18px;
+      height: 18px;
+    }
+  }
 `;
 
 const LangWrapper = styled.div`
@@ -145,6 +167,11 @@ const LangWrapper = styled.div`
   &:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    height: 36px;
+    padding: 0 2px;
   }
 `;
 
@@ -167,6 +194,12 @@ const BackButton = styled.button`
     background: rgba(255, 255, 255, 0.05);
     border-color: #ffffff;
   }
+
+  @media (max-width: 768px) {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
 `;
 
 const StudioLogo = styled.img`
@@ -176,6 +209,11 @@ const StudioLogo = styled.img`
   object-fit: cover;
   border: 1.5px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 32px;
+    height: 32px;
+  }
 `;
 
 const StudioText = styled.div`
@@ -189,6 +227,10 @@ const StudioName = styled.h2`
   color: white;
   margin: 0;
   font-family: "Tajawal", sans-serif;
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+  }
 `;
 
 const StudioDesc = styled.p`
@@ -201,6 +243,10 @@ const StudioDesc = styled.p`
   -webkit-box-orient: vertical;
   overflow: hidden;
   max-width: 400px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const FloatingCartPill = styled.button`
@@ -223,6 +269,13 @@ const FloatingCartPill = styled.button`
 
   &:hover {
     transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    height: 36px;
+    padding: 0 1rem;
+    font-size: 0.8rem;
+    gap: 6px;
   }
 `;
 
@@ -263,15 +316,15 @@ const uploadAssetWithFallback = async (fileBlob) => {
   );
 };
 
-const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
+const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
   const { i18n, t } = useTranslation();
   const dispatch = useDispatch();
+  const location = useLocation();
   const isArabic = i18n.language === "ar";
   const navigate = useNavigate();
 
   const { cart } = useSelector(selectCart);
   const { paginatedProducts, paginationLoading } = useSelector(selectProducts);
-  const { categories } = useSelector(selectCategories);
 
   const [selectedCanvas, setSelectedCanvas] = useState(null);
   const [isTrayOpen, setIsTrayOpen] = useState(false);
@@ -280,6 +333,19 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
   const [isSubmitting, setIsSubmitting] = useState(null);
   const [orderSuccessData, setOrderSuccessData] = useState(null);
   const [orderErrorMsg, setOrderErrorMsg] = useState("");
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // --- RECOVERY AUDIT: VERIFY NATIVE DIRECT FLOWS ---
+  const isDirectEntry = useMemo(() => {
+    return !location.state?.fromApp && !!initialSku;
+  }, [location.state, initialSku]);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const shopCartItems = useMemo(() => {
     const shopIdValue = shop?._id || shop?.id;
@@ -291,9 +357,6 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
     () => getImageUrl(selectedShopImage),
     [selectedShopImage],
   );
-
-    // We map raw products to the catalog. We pass RAW products, not adapted canvases.
-  const rawProducts = paginatedProducts || [];
 
   // Fetch product blanks inside the dashboard to display them on the Catalog
   useEffect(() => {
@@ -313,6 +376,11 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
     }
   }, [dispatch, shop, selectedCanvas]);
 
+  const rawProducts = useMemo(() => {
+    return paginatedProducts || [];
+  }, [paginatedProducts]);
+
+  // Resolve and open products automatically by Sku:
   useEffect(() => {
     if (initialSku && !selectedCanvas) {
       const matched = rawProducts.find(
@@ -323,8 +391,8 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
         if (canvasObj) {
           setSelectedCanvas(canvasObj);
         }
-      } else {
-        // Fallback: Fetch directly from API if not yet loaded in active pagination state
+      } else if (!paginationLoading && rawProducts.length > 0) {
+        // 🔴 FIXED: Prevent premature API triggers on direct load before memory catalog loads
         axios
           .get(`${process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com"}/global-product/slug/${initialSku}`)
           .then((res) => {
@@ -336,9 +404,8 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
           .catch((err) => console.warn("Could not find product matching Sku:", err));
       }
     }
-  }, [initialSku, rawProducts, selectedCanvas]);
+  }, [initialSku, rawProducts, selectedCanvas, paginationLoading]);
 
-  // 3. Update go-back navigation to restore default URL:
   const handleBackToCatalog = () => {
     setSelectedCanvas(null);
     setEditingCartItem(null);
@@ -381,13 +448,11 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-
-
   const handleSelectCanvas = (product) => {
     if (!product) return;
 
     if (product.sku) {
-      navigate(`/aurasLab/${product.sku}`, { replace: false });
+      navigate(`/aurasLab/${product.sku}`, { state: { fromApp: true } });
     } else if (product.canvasId) {
       setSelectedCanvas(product);
     } else {
@@ -396,7 +461,6 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
     }
   };
 
-  // --- TRANSITIONAL INTEGRATION FUNNEL ---
   const handleSelectDesign = (design) => {
     if (!rawProducts || rawProducts.length === 0) return;
     const defaultProduct = rawProducts[0];
@@ -543,6 +607,9 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
       });
   };
 
+  // --- RECOVERY AUDIT: BACK BUTTON VISIBILITY CHECK ---
+  const shouldShowBackButton = selectedCanvas && !(isDirectEntry && isMobile);
+
   return (
     <ThemeProvider theme={partnerTheme}>
       <Seo
@@ -560,7 +627,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
         <MainContent>
           <UnifiedHeaderRow $isArabic={isArabic}>
             <HeaderLeft>
-              {selectedCanvas && (
+              {shouldShowBackButton && (
                 <BackButton onClick={handleBackToCatalog}>
                   {isArabic ? <FaArrowRight /> : <FaArrowLeft />}
                   <span>{t("pod_studio_btn_back", "Back")}</span>
@@ -645,7 +712,15 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
                 sampleProducts={rawProducts}
               />
 
-              
+              {/* ========================================================== */}
+              {/* 🎨 CURATED ARTWORK & DESIGNER DISCOVERY SHOWCASE SECTION      */}
+              {/* ========================================================== */}
+              // not yet fully ready
+              {/* <EditorialShowcase
+                shopId={shop._id || shop.id}
+                onSelectDesign={handleSelectDesign}
+              /> */}
+
               <div
                 id="canvas-library-anchor"
                 style={{ scrollMarginTop: "100px" }}
@@ -662,15 +737,6 @@ const PodStudioDashboard = ({ shop, selectedShopImage , initialSku}) => {
                 products={rawProducts}
                 onSelectCanvas={handleSelectCanvas}
               />
-
-              {/* ========================================================== */}
-              {/* 🎨 CURATED ARTWORK & DESIGNER DISCOVERY SHOWCASE SECTION      */}
-              {/* ========================================================== */}
-              {/* <EditorialShowcase
-                shopId={shop._id || shop.id}
-                onSelectDesign={handleSelectDesign}
-              /> */}
-
 
               <CTASection onStartDesign={handleScrollToCatalog} />
             </div>

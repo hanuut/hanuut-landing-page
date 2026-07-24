@@ -79,11 +79,24 @@
 }
 
 @media (max-width: 768px) {
-  .auras-5-4-grid { grid-template-columns: repeat(2, 1fr); }
+  .auras-5-4-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .auras-5-4-item {
+    grid-column: span 1 !important;
+  }
+  .auras-pills-row {
+    padding: 0.25rem 0 !important;
+  }
 }
 
 @media (max-width: 480px) {
-  .auras-5-4-grid { grid-template-columns: 1fr; }
+  /* Maintain high-density 2-columns even on smaller devices */
+  .auras-5-4-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
 }
 
 /* RTL Helpers */
