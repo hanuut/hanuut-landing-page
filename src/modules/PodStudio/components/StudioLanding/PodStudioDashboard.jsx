@@ -715,7 +715,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
               {/* ========================================================== */}
               {/* 🎨 CURATED ARTWORK & DESIGNER DISCOVERY SHOWCASE SECTION      */}
               {/* ========================================================== */}
-              // not yet fully ready
+              {/* not yet fully ready */}
               {/* <EditorialShowcase
                 shopId={shop._id || shop.id}
                 onSelectDesign={handleSelectDesign}
