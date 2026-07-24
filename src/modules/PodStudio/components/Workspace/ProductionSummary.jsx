@@ -115,11 +115,9 @@ const ProductionSummary = ({
     [canvas.title, selectedSize],
   );
 
-  // Dynamic reference-dimension based ratios
   const printWidthRatio = useMemo(() => cfg.printW_ref / cfg.B_ref, [cfg]);
   const printHeightRatio = useMemo(() => cfg.printH_ref / cfg.A_ref, [cfg]);
 
-  // Size-Aware physical metrics resolution (System 1)
   const frontMetrics = useMemo(() => {
     return calculatePhysicalMetrics(
       frontDesign.scale,
@@ -186,8 +184,6 @@ const ProductionSummary = ({
     const hasFront = !!frontDesign.previewUrl;
     const hasBack = !!backDesign.previewUrl;
 
-    if (!hasFront && !hasBack) return;
-
     const oldId = editingCartItem
       ? editingCartItem.variantId || editingCartItem.lineItemId
       : null;
@@ -225,6 +221,9 @@ const ProductionSummary = ({
       dispatch(updateCartQuantity({ variantId: oldId, quantity: 0 }));
     }
 
+    // Assign "blank" if no design is uploaded
+    const printSideKeyword = hasFront && hasBack ? "double" : hasBack ? "back" : hasFront ? "front" : "blank";
+
     const cartPayload = {
       productId: canvas.canvasId,
       variantId: targetVariantId,
@@ -236,7 +235,7 @@ const ProductionSummary = ({
       quantity: editingCartItem ? editingCartItem.quantity : 1,
       shopId: shopId,
       podCustomization: {
-        printSide: hasFront && hasBack ? "double" : hasBack ? "back" : "front",
+        printSide: printSideKeyword,
         baseGarmentCost: baseCost,
         printCost: totalPrintCost,
         front: hasFront
@@ -317,9 +316,9 @@ const ProductionSummary = ({
         </span>
       </GrandTotalRow>
 
+      {/* REMOVED disabled condition entirely so users can commit blanks */}
       <CommitButton
         type="button"
-        disabled={!frontDesign.previewUrl && !backDesign.previewUrl}
         onClick={handleCommitToTray}
       >
         {t("pod_studio_btn_commit_tray")}

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
-import styled, { keyframes, css } from "styled-components";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
   FaCloudUploadAlt,
@@ -19,25 +19,6 @@ import {
   calculateScaleFromPhysicalWidth,
 } from "../../hooks/usePrintableArea";
 import { motion, AnimatePresence } from "framer-motion";
-
-// ============================================================================
-// KEYFRAMES & STYLED COMPONENTS
-// ============================================================================
-
-const uploadPulse = (color) => keyframes`
-  0% {
-    box-shadow: 0 0 0 0 ${color}00;
-    border-color: ${color}50;
-  }
-  15% {
-    box-shadow: 0 0 20px 4px ${color}50;
-    border-color: ${color};
-  }
-  35%, 100% {
-    box-shadow: 0 0 0 0 ${color}00;
-    border-color: ${color}50;
-  }
-`;
 
 const ControlsCard = styled.div`
   background: rgba(255, 255, 255, 0.02);
@@ -63,13 +44,6 @@ const UploadZone = styled.label`
   cursor: pointer;
   transition: all 0.2s;
   text-align: center;
-
-  ${(props) =>
-    !props.$hasDesign &&
-    css`
-      animation: ${uploadPulse(props.theme.primaryColor || "#F07A48")} 4s
-        infinite ease-in-out;
-    `}
 
   &:hover {
     background: ${(props) => props.theme.primaryColor || "#F07A48"}0a;
@@ -344,10 +318,6 @@ const SectionLabel = styled.span`
   font-family: "Tajawal", sans-serif;
 `;
 
-// ============================================================================
-// COMPONENT CLASS
-// ============================================================================
-
 const DesignControls = ({
   designState,
   setDesignState,
@@ -467,16 +437,18 @@ const DesignControls = ({
     refDimension === "width" ? physicalMetrics.width : physicalMetrics.height;
 
   return (
-    <div style={{ width: "100%" }}>
+    <div id="design-controls-section" style={{ width: "100%" }}>
       {!designState.previewUrl ? (
-        <UploadZone $hasDesign={!!designState.previewUrl}>
+        <UploadZone>
           <FaCloudUploadAlt style={{ fontSize: "1.75rem", color: "#a1a1aa" }} />
           <UploadLabel>{t("pod_studio_upload_design_title")}</UploadLabel>
           <UploadSub>{t("pod_studio_upload_requirements")}</UploadSub>
+          {/* WebView Compatibility: Changed accept from image/png to image/* */}
           <input
+            id="primary-upload-input"
             type="file"
             ref={fileInputRef}
-            accept="image/png"
+            accept="image/*"
             onChange={handleFileChange}
           />
         </UploadZone>
@@ -515,9 +487,10 @@ const DesignControls = ({
               >
                 <FaCloudUploadAlt />
                 <input
+                  id="replace-upload-input"
                   type="file"
                   ref={replacementInputRef}
-                  accept="image/png"
+                  accept="image/*"
                   onChange={handleFileChange}
                   style={{ display: "none" }}
                 />
@@ -533,6 +506,7 @@ const DesignControls = ({
             </ActionRow>
           </ArtworkManager>
 
+          {/* Dynamic i18n DPI Warning */}
           {dpiValue > 0 && (
             <ResolutionWidget $isHigh={dpiValue >= 150}>
               <span className="label">
@@ -544,7 +518,8 @@ const DesignControls = ({
                 {t("pod_studio_printable_surface")}
               </span>
               <span>
-                {dpiValue} DPI ({dpiValue >= 150
+                {dpiValue} DPI (
+                {dpiValue >= 150
                   ? t("pod_studio_status_artwork_ok")
                   : "Low Quality"}
                 )

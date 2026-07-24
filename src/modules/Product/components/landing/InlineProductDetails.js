@@ -780,8 +780,7 @@ const InlineProductDetails = ({
   const showSaves = !!(product.savesCount && product.savesCount > 0);
 
   const handleFinalSubmit = async (finalPrice) => {
-    if ((!podState.front.file && !podState.back.file) || !currentSizeDetails)
-      return;
+    if (!currentSizeDetails) return;
     setIsSubmitting(true);
 
     const oldId = editingCartItem

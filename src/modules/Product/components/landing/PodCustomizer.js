@@ -1275,7 +1275,6 @@ const PodStepTwoControls = ({
           type="button"
           $primary
           onClick={onNext}
-          disabled={!podState.front.file && !podState.back.file}
         >
           Continue {isArabic ? <FaChevronLeft /> : <FaChevronRight />}
         </WizardBtn>

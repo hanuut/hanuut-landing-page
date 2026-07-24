@@ -1,10 +1,26 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { useTranslation } from "react-i18next";
-import { FaBorderAll, FaFillDrip } from "react-icons/fa";
+import { FaBorderAll, FaFillDrip, FaCloudUploadAlt, FaSlidersH } from "react-icons/fa";
 import { getFittedPrintZoneRatios } from "../../hooks/usePrintableArea";
 import PrintableArea from "./PrintableArea";
+
+// --- FAB ANIMATION KEYFRAMES ---
+const pulseShine = keyframes`
+  0% {
+    box-shadow: 0 0 0 0 rgba(240, 122, 72, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(240, 122, 72, 0);
+    transform: scale(1.05);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(240, 122, 72, 0);
+    transform: scale(1);
+  }
+`;
 
 const StageOuter = styled.div`
   width: 100%;
@@ -137,6 +153,30 @@ const GridSvg = styled.svg`
   transition: opacity 0.2s ease;
 `;
 
+// --- MOBILE UPLOAD SHORTCUT FAB ---
+const MobileFAB = styled.button`
+  display: none;
+  @media (max-width: 768px) {
+    display: flex;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: ${(props) => props.theme.primaryColor || "#F07A48"};
+    color: #050505;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 1000;
+    cursor: pointer;
+    animation: ${pulseShine} 2s infinite;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+`;
+
 // --- RESTORED ORIGINAL GRID LINES LAYOUT (S3 Aligned) ---
 const GridLines = ({ visible, ratios }) => {
   if (!visible) return null;
@@ -246,6 +286,22 @@ const PreviewStage = ({
     return getFittedPrintZoneRatios(canvas.title, selectedSize, activeSide);
   }, [canvas.title, selectedSize, activeSide]);
 
+  // --- MOBILE FAB CLICK LOGIC ---
+  const handleFABClick = (e) => {
+    e.stopPropagation();
+    if (!designState.previewUrl) {
+      // Trigger the actual file input click
+      const fileInput = document.getElementById('primary-upload-input');
+      if (fileInput) fileInput.click();
+    } else {
+      // Scroll down to the editing sliders
+      const controlsSection = document.getElementById('design-controls-section');
+      if (controlsSection) {
+        controlsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
   return (
     <StageOuter>
       <SolidColorBackground $active={showSolidBg} $color={solidBgColor} />
@@ -296,6 +352,11 @@ const PreviewStage = ({
           <GridLines visible={showGrid} ratios={ratios} />
         </BoundingBox>
       </WorkspaceContainer>
+
+      {/* MOBILE UPLOAD/SCROLL SHORTCUT */}
+      <MobileFAB onClick={handleFABClick}>
+        {designState.previewUrl ? <FaSlidersH /> : <FaCloudUploadAlt />}
+      </MobileFAB>
     </StageOuter>
   );
 };
