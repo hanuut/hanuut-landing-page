@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -20,6 +20,18 @@ import {
 } from "../../hooks/usePrintableArea";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Helper: Convert Base64 payload from Flutter back to a Web File object
+const base64ToFile = (base64String, mimeType, fileName) => {
+  const byteCharacters = atob(base64String);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: mimeType || "image/png" });
+  return new File([blob], fileName || "artwork.png", { type: mimeType || "image/png" });
+};
+
 const ControlsCard = styled.div`
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -31,7 +43,7 @@ const ControlsCard = styled.div`
   box-sizing: border-box;
 `;
 
-const UploadZone = styled.label`
+const UploadZone = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -334,6 +346,40 @@ const DesignControls = ({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
 
+  // --- REGISTER FLUTTER NATIVE HANDSHAKE HANDLER ---
+  useEffect(() => {
+    window.handleNativeImage = (base64Image, mimeType, fileName) => {
+      try {
+        const file = base64ToFile(base64Image, mimeType, fileName);
+        const previewUrl = URL.createObjectURL(file);
+        setDesignState((prev) => ({ ...prev, file, previewUrl }));
+      } catch (err) {
+        console.error("Failed to parse native Flutter image payload:", err);
+      }
+    };
+
+    return () => {
+      delete window.handleNativeImage;
+    };
+  }, [setDesignState]);
+
+  // Unified trigger logic (calls JS Channel if inside Flutter app, or DOM click if browser)
+  const triggerImageUpload = useCallback(() => {
+    if (window.HanuutMediaBridge) {
+      window.HanuutMediaBridge.postMessage("pickImage");
+    } else if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  }, []);
+
+  const triggerReplacementUpload = useCallback(() => {
+    if (window.HanuutMediaBridge) {
+      window.HanuutMediaBridge.postMessage("pickImage");
+    } else if (replacementInputRef.current) {
+      replacementInputRef.current.click();
+    }
+  }, []);
+
   const cfg = useMemo(() => getTemplateConfig(canvasName), [canvasName]);
   const garmentDims = useMemo(
     () => getGarmentDimensions(canvasName, selectedSize),
@@ -439,11 +485,10 @@ const DesignControls = ({
   return (
     <div id="design-controls-section" style={{ width: "100%" }}>
       {!designState.previewUrl ? (
-        <UploadZone>
+        <UploadZone onClick={triggerImageUpload}>
           <FaCloudUploadAlt style={{ fontSize: "1.75rem", color: "#a1a1aa" }} />
           <UploadLabel>{t("pod_studio_upload_design_title")}</UploadLabel>
           <UploadSub>{t("pod_studio_upload_requirements")}</UploadSub>
-          {/* WebView Compatibility: Changed accept from image/png to image/* */}
           <input
             id="primary-upload-input"
             type="file"
@@ -483,7 +528,7 @@ const DesignControls = ({
               <MiniActionButton
                 type="button"
                 title="Replace Image"
-                onClick={() => replacementInputRef.current.click()}
+                onClick={triggerReplacementUpload}
               >
                 <FaCloudUploadAlt />
                 <input
@@ -506,7 +551,6 @@ const DesignControls = ({
             </ActionRow>
           </ArtworkManager>
 
-          {/* Dynamic i18n DPI Warning */}
           {dpiValue > 0 && (
             <ResolutionWidget $isHigh={dpiValue >= 150}>
               <span className="label">

@@ -287,12 +287,16 @@ const PreviewStage = ({
   }, [canvas.title, selectedSize, activeSide]);
 
   // --- MOBILE FAB CLICK LOGIC ---
-  const handleFABClick = (e) => {
+   const handleFABClick = (e) => {
     e.stopPropagation();
     if (!designState.previewUrl) {
-      // Trigger the actual file input click
-      const fileInput = document.getElementById('primary-upload-input');
-      if (fileInput) fileInput.click();
+      // Check if running in Flutter Native App
+      if (window.HanuutMediaBridge) {
+        window.HanuutMediaBridge.postMessage("pickImage");
+      } else {
+        const fileInput = document.getElementById('primary-upload-input');
+        if (fileInput) fileInput.click();
+      }
     } else {
       // Scroll down to the editing sliders
       const controlsSection = document.getElementById('design-controls-section');
