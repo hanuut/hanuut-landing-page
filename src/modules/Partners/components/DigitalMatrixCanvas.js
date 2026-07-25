@@ -19,12 +19,37 @@ const DigitalMatrixCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const isMobile = window.innerWidth < 768;
 
+    // --- MOBILE PERFORMANCE GUARD ---
+    // If on a mobile viewport, render a static grid once and DO NOT run an infinite 60fps animation loop.
+    // This stops JNI ImageReader buffer overflows in embedded WebViews.
+    if (isMobile) {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
+      ctx.fillStyle = "#050505";
+      ctx.fillRect(0, 0, w, h);
+      
+      ctx.strokeStyle = "rgba(240, 122, 72, 0.06)";
+      ctx.lineWidth = 1;
+      const gridCount = 12;
+      for (let i = 0; i <= gridCount; i++) {
+        const x = (w / gridCount) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      return; // Exit early: No requestAnimationFrame on mobile
+    }
+
+    // --- DESKTOP ANIMATION LOOP ---
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     let w, h;
     let pulses = [];
-    let mouse = { x: -1000, y: -1000, radius: isMobile ? 150 : 300 };
+    let mouse = { x: -1000, y: -1000, radius: 300 };
     let animationFrame;
 
     const ORANGE = "rgba(240, 122, 72,";
@@ -51,7 +76,7 @@ const DigitalMatrixCanvas = () => {
       triggerHyperSpeed() { this.isShooting = true; this.speed = this.baseSpeed * 100; this.opacity = 1; }
     }
 
-    const init = () => { pulses = []; const count = isMobile ? 20 : 45; for (let i = 0; i < count; i++) pulses.push(new DataPulse()); };
+    const init = () => { pulses = []; for (let i = 0; i < 45; i++) pulses.push(new DataPulse()); };
     const resize = () => { w = window.innerWidth; h = window.innerHeight; canvas.width = w * dpr; canvas.height = h * dpr; canvas.style.width = `${w}px`; canvas.style.height = `${h}px`; ctx.scale(dpr, dpr); init(); };
     const drawGrid = () => {
       const gridCount = 24; const horizon = h * 0.45; ctx.lineWidth = 1;
@@ -74,10 +99,7 @@ const DigitalMatrixCanvas = () => {
         grad.addColorStop(0, `${p.color} ${p.opacity})`); grad.addColorStop(1, `${p.color} 0)`); ctx.fillStyle = grad; ctx.arc(currentX, currentY, size, 0, Math.PI * 2); ctx.fill();
       });
       if (Math.random() < 0.0011) { const available = pulses.filter(p => !p.isShooting); if (available.length > 0) available[Math.floor(Math.random() * available.length)].triggerHyperSpeed(); }
-      const gradX = mouse.x === -1000 ? w/2 : mouse.x; const gradY = mouse.y === -1000 ? h/2 : mouse.y;
-      const vignette = ctx.createRadialGradient(gradX, gradY, 0, gradX, gradY, Math.max(1, mouse.radius * 2));
-      vignette.addColorStop(0, 'rgba(5, 5, 5, 0)'); vignette.addColorStop(0.7, 'rgba(5, 5, 5, 0.4)'); vignette.addColorStop(1, 'rgba(5, 5, 5, 0.8)');
-      ctx.fillStyle = vignette; ctx.fillRect(0, 0, w, h); animationFrame = requestAnimationFrame(animate);
+      animationFrame = requestAnimationFrame(animate);
     };
 
     const handleMouseMove = (e) => { mouse.x = e.clientX; mouse.y = e.clientY; };
@@ -85,7 +107,12 @@ const DigitalMatrixCanvas = () => {
     window.addEventListener("resize", resize); window.addEventListener("mousemove", handleMouseMove); window.addEventListener("mouseleave", handleMouseLeave);
     resize(); animate();
     
-    return () => { window.removeEventListener("resize", resize); window.removeEventListener("mousemove", handleMouseMove); window.removeEventListener("mouseleave", handleMouseLeave); cancelAnimationFrame(animationFrame); };
+    return () => { 
+      window.removeEventListener("resize", resize); 
+      window.removeEventListener("mousemove", handleMouseMove); 
+      window.removeEventListener("mouseleave", handleMouseLeave); 
+      if (animationFrame) cancelAnimationFrame(animationFrame); 
+    };
   }, []);
 
   return <CanvasContainer ref={canvasRef} />;
