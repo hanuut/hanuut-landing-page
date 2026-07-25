@@ -44,6 +44,8 @@ import { productToCanvasAdapter } from "../../adapters/productToCanvasAdapter";
 import { fetchProductById } from "../../../Product/state/reducers";
 import Seo from "../../../../components/Seo";
 import { createGlobalOrder } from "../../../Partners/services/orderServices";
+import DiscoveryCarousel from "../storefront/sections/DiscoveryCarousel";
+
 
 const LayoutShell = styled.div`
   min-height: 100vh;
@@ -711,6 +713,11 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
                 onScrollToCatalog={handleScrollToCatalog}
                 sampleProducts={rawProducts}
               />
+
+              <DiscoveryCarousel
+                  products={rawProducts}
+                  onSelectCanvas={handleSelectCanvas}
+                />
 
               {/* ========================================================== */}
               {/* 🎨 CURATED ARTWORK & DESIGNER DISCOVERY SHOWCASE SECTION      */}

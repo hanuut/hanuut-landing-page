@@ -1,26 +1,13 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { FaBorderAll, FaFillDrip, FaCloudUploadAlt, FaSlidersH } from "react-icons/fa";
-import { getFittedPrintZoneRatios } from "../../hooks/usePrintableArea";
+import { FaBorderAll, FaFillDrip } from "react-icons/fa";
+import {
+  getFittedPrintZoneRatios,
+  useGarmentAlphaBounds,
+} from "../../hooks/usePrintableArea";
 import PrintableArea from "./PrintableArea";
-
-// --- FAB ANIMATION KEYFRAMES ---
-const pulseShine = keyframes`
-  0% {
-    box-shadow: 0 0 0 0 rgba(240, 122, 72, 0.6);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 0 15px rgba(240, 122, 72, 0);
-    transform: scale(1.05);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(240, 122, 72, 0);
-    transform: scale(1);
-  }
-`;
 
 const StageOuter = styled.div`
   width: 100%;
@@ -153,42 +140,15 @@ const GridSvg = styled.svg`
   transition: opacity 0.2s ease;
 `;
 
-// --- MOBILE UPLOAD SHORTCUT FAB ---
-const MobileFAB = styled.button`
-  display: none;
-  @media (max-width: 768px) {
-    display: flex;
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: ${(props) => props.theme.primaryColor || "#F07A48"};
-    color: #050505;
-    border: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    z-index: 1000;
-    cursor: pointer;
-    animation: ${pulseShine} 2s infinite;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  }
-`;
-
-// --- RESTORED ORIGINAL GRID LINES LAYOUT (S3 Aligned) ---
 const GridLines = ({ visible, ratios }) => {
   if (!visible) return null;
 
-  // Calculate the horizontal line coordinate to align exactly with S2 print center
   const centerY = ratios
     ? ratios.absolutePrintArea.top + ratios.absolutePrintArea.height / 2
     : 50;
 
   return (
     <GridSvg $visible={visible}>
-      {/* Vertical Subdivision lines */}
       {[20, 40, 60, 80].map((pct) => (
         <React.Fragment key={`v-${pct}`}>
           <line
@@ -210,7 +170,6 @@ const GridLines = ({ visible, ratios }) => {
         </React.Fragment>
       ))}
 
-      {/* Horizontal Subdivision lines */}
       {[20, 40, 60, 80].map((pct) => (
         <React.Fragment key={`h-${pct}`}>
           <line
@@ -232,7 +191,6 @@ const GridLines = ({ visible, ratios }) => {
         </React.Fragment>
       ))}
 
-      {/* Main Vertical Axis (Always 50%) */}
       <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#000" strokeWidth="4" />
       <line
         x1="50%"
@@ -243,7 +201,6 @@ const GridLines = ({ visible, ratios }) => {
         strokeWidth="2"
       />
 
-      {/* Main Horizontal Axis (Spatially Aligned with S2 Print Center) */}
       <line
         x1="0"
         y1={`${centerY}%`}
@@ -282,29 +239,18 @@ const PreviewStage = ({
 }) => {
   const { t } = useTranslation();
 
-  const ratios = useMemo(() => {
-    return getFittedPrintZoneRatios(canvas.title, selectedSize, activeSide);
-  }, [canvas.title, selectedSize, activeSide]);
+  // Scan non-transparent bounds of the active template PNG
+  const alphaBounds = useGarmentAlphaBounds(activeTemplateUrl);
 
-  // --- MOBILE FAB CLICK LOGIC ---
-   const handleFABClick = (e) => {
-    e.stopPropagation();
-    if (!designState.previewUrl) {
-      // Check if running in Flutter Native App
-      if (window.HanuutMediaBridge) {
-        window.HanuutMediaBridge.postMessage("pickImage");
-      } else {
-        const fileInput = document.getElementById('primary-upload-input');
-        if (fileInput) fileInput.click();
-      }
-    } else {
-      // Scroll down to the editing sliders
-      const controlsSection = document.getElementById('design-controls-section');
-      if (controlsSection) {
-        controlsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-  };
+  const ratios = useMemo(() => {
+    return getFittedPrintZoneRatios(
+      canvas.title,
+      selectedSize,
+      activeSide,
+      canvas.sizeChart,
+      alphaBounds,
+    );
+  }, [canvas.title, selectedSize, activeSide, canvas.sizeChart, alphaBounds]);
 
   return (
     <StageOuter>
@@ -316,14 +262,14 @@ const PreviewStage = ({
           $active={showGrid}
           onClick={() => setShowGrid(!showGrid)}
         >
-          <FaBorderAll /> {t("pod_studio_toggle_grid")}
+          <FaBorderAll /> {t("pod_studio_toggle_grid", "Show Alignment Grid")}
         </FloatingToggleBtn>
         <FloatingToggleBtn
           type="button"
           $active={showSolidBg}
           onClick={() => setShowSolidBg(!showSolidBg)}
         >
-          <FaFillDrip /> {t("pod_studio_toggle_bg")}
+          <FaFillDrip /> {t("pod_studio_toggle_bg", "Custom Canvas Color")}
         </FloatingToggleBtn>
 
         {showSolidBg && (
@@ -356,11 +302,6 @@ const PreviewStage = ({
           <GridLines visible={showGrid} ratios={ratios} />
         </BoundingBox>
       </WorkspaceContainer>
-
-      {/* MOBILE UPLOAD/SCROLL SHORTCUT */}
-      <MobileFAB onClick={handleFABClick}>
-        {designState.previewUrl ? <FaSlidersH /> : <FaCloudUploadAlt />}
-      </MobileFAB>
     </StageOuter>
   );
 };

@@ -140,7 +140,7 @@ const PartnerSizingWidget = ({ canvas, selectedSize }) => {
           }
         })
         .catch((err) =>
-          console.error("Error fetching size chart reference image:", err),
+          console.error("Error fetching size chart reference image:", err)
         );
     }
     return () => {
@@ -150,11 +150,13 @@ const PartnerSizingWidget = ({ canvas, selectedSize }) => {
 
   const getMeasurementVal = (s, key) => {
     if (!s || !s.measurements) return "N/A";
-    const val = s.measurements instanceof Map ? s.measurements.get(key) : s.measurements[key];
+    const val =
+      s.measurements instanceof Map
+        ? s.measurements.get(key)
+        : s.measurements[key];
     return val !== undefined && val !== null ? `${val} cm` : "N/A";
   };
 
-  // --- STRICT EXIT GUARD: Render nothing if DB Sizing Data is absent ---
   if (
     !sizeChart ||
     !sizeChart.sizes ||
@@ -164,25 +166,11 @@ const PartnerSizingWidget = ({ canvas, selectedSize }) => {
     return null;
   }
 
-  const category = String(canvas.title || "").toLowerCase();
-  const cLabel =
-    category.includes("backpack") ||
-    category.includes("sac à dos") ||
-    category.includes("bag") ||
-    category.includes("short") ||
-    category.includes("pant")
-      ? isArabic
-        ? "العمق"
-        : "Depth"
-      : isArabic
-        ? "الأكمام"
-        : "Sleeve";
-
   const columnHeaders = {
     size: isArabic ? "المقاس" : "Size",
     height: isArabic ? "الارتفاع (A)" : "Height (A)",
     width: isArabic ? "العرض (B)" : "Width (B)",
-    cDimension: `${cLabel} (C)`,
+    depth: isArabic ? "العمق (C)" : "Depth (C)",
   };
 
   return (
@@ -207,7 +195,7 @@ const PartnerSizingWidget = ({ canvas, selectedSize }) => {
                 <Th>{columnHeaders.size}</Th>
                 <Th>{columnHeaders.height}</Th>
                 <Th>{columnHeaders.width}</Th>
-                <Th>{columnHeaders.cDimension}</Th>
+                <Th>{columnHeaders.depth}</Th>
               </tr>
             </thead>
             <tbody>
@@ -216,7 +204,8 @@ const PartnerSizingWidget = ({ canvas, selectedSize }) => {
                 const isActive =
                   selectedSize &&
                   sizeLabel &&
-                  String(sizeLabel).toUpperCase() === String(selectedSize).toUpperCase();
+                  String(sizeLabel).toUpperCase() ===
+                    String(selectedSize).toUpperCase();
                 return (
                   <Tr key={sizeLabel || index} $active={isActive}>
                     <Td>
