@@ -1,5 +1,3 @@
-// src/components/CustomRouter.js
-
 import React, { Suspense, lazy, useMemo } from "react";
 import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
@@ -170,7 +168,9 @@ const CustomRouter = ({ appConfig, location }) => {
           <Route path="/:username" element={<ShopPageWithUsername />} />
           <Route path="/:username/links" element={<ShopPageWithUsername />} />
           
-          {/* 🔴 EXPLICIT Isolated SKU Routes: Only trigger for aurasLab / @aurasLab */}
+          {/* 🔴 EXPLICIT Isolated SKU & Collection Landing Routes: Only trigger for aurasLab / @aurasLab */}
+          <Route path="/aurasLab/collection/:DiscoveryGroup" element={<ShopPageWithUsername />} />
+          <Route path="/@aurasLab/collection/:DiscoveryGroup" element={<ShopPageWithUsername />} />
           <Route path="/aurasLab/:ProductSku" element={<ShopPageWithUsername />} />
           <Route path="/@aurasLab/:ProductSku" element={<ShopPageWithUsername />} />
 

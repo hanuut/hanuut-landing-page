@@ -8,7 +8,7 @@ import { FaMinus, FaPlus, FaTshirt } from "react-icons/fa";
 import { getPreferredProductImageId } from "../../../PodStudio/hooks/usePrintableArea";
 
 // Expanded pool of apparel emojis
-const APPAREL_EMOJIS = ["%#24375;", "👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽", "👗", "👘", "🥻", "👠", "👡", "👢", "🧣", "🧤", "🎩", "👑", "🎒", "💼"];
+const APPAREL_EMOJIS = ["👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽", "👗", "👘", "🥻", "👠", "👡", "👢", "🧣", "🧤", "🎩", "👑", "🎒", "💼"];
 
 const getStableEmoji = (id, index) => {
   const str = String(id || index || "");
@@ -74,25 +74,33 @@ const CardWrapper = styled(motion.div)`
   }
 `;
 
+// 🔴 LIQUIDGLASS PRODUCT IMAGE CONTAINER (With dynamic multi-light backdrop gradients)
 const ImageContainer = styled.div`
   position: relative;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 14px;
+  overflow: hidden;
+  box-sizing: border-box;
 
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.03) 70%
-    ),
-    rgba(15, 15, 15, 0.45);
-
-  backdrop-filter: blur(25px) saturate(140%);
-  -webkit-backdrop-filter: blur(25px) saturate(140%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.03);
+  /* Premium LiquidGlass Backdrop Glares */
+  background-image:
+    /* Light source 1 (Top-Left glow) */
+    radial-gradient(circle at 15% 15%, ${(props) => props.$glow1 || "rgba(255, 255, 255, 0.08)"} 0%, transparent 60%),
+    /* Light source 2 (Bottom-Right glow) */
+    radial-gradient(circle at 85% 85%, ${(props) => props.$glow2 || "rgba(240, 122, 72, 0.04)"} 0%, transparent 60%),
+    /* Center focal glow */
+    radial-gradient(circle at center, ${(props) => props.$center || "rgba(255, 255, 255, 0.04)"} 0%, transparent 75%);
+  
+  background-color: #0c0c0e;
+  backdrop-filter: blur(25px) saturate(160%);
+  -webkit-backdrop-filter: blur(25px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    inset 0 0 30px rgba(255, 255, 255, 0.02),
+    0 10px 30px rgba(0, 0, 0, 0.4);
 
   ${(props) =>
     props.$layoutType === "grid"
@@ -103,8 +111,6 @@ const ImageContainer = styled.div`
       : `
     width: 110px;
     height: 110px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
     padding: 0.5rem;
 
@@ -119,11 +125,12 @@ const ImageContainer = styled.div`
     height: 100%;
     object-fit: contain;
     transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.45));
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.55));
     position: absolute;
     inset: 0;
     padding: 1rem;
     box-sizing: border-box;
+    z-index: 2;
   }
 
   ${CardWrapper}:hover & img {
@@ -199,20 +206,6 @@ const SpecLine = styled.span`
   font-size: 0.8rem;
   color: #a1a1aa;
   font-weight: 500;
-`;
-
-const RightActionColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1rem;
-  flex-shrink: 0;
-  min-width: 180px;
-
-  @media (max-width: 600px) {
-    align-items: stretch;
-    width: 100%;
-  }
 `;
 
 const PriceRow = styled.div`
@@ -322,6 +315,13 @@ const PremiumProductCard = ({
   const [hoverImageBuffer, setHoverImageBuffer] = useState(null);
   const [isCardHovered, setIsCardHovered] = useState(false);
 
+  // Dynamic Ambient Glass Glow Coordinates and Colors State
+  const [ambientGlows, setAmbientGlows] = useState({
+    glow1: "rgba(255, 255, 255, 0.06)",
+    glow2: "rgba(240, 122, 72, 0.04)",
+    center: "rgba(255, 255, 255, 0.04)"
+  });
+
   const defaultAvailability = product?.availabilities?.[0];
   const defaultSize = defaultAvailability?.sizes?.[0];
 
@@ -363,6 +363,67 @@ const PremiumProductCard = ({
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
   const hoverImageUrl = useMemo(() => getImageUrl(hoverImageBuffer), [hoverImageBuffer]);
+
+  // 🔴 DYNAMIC AMBIENT GLASS SCANNER: Determines product background colors from loaded pixels
+  useEffect(() => {
+    if (!imageUrl) return;
+
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = imageUrl;
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        canvas.width = 10;
+        canvas.height = 10;
+        ctx.drawImage(img, 0, 0, 10, 10);
+        
+        const imgData = ctx.getImageData(0, 0, 10, 10).data;
+        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+
+        for (let i = 0; i < imgData.length; i += 4) {
+          const r = imgData[i];
+          const g = imgData[i+1];
+          const b = imgData[i+2];
+          const a = imgData[i+3];
+
+          if (a > 50) { // Only analyze non-transparent visible product fabric pixels
+            rSum += r;
+            gSum += g;
+            bSum += b;
+            count++;
+          }
+        }
+
+        if (count > 0) {
+          const avgR = Math.round(rSum / count);
+          const avgG = Math.round(gSum / count);
+          const avgB = Math.round(bSum / count);
+          
+          const brightness = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
+
+          if (brightness < 100) {
+            // Dark Product (e.g. Sacoch/Black Tee): Emit high-contrast gold/blue glares to pop
+            setAmbientGlows({
+              glow1: "rgba(240, 122, 72, 0.16)", // Sunset Orange
+              glow2: "rgba(57, 127, 249, 0.12)", // Electric Blue
+              center: "rgba(255, 255, 255, 0.08)"
+            });
+          } else {
+            // Light Product: Emit a soft matching brand accent color
+            setAmbientGlows({
+              glow1: "rgba(57, 161, 112, 0.08)", // Soft Emerald Green
+              glow2: "rgba(255, 255, 255, 0.04)",
+              center: "rgba(240, 122, 72, 0.06)"
+            });
+          }
+        }
+      } catch (err) {
+        console.warn("Canvas image pixel scan skipped due to CORS:", err);
+      }
+    };
+  }, [imageUrl]);
   
   const productName = product.name;
 
@@ -461,7 +522,12 @@ const PremiumProductCard = ({
       onMouseEnter={() => setIsCardHovered(true)}
       onMouseLeave={() => setIsCardHovered(false)}
     >
-      <ImageContainer $layoutType="grid">
+      <ImageContainer 
+        $layoutType="grid"
+        $glow1={ambientGlows.glow1}
+        $glow2={ambientGlows.glow2}
+        $center={ambientGlows.center}
+      >
         <AnimatePresence mode="wait">
           {isCardHovered && hoverImageUrl ? (
             <motion.img
@@ -505,9 +571,11 @@ const PremiumProductCard = ({
 
       <Content $layoutType="grid">
         {isPodShop ? (
-          <SerialTag>
-            {t("pod_studio_base_label")} / {String(index + 1).padStart(3, "0")}
-          </SerialTag>
+          <IconRow>
+            <SerialTag>
+              {t("pod_studio_base_label")} / {String(index + 1).padStart(3, "0")}
+            </SerialTag>
+          </IconRow>
         ) : (
           product.brand && <Brand>{product.brand}</Brand>
         )}
@@ -549,12 +617,18 @@ const PremiumProductCard = ({
             onClick={handleCardSelect}
             $layoutType="grid"
           >
-            <FaTshirt /> {t("pod_studio_design_button")}
+            <FaTshirt /> {t("pod_studio_start_designing_btn", "Design")}
           </StudioActionBtn>
         )}
       </Content>
     </CardWrapper>
   );
 };
+
+const IconRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
 export default PremiumProductCard;

@@ -302,7 +302,7 @@ const uploadAssetWithFallback = async (fileBlob) => {
 };
 
 const ShopPageWithUsername = () => {
-  const { username: routeUsername, ProductSku } = useParams();
+  const { username: routeUsername, ProductSku, DiscoveryGroup } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -649,6 +649,7 @@ const ShopPageWithUsername = () => {
           shop={selectedShop}
           selectedShopImage={selectedShopImage}
           initialSku={ProductSku}
+          initialGroup={DiscoveryGroup}
         />
       );
     }

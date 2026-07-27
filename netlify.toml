@@ -33,6 +33,15 @@
   function = "bot-proxy"
   path = "/deeplink/*"
 
+# 🔴 4. AURAS LAB Storefront & Product pages
+[[edge_functions]]
+  function = "bot-proxy"
+  path = "/aurasLab/*"
+
+[[edge_functions]]
+  function = "bot-proxy"
+  path = "/aurasLab"
+
 # --- ROUTING & HEADERS ---
 
 [[redirects]]

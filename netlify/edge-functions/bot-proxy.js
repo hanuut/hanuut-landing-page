@@ -3,12 +3,10 @@ export default async (request, context) => {
   const url = new URL(request.url);
   const path = url.pathname;
 
-  // 1. Bot Detection
-  const botPattern = /facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|slackbot|googlebot/i;
+  // 1. Bot Detection (Expanded to include major Search & AI crawler engines)
+  const botPattern = /facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|slackbot|googlebot|bingbot|applebot|duckduckbot|yandex|petalbot|gptbot|oai-searchbot|perplexitybot|claudebot|ccbot|amazonbot/i;
   const isBot = botPattern.test(userAgent);
   
-  // If the user is a human (iPhone, Android, Desktop browser), 
-  // bypass this proxy immediately and let the React app load!
   if (!isBot) {
     return context.next();
   }
@@ -16,28 +14,28 @@ export default async (request, context) => {
   const API_URL = "https://api.hanuut.com"; 
   let targetUrl = null;
 
-  // === 1. Short Shop Link (/@username) ===
   if (path.startsWith("/@")) {
-    // Split by '/' to handle sub-routes like /links
-    // path: "/@le_cheese_arris/links" -> parts: ["", "@le_cheese_arris", "links"]
     const parts = path.split("/"); 
-    const username = parts[1].substring(1); // Get "@le_cheese_arris", remove "@"
-    
-    // Always request the shop's share data, regardless of if they linked the menu or the bio links
+    const username = parts[1].substring(1); 
     targetUrl = `${API_URL}/shop/share/${encodeURIComponent(username)}`;
   }
-  // === 2. Long Shop Link (/shop/@username) ===
   else if (path.startsWith("/shop/") && path.includes("@")) {
     const parts = path.split("/shop/"); 
     const username = parts[1].replace(/\/$/, "");
     targetUrl = `${API_URL}/shop/share/${encodeURIComponent(username)}`;
   }
-  // === 3. Blog Posts ===
+  // === 🔴 NEW: AURAS LAB Storefront + SKU routing ===
+  else if (path === "/aurasLab" || path === "/aurasLab/") {
+    targetUrl = `${API_URL}/shop/share/aurasLab`;
+  }
+  else if (path.startsWith("/aurasLab/")) {
+    const sku = path.split("/aurasLab/")[1]?.replace(/\/$/, "");
+    if (sku) targetUrl = `${API_URL}/global-product/share-by-sku/${encodeURIComponent(sku)}`;
+  }
   else if (path.startsWith("/blog/")) {
     const slug = path.split("/blog/")[1];
     if (slug) targetUrl = `${API_URL}/feedback/share/${slug}`;
   }
-  // === 4. Deep Links ===
   else if (path.startsWith("/deeplink/")) {
     if (path.includes("/dish/")) {
       const dishId = path.split("/dish/")[1];

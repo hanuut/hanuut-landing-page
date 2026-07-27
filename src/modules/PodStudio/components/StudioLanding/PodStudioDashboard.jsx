@@ -16,12 +16,12 @@ import {
 } from "../../../Cart/state/reducers";
 import { partnerTheme } from "../../../../config/Themes";
 import { getImageUrl } from "../../../../utils/imageUtils";
-import { retrieveFile, garbageCollectKeys } from "../../utils/indexedDbHelper";
+import { retrieveFile } from "../../utils/indexedDbHelper";
 import DesignWorkspace from "../Workspace/DesignWorkspace";
 import CreationTray from "../CreationTray/CreationTray";
 import Cart from "../../../Partners/components/Cart";
 import OrderSuccessModal from "../../../Partners/components/OrderSuccessModal";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 
 import CanvasLibrary from "./CanvasLibrary";
 import LanguagesDropDown from "../../../../components/LanguagesDropDown";
@@ -32,20 +32,15 @@ import HeroSection from "../storefront/sections/HeroSection";
 import CreativePossibilities from "../storefront/sections/CreativePossibilities";
 import CTASection from "../storefront/sections/CTASection";
 
-// --- CURATED EDITORIAL SHOWCASE IMPORT ---
-import EditorialShowcase from "../storefront/sections/EditorialShowcase";
-
 import {
   fetchPaginatedProducts,
   selectProducts,
 } from "../../../Product/state/reducers";
-import { selectCategories } from "../../../Categories/state/reducers";
 import { productToCanvasAdapter } from "../../adapters/productToCanvasAdapter";
 import { fetchProductById } from "../../../Product/state/reducers";
 import Seo from "../../../../components/Seo";
 import { createGlobalOrder } from "../../../Partners/services/orderServices";
 import DiscoveryCarousel from "../storefront/sections/DiscoveryCarousel";
-
 
 const LayoutShell = styled.div`
   min-height: 100vh;
@@ -134,11 +129,6 @@ const HeaderCircleBtn = styled(Link)`
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-  }
 
   img {
     width: 22px;
@@ -318,7 +308,7 @@ const uploadAssetWithFallback = async (fileBlob) => {
   );
 };
 
-const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
+const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup }) => {
   const { i18n, t } = useTranslation();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -338,7 +328,6 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  // --- RECOVERY AUDIT: VERIFY NATIVE DIRECT FLOWS ---
   const isDirectEntry = useMemo(() => {
     return !location.state?.fromApp && !!initialSku;
   }, [location.state, initialSku]);
@@ -358,9 +347,8 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
   const shopLogoUrl = useMemo(
     () => getImageUrl(selectedShopImage),
     [selectedShopImage],
-  );
+  ); 
 
-  // Fetch product blanks inside the dashboard to display them on the Catalog
   useEffect(() => {
     const shopIdValue = shop?._id || shop?.id;
     if (shopIdValue && !selectedCanvas) {
@@ -378,11 +366,23 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
     }
   }, [dispatch, shop, selectedCanvas]);
 
+  // 🔴 DYNAMIC CATEGORY LANDING ROUTE INTERCEPTOR: Focuses and scrolls down to category on load
+  useEffect(() => {
+    if (initialGroup && !selectedCanvas) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById("canvas-library-anchor");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [initialGroup, selectedCanvas]);
+
   const rawProducts = useMemo(() => {
     return paginatedProducts || [];
   }, [paginatedProducts]);
 
-  // Resolve and open products automatically by Sku:
   useEffect(() => {
     if (initialSku && !selectedCanvas) {
       const matched = rawProducts.find(
@@ -394,7 +394,6 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
           setSelectedCanvas(canvasObj);
         }
       } else if (!paginationLoading && rawProducts.length > 0) {
-        // 🔴 FIXED: Prevent premature API triggers on direct load before memory catalog loads
         axios
           .get(`${process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com"}/global-product/slug/${initialSku}`)
           .then((res) => {
@@ -439,7 +438,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
   const handleInitiateProduction = () => {
     setIsTrayOpen(false);
     dispatch(openCart());
-  };
+  }; 
 
   const handleUpdateQuantity = (variantId, newQuantity) => {
     dispatch(updateCartQuantity({ variantId, quantity: newQuantity }));
@@ -563,7 +562,6 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
           podCustomization: item.podCustomization,
         })),
       };
-
       const response = await createGlobalOrder(orderPayload);
       const orderResult = response.data;
 
@@ -609,19 +607,47 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
       });
   };
 
-  // --- RECOVERY AUDIT: BACK BUTTON VISIBILITY CHECK ---
   const shouldShowBackButton = selectedCanvas && !(isDirectEntry && isMobile);
+
+  // 🔴 DYNAMIC REACTIVE PRODUCT-LEVEL SEO & META INJECTION
+  const productSeoData = useMemo(() => {
+    if (!selectedCanvas) return null;
+    const prices = selectedCanvas.sizes?.map((s) => s.baseCost).filter(Boolean) || [0];
+    const slug = selectedCanvas.sku || selectedCanvas.canvasId;
+    return {
+      title: `${selectedCanvas.title} | AURAS LAB`,
+      description: (selectedCanvas.blueprint || `Custom print-on-demand ${selectedCanvas.title}, made in Algeria.`).slice(0, 155),
+      url: `https://hanuut.com/aurasLab/${slug}`,
+      schema: {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        name: selectedCanvas.title,
+        brand: { "@type": "Brand", name: "AURAS LAB" },
+        description: selectedCanvas.blueprint || selectedCanvas.title,
+        image: selectedCanvas.availableColors?.[0]?.imageId
+          ? `https://api.hanuut.com/image/raw/${selectedCanvas.availableColors[0].imageId}`
+          : undefined,
+        offers: {
+          "@type": "AggregateOffer",
+          priceCurrency: "DZD",
+          lowPrice: Math.min(...prices),
+          highPrice: Math.max(...prices),
+          offerCount: prices.length,
+          availability: "https://schema.org/InStock",
+        },
+      },
+    };
+  }, [selectedCanvas]);
 
   return (
     <ThemeProvider theme={partnerTheme}>
       <Seo
-        title={shop.name || "AURAS LAB"}
-        description={
-          shop.description || "Print-On-Demand Custom Streetwear Laboratory"
-        }
-        url={`https://hanuut.com/@${shop.username}`}
-        image={shopLogoUrl}
-        shop={shop}
+        title={productSeoData?.title || shop.name || "AURAS LAB"}
+        description={productSeoData?.description || shop.description || "Print-On-Demand Custom Streetwear Laboratory"}
+        url={productSeoData?.url || `https://hanuut.com/@${shop.username}`}
+        image={productSeoData ? undefined : shopLogoUrl}
+        shop={productSeoData ? undefined : shop}
+        customSchema={productSeoData?.schema}
       />
 
       <LayoutShell dir={isArabic ? "rtl" : "ltr"} className="pod-storefront">
@@ -664,17 +690,14 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
             </HeaderLeft>
 
             <HeaderRight>
-              {/* Home Link */}
               <HeaderCircleBtn to="/" title={t("back_home", "Back to Home")}>
                 <img src="/logoPic.png" alt="Hanuut Home" />
               </HeaderCircleBtn>
 
-              {/* Language Switcher Wrapper */}
               <LangWrapper>
                 <LanguagesDropDown textColor="#ffffff" />
               </LangWrapper>
 
-              {/* Shopping Cart Pill */}
               {(shopCartItems.length > 0 || !selectedCanvas) && (
                 <FloatingCartPill onClick={() => setIsTrayOpen(true)}>
                   <FaShoppingCart />
@@ -715,24 +738,14 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
               />
 
               <DiscoveryCarousel
-                  products={rawProducts}
-                  onSelectCanvas={handleSelectCanvas}
-                />
-
-              {/* ========================================================== */}
-              {/* 🎨 CURATED ARTWORK & DESIGNER DISCOVERY SHOWCASE SECTION      */}
-              {/* ========================================================== */}
-              {/* not yet fully ready */}
-              {/* <EditorialShowcase
-                shopId={shop._id || shop.id}
-                onSelectDesign={handleSelectDesign}
-              /> */}
+                products={rawProducts}
+                onSelectCanvas={handleSelectCanvas}
+              />
 
               <div
                 id="canvas-library-anchor"
                 style={{ scrollMarginTop: "100px" }}
               >
-                {/* Notice we pass the exact old props back into the exact old component layout */}
                 <CanvasLibrary
                   shopId={shop._id || shop.id}
                   onSelectCanvas={handleSelectCanvas}
@@ -781,7 +794,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
               orderData={orderSuccessData}
               onClose={handleClearSuccess}
             />
-          )}
+          )} 
         </AnimatePresence>
       </LayoutShell>
     </ThemeProvider>
@@ -791,6 +804,8 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku }) => {
 PodStudioDashboard.propTypes = {
   shop: PropTypes.object.isRequired,
   selectedShopImage: PropTypes.object,
+  initialSku: PropTypes.string,
+  initialGroup: PropTypes.string,
 };
 
 export default PodStudioDashboard;
