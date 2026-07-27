@@ -2,20 +2,15 @@ import React, { useMemo, useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation, Pagination, Keyboard } from "swiper/modules";
+import { Autoplay, Keyboard, Pagination } from "swiper/modules";
 import {
-  FaChevronLeft,
-  FaChevronRight,
-  FaMagic,
   FaArrowRight,
   FaArrowLeft,
-  FaShoppingBag,
 } from "react-icons/fa";
 
 import "swiper/css";
-import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 import { getImage } from "../../../../Images/services/imageServices";
@@ -27,7 +22,7 @@ import { getImageUrl } from "../../../../../utils/imageUtils";
 
 const GROUP_CONFIGS = {
   fashion: {
-    badge: "01 / FASHION",
+    emoji: "👔",
     titleKey: "discovery_fashion_title",
     defaultTitle: "Wear What Only You Can Imagine.",
     titleAr: "ارتدِ ما لا يستطيع غيرك تخيله.",
@@ -43,7 +38,7 @@ const GROUP_CONFIGS = {
       "radial-gradient(circle at 75% 35%, rgba(240, 122, 72, 0.22) 0%, transparent 65%)",
   },
   accessories: {
-    badge: "02 / ACCESSORIES",
+    emoji: "👜",
     titleKey: "discovery_accessories_title",
     defaultTitle: "Carry Your Ideas Everywhere.",
     titleAr: "احمل أفكارك في كل مكان.",
@@ -59,7 +54,7 @@ const GROUP_CONFIGS = {
       "radial-gradient(circle at 75% 35%, rgba(57, 127, 249, 0.22) 0%, transparent 65%)",
   },
   sports: {
-    badge: "03 / PERFORMANCE & SPORTS",
+    emoji: "🎽",
     titleKey: "discovery_sports_title",
     defaultTitle: "Train In Your Own Identity.",
     titleAr: "تدرّب بهويتك الخاصة.",
@@ -74,13 +69,29 @@ const GROUP_CONFIGS = {
     bgGradient:
       "radial-gradient(circle at 75% 35%, rgba(57, 161, 112, 0.22) 0%, transparent 65%)",
   },
+  kids: {
+    emoji: "🧸",
+    titleKey: "discovery_kids_title",
+    defaultTitle: "Bespoke Apparel Built For Play.",
+    titleAr: "ملابس مخصصة للعب والمرح.",
+    descKey: "discovery_kids_desc",
+    defaultDesc:
+      "Soft organic cotton and durable playwear tailored for active little creators.",
+    descAr: "ملابس قطنية ناعمة ومتينة مصممة خصيصاً للمبدعين الصغار النشطين.",
+    ctaKey: "discovery_kids_cta",
+    defaultCta: "Design Kids Collection",
+    ctaAr: "صمّم تشكيلة الأطفال",
+    accentColor: "#EC4899",
+    bgGradient:
+      "radial-gradient(circle at 75% 35%, rgba(236, 72, 153, 0.22) 0%, transparent 65%)",
+  },
 };
 
 const getGroupConfig = (groupKey, index, t, isArabic) => {
   if (GROUP_CONFIGS[groupKey]) {
     const cfg = GROUP_CONFIGS[groupKey];
     return {
-      badge: cfg.badge,
+      emoji: cfg.emoji,
       title: t(cfg.titleKey, isArabic ? cfg.titleAr : cfg.defaultTitle),
       desc: t(cfg.descKey, isArabic ? cfg.descAr : cfg.defaultDesc),
       cta: t(cfg.ctaKey, isArabic ? cfg.ctaAr : cfg.defaultCta),
@@ -89,13 +100,12 @@ const getGroupConfig = (groupKey, index, t, isArabic) => {
     };
   }
 
-  const numStr = String(index + 1).padStart(2, "0");
   const formattedName = groupKey.toUpperCase();
   return {
-    badge: `${numStr} / ${formattedName}`,
+    emoji: "👕",
     title: isArabic
       ? `صمّم منتجات ${groupKey}`
-      : `Create Your Own ${groupKey.charAt(0).toUpperCase() + groupKey.slice(1)}.`,
+      : `Create Your Own ${formattedName}.`,
     desc: isArabic
       ? `استكشف الخامات المتاحة لـ ${groupKey} وأضف لمستك الفنية.`
       : `Explore specialized ${groupKey} blanks and customize with your artwork.`,
@@ -107,66 +117,95 @@ const getGroupConfig = (groupKey, index, t, isArabic) => {
 };
 
 // ============================================================================
-// STYLED COMPONENTS
+// STYLED COMPONENTS - NIKE x APPLE SYSTEM COHESION
 // ============================================================================
 
 const CarouselSection = styled.section`
   width: 100%;
+  height: calc(100vh - 80px);
+  min-height: 600px;
   position: relative;
   background-color: #050505;
   overflow: hidden;
-  padding: 1rem 0 3rem 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+  /* Subtle Blueprint Grid overlay */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: center center;
+    z-index: 1;
+    pointer-events: none;
+  }
 
   .swiper {
     width: 100%;
-    padding-bottom: 4rem;
+    height: 100%;
   }
 
+  .swiper-pagination {
+    bottom: 25px !important;
+  }
+
+  /* Interactive Growing Bullets on Hover */
   .swiper-pagination-bullet {
     background: rgba(255, 255, 255, 0.25);
     opacity: 1;
-    width: 10px;
-    height: 10px;
-    transition: all 0.3s ease;
+    width: 12px;
+    height: 6px;
+    border-radius: 3px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .swiper-pagination-bullet:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(1.3);
   }
 
   .swiper-pagination-bullet-active {
     background: #f07a48;
-    width: 32px;
-    border-radius: 6px;
+    width: 36px;
   }
 `;
 
 const SlideLayout = styled.div`
-  width: 90%;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  min-height: 75vh;
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 3rem;
-  align-items: center;
+  padding: 0 2rem;
+  box-sizing: border-box;
   position: relative;
   z-index: 2;
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    min-height: auto;
-    gap: 2.5rem;
-    padding: 2rem 0;
+    grid-template-rows: auto auto;
+    gap: 2rem;
+    padding-top: 4rem;
+    justify-content: center;
   }
 `;
 
-const TextCol = styled.div`
+const TextColumn = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   gap: 1.5rem;
   text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+  z-index: 5;
 
   @media (max-width: 900px) {
     align-items: center;
@@ -174,72 +213,64 @@ const TextCol = styled.div`
   }
 `;
 
-const Badge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0.4rem 1.2rem;
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid ${(props) => props.$color || "#F07A48"}60;
-  color: ${(props) => props.$color || "#F07A48"};
-  font-size: 0.8rem;
-  font-weight: 800;
-  font-family: monospace;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+const GroupEmoji = styled.div`
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 0 12px ${(props) => props.$color}50);
 `;
 
-const Title = styled.h2`
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
+const EditorialTitle = styled.h2`
+  font-size: clamp(2.4rem, 5vw, 4rem);
   font-weight: 900;
   color: #ffffff;
-  line-height: 1.15;
+  line-height: 1.1;
   margin: 0;
   font-family: "Tajawal", sans-serif;
-  letter-spacing: -0.5px;
+  letter-spacing: -1px;
+
+  span {
+    color: ${(props) => props.$color || "#F07A48"};
+    text-shadow: 0 0 40px ${(props) => props.$color || "#F07A48"}30;
+  }
 `;
 
-const Description = styled.p`
+const EditorialDescription = styled.p`
   font-size: 1.1rem;
   color: #a1a1aa;
   line-height: 1.6;
   font-family: "Cairo", sans-serif;
-  max-width: 540px;
+  max-width: 500px;
   margin: 0;
 `;
 
-const BannerCTAButton = styled(motion.button)`
+const PrimaryCTAButton = styled(motion.button)`
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 1.1rem 2.5rem;
+  padding: 1.1rem 2.6rem;
   border-radius: 50px;
   background: ${(props) => props.$color || "#F07A48"};
   color: #050505;
   border: none;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 800;
   font-family: "Tajawal", sans-serif;
   cursor: pointer;
-  box-shadow: 0 12px 30px ${(props) => props.$color || "#F07A48"}40;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 30px ${(props) => props.$color || "#F07A48"}30;
 
   &:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 18px 40px ${(props) => props.$color || "#F07A48"}60;
-    filter: brightness(1.1);
-  }
-
-  svg {
-    font-size: 1.1rem;
+    filter: brightness(1.15);
   }
 `;
 
-const ArtCol = styled.div`
+// ============================================================================
+// ASYMMETRIC VISUAL COMPOSITIONS (Slide-Specific Art Structures)
+// ============================================================================
+
+const ArtStage = styled.div`
   position: relative;
   width: 100%;
-  height: 420px;
+  height: 480px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -249,134 +280,386 @@ const ArtCol = styled.div`
   }
 `;
 
-const SlideBackgroundGlow = styled.div`
+const AmbientGlow = styled.div`
   position: absolute;
-  inset: -20%;
+  inset: -15%;
   background: ${(props) => props.$gradient};
   pointer-events: none;
   z-index: 0;
-  filter: blur(50px);
-  opacity: 0.8;
+  filter: blur(60px);
+  opacity: 0.65;
 `;
 
-const ArtCardWrapper = styled(motion.div)`
+// Slide 1 Layout: Overlapping Asymmetric Fan (Fashion)
+const StaggeredStackCard = styled(motion.div)`
   position: absolute;
-  width: 210px;
-  background: rgba(18, 18, 20, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 1rem;
+  width: 190px;
+  height: 250px;
+  background: rgba(18, 18, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 1.25rem;
+  box-sizing: border-box;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  cursor: pointer;
-  z-index: ${(props) => props.$zIndex};
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-  transition: border-color 0.3s ease;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
-  &:hover {
-    border-color: ${(props) => props.$accentColor || "#F07A48"};
+  img {
+    width: 100%;
+    height: 75%;
+    object-fit: contain;
+    filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.6));
+  }
+
+  .meta {
+    text-align: center;
+    .name { font-size: 0.85rem; font-weight: 800; color: white; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .price { font-size: 0.8rem; font-family: monospace; color: ${(props) => props.$color}; font-weight: 700; margin-top: 2px; display: block; }
   }
 
   @media (max-width: 768px) {
-    width: 160px;
-    padding: 0.75rem;
+    width: 140px;
+    height: 180px;
   }
 `;
 
-const ArtImageStage = styled.div`
-  width: 100%;
-  height: 170px;
+// Slide 2 Layout: Dense Layered Overlapping Stack (Accessories)
+const DenseLayeredStackCard = styled(motion.div)`
+  position: absolute;
+  width: 185px;
+  height: 240px;
+  background: rgba(22, 22, 25, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  position: relative;
+  justify-content: space-between;
+  padding: 1.25rem;
+  box-sizing: border-box;
+  box-shadow: 0 30px 55px rgba(0, 0, 0, 0.7);
 
   img {
     max-width: 90%;
-    max-height: 90%;
+    max-height: 75%;
     object-fit: contain;
-    filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.55));
+  }
+
+  .meta {
+    text-align: center;
+    .name { font-size: 0.85rem; font-weight: 800; color: white; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .price { font-size: 0.8rem; font-family: monospace; color: #397FF9; font-weight: 700; display: block; margin-top: 2px; }
   }
 
   @media (max-width: 768px) {
-    height: 120px;
+    width: 135px;
+    height: 175px;
   }
 `;
 
-const ArtInfoOverlay = styled.div`
+// Slide 3 Layout: Glassmorphic Blueprint Matrix (Sports)
+const IsometricStage = styled.div`
+  position: relative;
+  width: 340px;
+  height: 340px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1.5px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.02);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(57, 161, 112, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(57, 161, 112, 0.08) 1px, transparent 1px);
+    background-size: 20px 20px;
+    border-radius: 24px;
+  }
+
+  @media (max-width: 768px) {
+    width: 250px;
+    height: 250px;
+  }
+`;
+
+const IsoApparelCard = styled(motion.div)`
+  position: absolute;
+  width: 175px;
+  height: 220px;
+  background: rgba(18, 18, 20, 0.9);
+  border: 1.5px solid rgba(57, 161, 112, 0.3);
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-top: 0.5rem;
-  text-align: center;
+  justify-content: space-between;
+  padding: 1rem;
+  box-sizing: border-box;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.75);
 
-  .prod-name {
-    font-size: 0.85rem;
+  img {
+    max-width: 90%;
+    max-height: 75%;
+    object-fit: contain;
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6));
+  }
+
+  .meta {
+    text-align: center;
+    .name { font-size: 0.8rem; font-weight: 800; color: white; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .price { font-size: 0.75rem; font-family: monospace; color: #39A170; font-weight: 700; display: block; margin-top: 2px; }
+  }
+
+  @media (max-width: 768px) {
+    width: 130px;
+    height: 165px;
+  }
+`;
+
+const XboxTextColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+  z-index: 5;
+`;
+
+const XboxActionRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+`;
+
+const MutedSecondaryLink = styled.button`
+  background: transparent;
+  border: none;
+  color: #a1a1aa;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: "Tajawal", sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #f07a48;
+  }
+`;
+
+const PlayStationTextCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.5rem;
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+  z-index: 5;
+
+  @media (max-width: 900px) {
+    align-items: center;
+    text-align: center;
+  }
+`;
+
+const NintendoTextCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.5rem;
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+  z-index: 5;
+
+  @media (max-width: 900px) {
+    align-items: center;
+    text-align: center;
+  }
+`;
+
+const CloseButton = styled.button`
+  background: transparent;
+  border: none;
+  color: #a1a1aa;
+  font-size: 1.5rem;
+  cursor: pointer;
+  &:hover {
+    color: white;
+  }
+`;
+
+const ArtCol = styled.div`
+  position: relative;
+  width: 100%;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: 900px) {
+    height: 320px;
+  }
+`;
+
+// ============================================================================
+// DYNAMIC GRID OVERLAY SELECTION MODAL
+// ============================================================================
+
+const GridOverlayBackdrop = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 5, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
+const GridModalCard = styled(motion.div)`
+  width: 100%;
+  max-width: 1100px;
+  background: #111214;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 2rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: 90vh;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+  color: white;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+
+  @media (max-width: 768px) {
+    padding: 1.25rem;
+  }
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.75rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.45rem;
     font-weight: 800;
-    color: #ffffff;
+    font-family: "Tajawal", sans-serif;
+  }
+`;
+
+const VerticalScrollGrid = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+`;
+
+const OptionProductCard = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: ${(props) => props.$color};
+    background: rgba(255, 255, 255, 0.04);
+  }
+`;
+
+const CardImageStage = styled.div`
+  width: 100%;
+  aspect-ratio: 1;
+  background: #0c0c0e;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  box-sizing: border-box;
+
+  img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.5));
+  }
+`;
+
+const CardDetailsRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: start;
+  gap: 4px;
+
+  .name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: white;
     font-family: "Tajawal", sans-serif;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    width: 100%;
   }
 
-  .prod-price {
-    font-size: 0.8rem;
-    font-weight: 700;
+  .price {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: ${(props) => props.$color};
     font-family: monospace;
   }
 `;
 
-const NavControlBtn = styled.button`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(24, 24, 27, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: #f07a48;
-    color: #f07a48;
-    transform: translateY(-50%) scale(1.08);
-  }
-
-  &.discovery-prev-btn {
-    left: 1.5rem;
-  }
-  &.discovery-next-btn {
-    right: 1.5rem;
-  }
-
-  @media (max-width: 768px) {
-    width: 38px;
-    height: 38px;
-    &.discovery-prev-btn {
-      left: 0.5rem;
-    }
-    &.discovery-next-btn {
-      right: 0.5rem;
-    }
-  }
-`;
-
 // ============================================================================
-// ARTISTIC PRODUCT COMPOSITION ELEMENT
+// ASYMMETRIC FLOATING PRODUCT COMPONENT (RESOLVES BUFFER ASYNC)
 // ============================================================================
 
-const ProductArtElement = ({ product, index, onSelect, accentColor }) => {
+const ResolvedFloatingProduct = ({ product, index, config, layoutType }) => {
   const [imgUrl, setImgUrl] = useState(null);
 
   useEffect(() => {
@@ -407,59 +690,106 @@ const ProductArtElement = ({ product, index, onSelect, accentColor }) => {
     };
   }, [product]);
 
-  // Spatial layout transforms for 3D layered floating artwork
-  const transforms = [
-    { scale: 1.05, rotate: 0, x: 0, y: -10, zIndex: 3 },
-    { scale: 0.88, rotate: -8, x: -65, y: 25, zIndex: 2 },
-    { scale: 0.88, rotate: 8, x: 65, y: 20, zIndex: 2 },
-    { scale: 0.75, rotate: -14, x: -110, y: 55, zIndex: 1 },
-  ];
-
-  const styleConfig = transforms[index % transforms.length];
-
   const price =
-    product.availabilities?.[0]?.sizes?.[0]?.sellingPrice ||
-    product.sellingPrice ||
+    product?.availabilities?.[0]?.sizes?.[0]?.sellingPrice ||
+    product?.sellingPrice ||
     0;
 
+  if (layoutType === "xbox") {
+    const offsets = [
+      { rotate: -8, x: -90, y: 15, zIndex: 1 },
+      { rotate: 4, x: 10, y: -25, zIndex: 3 },
+      { rotate: -12, x: 95, y: 35, zIndex: 1 },
+    ];
+    const transf = offsets[index % offsets.length];
+
+    return (
+      <StaggeredStackCard
+        $color={config.accentColor}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          x: transf.x,
+          y: [transf.y, transf.y - 12, transf.y],
+          rotate: transf.rotate,
+          zIndex: transf.zIndex,
+        }}
+        transition={{
+          y: { repeat: Infinity, duration: 4.5 + index, ease: "easeInOut" },
+          opacity: { duration: 0.6 },
+        }}
+      >
+        {imgUrl ? <img src={imgUrl} alt="" /> : <span style={{ fontSize: "2rem" }}>👕</span>}
+        <div className="meta">
+          <span className="name">{product.name}</span>
+          <span className="price">{price} DA</span>
+        </div>
+      </StaggeredStackCard>
+    );
+  }
+
+  if (layoutType === "playstation") {
+    const offsets = [
+      { rotate: -10, x: -85, y: 25, zIndex: 1 },
+      { rotate: 6, x: 15, y: -15, zIndex: 3 },
+      { rotate: -14, x: 100, y: 45, zIndex: 2 },
+    ];
+    const transf = offsets[index % offsets.length];
+
+    return (
+      <DenseLayeredStackCard
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          x: transf.x,
+          y: [transf.y, transf.y - 12, transf.y],
+          rotate: transf.rotate,
+          zIndex: transf.zIndex,
+        }}
+        transition={{
+          y: { repeat: Infinity, duration: 4.5 + index, ease: "easeInOut" },
+          opacity: { duration: 0.5 },
+        }}
+      >
+        {imgUrl ? <img src={imgUrl} alt="" /> : <span style={{ fontSize: "2rem" }}>👜</span>}
+        <div className="meta">
+          <span className="name">{product.name}</span>
+          <span className="price">{price} DA</span>
+        </div>
+      </DenseLayeredStackCard>
+    );
+  }
+
+  const offsets = [
+    { rotate: -12, x: -75, y: -20, zIndex: 2 },
+    { rotate: 8, x: 65, y: 35, zIndex: 3 },
+  ];
+  const transf = offsets[index % offsets.length];
+
   return (
-    <ArtCardWrapper
-      onClick={() => onSelect(product)}
-      initial={{ opacity: 0, y: 30 }}
+    <IsoApparelCard
+      initial={{ opacity: 0, y: 50 }}
       animate={{
         opacity: 1,
-        y: [styleConfig.y, styleConfig.y - 8, styleConfig.y],
-        scale: styleConfig.scale,
-        rotate: styleConfig.rotate,
+        scale: 1,
+        x: transf.x,
+        y: [transf.y, transf.y - 15, transf.y],
+        rotate: transf.rotate,
+        zIndex: transf.zIndex,
       }}
       transition={{
-        y: { repeat: Infinity, duration: 4 + index, ease: "easeInOut" },
+        y: { repeat: Infinity, duration: 4.8 + index, ease: "easeInOut" },
         opacity: { duration: 0.6 },
       }}
-      whileHover={{
-        scale: styleConfig.scale * 1.08,
-        rotate: 0,
-        zIndex: 10,
-        boxShadow: `0 20px 40px rgba(0,0,0,0.6), 0 0 25px ${accentColor}40`,
-      }}
-      $zIndex={styleConfig.zIndex}
-      style={{ left: `calc(50% + ${styleConfig.x}px - 105px)` }}
-      $accentColor={accentColor}
     >
-      <ArtImageStage>
-        {imgUrl ? (
-          <img src={imgUrl} alt={product.name} loading="lazy" />
-        ) : (
-          <div style={{ fontSize: "3.5rem" }}>👕</div>
-        )}
-      </ArtImageStage>
-      <ArtInfoOverlay>
-        <span className="prod-name">{product.name}</span>
-        <span className="prod-price" style={{ color: accentColor }}>
-          {price} DA
-        </span>
-      </ArtInfoOverlay>
-    </ArtCardWrapper>
+      {imgUrl ? <img src={imgUrl} alt="" /> : <span style={{ fontSize: "3rem" }}>🎽</span>}
+      <div className="meta">
+        <span className="name">{product.name}</span>
+        <span className="price">{price} DA</span>
+      </div>
+    </IsoApparelCard>
   );
 };
 
@@ -470,20 +800,17 @@ const ProductArtElement = ({ product, index, onSelect, accentColor }) => {
 const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
 
-  // Group products dynamically by product.discoveryGroup or product.categoryLanding
+  const [activeOverlayGroup, setActiveOverlayGroup] = useState(null);
+
   const groupedProducts = useMemo(() => {
     if (!products || products.length === 0) return {};
 
     const groups = {};
 
     products.forEach((product) => {
-      // 1. Explicit backend attribute check
       let groupKey = product.discoveryGroup || product.categoryLanding;
 
-      // 2. Fallback heuristic if attribute is not set on legacy products
       if (!groupKey) {
         const normName = String(product.name || "").toLowerCase();
         const normCat = String(
@@ -525,73 +852,189 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
     return groups;
   }, [products]);
 
+  // 🔴 DYNAMICALLY REGISTER 'kids' IF AN ITEM BELONGS TO IT IN THE DATABASE
   const groupKeys = useMemo(() => {
-    const keys = Object.keys(groupedProducts);
-    return keys.length > 0 ? keys : ["fashion", "accessories", "sports"];
-  }, [groupedProducts]);
+    const keys = ["fashion", "accessories", "sports"];
+    const hasKids = products.some(
+      (p) =>
+        String(p.discoveryGroup || p.categoryLanding || "").toLowerCase() === "kids"
+    );
+    if (hasKids) {
+      keys.push("kids");
+    }
+    return keys;
+  }, [products]);
 
-  const handleCtaClick = (groupKey, items) => {
-    if (items && items.length > 0 && onSelectCanvas) {
-      onSelectCanvas(items[0]);
-    } else {
-      const el = document.getElementById("canvas-library-anchor");
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  const getLayoutTypeByIndex = (index) => {
+    const remainder = index % 4; // Mapped dynamically up to 4 groups
+    if (remainder === 0) return "xbox";
+    if (remainder === 1) return "playstation";
+    if (remainder === 2) return "nintendo";
+    return "playstation"; // Kids slide adopts beautiful playstation fanned orbits
+  };
+
+  const handleSecondaryCtaClick = () => {
+    const el = document.getElementById("canvas-library-anchor");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
   return (
     <CarouselSection>
       <Swiper
-        modules={[Autoplay, Navigation, Pagination, Keyboard]}
+        modules={[Autoplay, Keyboard, Pagination]}
         loop={true}
         autoplay={{
-          delay: 6000,
+          delay: 7000,
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
         keyboard={{ enabled: true }}
         pagination={{ clickable: true }}
-        navigation={{
-          prevEl: ".discovery-prev-btn",
-          nextEl: ".discovery-next-btn",
-        }}
-        speed={700}
+        speed={800}
         slidesPerView={1}
       >
         {groupKeys.map((groupKey, index) => {
           const config = getGroupConfig(groupKey, index, t, isArabic);
-          const items = groupedProducts[groupKey] || [];
+          const rawItems = groupedProducts[groupKey] || [];
+          const items = rawItems.length > 0 ? rawItems : products; 
 
+          const layoutType = getLayoutTypeByIndex(index);
+
+          // Render Slide 1: Xbox Style Layout (Fashion)
+          if (layoutType === "xbox") {
+            return (
+              <SwiperSlide key={groupKey}>
+                <SlideLayout $isArabic={isArabic}>
+                  <AmbientGlow $gradient={config.bgGradient} />
+                  <XboxTextColumn $isArabic={isArabic}>
+                    <GroupEmoji $color={config.accentColor}>
+                      {config.emoji}
+                    </GroupEmoji>
+                    <EditorialTitle $color={config.accentColor}>
+                      {config.title}
+                    </EditorialTitle>
+                    <EditorialDescription>{config.desc}</EditorialDescription>
+
+                    <XboxActionRow>
+                      <PrimaryCTAButton
+                        type="button"
+                        $color={config.accentColor}
+                        onClick={() => setActiveOverlayGroup(groupKey)}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <span>{config.cta}</span>
+                        {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+                      </PrimaryCTAButton>
+
+                      <MutedSecondaryLink
+                        type="button"
+                        onClick={handleSecondaryCtaClick}
+                      >
+                        <span>{isArabic ? "تصفح الكل ➔" : "SHOP BLANKS ➔"}</span>
+                      </MutedSecondaryLink>
+                    </XboxActionRow>
+                  </XboxTextColumn>
+
+                  <ArtCol>
+                    {items.slice(0, 3).map((prod, pIdx) => (
+                      <ResolvedFloatingProduct
+                        key={prod._id || prod.id}
+                        product={prod}
+                        index={pIdx}
+                        config={config}
+                        layoutType="xbox"
+                      />
+                    ))}
+                  </ArtCol>
+                </SlideLayout>
+              </SwiperSlide>
+            );
+          }
+
+          // Render Slide 2 & Slide 4: PlayStation Style Layout (Accessories & Kids)
+          if (layoutType === "playstation") {
+            return (
+              <SwiperSlide key={groupKey}>
+                <SlideLayout $isArabic={isArabic}>
+                  <AmbientGlow $gradient={config.bgGradient} />
+                  
+                  <PlayStationTextCol $isArabic={isArabic}>
+                    <GroupEmoji $color={config.accentColor}>
+                      {config.emoji}
+                    </GroupEmoji>
+                    <EditorialTitle $color={config.accentColor}>
+                      {config.title}
+                    </EditorialTitle>
+                    <EditorialDescription>{config.desc}</EditorialDescription>
+
+                    <PrimaryCTAButton
+                      type="button"
+                      $color={config.accentColor}
+                      onClick={() => setActiveOverlayGroup(groupKey)}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.98 }}
+                      style={{ marginTop: "0.5rem" }}
+                    >
+                      <span>{config.cta}</span>
+                      {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+                    </PrimaryCTAButton>
+                  </PlayStationTextCol>
+
+                  <ArtCol>
+                    {items.slice(0, 3).map((prod, pIdx) => (
+                      <ResolvedFloatingProduct
+                        key={prod._id || prod.id}
+                        product={prod}
+                        index={pIdx}
+                        config={config}
+                        layoutType="playstation"
+                      />
+                    ))}
+                  </ArtCol>
+                </SlideLayout>
+              </SwiperSlide>
+            );
+          }
+
+          // Render Slide 3: Nintendo Style Layout (Sports)
           return (
             <SwiperSlide key={groupKey}>
               <SlideLayout $isArabic={isArabic}>
-                <SlideBackgroundGlow $gradient={config.bgGradient} />
+                <AmbientGlow $gradient={config.bgGradient} />
+                
+                <NintendoTextCol $isArabic={isArabic}>
+                  <GroupEmoji $color={config.accentColor}>
+                    {config.emoji}
+                  </GroupEmoji>
+                  <EditorialTitle $color={config.accentColor}>
+                    {config.title}
+                  </EditorialTitle>
+                  <EditorialDescription>{config.desc}</EditorialDescription>
 
-                <TextCol $isArabic={isArabic}>
-                  <Badge $color={config.accentColor}>{config.badge}</Badge>
-                  <Title $color={config.accentColor}>{config.title}</Title>
-                  <Description>{config.desc}</Description>
-
-                  <BannerCTAButton
+                  <PrimaryCTAButton
                     type="button"
                     $color={config.accentColor}
-                    onClick={() => handleCtaClick(groupKey, items)}
+                    onClick={() => setActiveOverlayGroup(groupKey)}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
+                    style={{ marginTop: "0.5rem" }}
                   >
                     <span>{config.cta}</span>
                     {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
-                  </BannerCTAButton>
-                </TextCol>
+                  </PrimaryCTAButton>
+                </NintendoTextCol>
 
                 <ArtCol>
-                  {items.slice(0, 3).map((prod, pIdx) => (
-                    <ProductArtElement
-                      key={prod._id || prod.id || pIdx}
+                  {items.slice(0, 2).map((prod, pIdx) => (
+                    <ResolvedFloatingProduct
+                      key={prod._id || prod.id}
                       product={prod}
                       index={pIdx}
-                      onSelect={onSelectCanvas}
-                      accentColor={config.accentColor}
+                      config={config}
+                      layoutType="nintendo"
                     />
                   ))}
                 </ArtCol>
@@ -601,14 +1044,112 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
         })}
       </Swiper>
 
-      {/* Floating Navigation Controls */}
-      <NavControlBtn className="discovery-prev-btn" ref={prevRef}>
-        {isArabic ? <FaChevronRight /> : <FaChevronLeft />}
-      </NavControlBtn>
-      <NavControlBtn className="discovery-next-btn" ref={nextRef}>
-        {isArabic ? <FaChevronLeft /> : <FaChevronRight />}
-      </NavControlBtn>
+      {/* 4xN VERTICAL SELECTION GRID OVERLAY */}
+      <AnimatePresence>
+        {activeOverlayGroup && (
+          <GridOverlayBackdrop
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActiveOverlayGroup(null)}
+          >
+            <GridModalCard
+              $isArabic={isArabic}
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.95, y: 30 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 30 }}
+            >
+              <ModalHeader>
+                <h3>
+                  {isArabic
+                    ? `تصفح خامات: ${activeOverlayGroup.toUpperCase()}`
+                    : `Browse Blanks: ${activeOverlayGroup.toUpperCase()}`}
+                </h3>
+                <CloseButton onClick={() => setActiveOverlayGroup(null)}>
+                  &times;
+                </CloseButton>
+              </ModalHeader>
+
+              <VerticalScrollGrid>
+                {/* Fail-safe grid population to prevent empty scroll results */}
+                {((groupedProducts[activeOverlayGroup] || []).length > 0 ? (groupedProducts[activeOverlayGroup] || []) : products).map((product, pIdx) => {
+                  const themeColor = getGroupConfig(
+                    activeOverlayGroup,
+                    groupKeys.indexOf(activeOverlayGroup),
+                    t,
+                    isArabic
+                  ).accentColor;
+
+                  return (
+                    <OptionGridCard
+                      key={product._id || product.id}
+                      product={product}
+                      color={themeColor}
+                      onSelect={() => {
+                        setActiveOverlayGroup(null);
+                        onSelectCanvas(product);
+                      }}
+                    />
+                  );
+                })}
+              </VerticalScrollGrid>
+            </GridModalCard>
+          </GridOverlayBackdrop>
+        )}
+      </AnimatePresence>
     </CarouselSection>
+  );
+};
+
+const OptionGridCard = ({ product, color, onSelect }) => {
+  const [imgUrl, setImgUrl] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const imgId =
+      product?.previewImages?.[0] ||
+      product?.availabilities?.[0]?.imageId ||
+      product?.imageId;
+
+    if (imgId) {
+      if (
+        typeof imgId === "string" &&
+        (imgId.startsWith("http") || imgId.startsWith("data:"))
+      ) {
+        setImgUrl(imgId);
+      } else {
+        getImage(imgId).then((res) => {
+          if (isMounted && res.data) {
+            setImgUrl(getImageUrl(res.data));
+          }
+        });
+      }
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [product]);
+
+  const price =
+    product.availabilities?.[0]?.sizes?.[0]?.sellingPrice ||
+    product.sellingPrice ||
+    0;
+
+  return (
+    <OptionProductCard
+      $color={color}
+      onClick={onSelect}
+      whileHover={{ scale: 1.02, y: -4 }}
+    >
+      <CardImageStage>
+        {imgUrl ? <img src={imgUrl} alt="" /> : <span style={{ fontSize: "2rem" }}>👕</span>}
+      </CardImageStage>
+      <CardDetailsRow $color={color}>
+        <span className="name">{product.name}</span>
+        <span className="price">{price} DA</span>
+      </CardDetailsRow>
+    </OptionProductCard>
   );
 };
 

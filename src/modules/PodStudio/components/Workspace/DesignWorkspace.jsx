@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import PropTypes from "prop-types";
 import styled, { createGlobalStyle } from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -11,6 +11,7 @@ import {
   FaSyncAlt,
   FaShoppingCart,
   FaEye,
+  FaEyeSlash,
 } from "react-icons/fa";
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
@@ -67,6 +68,8 @@ const MobileStageWrapper = styled.div`
     flex-shrink: 0;
     padding: 4px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
   }
 `;
 
@@ -280,24 +283,58 @@ const MobileFloatingPurchaseCTA = styled(motion.button)`
   }
 `;
 
-const EyeIconButton = styled.button`
-  background: transparent;
-  border: none;
-  color: #fff;
+// 🔴 THE NEW SLIDE-TO-LOCK PREVIEW INTERACTIVE SWITCH
+const SwitchTrack = styled.div`
+  width: 66px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 15px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  box-sizing: border-box;
   cursor: pointer;
-  display: inline-flex;
+  pointer-events: auto !important;
+`;
+
+const SwitchThumb = styled(motion.div)`
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: ${(props) => props.$active ? "#39A170" : props.theme.primaryColor || "#F07A48"};
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
-  border-radius: 50%;
-  transition: background 0.2s, transform 0.1s;
-  pointer-events: auto !important; /* Ensure always clickable even at 2% parent opacity */
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-  }
+  color: #050505;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  cursor: grab;
   &:active {
-    transform: scale(0.9);
+    cursor: grabbing;
+  }
+`;
+
+const SubStageCTA = styled(motion.button)`
+  display: none;
+  @media (max-width: 768px) {
+    display: flex;
+    width: calc(100% - 24px);
+    margin: 10px auto;
+    height: 44px;
+    background: ${(props) => props.theme.primaryColor || "#F07A48"};
+    color: #050505;
+    border: none;
+    border-radius: 22px;
+    font-weight: 800;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 6px 20px rgba(240, 122, 72, 0.35);
+    font-family: "Tajawal", sans-serif;
+    z-index: 1002;
+    cursor: pointer;
   }
 `;
 
@@ -316,6 +353,10 @@ const getDisplayColorHex = (colorName) => {
   const normalized = String(colorName || "").trim().toLowerCase();
   return COLOR_MAP[normalized] || "#27272a";
 };
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 
 const DesignWorkspace = ({
   canvas,
@@ -344,8 +385,9 @@ const DesignWorkspace = ({
   const [showSolidBg, setShowSolidBg] = useState(false);
   const [solidBgColor, setSolidBgColor] = useState("#FFFFFF");
 
-  // DYNAMIC OPACITY STATE FOR THE LIGHTWEIGHT OVERLAY PREVIEW MODE
+  // MOBILE ACCURATE 10% OPACITY & LOCK-STATE SWITCH VARIABLES
   const [uiOpacity, setUiOpacity] = useState(1);
+  const [isLockedToZero, setIsLockedToZero] = useState(false);
 
   const [frontDesign, setFrontDesign, undoFront, redoFront, canUndoFront, canRedoFront, resetFront] =
     useDesignHistory({ file: null, previewUrl: null, x: 50, y: 50, scale: 50, rotation: 0 });
@@ -416,6 +458,30 @@ const DesignWorkspace = ({
     };
   }, [activeTemplateId]);
 
+  // Handle Switch slide drag gesture to execute locking
+  const handleDragEnd = (event, info) => {
+    if (isLockedToZero) return;
+    const threshold = isArabic ? -12 : 12;
+    const offset = info.offset.x;
+
+    if ((isArabic && offset < threshold) || (!isArabic && offset > threshold)) {
+      setIsLockedToZero(true);
+      setUiOpacity(0); // Lock panel completely
+    } else {
+      setUiOpacity(1); // Snap back to 100%
+    }
+  };
+
+  const handleSwitchClick = () => {
+    if (isLockedToZero) {
+      setIsLockedToZero(false);
+      setUiOpacity(1);
+    }
+  };
+
+  // Determine current active opacity value based on gesture state
+  const computedOpacity = isLockedToZero ? 0 : uiOpacity;
+
   return (
     <WorkspaceWrapper>
       <MobilePageLock />
@@ -435,6 +501,26 @@ const DesignWorkspace = ({
             solidBgColor={solidBgColor}
             setSolidBgColor={setSolidBgColor}
           />
+          
+          {/* 🔴 Context-Aware CTA showing directly under the preview when panels are locked to 0 */}
+          <AnimatePresence>
+            {activeTab !== "cart" && isLockedToZero && (
+              <SubStageCTA
+                type="button"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                onClick={() => {
+                  setIsLockedToZero(false);
+                  setUiOpacity(1);
+                  setActiveTab("cart");
+                }}
+              >
+                <FaShoppingCart />
+                <span>{isArabic ? "إكمال وتأكيد الطلبية ➔" : "Proceed with Order ➔"}</span>
+              </SubStageCTA>
+            )}
+          </AnimatePresence>
         </MobileStageWrapper>
 
         {/* DESKTOP PANEL */}
@@ -519,9 +605,9 @@ const DesignWorkspace = ({
           <MobileToolPanel
             key={activeTab}
             initial={{ y: "100%", opacity: 0 }}
-            animate={{ y: 0, opacity: uiOpacity }}
+            animate={{ y: 0, opacity: computedOpacity }}
             exit={{ y: "100%", opacity: 0 }}
-            style={{ opacity: uiOpacity, transition: "opacity 0.15s ease" }}
+            style={{ opacity: computedOpacity, transition: "opacity 0.15s ease", pointerEvents: isLockedToZero ? "none" : "auto" }}
             transition={{ type: "spring", damping: 25, stiffness: 260 }}
           >
             <div
@@ -535,21 +621,26 @@ const DesignWorkspace = ({
                 flexShrink: 0,
               }}
             >
-              <span style={{ fontSize: "0.85rem", fontWeight: "800", color: "#a1a1aa", display: "flex", alignItems: "center", gap: "8px" }}>
-                {/* 🔴 Hold-to-View UI Opacity toggle (Fades interface to 2% to reveal full canvas) */}
-                <EyeIconButton
-                  type="button"
-                  onPointerDown={() => setUiOpacity(0.02)}
-                  onPointerUp={() => setUiOpacity(1)}
-                  onTouchStart={() => setUiOpacity(0.02)}
-                  onTouchEnd={() => setUiOpacity(1)}
-                  onMouseDown={() => setUiOpacity(0.02)}
-                  onMouseUp={() => setUiOpacity(1)}
-                  onMouseLeave={() => setUiOpacity(1)}
-                  title="Hold to see preview clearly"
-                >
-                  <FaEye />
-                </EyeIconButton>
+              <span style={{ fontSize: "0.85rem", fontWeight: "800", color: "#a1a1aa", display: "flex", alignItems: "center", gap: "10px" }}>
+                {/* 🔴 PHYSICAL SLIDE-TO-LOCK SWITCH BUTTON */}
+                <SwitchTrack onClick={handleSwitchClick}>
+                  <SwitchThumb
+                    drag="x"
+                    dragElastic={0.08}
+                    dragConstraints={isArabic ? { left: -32, right: 0 } : { left: 0, right: 32 }}
+                    dragMomentum={false}
+                    onDragEnd={handleDragEnd}
+                    onPointerDown={() => !isLockedToZero && setUiOpacity(0.1)} // Dims to 10% on hold
+                    onPointerUp={() => !isLockedToZero && setUiOpacity(1)} // Resets to 100% on release
+                    onTouchStart={() => !isLockedToZero && setUiOpacity(0.1)}
+                    onTouchEnd={() => !isLockedToZero && setUiOpacity(1)}
+                    $active={isLockedToZero}
+                    animate={{ x: isLockedToZero ? (isArabic ? -32 : 32) : 0 }}
+                    transition={{ type: "spring", stiffness: 350, damping: 20 }}
+                  >
+                    {isLockedToZero ? <FaEyeSlash /> : <FaEye />}
+                  </SwitchThumb>
+                </SwitchTrack>
 
                 {activeTab === "transform" && (isArabic ? "حجم التصميم" : "SCALE CONTROLS")}
                 {activeTab === "position" && (isArabic ? "موقع التصميم" : "POSITION CONTROLS")}
@@ -640,8 +731,12 @@ const DesignWorkspace = ({
       <MobileFloatingPurchaseCTA
         type="button"
         whileTap={{ scale: 0.96 }}
-        onClick={() => setActiveTab("cart")}
-        style={{ opacity: uiOpacity, transition: "opacity 0.15s ease" }}
+        onClick={() => {
+          setIsLockedToZero(false);
+          setUiOpacity(1);
+          setActiveTab("cart");
+        }}
+        style={{ opacity: computedOpacity, transition: "opacity 0.15s ease", pointerEvents: isLockedToZero ? "none" : "auto" }}
       >
         <FaShoppingCart />
         <span>{isArabic ? "إكمال وتأكيد الطلبية ➔" : "Proceed with Order ➔"}</span>
@@ -688,7 +783,7 @@ const DesignWorkspace = ({
       </AnimatePresence>
 
       {/* FIXED MOBILE BOTTOM DOCK NAVIGATION */}
-      <MobileBottomDock style={{ opacity: uiOpacity, transition: "opacity 0.15s ease" }}>
+      <MobileBottomDock style={{ opacity: computedOpacity, transition: "opacity 0.15s ease", pointerEvents: isLockedToZero ? "none" : "auto" }}>
         <DockTab
           $active={activeTab === "info"}
           onClick={() => setActiveTab("info")}
@@ -729,6 +824,25 @@ const DesignWorkspace = ({
           <span>{t("pod_studio_tray_title", "Bag")}</span>
         </DockTab>
       </MobileBottomDock>
+
+      {/* 🔴 FIXED PERSISTENT FLOATING TOGGLE FOR LOCK RECOVERY MODE */}
+      {isLockedToZero && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "18px",
+            right: isArabic ? "auto" : "18px",
+            left: isArabic ? "18px" : "auto",
+            zIndex: 1010,
+          }}
+        >
+          <SwitchTrack onClick={handleSwitchClick}>
+            <SwitchThumb $active={isLockedToZero} animate={{ x: isArabic ? -32 : 32 }}>
+              <FaEyeSlash />
+            </SwitchThumb>
+          </SwitchTrack>
+        </div>
+      )}
     </WorkspaceWrapper>
   );
 };
