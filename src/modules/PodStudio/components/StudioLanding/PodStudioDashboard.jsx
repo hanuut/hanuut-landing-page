@@ -41,6 +41,7 @@ import { fetchProductById } from "../../../Product/state/reducers";
 import Seo from "../../../../components/Seo";
 import { createGlobalOrder } from "../../../Partners/services/orderServices";
 import DiscoveryCarousel from "../storefront/sections/DiscoveryCarousel";
+import EditorialShowcase from "../storefront/sections/EditorialShowcase";
 
 const LayoutShell = styled.div`
   min-height: 100vh;
@@ -328,6 +329,8 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
+  const shopId = shop?._id || shop?.id;
+
   const isDirectEntry = useMemo(() => {
     return !location.state?.fromApp && !!initialSku;
   }, [location.state, initialSku]);
@@ -339,10 +342,9 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
   }, []);
 
   const shopCartItems = useMemo(() => {
-    const shopIdValue = shop?._id || shop?.id;
-    if (!shopIdValue) return [];
-    return cart.filter((item) => item.shopId === shopIdValue);
-  }, [cart, shop]);
+    if (!shopId) return [];
+    return cart.filter((item) => item.shopId === shopId);
+  }, [cart, shopId]);
 
   const shopLogoUrl = useMemo(
     () => getImageUrl(selectedShopImage),
@@ -350,11 +352,10 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
   ); 
 
   useEffect(() => {
-    const shopIdValue = shop?._id || shop?.id;
-    if (shopIdValue && !selectedCanvas) {
+    if (shopId && !selectedCanvas) {
       dispatch(
         fetchPaginatedProducts({
-          shopId: shopIdValue,
+          shopId: shopId,
           page: 1,
           limit: 12,
           categoryId: "",
@@ -364,9 +365,8 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
         }),
       );
     }
-  }, [dispatch, shop, selectedCanvas]);
+  }, [dispatch, shopId, selectedCanvas]);
 
-  // 🔴 DYNAMIC CATEGORY LANDING ROUTE INTERCEPTOR: Focuses and scrolls down to category on load
   useEffect(() => {
     if (initialGroup && !selectedCanvas) {
       const timer = setTimeout(() => {
@@ -462,27 +462,42 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
     }
   };
 
-  const handleSelectDesign = (design) => {
-    if (!rawProducts || rawProducts.length === 0) return;
-    const defaultProduct = rawProducts[0];
-    const canvas = productToCanvasAdapter(defaultProduct);
+  const handleSelectDesign = (canvasOrProduct, artistDesign = null, preferredSide = "front") => {
+    if (!canvasOrProduct) return;
 
-    if (canvas) {
-      const customizedObject = {
-        ...canvas,
-        initialDesignPayload: {
-          front: {
-            previewUrl: `https://api.hanuut.com/image/raw/${design._id || design.id}`,
-            file: "existing",
-            scale: design.podDesignMetadata?.defaultPlacement?.scale || 50,
-            x: design.podDesignMetadata?.defaultPlacement?.x || 50,
-            y: design.podDesignMetadata?.defaultPlacement?.y || 50,
-            rotation: design.podDesignMetadata?.defaultPlacement?.rotation || 0,
-          },
+    let canvasObj = canvasOrProduct;
+    if (!canvasObj.canvasId) {
+      canvasObj = productToCanvasAdapter(canvasOrProduct);
+    }
+
+    if (artistDesign) {
+      const meta = artistDesign.podDesignMetadata || {};
+      canvasObj = {
+        ...canvasObj,
+        initialArtistDesign: {
+          designId: artistDesign._id || artistDesign.id,
+          artistName: meta.artistName,
+          collectionName: meta.collectionName,
+          preferredSide: preferredSide, // Front or Back
+          front: preferredSide === "front" ? {
+            imageUrl: `https://api.hanuut.com/image/raw/${artistDesign._id || artistDesign.id}`,
+            width: meta.defaultPlacement?.scale || 55,
+            x: meta.defaultPlacement?.x || 50,
+            y: meta.defaultPlacement?.y || 35,
+            rotation: meta.defaultPlacement?.rotation || 0,
+          } : null,
+          back: preferredSide === "back" ? {
+            imageUrl: `https://api.hanuut.com/image/raw/${artistDesign._id || artistDesign.id}`,
+            width: meta.defaultPlacement?.scale || 55,
+            x: meta.defaultPlacement?.x || 50,
+            y: meta.defaultPlacement?.y || 35,
+            rotation: meta.defaultPlacement?.rotation || 0,
+          } : null,
         },
       };
-      setSelectedCanvas(customizedObject);
     }
+
+    setSelectedCanvas(canvasObj);
   };
 
   const handlePlaceOrder = async (customerDetails) => {
@@ -535,7 +550,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
       );
 
       const orderPayload = {
-        shopId: shop._id || shop.id,
+        shopId: shopId,
         customerName: customerDetails.customerName,
         customerPhone: customerDetails.customerPhone,
         deliveryInfo: customerDetails.note || "No note",
@@ -712,6 +727,9 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
                   )}
                 </FloatingCartPill>
               )}
+              <HeaderCircleBtn to="collab" title={t("pod_studio_join_creators_btn", "Join as Creator")}>
+                <span style={{ fontSize: "1.1rem" }}>🎨</span>
+              </HeaderCircleBtn>
             </HeaderRight>
           </UnifiedHeaderRow>
 
@@ -719,7 +737,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
             <DesignWorkspace
               canvas={selectedCanvas}
               onClose={handleBackToCatalog}
-              shopId={shop._id || shop.id}
+              shopId={shopId}
               editingCartItem={editingCartItem}
               onCommitSuccess={handleCommitSuccess}
             />
@@ -742,12 +760,19 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
                 onSelectCanvas={handleSelectCanvas}
               />
 
+              <EditorialShowcase
+                shopId={shopId}
+                onSelectDesign={(canvas, artistDesign) => {
+                  handleSelectDesign(canvas, artistDesign);
+                }}
+              />
+
               <div
                 id="canvas-library-anchor"
                 style={{ scrollMarginTop: "100px" }}
               >
                 <CanvasLibrary
-                  shopId={shop._id || shop.id}
+                  shopId={shopId}
                   onSelectCanvas={handleSelectCanvas}
                   shop={shop}
                 />
@@ -765,7 +790,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
 
         <CreationTray
           cartItems={cart}
-          shopId={shop._id || shop.id}
+          shopId={shopId}
           isOpen={isTrayOpen}
           onClose={() => setIsTrayOpen(false)}
           onDelete={handleDeleteItem}
@@ -780,7 +805,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
             onSubmitOrder={handlePlaceOrder}
             isSubmitting={isSubmitting}
             shopDomain="global"
-            shopId={shop._id || shop.id}
+            shopId={shopId}
             orderErrorMsg={orderErrorMsg}
             onEditCustomItem={handleEditCustomItem}
             orderSuccessData={orderSuccessData}
@@ -800,6 +825,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
     </ThemeProvider>
   );
 };
+
 
 PodStudioDashboard.propTypes = {
   shop: PropTypes.object.isRequired,

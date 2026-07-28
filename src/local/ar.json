@@ -1389,5 +1389,22 @@
   "discovery_accessories_cta": "صمّم الحقائب والإكسسوارات",
   "discovery_sports_title": "تدرّب بهويتك الخاصة.",
   "discovery_sports_desc": "ملابس رياضية مصممة خصيصاً لأداء عالي ورُوح الفريق.",
-  "discovery_sports_cta": "صمّم الملابس الرياضية"
+  "discovery_sports_cta": "صمّم الملابس الرياضية",
+  "pod_studio_join_creators_btn": "انضم كصانع تصاميم 🎨",
+  "creator_collab_hero_title": "حوّل فنك لأرباح حقيقية. بدون مصاريف تصنيع.",
+  "creator_collab_hero_subtitle": "انشر تصاميمك على خامات أوراس لاب الفاخرة. احصل على نسبة أرباح من كل قطعة تنباع في 58 ولاية، وحنا نتكفلو بالطبع والشحن.",
+  "creator_collab_step1_title": "1. قدم طلبك",
+  "creator_collab_step1_desc": "أدخل اسمك الفني وارفع عينات من تصاميمك.",
+  "creator_collab_step2_title": "2. مراجعة الجودة",
+  "creator_collab_step2_desc": "يقوم فريقنا بمراجعة الجودة والتواصل معك لتأكيد الاتفاقية.",
+  "creator_collab_step3_title": "3. ابدأ كسب الأرباح",
+  "creator_collab_step3_desc": "تتاح تصاميمك للزبائن وتحصل على أرباحك عن كل مبيعة.",
+  "creator_form_artist_name": "الاسم الفني / اسم البراند",
+  "creator_form_collection_title": "عنوان أول تشكيلة (Collection)",
+  "creator_form_phone": "رقم الهاتف للتواصل",
+  "creator_form_portfolio": "رابط الأعمال (Instagram / Behance / Drive)",
+  "creator_form_upload_samples": "رفع عينة من التصاميم (اختياري)",
+  "creator_form_submit": "إرسال طلب الانضمام 🚀",
+  "creator_form_success": "تم استلام طلبك بنجاح! سيتواصل معك فريق أوراس لاب قريباً.",
+  "editorial_showcase_title" : "الصنايعية AURASLAB  X "
 }

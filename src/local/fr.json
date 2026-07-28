@@ -1345,5 +1345,22 @@
   "discovery_sports_title": "Entraînez-vous avec votre propre identité.",
   "discovery_sports_desc": "Vêtements de sport haute performance conçus pour l'esprit d'équipe et la performance.",
   "discovery_sports_cta": "Personnaliser le Sportswear",
-  "pod_studio_reviewed_notice": "Vérifié avant production"
+  "pod_studio_reviewed_notice": "Vérifié avant production",
+  "pod_studio_join_creators_btn": "Rejoindre en tant que Créateur 🎨",
+  "creator_collab_hero_title": "Monétisez votre Art. Sans frais de fabrication.",
+  "creator_collab_hero_subtitle": "Publiez vos visuels sur les supports AURAS LAB. Gagnez des commissions sur chaque vente à travers les 58 Wilayas pendant que nous gérons l'impression et la livraison.",
+  "creator_collab_step1_title": "1. Candidater",
+  "creator_collab_step1_desc": "Soumettez votre nom d'artiste et vos visuels.",
+  "creator_collab_step2_title": "2. Validation Qualité",
+  "creator_collab_step2_desc": "Notre équipe valide la haute résolution de vos designs.",
+  "creator_collab_step3_title": "3. Touchez vos Commissions",
+  "creator_collab_step3_desc": "Vos designs sont mis en ligne et vous touchez des redevances par vente.",
+  "creator_form_artist_name": "Nom d'Artiste / Marque",
+  "creator_form_collection_title": "Titre de la première collection",
+  "creator_form_phone": "Téléphone de contact",
+  "creator_form_portfolio": "Lien Portfolio (Instagram / Behance / Drive)",
+  "creator_form_upload_samples": "Téléverser des aperçus (Optionnel)",
+  "creator_form_submit": "Envoyer la candidature 🚀",
+  "creator_form_success": "Candidature reçue ! L'équipe AURAS LAB vous contactera sous peu.",
+  "editorial_showcase_title" : "AURASLAB X CREATORS"
 }

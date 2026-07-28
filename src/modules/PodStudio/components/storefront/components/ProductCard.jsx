@@ -6,8 +6,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { getImage } from "../../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../../utils/imageUtils";
 import { getPreferredProductImageId } from "../../../hooks/usePrintableArea";
+import { analyzeProductImageLuminance } from "../../../utils/colorLuminanceAnalyzer";
 
-// Expanded pool of apparel emojis
 const APPAREL_EMOJIS = ["👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽", "👗", "👘", "🥻", "👠", "👡", "👢", "🧣", "🧤", "🎩", "👑", "🎒", "💼"];
 
 const getStableEmoji = (id, index) => {
@@ -42,37 +42,90 @@ const CardWrapper = styled.div`
   }
 `;
 
-const ImageStage = styled.div`
+// 🔴 LIQUID GLASS STAGE CONTAINER
+const LiquidGlassStage = styled.div`
   width: 100%;
   aspect-ratio: 1;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.01) 85%
-  );
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(25px) saturate(160%);
+  -webkit-backdrop-filter: blur(25px) saturate(160%);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   position: relative;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.03);
 
   img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.45));
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.65));
     transition: transform 0.4s ease;
     position: absolute;
     inset: 0;
     padding: 1rem;
     box-sizing: border-box;
+    z-index: 5;
   }
 
   ${CardWrapper}:hover & img {
-    transform: scale(1.04);
+    transform: scale(1.05);
   }
+`;
+
+// 🔴 MULTIPLE ADAPTIVE LIGHT SOURCES
+const LightOrb1 = styled.div`
+  position: absolute;
+  top: -25%;
+  left: -20%;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    ${(props) => props.$color || "rgba(255, 255, 255, 0.15)"} 0%,
+    transparent 70%
+  );
+  filter: blur(30px);
+  pointer-events: none;
+  z-index: 1;
+`;
+
+const LightOrb2 = styled.div`
+  position: absolute;
+  bottom: -25%;
+  right: -20%;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    ${(props) => props.$color || "rgba(240, 122, 72, 0.15)"} 0%,
+    transparent 70%
+  );
+  filter: blur(35px);
+  pointer-events: none;
+  z-index: 1;
+`;
+
+const LightOrb3 = styled.div`
+  position: absolute;
+  top: 35%;
+  right: 10%;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    ${(props) => props.$color || "rgba(57, 161, 112, 0.12)"} 0%,
+    transparent 70%
+  );
+  filter: blur(25px);
+  pointer-events: none;
+  z-index: 1;
 `;
 
 const InfoBlock = styled.div`
@@ -157,6 +210,13 @@ const ProductCard = ({ product, index, onSelect }) => {
   const [hoverImageBuffer, setHoverImageBuffer] = useState(null);
   const [isCardHovered, setIsCardHovered] = useState(false);
 
+  // Dynamic Light Colors State
+  const [lightScheme, setLightScheme] = useState({
+    color1: "rgba(240, 122, 72, 0.15)",
+    color2: "rgba(57, 127, 249, 0.15)",
+    color3: "rgba(255, 255, 255, 0.1)",
+  });
+
   const defaultAvailability = product?.availabilities?.[0];
   const defaultSize = defaultAvailability?.sizes?.[0];
 
@@ -175,6 +235,10 @@ const ProductCard = ({ product, index, onSelect }) => {
         .then((res) => {
           if (isMounted && res?.data) {
             setImageBuffer(res.data);
+            const url = getImageUrl(res.data);
+            analyzeProductImageLuminance(url).then((scheme) => {
+              if (isMounted) setLightScheme(scheme);
+            });
           }
         })
         .catch((err) => console.error("Error loading substrate image:", err));
@@ -229,7 +293,12 @@ const ProductCard = ({ product, index, onSelect }) => {
       onMouseEnter={() => setIsCardHovered(true)}
       onMouseLeave={() => setIsCardHovered(false)}
     >
-      <ImageStage onClick={onSelect}>
+      <LiquidGlassStage onClick={onSelect}>
+        {/* Dynamic Multi-Source Light Orbs */}
+        <LightOrb1 $color={lightScheme.color1} />
+        <LightOrb2 $color={lightScheme.color2} />
+        <LightOrb3 $color={lightScheme.color3} />
+
         <AnimatePresence mode="wait">
           {isCardHovered && hoverImageUrl ? (
             <motion.img
@@ -263,13 +332,15 @@ const ProductCard = ({ product, index, onSelect }) => {
                 justifyContent: "center",
                 position: "absolute",
                 inset: 0,
+                zIndex: 5,
               }}
             >
               {getStableEmoji(targetId, index)}
             </motion.div>
           )}
         </AnimatePresence>
-      </ImageStage>
+      </LiquidGlassStage>
+
       <InfoBlock>
         <CategoryBadge>
           {t("pod_store.base_label", "CANVAS")} /{" "}

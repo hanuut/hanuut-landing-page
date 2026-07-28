@@ -169,10 +169,13 @@ const CustomRouter = ({ appConfig, location }) => {
           <Route path="/:username/links" element={<ShopPageWithUsername />} />
           
           {/* 🔴 EXPLICIT Isolated SKU & Collection Landing Routes: Only trigger for aurasLab / @aurasLab */}
+          <Route path="/aurasLab/collab" element={<ShopPageWithUsername />} />
+          <Route path="/@aurasLab/collab" element={<ShopPageWithUsername />} />
           <Route path="/aurasLab/collection/:DiscoveryGroup" element={<ShopPageWithUsername />} />
           <Route path="/@aurasLab/collection/:DiscoveryGroup" element={<ShopPageWithUsername />} />
           <Route path="/aurasLab/:ProductSku" element={<ShopPageWithUsername />} />
           <Route path="/@aurasLab/:ProductSku" element={<ShopPageWithUsername />} />
+
 
           {/* Catch all route */}
           <Route path="*" element={<NotFoundPage />} />

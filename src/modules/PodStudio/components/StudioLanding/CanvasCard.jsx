@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
+import { analyzeProductImageLuminance } from "../../utils/colorLuminanceAnalyzer";
 
 const CardContainer = styled.div`
   background: #18181b;
@@ -21,23 +22,27 @@ const CardContainer = styled.div`
   }
 `;
 
-const CanvasPreviewArea = styled.div`
+const LiquidCanvasPreviewArea = styled.div`
   width: 100%;
   height: 240px;
-  background-color: #0c0c0e;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(25px) saturate(160%);
+  -webkit-backdrop-filter: blur(25px) saturate(160%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
   img {
-    max-width: 90%;
-    max-height: 90%;
+    max-width: 88%;
+    max-height: 88%;
     object-fit: contain;
-    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.65));
     transition: transform 0.4s ease;
+    z-index: 5;
   }
 
   ${CardContainer}:hover img {
@@ -45,17 +50,53 @@ const CanvasPreviewArea = styled.div`
   }
 `;
 
+const LightOrb1 = styled.div`
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    ${(props) => props.$color} 0%,
+    transparent 70%
+  );
+  filter: blur(30px);
+  pointer-events: none;
+  z-index: 1;
+`;
+
+const LightOrb2 = styled.div`
+  position: absolute;
+  bottom: -20%;
+  right: -20%;
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    ${(props) => props.$color} 0%,
+    transparent 70%
+  );
+  filter: blur(35px);
+  pointer-events: none;
+  z-index: 1;
+`;
+
 const SerialTag = styled.div`
   position: absolute;
   top: 15px;
   left: 15px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 4px 8px;
   border-radius: 6px;
   font-family: monospace;
   font-size: 0.75rem;
   color: #a1a1aa;
+  z-index: 10;
 `;
 
 const ContentBlock = styled.div`
@@ -119,6 +160,10 @@ const ActionButton = styled.button`
 const CanvasCard = ({ canvas, onSelect }) => {
   const { t } = useTranslation();
   const [imageUrl, setImageUrl] = useState(null);
+  const [lightScheme, setLightScheme] = useState({
+    color1: "rgba(240, 122, 72, 0.15)",
+    color2: "rgba(57, 127, 249, 0.15)",
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -126,7 +171,11 @@ const CanvasCard = ({ canvas, onSelect }) => {
       getImage(canvas.previewImageId)
         .then((res) => {
           if (isMounted && res.data) {
-            setImageUrl(getImageUrl(res.data));
+            const url = getImageUrl(res.data);
+            setImageUrl(url);
+            analyzeProductImageLuminance(url).then((scheme) => {
+              if (isMounted) setLightScheme(scheme);
+            });
           }
         })
         .catch((err) =>
@@ -140,14 +189,17 @@ const CanvasCard = ({ canvas, onSelect }) => {
 
   return (
     <CardContainer>
-      <CanvasPreviewArea onClick={() => onSelect(canvas)}>
+      <LiquidCanvasPreviewArea onClick={() => onSelect(canvas)}>
+        <LightOrb1 $color={lightScheme.color1} />
+        <LightOrb2 $color={lightScheme.color2} />
+
         <SerialTag>{canvas.serialNumber}</SerialTag>
         {imageUrl ? (
           <img src={imageUrl} alt={canvas.title} loading="lazy" />
         ) : (
-          <div style={{ color: "#333", fontSize: "3rem" }}>👕</div>
+          <div style={{ color: "#333", fontSize: "3rem", zIndex: 5 }}>👕</div>
         )}
-      </CanvasPreviewArea>
+      </LiquidCanvasPreviewArea>
       <ContentBlock>
         <CanvasTitle onClick={() => onSelect(canvas)}>
           {canvas.title}

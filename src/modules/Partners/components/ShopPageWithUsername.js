@@ -50,6 +50,9 @@ import { retrieveFile } from "../../PodStudio/utils/indexedDbHelper";
 import NotFoundPage from "../../NotFoundPage";
 import { FaShoppingCart, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
+import CreatorCollabPage from "../../PodStudio/components/storefront/pages/CreatorCollabPage";
+
+
 const DynamicThemeStyles = createGlobalStyle`
   body {
     background-color: ${(props) => props.theme.body} !important;
@@ -313,6 +316,9 @@ const ShopPageWithUsername = () => {
   const selectedShop = useSelector(selectShop);
   const selectedShopImage = useSelector(selectSelectedShopImage);
   const { cart: cartItems } = useSelector(selectCart);
+
+  // Inside ShopPageWithUsername component:
+  const isCollabRoute = location.pathname.endsWith("/collab");
 
   // 🔴 FIXED FALLBACK FOR DIRECT DEEP LINKS (No routeUsername inside path)
   const username = useMemo(() => {
@@ -643,7 +649,12 @@ const ShopPageWithUsername = () => {
     domainKeyWord
   ) {
     const isPodEnabled = selectedShop?.shopSettings?.printOnDemand === true;
-    if (isPodEnabled) {
+
+      if (isCollabRoute) {
+        return <CreatorCollabPage shop={selectedShop} selectedShopImage={selectedShopImage} />;
+      }
+
+      if (isPodEnabled) {
       return (
         <PodStudioDashboard
           shop={selectedShop}
@@ -653,6 +664,9 @@ const ShopPageWithUsername = () => {
         />
       );
     }
+
+   
+
     const shopTitle = selectedShop.name || "HANUUT";
     const shopImage = getImageUrl(selectedShop.imageId);
     

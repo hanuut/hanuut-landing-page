@@ -240,6 +240,7 @@ const DesignControls = ({
   sizeChart = null,
   activeTab,
   setActiveTab,
+  isArtistLocked = false, 
 }) => {
   const { t, i18n } = useTranslation();
   const fileInputRef = useRef(null);
@@ -331,18 +332,25 @@ const DesignControls = ({
   return (
     <div id="design-controls-section" style={{ width: "100%" }}>
       {!designState.previewUrl ? (
-        <UploadZone onClick={() => fileInputRef.current?.click()}>
-          <FaCloudUploadAlt style={{ fontSize: "2rem", color: "#F07A48" }} />
-          <UploadLabel>{t("pod_studio_upload_design_title", "Import Artwork")}</UploadLabel>
-          <UploadSub>{t("pod_studio_upload_requirements", "PNG image with transparent background")}</UploadSub>
-          <input
-            id="primary-upload-input"
-            type="file"
-            ref={fileInputRef}
-            accept="image/*"
-            onChange={handleFileChange}
-          />
-        </UploadZone>
+        // If locked, do not allow uploading a new design
+        isArtistLocked ? (
+          <div style={{ color: "#71717a", textAlign: "center", padding: "2rem" }}>
+            {isArabic ? "هذا التصميم محمي بواسطة الفنان." : "This original artwork is protected by the artist."}
+          </div>
+        ) : (
+          <UploadZone onClick={() => fileInputRef.current?.click()}>
+            <FaCloudUploadAlt style={{ fontSize: "2rem", color: "#F07A48" }} />
+            <UploadLabel>{t("pod_studio_upload_design_title", "Import Artwork")}</UploadLabel>
+            <UploadSub>{t("pod_studio_upload_requirements", "PNG image with transparent background")}</UploadSub>
+            <input
+              id="primary-upload-input"
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </UploadZone>
+        )
       ) : (
         <ControlsCard>
           <ArtworkManager $isArabic={isArabic}>
@@ -352,12 +360,12 @@ const DesignControls = ({
               </ArtworkThumbnailWrap>
               <div style={{ display: "flex", flexDirection: "column", gap: "2px", textAlign: "start" }}>
                 <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "#FFF" }}>
-                  {designState.file?.name
-                    ? designState.file.name.substring(0, 14) + "..."
-                    : "Artwork Layer"}
+                  {isArtistLocked 
+                    ? (isArabic ? "تصميم محمي" : "Original Design") 
+                    : (designState.file?.name ? designState.file.name.substring(0, 14) + "..." : "Artwork Layer")
+                  }
                 </span>
                 
-                {/* 🔴 Contextual DPI Indicator (Priority Grouping inside File Card) */}
                 {dpiValue > 0 && (
                   <span style={{ fontSize: "0.72rem", color: dpiValue >= 150 ? "#39A170" : "#ef4444", fontWeight: "700" }}>
                     {dpiValue} DPI ({dpiValue >= 150 ? t("pod_studio_status_artwork_ok", "High Quality") : "Low Quality"})
@@ -365,30 +373,34 @@ const DesignControls = ({
                 )}
               </div>
             </ArtworkInfo>
-            <ActionRow>
-              <MiniActionButton
-                type="button"
-                title="Replace Artwork"
-                onClick={() => replacementInputRef.current?.click()}
-              >
-                <FaCloudUploadAlt />
-                <input
-                  type="file"
-                  ref={replacementInputRef}
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  style={{ display: "none" }}
-                />
-              </MiniActionButton>
-              <MiniActionButton
-                type="button"
-                className="danger"
-                title="Remove Artwork"
-                onClick={handleReset}
-              >
-                <FaTrash />
-              </MiniActionButton>
-            </ActionRow>
+            
+            {/* 🔴 HIDE ACTION BUTTONS FOR PROTECTED ARTIST DESIGNS */}
+            {!isArtistLocked && (
+              <ActionRow>
+                <MiniActionButton
+                  type="button"
+                  title="Replace Artwork"
+                  onClick={() => replacementInputRef.current?.click()}
+                >
+                  <FaCloudUploadAlt />
+                  <input
+                    type="file"
+                    ref={replacementInputRef}
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
+                </MiniActionButton>
+                <MiniActionButton
+                  type="button"
+                  className="danger"
+                  title="Remove Artwork"
+                  onClick={handleReset}
+                >
+                  <FaTrash />
+                </MiniActionButton>
+              </ActionRow>
+            )}
           </ArtworkManager>
 
           <TabBar>

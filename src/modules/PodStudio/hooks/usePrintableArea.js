@@ -147,8 +147,9 @@ export const getRawPrintCost = (widthCm, heightCm) => {
 };
 
 /**
- * Calculates true physical centimeter dimensions directly from physical garment data (A, B)
- * and the user's selected scale percentage.
+ * Calculates physical dimensions (in cm) based on real visible fabric proportions.
+ * Maps the design's on-screen size directly to the physical dimensions of the garment,
+ * ensuring that the displayed measurements always match visual reality.
  */
 export const calculatePhysicalMetrics = (
   scale,
@@ -156,15 +157,30 @@ export const calculatePhysicalMetrics = (
   bodyHeightCm,
   aspectRatio
 ) => {
-  const maxPrintWidthCm = bodyWidthCm * 0.75;
+  // In the visual canvas, the printable box is scaled to occupy almost the entire
+  // visible fabric area on screen. We map the scale directly to the garment's full dimensions.
+  const visualGarmentWidthPct = 0.95;
+  const visualGarmentHeightPct = 0.95;
+
+  const maxPrintWidthCm = bodyWidthCm * visualGarmentWidthPct;
+  const maxPrintHeightCm = bodyHeightCm * visualGarmentHeightPct;
+
+  // Compute physical width based on the scale percentage
   const widthCm = (scale / 100) * maxPrintWidthCm;
-  const heightCm = widthCm / (aspectRatio || 1);
+
+  // Calculate height using the image aspect ratio
+  let heightCm = widthCm / (aspectRatio || 1);
+
+  // Bound the height so it doesn't exceed the t-shirt's physical boundaries
+  if (heightCm > bodyHeightCm) {
+    heightCm = bodyHeightCm;
+  }
 
   return {
     width: parseFloat(widthCm.toFixed(1)),
     height: parseFloat(heightCm.toFixed(1)),
     maxPrintWidthCm: parseFloat(maxPrintWidthCm.toFixed(1)),
-    maxPrintHeightCm: parseFloat((bodyHeightCm * 0.85).toFixed(1)),
+    maxPrintHeightCm: parseFloat(bodyHeightCm.toFixed(1)), // Max height matches full garment length
   };
 };
 
@@ -172,7 +188,8 @@ export const calculateScaleFromPhysicalWidth = (
   widthCm,
   bodyWidthCm
 ) => {
-  const maxPrintWidthCm = bodyWidthCm * 0.75;
+  const visualGarmentWidthPct = 0.95;
+  const maxPrintWidthCm = bodyWidthCm * visualGarmentWidthPct;
   const scale = (widthCm / maxPrintWidthCm) * 100;
   return Math.min(120, Math.max(15, Math.round(scale)));
 };

@@ -94,73 +94,63 @@ const ProductionSummary = ({
   const [backAspect, setBackAspect] = useState(1);
 
   useEffect(() => {
+    let isMounted = true;
     if (frontDesign.previewUrl) {
       const img = new Image();
       img.src = frontDesign.previewUrl;
-      img.onload = () => setFrontAspect(img.naturalWidth / img.naturalHeight);
+      img.onload = () => {
+        if (isMounted) setFrontAspect(img.naturalWidth / img.naturalHeight);
+      };
     }
+    return () => {
+      isMounted = false;
+    };
   }, [frontDesign.previewUrl]);
 
   useEffect(() => {
+    let isMounted = true;
     if (backDesign.previewUrl) {
       const img = new Image();
       img.src = backDesign.previewUrl;
-      img.onload = () => setBackAspect(img.naturalWidth / img.naturalHeight);
+      img.onload = () => {
+        if (isMounted) setBackAspect(img.naturalWidth / img.naturalHeight);
+      };
     }
+    return () => {
+      isMounted = false;
+    };
   }, [backDesign.previewUrl]);
 
   const cfg = useMemo(() => getTemplateConfig(canvas.title), [canvas.title]);
   const garmentDims = useMemo(
-    () => getGarmentDimensions(canvas.title, selectedSize),
-    [canvas.title, selectedSize],
+    () => getGarmentDimensions(canvas.title, selectedSize, canvas.sizeChart),
+    [canvas.title, selectedSize, canvas.sizeChart],
   );
 
+  // Exact replication of NestJS backend's dimension and scale math
   const printWidthRatio = useMemo(() => cfg.printW_ref / cfg.B_ref, [cfg]);
-  const printHeightRatio = useMemo(() => cfg.printH_ref / cfg.A_ref, [cfg]);
-
-  const frontMetrics = useMemo(() => {
-    return calculatePhysicalMetrics(
-      frontDesign.scale,
-      garmentDims.B,
-      garmentDims.A,
-      printWidthRatio,
-      printHeightRatio,
-      frontAspect,
-    );
-  }, [
-    frontDesign.scale,
-    garmentDims,
-    printWidthRatio,
-    printHeightRatio,
-    frontAspect,
-  ]);
-
-  const backMetrics = useMemo(() => {
-    return calculatePhysicalMetrics(
-      backDesign.scale,
-      garmentDims.B,
-      garmentDims.A,
-      printWidthRatio,
-      printHeightRatio,
-      backAspect,
-    );
-  }, [
-    backDesign.scale,
-    garmentDims,
-    printWidthRatio,
-    printHeightRatio,
-    backAspect,
-  ]);
 
   const frontPrintCost = useMemo(() => {
     if (!frontDesign.previewUrl) return 0;
-    return getRawPrintCost(frontMetrics.width, frontMetrics.height) + 50 + 60;
-  }, [frontDesign.previewUrl, frontMetrics]);
+    
+    const maxPrintWidthCm = garmentDims.B * printWidthRatio;
+    const wCm = (frontDesign.scale / 100) * maxPrintWidthCm;
+    const hCm = wCm / frontAspect;
+
+    // Matches backend: rawPrintCost + (50 + 60) for active side
+    return getRawPrintCost(wCm, hCm) + 110;
+  }, [frontDesign.previewUrl, frontDesign.scale, garmentDims, printWidthRatio, frontAspect]);
 
   const backPrintCost = useMemo(() => {
     if (!backDesign.previewUrl) return 0;
-    return getRawPrintCost(backMetrics.width, backMetrics.height) + 50 + 60;
-  }, [backDesign.previewUrl, backMetrics]);
+
+    const maxPrintWidthCm = garmentDims.B * printWidthRatio;
+    const wCm = (backDesign.scale / 100) * maxPrintWidthCm;
+    const hCm = wCm / backAspect;
+
+    // Matches backend: rawPrintCost + (50 + 60) for active side
+    return getRawPrintCost(wCm, hCm) + 110;
+  }, [backDesign.previewUrl, backDesign.scale, garmentDims, printWidthRatio, backAspect]);
 
   const totalPrintCost = frontPrintCost + backPrintCost;
   const totalCost = baseCost + totalPrintCost;
@@ -221,7 +211,6 @@ const ProductionSummary = ({
       dispatch(updateCartQuantity({ variantId: oldId, quantity: 0 }));
     }
 
-    // Assign "blank" if no design is uploaded
     const printSideKeyword = hasFront && hasBack ? "double" : hasBack ? "back" : hasFront ? "front" : "blank";
 
     const cartPayload = {
@@ -243,12 +232,12 @@ const ProductionSummary = ({
               imageId:
                 frontDesign.file === "existing"
                   ? frontDesign.previewUrl
-                  : targetVariantId + "_front",
+                  : `${targetVariantId}_front`,
               imageUrl: frontDesign.previewUrl,
               originalImageId:
                 frontDesign.file === "existing"
                   ? frontDesign.previewUrl
-                  : targetVariantId + "_front",
+                  : `${targetVariantId}_front`,
               originalImageUrl: frontDesign.previewUrl,
               width: frontDesign.scale,
               height: frontDesign.scale,
@@ -263,12 +252,12 @@ const ProductionSummary = ({
               imageId:
                 backDesign.file === "existing"
                   ? backDesign.previewUrl
-                  : targetVariantId + "_back",
+                  : `${targetVariantId}_back`,
               imageUrl: backDesign.previewUrl,
               originalImageId:
                 backDesign.file === "existing"
                   ? backDesign.previewUrl
-                  : targetVariantId + "_back",
+                  : `${targetVariantId}_back`,
               originalImageUrl: backDesign.previewUrl,
               width: backDesign.scale,
               height: backDesign.scale,
@@ -290,14 +279,14 @@ const ProductionSummary = ({
       <CostRow>
         <span>{t("pod_studio_item_base_cost")}</span>
         <span>
-          {baseCost} {t("dzd")}
+          {baseCost} {t("zd", "DA")}
         </span>
       </CostRow>
       {frontPrintCost > 0 && (
         <CostRow>
           <span>{t("pod_studio_item_front_cost")} (Front)</span>
           <span>
-            +{frontPrintCost} {t("dzd")}
+            +{frontPrintCost} {t("zd", "DA")}
           </span>
         </CostRow>
       )}
@@ -305,18 +294,17 @@ const ProductionSummary = ({
         <CostRow>
           <span>{t("pod_studio_item_front_cost")} (Back)</span>
           <span>
-            +{backPrintCost} {t("dzd")}
+            +{backPrintCost} {t("zd", "DA")}
           </span>
         </CostRow>
       )}
       <GrandTotalRow>
         <span>{t("pod_studio_item_total_cost")}</span>
         <span>
-          {totalCost} {t("dzd")}
+          {totalCost} {t("zd", "DA")}
         </span>
       </GrandTotalRow>
 
-      {/* REMOVED disabled condition entirely so users can commit blanks */}
       <CommitButton
         type="button"
         onClick={handleCommitToTray}

@@ -1,3 +1,5 @@
+// src/modules/PodStudio/components/Workspace/DesignWorkspace.jsx
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import PropTypes from "prop-types";
 import styled, { createGlobalStyle } from "styled-components";
@@ -21,6 +23,8 @@ import ProductionSummary from "./ProductionSummary";
 import PartnerSizingWidget from "./PartnerSizingWidget";
 import { useDesignHistory } from "../../hooks/useDesignHistory";
 import { motion, AnimatePresence } from "framer-motion";
+import PrePreparedDesignsTab from "./PrePreparedDesignsTab";
+import CollapsibleSizingWidget from "./CollapsibleSizingWidget";
 
 const MobilePageLock = createGlobalStyle`
   @media (max-width: 768px) {
@@ -283,7 +287,6 @@ const MobileFloatingPurchaseCTA = styled(motion.button)`
   }
 `;
 
-// 🔴 THE NEW SLIDE-TO-LOCK PREVIEW INTERACTIVE SWITCH
 const SwitchTrack = styled.div`
   width: 66px;
   height: 30px;
@@ -374,7 +377,12 @@ const DesignWorkspace = ({
   const [selectedSize, setSelectedSize] = useState(
     canvas.sizes[0]?.sizeCode || ""
   );
-  const [activeSide, setActiveSide] = useState("front");
+  
+  const artistDesign = canvas.initialArtistDesign;
+  const isArtistLocked = !!artistDesign;
+  const preferredSide = artistDesign?.preferredSide || "front";
+
+  const [activeSide, setActiveSide] = useState(preferredSide);
   const [templateUrl, setTemplateUrl] = useState(null);
 
   // SINGLE SHARED SOURCE OF TRUTH ACTIVE TAB STATE
@@ -389,11 +397,27 @@ const DesignWorkspace = ({
   const [uiOpacity, setUiOpacity] = useState(1);
   const [isLockedToZero, setIsLockedToZero] = useState(false);
 
+  // Front Design Initialization
   const [frontDesign, setFrontDesign, undoFront, redoFront, canUndoFront, canRedoFront, resetFront] =
-    useDesignHistory({ file: null, previewUrl: null, x: 50, y: 50, scale: 50, rotation: 0 });
+    useDesignHistory({
+      file: (isArtistLocked && preferredSide === "front") ? "artist_locked" : null,
+      previewUrl: (artistDesign && preferredSide === "front") ? artistDesign.front?.imageUrl : null,
+      x: preferredSide === "front" ? (artistDesign?.front?.x ?? 50) : 50,
+      y: preferredSide === "front" ? (artistDesign?.front?.y ?? 35) : 50,
+      scale: preferredSide === "front" ? (artistDesign?.front?.width ?? 55) : 50,
+      rotation: preferredSide === "front" ? (artistDesign?.front?.rotation ?? 0) : 0,
+    });
 
+  // Back Design Initialization
   const [backDesign, setBackDesign, undoBack, redoBack, canUndoBack, canRedoBack, resetBack] =
-    useDesignHistory({ file: null, previewUrl: null, x: 50, y: 50, scale: 50, rotation: 0 });
+    useDesignHistory({
+      file: (isArtistLocked && preferredSide === "back") ? "artist_locked" : null,
+      previewUrl: (artistDesign && preferredSide === "back") ? artistDesign.back?.imageUrl : null,
+      x: preferredSide === "back" ? (artistDesign?.back?.x ?? 50) : 50,
+      y: preferredSide === "back" ? (artistDesign?.back?.y ?? 35) : 50,
+      scale: preferredSide === "back" ? (artistDesign?.back?.width ?? 55) : 50,
+      rotation: preferredSide === "back" ? (artistDesign?.back?.rotation ?? 0) : 0,
+    });
 
   const activeDesignState = activeSide === "back" ? backDesign : frontDesign;
   const setActiveDesignState = activeSide === "back" ? setBackDesign : setFrontDesign;
@@ -437,10 +461,13 @@ const DesignWorkspace = ({
     );
   }, [canvas, selectedColor]);
 
-  const activeTemplateId =
-    activeSide === "back"
-      ? activeColorObj?.podBackTemplateId
-      : activeColorObj?.podFrontTemplateId;
+  // 🔴 FIX: Dynamically fetch front or back template asset URL matching the active color & side
+  const activeTemplateId = useMemo(() => {
+    if (!activeColorObj) return null;
+    return activeSide === "back"
+      ? activeColorObj.podBackTemplateId
+      : activeColorObj.podFrontTemplateId || activeColorObj.imageId;
+  }, [activeColorObj, activeSide]);
 
   useEffect(() => {
     let isMounted = true;
@@ -482,6 +509,8 @@ const DesignWorkspace = ({
   // Determine current active opacity value based on gesture state
   const computedOpacity = isLockedToZero ? 0 : uiOpacity;
 
+  const isCurrentSideLocked = isArtistLocked && preferredSide === activeSide;
+
   return (
     <WorkspaceWrapper>
       <MobilePageLock />
@@ -501,8 +530,14 @@ const DesignWorkspace = ({
             solidBgColor={solidBgColor}
             setSolidBgColor={setSolidBgColor}
           />
+
+          {/* 🔴 INJECTED: Collapsible Sizing Matrix sits perfectly under the preview */}
+          <CollapsibleSizingWidget
+            canvas={canvas}
+            selectedSize={selectedSize}
+          />
           
-          {/* 🔴 Context-Aware CTA showing directly under the preview when panels are locked to 0 */}
+          {/* Context-Aware CTA showing directly under the preview when panels are locked to 0 */}
           <AnimatePresence>
             {activeTab !== "cart" && isLockedToZero && (
               <SubStageCTA
@@ -584,7 +619,27 @@ const DesignWorkspace = ({
             sizeChart={canvas.sizeChart}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
+            isArtistLocked={isCurrentSideLocked} // Only lock the specific side selected by the artist
           />
+
+          {/* INJECTED: CURATED COLLABORATIVE DESIGN SELECTOR */}
+          {activeTab === "transform" && isArtistLocked && (
+            <div style={{ marginTop: "1rem" }}>
+              <PrePreparedDesignsTab
+                activeCategory={artistDesign.collectionName} // Filters by current collection
+                onSelectArtwork={(artworkUrl, defaultPlacement) => {
+                  setActiveDesignState({
+                    file: "artist_locked",
+                    previewUrl: artworkUrl,
+                    scale: defaultPlacement?.scale || 55,
+                    x: defaultPlacement?.x || 50,
+                    y: defaultPlacement?.y || 35,
+                    rotation: defaultPlacement?.rotation || 0,
+                  });
+                }}
+              />
+            </div>
+          )}
 
           <ProductionSummary
             canvas={canvas}
@@ -622,7 +677,7 @@ const DesignWorkspace = ({
               }}
             >
               <span style={{ fontSize: "0.85rem", fontWeight: "800", color: "#a1a1aa", display: "flex", alignItems: "center", gap: "10px" }}>
-                {/* 🔴 PHYSICAL SLIDE-TO-LOCK SWITCH BUTTON */}
+                {/* PHYSICAL SLIDE-TO-LOCK SWITCH BUTTON */}
                 <SwitchTrack onClick={handleSwitchClick}>
                   <SwitchThumb
                     drag="x"
@@ -712,16 +767,36 @@ const DesignWorkspace = ({
                 </>
               )}
 
+              {/* ADAPTIVE MOBILE PRE-PREPARED DESIGNS VIEW */}
+              {activeTab === "transform" && isArtistLocked && (
+                <div style={{ marginBottom: "1rem" }}>
+                  <PrePreparedDesignsTab
+                    activeCategory={artistDesign.collectionName}
+                    onSelectArtwork={(artworkUrl, defaultPlacement) => {
+                      setActiveDesignState({
+                        file: "artist_locked",
+                        previewUrl: artworkUrl,
+                        scale: defaultPlacement?.scale || 55,
+                        x: defaultPlacement?.x || 50,
+                        y: defaultPlacement?.y || 35,
+                        rotation: defaultPlacement?.rotation || 0,
+                      });
+                    }}
+                  />
+                </div>
+              )}
+
               {(activeTab === "transform" || activeTab === "position" || activeTab === "rotation") && (
                 <DesignControls
-                  designState={activeDesignState}
-                  setDesignState={setActiveDesignState}
-                  canvasName={canvas.title}
-                  selectedSize={selectedSize}
-                  sizeChart={canvas.sizeChart}
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                />
+            designState={activeDesignState}
+            setDesignState={setActiveDesignState}
+            canvasName={canvas.title}
+            selectedSize={selectedSize}
+            sizeChart={canvas.sizeChart}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            isArtistLocked={isCurrentSideLocked}
+          />
               )}
             </div>
           </MobileToolPanel>
@@ -825,7 +900,7 @@ const DesignWorkspace = ({
         </DockTab>
       </MobileBottomDock>
 
-      {/* 🔴 FIXED PERSISTENT FLOATING TOGGLE FOR LOCK RECOVERY MODE */}
+      {/* FIXED PERSISTENT FLOATING TOGGLE FOR LOCK RECOVERY MODE */}
       {isLockedToZero && (
         <div
           style={{

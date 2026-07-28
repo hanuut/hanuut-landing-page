@@ -1340,6 +1340,23 @@
   "discovery_sports_title": "Train In Your Own Identity.",
   "discovery_sports_desc": "Engineered athletic wear and gym apparel tailored for team spirit and solo performance.",
   "discovery_sports_cta": "Customize Activewear",
-  "pod_studio_reviewed_notice": "Reviewed before production"
+  "pod_studio_reviewed_notice": "Reviewed before production",
+  "pod_studio_join_creators_btn": "Join as a Creator 🎨",
+  "creator_collab_hero_title": "Monetize Your Art. Zero Manufacturing Friction.",
+  "creator_collab_hero_subtitle": "Publish your graphics on AURAS LAB blanks. Earn royalties on every sale across 58 Wilayas while we handle production, printing, and logistics.",
+  "creator_collab_step1_title": "1. Apply",
+  "creator_collab_step1_desc": "Submit your artistic alias and artwork samples.",
+  "creator_collab_step2_title": "2. Quality Review",
+  "creator_collab_step2_desc": "Our team reviews print resolution and agrees on royalty terms with you.",
+  "creator_collab_step3_title": "3. Earn Royalties",
+  "creator_collab_step3_desc": "Your designs go live on our canvases, and you earn profit on every order.",
+  "creator_form_artist_name": "Artistic Alias / Brand Name",
+  "creator_form_collection_title": "First Collection Title",
+  "creator_form_phone": "Contact Phone Number",
+  "creator_form_portfolio": "Portfolio Link (Instagram / Behance / Drive)",
+  "creator_form_upload_samples": "Upload Design Samples (Optional)",
+  "creator_form_submit": "Submit Application 🚀",
+  "creator_form_success": "Application received! The AURAS LAB team will contact you shortly.",
+  "editorial_showcase_title" : "AURASLAB X CREATORS"
 
 }
