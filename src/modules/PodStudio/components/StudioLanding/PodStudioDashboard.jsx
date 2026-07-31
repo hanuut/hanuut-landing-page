@@ -357,7 +357,7 @@ const PodStudioDashboard = ({ shop, selectedShopImage, initialSku, initialGroup 
         fetchPaginatedProducts({
           shopId: shopId,
           page: 1,
-          limit: 12,
+          limit: 25,
           categoryId: "",
           search: "",
           isNewFilter: true,

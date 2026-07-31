@@ -657,7 +657,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
   const [hoveredLineIdx, setHoveredLineIdx] = useState(null);
   const [isItemHovered, setIsItemHovered] = useState(false);
 
-  // 🔴 LAZY LOADING: Automatically triggers and reads next pages on scroll
+// 🔴 LAZY LOADING: Automatically triggers and reads next pages on scroll
   useEffect(() => {
     if (paginationLoading) return;
 
@@ -668,7 +668,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
             fetchPaginatedProducts({ 
               shopId,
               page: paginationMeta.page + 1,
-              limit: 12,
+              limit: 25, // <-- Increased from 12
               categoryId: selectedCategory || "",
               search: searchQuery,
               isNewFilter: false, // Appends new products to list
@@ -692,6 +692,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
     };
   }, [dispatch, shopId, selectedCategory, searchQuery, paginationLoading, paginationMeta]);
 
+  
   const shopCategoryIds = useMemo(() => {
     if (!shop?.categories) return [];
     return shop.categories.map((cat) => typeof cat === "object" ? cat._id || cat.id : cat);

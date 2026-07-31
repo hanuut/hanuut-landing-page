@@ -361,7 +361,7 @@ const ArtistDesignProductModal = ({ isOpen, onClose, design, shopId, onSelectPro
         fetchPaginatedProducts({
           shopId,
           page: 1,
-          limit: 24,
+          limit: 25,
           categoryId: "",
           search: "",
           isNewFilter: true,

@@ -220,7 +220,7 @@ const GlobalShopLandingPage = ({
         fetchPaginatedProducts({
           shopId: normalizedShopId,
           page: 1,
-          limit: 12,
+          limit: 20,
           categoryId: "",
           search: "",
           isNewFilter: true,
@@ -261,7 +261,7 @@ const GlobalShopLandingPage = ({
         fetchPaginatedProducts({
           shopId: normalizedShopId,
           page: 1,
-          limit: 12,
+          limit: 20,
           categoryId: selectedCategory || "",
           search: searchQuery,
           isNewFilter: true,
@@ -310,7 +310,7 @@ const GlobalShopLandingPage = ({
             fetchPaginatedProducts({
               shopId: normalizedShopId,
               page: paginationMeta.page + 1,
-              limit: 12,
+              limit: 20,
               categoryId: selectedCategory || "",
               search: searchQuery,
               isNewFilter: false,
