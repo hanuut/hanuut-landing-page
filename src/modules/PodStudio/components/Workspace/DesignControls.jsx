@@ -26,13 +26,14 @@ const ControlsCard = styled.div`
   box-sizing: border-box;
 `;
 
-const UploadZone = styled.label`
+
+const UploadZone = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem; /* Reduced */
-  padding: 2rem 1rem; /* Reduced from 3rem 1.25rem */
+  gap: 0.5rem;
+  padding: 2rem 1rem;
   border: 2px dashed ${(props) => props.theme.primaryColor || "#F07A48"}80;
   border-radius: 16px;
   background: ${(props) => props.theme.primaryColor || "#F07A48"}04;
@@ -45,7 +46,15 @@ const UploadZone = styled.label`
     border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
   }
 
-  input { display: none; }
+  /* Safe WebView Hidden Input */
+  input[type="file"] {
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+  }
 `;
 
 
@@ -163,30 +172,6 @@ const ActionRow = styled.div`
   gap: 0.4rem;
 `;
 
-const MiniActionLabel = styled.label`
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.02);
-  color: #a1a1aa;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  font-size: 0.95rem;
-  margin: 0;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  input { display: none; }
-`;
-
 const MiniActionButton = styled.button`
   width: 34px;
   height: 34px;
@@ -290,12 +275,16 @@ const DesignControls = ({
             {isArabic ? "هذا التصميم محمي بواسطة الفنان." : "This original artwork is protected by the artist."}
           </div>
         ) : (
-          <UploadZone>
+          <UploadZone onClick={() => fileInputRef.current?.click()}>
             <FaCloudUploadAlt style={{ fontSize: "2rem", color: "#F07A48" }} />
             <UploadLabel>{t("pod_studio_upload_design_title", "Import Artwork")}</UploadLabel>
             <UploadSub>{t("pod_studio_upload_requirements", "PNG image with transparent background")}</UploadSub>
-            {/* 🔴 FLUTTER WEBVIEW FIX: NATIVE INPUT INSIDE LABEL */}
-            <input type="file" accept="image/*" onChange={handleFileChange} />
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/png, image/jpeg, image/*"
+              onChange={handleFileChange}
+            />
           </UploadZone>
         )
       ) : (
@@ -318,11 +307,21 @@ const DesignControls = ({
               
               {!isArtistLocked && (
                 <ActionRow>
-                  {/* 🔴 FLUTTER WEBVIEW FIX: NATIVE INPUT INSIDE LABEL */}
-                  <MiniActionLabel title="Replace Artwork">
+                  <MiniActionButton 
+                    type="button" 
+                    title="Replace Artwork"
+                    onClick={() => replacementInputRef.current?.click()}
+                  >
                     <FaCloudUploadAlt />
-                    <input type="file" accept="image/*" onChange={handleFileChange} />
-                  </MiniActionLabel>
+                    <input
+                      type="file"
+                      ref={replacementInputRef}
+                      accept="image/png, image/jpeg, image/*"
+                      onChange={handleFileChange}
+                      style={{ position: 'absolute', width: '0.1px', height: '0.1px', opacity: 0, zIndex: -1 }}
+                    />
+                  </MiniActionButton>
+                  
                   <MiniActionButton type="button" className="danger" title="Remove Artwork" onClick={handleReset}>
                     <FaTrash />
                   </MiniActionButton>
