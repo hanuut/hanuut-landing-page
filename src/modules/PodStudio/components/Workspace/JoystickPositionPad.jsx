@@ -13,11 +13,11 @@ import {
 const PadContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.5rem; /* Tighter */
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  padding: 1rem;
+  padding: 0.75rem 1rem; /* Tighter */
   box-sizing: border-box;
 `;
 
@@ -45,9 +45,9 @@ const PadHeader = styled.div`
 const JoystickGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  width: 140px;
-  height: 140px;
+  gap: 4px; /* Tighter */
+  width: 120px; /* Reduced from 140px */
+  height: 120px; /* Reduced from 140px */
   margin: 0 auto;
 `;
 

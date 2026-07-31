@@ -1331,7 +1331,6 @@
     "pod_studio_item_front_cost": "قيمة الطباعة الأمامية:",
     "pod_studio_item_back_cost": "قيمة الطباعة الخلفية:",
     "pod_studio_item_total_cost": "الإجمالي المستحق للمشروع:",
-    "pod_studio_btn_commit_tray": "أضف إلى تشكيلتك",
     "pod_studio_tray_title": "سلة تصاميمك المنجزة",
     "pod_studio_empty_tray": "لم تضف أي تصاميم مخصصة بعد.",
     "pod_studio_btn_submit_production": "بدء خط الإنتاج الفوري",
@@ -1406,5 +1405,8 @@
   "creator_form_upload_samples": "رفع عينة من التصاميم (اختياري)",
   "creator_form_submit": "إرسال طلب الانضمام 🚀",
   "creator_form_success": "تم استلام طلبك بنجاح! سيتواصل معك فريق أوراس لاب قريباً.",
-  "editorial_showcase_title" : "الصنايعية AURASLAB  X "
+  "editorial_showcase_title" : "الصنايعية AURASLAB  X ",
+  "pod_studio_billing_breakdown": "تفاصيل الفاتورة",
+  "pod_studio_btn_update_tray": "تحديث التصميم",
+  "pod_studio_btn_commit_tray": "أضف إلى تشكيلتك"
 }

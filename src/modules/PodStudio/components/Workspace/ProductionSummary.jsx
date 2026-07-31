@@ -9,54 +9,55 @@ import {
   getGarmentDimensions,
   getTemplateConfig,
   getRawPrintCost,
-  calculatePhysicalMetrics,
 } from "../../hooks/usePrintableArea";
 
 const BillCard = styled.div`
-  background: rgba(255, 255, 255, 0.02);
+  background: #060608;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: 20px;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
   width: 100%;
   box-sizing: border-box;
+  margin-top: auto; /* Push to bottom of control panel */
 `;
 
 const CostRow = styled.div`
   display: flex;
   justify-content: space-between;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #a1a1aa;
   font-family: "Cairo", sans-serif;
+  font-weight: 600;
 `;
 
 const GrandTotalRow = styled(CostRow)`
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
   padding-top: 0.75rem;
   margin-top: 0.25rem;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: ${(props) => props.theme.primaryColor || "#F07A48"};
 `;
 
 const CommitButton = styled.button`
   width: 100%;
-  padding: 1.1rem;
+  padding: 1rem;
   background-color: ${(props) => props.theme.primaryColor || "#F07A48"};
   color: #050505;
   border: none;
-  border-radius: 14px;
-  font-size: 1.1rem;
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.2s;
   font-family: "Tajawal", sans-serif;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
 
   &:hover {
-    filter: brightness(1.1);
+    filter: brightness(1.15);
     transform: translateY(-2px);
   }
 
@@ -81,9 +82,7 @@ const ProductionSummary = ({
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
-  const activeColorObj = canvas.availableColors.find(
-    (c) => c.colorName === selectedColor,
-  );
+  const activeColorObj = canvas.availableColors.find((c) => c.colorName === selectedColor);
 
   const baseCost = useMemo(() => {
     const matchedSize = canvas.sizes.find((s) => s.sizeCode === selectedSize);
@@ -98,13 +97,9 @@ const ProductionSummary = ({
     if (frontDesign.previewUrl) {
       const img = new Image();
       img.src = frontDesign.previewUrl;
-      img.onload = () => {
-        if (isMounted) setFrontAspect(img.naturalWidth / img.naturalHeight);
-      };
+      img.onload = () => { if (isMounted) setFrontAspect(img.naturalWidth / img.naturalHeight); };
     }
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [frontDesign.previewUrl]);
 
   useEffect(() => {
@@ -112,51 +107,39 @@ const ProductionSummary = ({
     if (backDesign.previewUrl) {
       const img = new Image();
       img.src = backDesign.previewUrl;
-      img.onload = () => {
-        if (isMounted) setBackAspect(img.naturalWidth / img.naturalHeight);
-      };
+      img.onload = () => { if (isMounted) setBackAspect(img.naturalWidth / img.naturalHeight); };
     }
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [backDesign.previewUrl]);
 
   const cfg = useMemo(() => getTemplateConfig(canvas.title), [canvas.title]);
   const garmentDims = useMemo(
     () => getGarmentDimensions(canvas.title, selectedSize, canvas.sizeChart),
-    [canvas.title, selectedSize, canvas.sizeChart],
+    [canvas.title, selectedSize, canvas.sizeChart]
   );
 
-  // Exact replication of NestJS backend's dimension and scale math
   const printWidthRatio = useMemo(() => cfg.printW_ref / cfg.B_ref, [cfg]);
 
   const frontPrintCost = useMemo(() => {
     if (!frontDesign.previewUrl) return 0;
-    
     const maxPrintWidthCm = garmentDims.B * printWidthRatio;
     const wCm = (frontDesign.scale / 100) * maxPrintWidthCm;
     const hCm = wCm / frontAspect;
-
-    // Matches backend: rawPrintCost + (50 + 60) for active side
     return getRawPrintCost(wCm, hCm) + 110;
   }, [frontDesign.previewUrl, frontDesign.scale, garmentDims, printWidthRatio, frontAspect]);
 
   const backPrintCost = useMemo(() => {
     if (!backDesign.previewUrl) return 0;
-
     const maxPrintWidthCm = garmentDims.B * printWidthRatio;
     const wCm = (backDesign.scale / 100) * maxPrintWidthCm;
     const hCm = wCm / backAspect;
-
-    // Matches backend: rawPrintCost + (50 + 60) for active side
     return getRawPrintCost(wCm, hCm) + 110;
   }, [backDesign.previewUrl, backDesign.scale, garmentDims, printWidthRatio, backAspect]);
 
   const totalPrintCost = frontPrintCost + backPrintCost;
   const totalCost = baseCost + totalPrintCost;
 
-  const apiProdUrl =
-    process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+  const apiProdUrl = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
 
   const frontTemplateUrl = useMemo(() => {
     return activeColorObj?.podFrontTemplateId
@@ -174,21 +157,13 @@ const ProductionSummary = ({
     const hasFront = !!frontDesign.previewUrl;
     const hasBack = !!backDesign.previewUrl;
 
-    const oldId = editingCartItem
-      ? editingCartItem.variantId || editingCartItem.lineItemId
-      : null;
-    const targetVariantId =
-      oldId ||
-      `pod_${canvas.canvasId}_${selectedColor}_${selectedSize}_${Date.now()}`;
+    const oldId = editingCartItem ? editingCartItem.variantId || editingCartItem.lineItemId : null;
+    const targetVariantId = oldId || `pod_${canvas.canvasId}_${selectedColor}_${selectedSize}_${Date.now()}`;
 
     if (hasFront) {
       if (frontDesign.file && typeof frontDesign.file !== "string") {
         await persistFile(`${targetVariantId}_front`, frontDesign.file);
-      } else if (
-        frontDesign.file === "existing" &&
-        oldId &&
-        targetVariantId !== oldId
-      ) {
+      } else if (frontDesign.file === "existing" && oldId && targetVariantId !== oldId) {
         const oldFile = await retrieveFile(`${oldId}_front`);
         if (oldFile) await persistFile(`${targetVariantId}_front`, oldFile);
       }
@@ -197,11 +172,7 @@ const ProductionSummary = ({
     if (hasBack) {
       if (backDesign.file && typeof backDesign.file !== "string") {
         await persistFile(`${targetVariantId}_back`, backDesign.file);
-      } else if (
-        backDesign.file === "existing" &&
-        oldId &&
-        targetVariantId !== oldId
-      ) {
+      } else if (backDesign.file === "existing" && oldId && targetVariantId !== oldId) {
         const oldFile = await retrieveFile(`${oldId}_back`);
         if (oldFile) await persistFile(`${targetVariantId}_back`, oldFile);
       }
@@ -227,46 +198,24 @@ const ProductionSummary = ({
         printSide: printSideKeyword,
         baseGarmentCost: baseCost,
         printCost: totalPrintCost,
-        front: hasFront
-          ? {
-              imageId:
-                frontDesign.file === "existing"
-                  ? frontDesign.previewUrl
-                  : `${targetVariantId}_front`,
-              imageUrl: frontDesign.previewUrl,
-              originalImageId:
-                frontDesign.file === "existing"
-                  ? frontDesign.previewUrl
-                  : `${targetVariantId}_front`,
-              originalImageUrl: frontDesign.previewUrl,
-              width: frontDesign.scale,
-              height: frontDesign.scale,
-              x: frontDesign.x,
-              y: frontDesign.y,
-              rotation: frontDesign.rotation,
-              templateUrl: frontTemplateUrl,
-            }
-          : null,
-        back: hasBack
-          ? {
-              imageId:
-                backDesign.file === "existing"
-                  ? backDesign.previewUrl
-                  : `${targetVariantId}_back`,
-              imageUrl: backDesign.previewUrl,
-              originalImageId:
-                backDesign.file === "existing"
-                  ? backDesign.previewUrl
-                  : `${targetVariantId}_back`,
-              originalImageUrl: backDesign.previewUrl,
-              width: backDesign.scale,
-              height: backDesign.scale,
-              x: backDesign.x,
-              y: backDesign.y,
-              rotation: backDesign.rotation,
-              templateUrl: backTemplateUrl,
-            }
-          : null,
+        front: hasFront ? {
+          imageId: frontDesign.file === "existing" ? frontDesign.previewUrl : `${targetVariantId}_front`,
+          imageUrl: frontDesign.previewUrl,
+          originalImageId: frontDesign.file === "existing" ? frontDesign.previewUrl : `${targetVariantId}_front`,
+          originalImageUrl: frontDesign.previewUrl,
+          width: frontDesign.scale, height: frontDesign.scale,
+          x: frontDesign.x, y: frontDesign.y, rotation: frontDesign.rotation,
+          templateUrl: frontTemplateUrl,
+        } : null,
+        back: hasBack ? {
+          imageId: backDesign.file === "existing" ? backDesign.previewUrl : `${targetVariantId}_back`,
+          imageUrl: backDesign.previewUrl,
+          originalImageId: backDesign.file === "existing" ? backDesign.previewUrl : `${targetVariantId}_back`,
+          originalImageUrl: backDesign.previewUrl,
+          width: backDesign.scale, height: backDesign.scale,
+          x: backDesign.x, y: backDesign.y, rotation: backDesign.rotation,
+          templateUrl: backTemplateUrl,
+        } : null,
       },
     };
 
@@ -277,39 +226,28 @@ const ProductionSummary = ({
   return (
     <BillCard>
       <CostRow>
-        <span>{t("pod_studio_item_base_cost")}</span>
-        <span>
-          {baseCost} {t("zd", "DA")}
-        </span>
+        <span>{t("pod_studio_item_base_cost", "Apparel Base")}</span>
+        <span>{baseCost} {t("zd", "DA")}</span>
       </CostRow>
       {frontPrintCost > 0 && (
         <CostRow>
-          <span>{t("pod_studio_item_front_cost")} (Front)</span>
-          <span>
-            +{frontPrintCost} {t("zd", "DA")}
-          </span>
+          <span>{t("pod_studio_item_front_cost", "Front Print")}</span>
+          <span>+{frontPrintCost} {t("zd", "DA")}</span>
         </CostRow>
       )}
       {backPrintCost > 0 && (
         <CostRow>
-          <span>{t("pod_studio_item_front_cost")} (Back)</span>
-          <span>
-            +{backPrintCost} {t("zd", "DA")}
-          </span>
+          <span>{t("pod_studio_item_back_cost", "Back Print")}</span>
+          <span>+{backPrintCost} {t("zd", "DA")}</span>
         </CostRow>
       )}
       <GrandTotalRow>
-        <span>{t("pod_studio_item_total_cost")}</span>
-        <span>
-          {totalCost} {t("zd", "DA")}
-        </span>
+        <span>{t("pod_studio_item_total_cost", "Total Due")}</span>
+        <span>{totalCost} {t("zd", "DA")}</span>
       </GrandTotalRow>
 
-      <CommitButton
-        type="button"
-        onClick={handleCommitToTray}
-      >
-        {t("pod_studio_btn_commit_tray")}
+      <CommitButton type="button" onClick={handleCommitToTray}>
+        {editingCartItem ? t("pod_studio_btn_update_tray", "Update Design") : t("pod_studio_btn_commit_tray", "Add to Collection")}
       </CommitButton>
     </BillCard>
   );

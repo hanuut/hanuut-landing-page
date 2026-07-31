@@ -1287,7 +1287,6 @@
     "pod_studio_item_front_cost": "Coût Impression Avant :",
     "pod_studio_item_back_cost": "Coût Impression Arrière :",
     "pod_studio_item_total_cost": "Total dû :",
-    "pod_studio_btn_commit_tray": "Ajouter à la Collection",
     "pod_studio_tray_title": "Vos Créations",
     "pod_studio_empty_tray": "Aucune création pour le moment.",
     "pod_studio_btn_submit_production": "Lancer la Production",
@@ -1362,5 +1361,8 @@
   "creator_form_upload_samples": "Téléverser des aperçus (Optionnel)",
   "creator_form_submit": "Envoyer la candidature 🚀",
   "creator_form_success": "Candidature reçue ! L'équipe AURAS LAB vous contactera sous peu.",
-  "editorial_showcase_title" : "AURASLAB X CREATORS"
+  "editorial_showcase_title" : "AURASLAB X CREATORS",
+  "pod_studio_billing_breakdown": "FACTURATION & PRODUCTION",
+  "pod_studio_btn_update_tray": "Mettre à jour le design",
+  "pod_studio_btn_commit_tray": "Ajouter à la collection"
 }
