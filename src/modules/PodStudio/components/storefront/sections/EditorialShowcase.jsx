@@ -1,22 +1,23 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PropTypes from "prop-types";
-import styled, { keyframes } from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaPaintBrush, FaCheckCircle, FaLayerGroup, FaTimes } from "react-icons/fa";
+import { FaCheckCircle, FaTimes, FaPalette, FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../../../../components/Loader";
 import ArtistDesignProductModal from "../../Workspace/ArtistDesignProductModal";
 
 // ===========================================================================
-// STYLED COMPONENTS - CLUSTERED STACKED COLLECTIONS
+// GLOBALS & STYLES
 // ===========================================================================
 
-const floatOrganic = keyframes`
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-5px) rotate(0.3deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
+const ModalBodyLock = createGlobalStyle`
+  body {
+    overflow: hidden !important;
+    touch-action: none;
+  }
 `;
 
 const ShowcaseSection = styled.section`
@@ -93,176 +94,212 @@ const JoinCreatorBtn = styled.button`
   }
 `;
 
-const ClusterFeed = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
+// --- NEW COMPACT BENTO GRID FOR ARTISTS ---
+const ArtistBentoGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
   max-width: 1280px;
   width: 90%;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 `;
 
-const ClusterPileRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.02);
+const ArtistCardWrapper = styled(motion.div)`
+  aspect-ratio: 4 / 4.5;
+  background: #0c0c0e;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 24px;
-  padding: 1.75rem 2.5rem;
-  box-sizing: border-box;
-  gap: 2rem;
-  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-color: rgba(240, 122, 72, 0.3);
-    background: rgba(255, 255, 255, 0.035);
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 1.5rem;
-  }
-`;
-
-const ClusterMeta = styled.div`
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  flex: 1;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 
-  .collection-name {
-    font-size: 1.6rem;
-    font-weight: 900;
-    color: white;
-    font-family: "Tajawal", sans-serif;
-    margin: 0;
-  }
-
-  .artist-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    color: #a1a1aa;
-    font-weight: 700;
-    font-family: "Cairo", sans-serif;
-  }
-
-  .count-badge {
-    font-size: 0.75rem;
-    color: ${(props) => props.theme.primaryColor || "#F07A48"};
-    font-family: monospace;
-    font-weight: 700;
-    text-transform: uppercase;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
   }
 `;
 
-const StackPreviewCluster = styled.div`
-  position: relative;
-  width: 180px;
-  height: 130px;
-  cursor: pointer;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    height: 140px;
-  }
-`;
-
-const StackedItemLayer = styled(motion.div)`
+const FanningStage = styled.div`
   position: absolute;
-  width: 90px;
-  height: 110px;
-  background: #111214;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
+  inset: 0;
+  bottom: 80px; /* Leave space for the text footer */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
+  z-index: 1;
+`;
+
+const CardArtwork = styled(motion.div)`
+  position: absolute;
+  width: 160px;
+  height: 200px;
+  background: #18181b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
   box-sizing: border-box;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  animation: ${floatOrganic} 5s ease-in-out infinite;
-  animation-delay: ${(props) => props.$delay || "0s"};
 
   img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
   }
 `;
 
-const ExploreStackBtn = styled.button`
-  background: #ffffff;
-  color: #050505;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 50px;
+const ArtistCardFooter = styled(motion.div)`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 3rem 1.5rem 1.5rem 1.5rem;
+  background: linear-gradient(to top, rgba(5, 5, 5, 1) 0%, rgba(5, 5, 5, 0.8) 50%, transparent 100%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+  ${(props) => (props.$isArabic ? "align-items: flex-end; text-align: right;" : "")}
+`;
+
+const ArtistName = styled.h3`
+  font-size: 1.4rem;
   font-weight: 800;
-  font-size: 0.9rem;
-  cursor: pointer;
+  color: white;
+  margin: 0 0 6px 0;
+  font-family: "Tajawal", sans-serif;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: "Tajawal", sans-serif;
-  transition: all 0.2s;
-  white-space: nowrap;
+`;
 
-  &:hover {
-    background: ${(props) => props.theme.primaryColor || "#F07A48"};
-    color: #ffffff;
-    transform: translateY(-2px);
+const ArtistMetaPill = styled.span`
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a1a1aa;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: "Cairo", sans-serif;
+`;
+
+const HoverCtaBtn = styled(motion.div)`
+  margin-top: 1rem;
+  background: ${(props) => props.theme.primaryColor || "#F07A48"};
+  color: #000;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  font-family: "Tajawal", sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+// --- IMMERSIVE TAKEOVER MODAL ---
+const Overlay = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  @media (min-width: 768px) {
+    padding: 2rem;
+    align-items: center;
   }
 `;
 
-const ExpandedGridWrapper = styled(motion.div)`
-  background: rgba(14, 14, 16, 0.95);
-  border: 1px solid rgba(240, 122, 72, 0.3);
-  border-radius: 24px;
-  padding: 2rem;
-  margin-top: 1rem;
+const ModalContainer = styled(motion.div)`
+  width: 100%;
+  max-width: 1200px;
+  height: 90vh;
+  background: #0b0b0d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px 28px 0 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  box-sizing: border-box;
-  position: relative;
+  overflow: hidden;
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.8);
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+
+  @media (min-width: 768px) {
+    border-radius: 28px;
+    height: 85vh;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.85);
+  }
 `;
 
-const ExpandedHeader = styled.div`
+const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 1rem;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: #111214;
+  flex-shrink: 0;
+`;
 
-  h4 {
+const ModalHeaderInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+
+  h2 {
     margin: 0;
-    font-size: 1.15rem;
-    font-weight: 800;
+    font-size: 1.8rem;
+    font-weight: 900;
     color: white;
     font-family: "Tajawal", sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #a1a1aa;
+    font-family: "Cairo", sans-serif;
   }
 `;
 
-const CloseGridBtn = styled.button`
+const CloseBtn = styled.button`
   background: rgba(255, 255, 255, 0.05);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #a1a1aa;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.2rem;
   transition: all 0.2s;
 
   &:hover {
@@ -271,10 +308,60 @@ const CloseGridBtn = styled.button`
   }
 `;
 
+const ModalBody = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  box-sizing: border-box;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
+
+  @media (max-width: 768px) { padding: 1.5rem; }
+`;
+
+const CollectionSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+const CollectionTitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: white;
+    font-family: "Tajawal", sans-serif;
+  }
+
+  span {
+    background: rgba(240, 122, 72, 0.1);
+    color: #F07A48;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: monospace;
+  }
+`;
+
 const DesignsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.5rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
 `;
 
 const PureTextDesignCard = styled(motion.div)`
@@ -321,18 +408,14 @@ const DirectTextOverlay = styled.div`
   pointer-events: none;
 
   .art-title {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-weight: 800;
     color: white;
     font-family: "Tajawal", sans-serif;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
-  }
-
-  .artist-sub {
-    font-size: 0.72rem;
-    color: #a1a1aa;
-    font-family: "Cairo", sans-serif;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
 
@@ -350,6 +433,50 @@ const EmptyContainer = styled.div`
   font-family: "Cairo", sans-serif;
 `;
 
+// ===========================================================================
+// ANIMATION VARIANTS (THE FANNING EFFECT)
+// ===========================================================================
+
+const getFanVariants = (index, total) => {
+  // Default messy stacked state
+  const initial = {
+    x: 0,
+    y: index * 4,
+    rotate: (index % 2 === 0 ? 1 : -1) * (index * 2.5),
+    scale: 1 - (index * 0.05),
+    zIndex: total - index
+  };
+
+  // Fanned out elegant state on hover
+  let hoverX = 0, hoverY = -15, hoverRot = 0;
+
+  if (total === 1) { 
+    hoverX = 0; hoverRot = 0; hoverY = -15; 
+  } else if (total === 2) {
+    if (index === 0) { hoverX = -35; hoverRot = -12; hoverY = 0; }
+    else { hoverX = 35; hoverRot = 12; hoverY = 0; }
+  } else {
+    if (index === 0) { hoverX = -55; hoverRot = -18; hoverY = 10; } // Left
+    else if (index === 1) { hoverX = 0; hoverRot = 0; hoverY = -25; } // Center High
+    else if (index === 2) { hoverX = 55; hoverRot = 18; hoverY = 10; } // Right
+    else { hoverX = (index % 2 === 0 ? 70 : -70); hoverRot = (index % 2 === 0 ? 25 : -25); hoverY = 30; } // Hidden backs
+  }
+
+  const hover = {
+    x: hoverX,
+    y: hoverY,
+    rotate: hoverRot,
+    scale: index === 1 && total > 2 ? 1.05 : 1, // Center pops out more
+    zIndex: total - index
+  };
+
+  return { initial, hover };
+};
+
+// ===========================================================================
+// MAIN COMPONENT
+// ===========================================================================
+
 const EditorialShowcase = ({ shopId, onSelectDesign }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
@@ -357,7 +484,7 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
 
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expandedCollection, setExpandedCollection] = useState(null);
+  const [activeCreator, setActiveCreator] = useState(null);
   const [selectedArtistDesign, setSelectedArtistDesign] = useState(null);
 
   const API_URL = useMemo(() => {
@@ -385,28 +512,43 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
     };
   }, [API_URL]);
 
-  const groupedCollections = useMemo(() => {
-    const groups = {};
-    designs.forEach((design) => {
+  // Transform flat array into Artist -> Collections hierarchy
+  const creators = useMemo(() => {
+    const map = {};
+    designs.forEach(design => {
       const meta = design.podDesignMetadata || {};
-      const key = meta.collectionName || meta.artistName || "Studio Drop";
-      if (!groups[key]) {
-        groups[key] = {
-          collectionName: meta.collectionName || "Studio Drop",
-          artistName: meta.artistName || "Collaborator",
-          items: [],
+      const artistName = meta.artistName || "Studio Collaborator";
+      const collectionName = meta.collectionName || "Studio Drop";
+
+      if (!map[artistName]) {
+        map[artistName] = {
+          artistName,
+          totalDesigns: 0,
+          collections: {},
+          previewImages: [] // Cap at 3 for the fanning effect
         };
       }
-      groups[key].items.push(design);
+
+      if (!map[artistName].collections[collectionName]) {
+        map[artistName].collections[collectionName] = [];
+      }
+
+      map[artistName].collections[collectionName].push(design);
+      map[artistName].totalDesigns += 1;
+
+      if (map[artistName].previewImages.length < 3) {
+        map[artistName].previewImages.push(design);
+      }
     });
-    return Object.values(groups);
+
+    return Object.values(map);
   }, [designs]);
 
   if (loading) {
     return <Loader fullscreen={false} />;
   }
 
-  if (designs.length === 0) {
+  if (creators.length === 0) {
     return (
       <ShowcaseSection>
         <HeaderRow $isArabic={isArabic}>
@@ -429,121 +571,144 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
     <ShowcaseSection className="editorial-showcase-section">
       <HeaderRow $isArabic={isArabic}>
         <SectionHeader>
-          <CategoryLabel>{t("pod_studio_hero_badge", "CURATED LAB")}</CategoryLabel>
-          <Title>{t("editorial_showcase_title", "Featured Collaborations")}</Title>
+          <CategoryLabel>{t("pod_studio_hero_badge", "PREMIUM BLANKS")}</CategoryLabel>
+          <Title>{t("editorial_showcase_title", "AURASLAB X CREATORS")}</Title>
         </SectionHeader>
         <JoinCreatorBtn onClick={() => navigate("collab")}>
           <span>🎨</span> {t("pod_studio_join_creators_btn", "Join as a Creator")}
         </JoinCreatorBtn>
       </HeaderRow>
 
-      <ClusterFeed>
-        {groupedCollections.map((group, gIdx) => {
-          const isExpanded = expandedCollection === group.collectionName;
-          const stackPreviews = group.items.slice(0, 3);
-
-          return (
-            <div key={gIdx}>
-              <ClusterPileRow
-                $isArabic={isArabic}
-                onClick={() => setExpandedCollection(isExpanded ? null : group.collectionName)}
-                style={{ cursor: "pointer" }}
-              >
-                <ClusterMeta>
-                  <span className="count-badge">
-                    {group.items.length} {isArabic ? "تصاميم متاحـة" : "Designs Available"}
-                  </span>
-                  <h3 className="collection-name">{group.collectionName}</h3>
-                  <div className="artist-row">
-                    <span>{group.artistName}</span>
-                    <FaCheckCircle color="#39A170" size={13} title="Verified Creator" />
-                  </div>
-                </ClusterMeta>
-
-                <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-                  <StackPreviewCluster>
-                    {stackPreviews.map((item, pIdx) => {
-                      const offsets = [
-                        { x: -15, rotate: -6, z: 1 },
-                        { x: 0, rotate: 2, z: 3 },
-                        { x: 15, rotate: 8, z: 2 },
-                      ];
-                      const transf = offsets[pIdx % offsets.length];
-
-                      return (
-                        <StackedItemLayer
-                          key={item._id || item.id}
-                          $delay={`${pIdx * 0.3}s`}
-                          animate={{ x: transf.x, rotate: transf.rotate, zIndex: transf.z }}
-                        >
-                          <img
-                            src={`${API_URL}/image/raw/${item._id || item.id}`}
-                            alt=""
-                          />
-                        </StackedItemLayer>
-                      );
-                    })}
-                  </StackPreviewCluster>
-
-                  <ExploreStackBtn>
-                    <FaLayerGroup /> {isExpanded ? (isArabic ? "إغلاق" : "Collapse") : (isArabic ? "استكشاف" : "Explore Stack")}
-                  </ExploreStackBtn>
-                </div>
-              </ClusterPileRow>
-
-              <AnimatePresence>
-                {isExpanded && (
-                  <ExpandedGridWrapper
-                    initial={{ opacity: 0, height: 0, y: -10 }}
-                    animate={{ opacity: 1, height: "auto", y: 0 }}
-                    exit={{ opacity: 0, height: 0, y: -10 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
+      {/* 🔴 THE COMPACT CREATOR BENTO GRID */}
+      <ArtistBentoGrid>
+        {creators.map((creator, idx) => (
+          <ArtistCardWrapper
+            key={idx}
+            initial="initial"
+            whileHover="hover"
+            onClick={() => setActiveCreator(creator)}
+          >
+            <FanningStage>
+              {creator.previewImages.map((img, i) => {
+                const total = creator.previewImages.length;
+                return (
+                  <CardArtwork
+                    key={img._id || img.id}
+                    variants={getFanVariants(i, total)}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
-                    <ExpandedHeader>
-                      <h4>{group.collectionName} — {group.artistName}</h4>
-                      <CloseGridBtn onClick={() => setExpandedCollection(null)}>
-                        <FaTimes />
-                      </CloseGridBtn>
-                    </ExpandedHeader>
+                    <img src={`${API_URL}/image/raw/${img._id || img.id}`} alt="Artwork preview" />
+                  </CardArtwork>
+                );
+              })}
+            </FanningStage>
 
-                    <DesignsGrid>
-                      {group.items.map((design) => {
-                        const cleanTitle = design.originalname.split(".")[0].replace(/[_-]/g, " ");
-                        return (
-                          <PureTextDesignCard
-                            key={design._id || design.id}
-                            onClick={() => setSelectedArtistDesign(design)}
-                            whileHover={{ scale: 1.02 }}
-                          >
-                            <img
-                              src={`${API_URL}/image/raw/${design._id || design.id}`}
-                              alt={cleanTitle}
-                              loading="lazy"
-                            />
-                            <DirectTextOverlay $isArabic={isArabic}>
-                              <span className="art-title">{cleanTitle}</span>
-                              <span className="artist-sub">{group.artistName}</span>
-                            </DirectTextOverlay>
-                          </PureTextDesignCard>
-                        );
-                      })}
-                    </DesignsGrid>
-                  </ExpandedGridWrapper>
-                )}
-              </AnimatePresence>
-            </div>
-          );
-        })}
-      </ClusterFeed>
+            <ArtistCardFooter $isArabic={isArabic}>
+              <ArtistName>
+                {creator.artistName}
+                <FaCheckCircle color="#39A170" size={16} title="Verified Creator" />
+              </ArtistName>
+              <ArtistMetaPill>
+                {Object.keys(creator.collections).length} {isArabic ? "تشكيلات" : "Collections"} • {creator.totalDesigns} {isArabic ? "تصاميم" : "Designs"}
+              </ArtistMetaPill>
+              
+              <HoverCtaBtn
+                variants={{
+                  initial: { opacity: 0, y: 15, height: 0, marginTop: 0 },
+                  hover: { opacity: 1, y: 0, height: "auto", marginTop: "1rem" }
+                }}
+              >
+                <FaPalette /> {isArabic ? "استكشاف الفنان" : "View Creator"}
+              </HoverCtaBtn>
+            </ArtistCardFooter>
+          </ArtistCardWrapper>
+        ))}
+      </ArtistBentoGrid>
 
+      {/* 🔴 IMMERSIVE CREATOR TAKEOVER MODAL */}
+      <AnimatePresence>
+        {activeCreator && (
+          <>
+            <ModalBodyLock />
+            <Overlay
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActiveCreator(null)}
+            >
+              <ModalContainer
+                $isArabic={isArabic}
+                onClick={(e) => e.stopPropagation()}
+                initial={{ y: "100%", scale: 0.95 }}
+                animate={{ y: 0, scale: 1 }}
+                exit={{ y: "100%", scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              >
+                <ModalHeader>
+                  <ModalHeaderInfo $isArabic={isArabic}>
+                    <h2>
+                      {activeCreator.artistName}
+                      <FaCheckCircle color="#39A170" size={20} />
+                    </h2>
+                    <p>
+                      {activeCreator.totalDesigns} {isArabic ? "تصميم متاح" : "Exclusive Designs"}
+                    </p>
+                  </ModalHeaderInfo>
+                  <CloseBtn onClick={() => setActiveCreator(null)}>
+                    <FaTimes />
+                  </CloseBtn>
+                </ModalHeader>
+
+                <ModalBody>
+                  {Object.entries(activeCreator.collections).map(([colName, items]) => (
+                    <CollectionSection key={colName}>
+                      <CollectionTitleRow>
+                        <h4>{colName}</h4>
+                        <span>{items.length} {isArabic ? "عناصر" : "Items"}</span>
+                      </CollectionTitleRow>
+                      
+                      <DesignsGrid>
+                        {items.map((design) => {
+                          const cleanTitle = (design.originalname || "").split(".")[0].replace(/[_-]/g, " ");
+                          return (
+                            <PureTextDesignCard
+                              key={design._id || design.id}
+                              onClick={() => {
+                                setSelectedArtistDesign(design);
+                                setActiveCreator(null); // Close profile, open product selector
+                              }}
+                              whileHover={{ scale: 1.03 }}
+                            >
+                              <img
+                                src={`${API_URL}/image/raw/${design._id || design.id}`}
+                                alt={cleanTitle}
+                                loading="lazy"
+                              />
+                              <DirectTextOverlay $isArabic={isArabic}>
+                                <span className="art-title">{cleanTitle}</span>
+                              </DirectTextOverlay>
+                            </PureTextDesignCard>
+                          );
+                        })}
+                      </DesignsGrid>
+                    </CollectionSection>
+                  ))}
+                </ModalBody>
+              </ModalContainer>
+            </Overlay>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* RE-USE EXISTING PRODUCT SELECTION MODAL ONCE A DESIGN IS CLICKED */}
       <ArtistDesignProductModal
         isOpen={!!selectedArtistDesign}
         onClose={() => setSelectedArtistDesign(null)}
         design={selectedArtistDesign}
         shopId={shopId}
-        onSelectProductWithDesign={(canvas, design) => {
+        onSelectProductWithDesign={(canvas, design, preferredSide) => {
           setSelectedArtistDesign(null);
-          onSelectDesign(canvas, design);
+          onSelectDesign(canvas, design, preferredSide);
         }}
       />
     </ShowcaseSection>

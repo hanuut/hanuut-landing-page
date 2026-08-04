@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -204,6 +204,9 @@ const DesignControls = ({
 }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
+
+  const fileInputRef = useRef(null);
+  const replacementInputRef = useRef(null);
 
   const garmentDims = useMemo(
     () => getGarmentDimensions(canvasName, selectedSize, sizeChart),

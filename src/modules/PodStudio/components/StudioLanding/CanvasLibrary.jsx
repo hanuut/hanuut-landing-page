@@ -9,11 +9,8 @@ import styled, { keyframes, css } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  FaSearch,
-  FaPalette,
-  FaTshirt,
-} from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
+
 import {
   fetchPaginatedProducts,
   selectProducts,
@@ -24,17 +21,13 @@ import Loader from "../../../../components/Loader";
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
 
-// --- TEXT PARSER ---
-const parseBilingualText = (text, targetLang) => {
-  if (!text) return "";
-  return text;
-};
+import PremiumProductCard from "../../../Product/components/landing/PremiumProductCard";
 
 // Global in-memory image cache dictionary (Zero-fetch lag)
 const imageCache = {};
 
 // ==========================================================
-// STYLED COMPONENTS - GLASS STITCH INTERACTIVE WORKSPACE
+// STYLED COMPONENTS
 // ==========================================================
 
 const LibraryContainer = styled.div`
@@ -132,26 +125,13 @@ const SearchBox = styled.div`
   }
 `;
 
-// --- MULTI-RAIL CAROUSEL WRAPPERS ---
 const MarqueeWrapper = styled.div`
   width: 100vw;
   margin-left: calc(-50vw + 50%);
   overflow: hidden;
-  padding: 3rem 0; /* Extra clearance room */
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 15%,
-    black 85%,
-    transparent
-  );
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 15%,
-    black 85%,
-    transparent
-  );
+  padding: 3rem 0; 
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
   direction: ltr;
   position: relative;
   z-index: 2;
@@ -199,14 +179,8 @@ const MarqueeItem = styled.div`
 `;
 
 const expandPulse = keyframes`
-  0% {
-    transform: translate(-50%, -50%) scale(0.9);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.35);
-    opacity: 0;
-  }
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(1.35); opacity: 0; }
 `;
 
 const CirclePulseRing = styled.div`
@@ -280,104 +254,31 @@ const CircleBg = styled.div`
 
   ${MarqueeItem}:hover & {
     border-color: ${(props) => props.$color || "#f07a48"};
-    box-shadow:
-      0 15px 35px ${(props) => props.$color || "rgba(240, 122, 72, 0.25)"},
-      inset 0 0 15px rgba(240, 122, 72, 0.05);
+    box-shadow: 0 15px 35px ${(props) => props.$color || "rgba(240, 122, 72, 0.25)"}, inset 0 0 15px rgba(240, 122, 72, 0.05);
   }
 `;
 
-// --- GRID CARD COMPONENTS ---
-const GridCard = styled.div`
-  background: #111214;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  height: 100%;
-  position: relative;
-  z-index: 2;
-
-  &:hover {
-    border-color: #f07a48;
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-  }
-`;
-
-const GridImageStage = styled.div`
+const BlueprintCardsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
   width: 100%;
-  aspect-ratio: 1;
-  background: radial-gradient(
-    circle at center,
-    rgba(255, 255, 255, 0.05) 0%,
-    transparent 70%
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  position: relative;
 
-  img {
-    max-width: 85%;
-    max-height: 85%;
-    object-fit: contain;
-    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.5));
-    transition: transform 0.4s ease;
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  ${GridCard}:hover & img {
-    transform: scale(1.08);
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
   }
 `;
 
-const GridInfo = styled.div`
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.02);
-  flex-grow: 1;
-  justify-content: space-between;
-`;
-
-const SpecBadge = styled.span`
-  background: rgba(255, 255, 255, 0.03);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.65rem;
-  color: #71717a;
-  font-family: monospace;
-  text-transform: uppercase;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-`;
-
-const ActionBtn = styled.button`
-  background: #f07a48;
-  color: #000;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  font-weight: 800;
-  font-size: 0.85rem;
-  cursor: pointer;
-  font-family: "Tajawal", sans-serif;
-  transition: transform 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-
-  &:hover {
-    transform: scale(1.02);
-    filter: brightness(1.15);
-  }
-`;
-
-// --- FLOATING POPOVER (MATERIAL BLUEPRINT) ---
+// FLOATING POPOVER (MATERIAL BLUEPRINT)
 const FloatingPopover = styled(motion.div)`
   position: fixed;
   background: rgba(24, 24, 27, 0.85);
@@ -480,7 +381,17 @@ const TechRow = styled.div`
   }
 `;
 
-// 🔴 AUTOMATED INFINITE SCROLL DUSTING PORTAL
+const SpecBadge = styled.span`
+  background: rgba(255, 255, 255, 0.03);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  color: #71717a;
+  font-family: monospace;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+`;
+
 const LoadMoreTrigger = styled.div`
   height: 70px;
   width: 100%;
@@ -657,7 +568,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
   const [hoveredLineIdx, setHoveredLineIdx] = useState(null);
   const [isItemHovered, setIsItemHovered] = useState(false);
 
-// 🔴 LAZY LOADING: Automatically triggers and reads next pages on scroll
+  // 🔴 LAZY LOADING OBSERVER (LIMIT = 25 for quick start)
   useEffect(() => {
     if (paginationLoading) return;
 
@@ -668,10 +579,10 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
             fetchPaginatedProducts({ 
               shopId,
               page: paginationMeta.page + 1,
-              limit: 25, // <-- Increased from 12
+              limit: 25, 
               categoryId: selectedCategory || "",
               search: searchQuery,
-              isNewFilter: false, // Appends new products to list
+              isNewFilter: false, 
               printOnDemand: true,
             })
           );
@@ -692,7 +603,6 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
     };
   }, [dispatch, shopId, selectedCategory, searchQuery, paginationLoading, paginationMeta]);
 
-  
   const shopCategoryIds = useMemo(() => {
     if (!shop?.categories) return [];
     return shop.categories.map((cat) => typeof cat === "object" ? cat._id || cat.id : cat);
@@ -857,33 +767,41 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
         </SearchBox>
       </FilterRow>
 
-      <div className="auras-5-4-grid">
-        {filteredList.map((canvas) => (
-          <GridCard key={canvas.canvasId} className="auras-5-4-item" onClick={() => onSelectCanvas(canvas)} onMouseEnter={(e) => handleMouseEnter(e, canvas, null)}>
-            <GridImageStage>
-              <CustomRotatingMockup colorObj={canvas.availableColors?.[0]} title={canvas.title} isLarge={false} />
-            </GridImageStage>
-            <GridInfo>
-              <div>
-                <SpecBadge>{canvas.sku}</SpecBadge>
-                <h3 style={{ margin: "8px 0", fontSize: "1.05rem", color: "white", fontFamily: "Tajawal", fontWeight: 800 }}>
-                  {canvas.title}
-                </h3>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1rem" }}>
-                <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "white" }}>
-                  {parseInt(canvas.baseCost)} {t("dzd", "DA")}
-                </span>
-                <ActionBtn>
-                  <FaTshirt /> Design
-                </ActionBtn>
-              </div>
-            </GridInfo>
-          </GridCard>
-        ))}
-      </div>
+      {/* 🔴 IMPLEMENTED THE NEW BLUEPRINT CARDS FOR THE LIBRARY GRID */}
+      <BlueprintCardsGrid>
+        {filteredList.map((canvas) => {
+          // Adapt 'canvas' back to expected product shape for the PremiumProductCard
+          const pseudoProduct = {
+            _id: canvas.canvasId,
+            id: canvas.canvasId,
+            name: canvas.title,
+            sku: canvas.sku,
+            hasBackPrintSurface: canvas.specifications?.printableSurfaces?.includes("back"),
+            specifications: [
+              { name: "gsm", value: canvas.specifications?.gsm },
+              { name: "material", value: canvas.specifications?.composition }
+            ].filter(s => s.value),
+            availabilities: [{
+              color: canvas.availableColors?.[0]?.colorName || "white",
+              imageId: canvas.availableColors?.[0]?.imageId,
+              podFrontTemplateId: canvas.availableColors?.[0]?.podFrontTemplateId,
+              sizes: canvas.sizes?.map(s => ({ size: s.sizeCode, sellingPrice: s.baseCost }))
+            }]
+          };
 
-      {/* 🔴 Trigger to load next pages on scroll down */}
+          return (
+            <PremiumProductCard
+              key={canvas.canvasId}
+              product={pseudoProduct}
+              index={0}
+              onCardClick={() => onSelectCanvas(canvas)}
+              isPodShop={true}
+              layoutType="grid"
+            />
+          );
+        })}
+      </BlueprintCardsGrid>
+
       <LoadMoreTrigger ref={observerRef}>
         {paginationLoading && <InlineSpinner />}
       </LoadMoreTrigger>
@@ -928,7 +846,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
                 </>
               ) : (
                 <p style={{ margin: 0, fontSize: "0.85rem", color: "#e4e4e7", lineHeight: "1.5", fontFamily: "Cairo, sans-serif" }}>
-                  {parseBilingualText(popoverState.canvas.shortDescription, i18n.language)}
+                  {popoverState.canvas.shortDescription}
                 </p>
               )}
             </div>

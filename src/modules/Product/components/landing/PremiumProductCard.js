@@ -4,270 +4,256 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { getImageUrl } from "../../../../utils/imageUtils";
 import { getImage } from "../../../Images/services/imageServices";
-import { FaMinus, FaPlus, FaTshirt } from "react-icons/fa";
+import { FaArrowRight, FaMinus, FaPlus } from "react-icons/fa";
 import { getPreferredProductImageId } from "../../../PodStudio/hooks/usePrintableArea";
 
-// Expanded pool of apparel emojis
-const APPAREL_EMOJIS = ["👕", "👔", "🧥", "🥼", "👖", "🩳", "🧦", "👟", "🎒", "👜", "🧢", "🎽", "👗", "👘", "🥻", "👠", "👡", "👢", "🧣", "🧤", "🎩", "👑", "🎒", "💼"];
+// ===========================================================================
+// UTILITIES
+// ===========================================================================
+
+const APPAREL_EMOJIS = ["👕", "👔", "🧥", "🥼", "👖", "🩳", "🎒", "👜", "🧢"];
 
 const getStableEmoji = (id, index) => {
   const str = String(id || index || "");
   let sum = 0;
-  for (let i = 0; i < str.length; i++) {
-    sum += str.charCodeAt(i);
-  }
-  const emojiIndex = (sum + (index || 0)) % APPAREL_EMOJIS.length;
-  return APPAREL_EMOJIS[emojiIndex];
+  for (let i = 0; i < str.length; i++) sum += str.charCodeAt(i);
+  return APPAREL_EMOJIS[sum % APPAREL_EMOJIS.length];
 };
 
-const formatSpecification = (spec) => {
-  if (!spec || !spec.value) return "";
-  const value = spec.value.toString().trim();
-  return value.charAt(0).toUpperCase() + value.slice(1);
+const COLOR_MAP = {
+  black: "#000000", noir: "#000000", white: "#FFFFFF", blanc: "#FFFFFF",
+  red: "#EF4444", rouge: "#EF4444", blue: "#3B82F6", bleu: "#3B82F6", navy: "#1E3A8A",
+  green: "#10B981", vert: "#10B981", yellow: "#F59E0B", jaune: "#F59E0B",
+  grey: "#9CA3AF", gris: "#9CA3AF", pink: "#EC4899", rose: "#EC4899",
+  beige: "#F5F5DC", cream: "#FEF3C7", brown: "#78350F", marron: "#78350F",
+  purple: "#8B5CF6", mauve: "#8B5CF6", burgundy: "#7F1D1D", bordeaux: "#7F1D1D"
 };
+
+const getHex = (c) => COLOR_MAP[String(c).toLowerCase().trim()] || c;
+
+// ===========================================================================
+// STYLED COMPONENTS (BLUEPRINT AESTHETIC)
+// ===========================================================================
 
 const CardWrapper = styled(motion.div)`
-  background-color: ${(props) => props.theme.surface};
+  background-color: #0c0c0e;
   border-radius: 20px;
   overflow: hidden;
   display: flex;
+  flex-direction: column;
   position: relative;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-sizing: border-box;
-
-  ${(props) =>
-    props.$layoutType === "grid"
-      ? `
-    flex-direction: column;
-    height: 100%;
-  `
-      : `
-    flex-direction: row;
-    align-items: center;
-    padding: 1.25rem;
-    gap: 2rem;
-    width: 100%;
-
-    @media(max-width: 600px) {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 1.25rem;
-    }
-  `}
-
-  border: 2px solid ${(props) =>
-    props.$isActive ? props.theme.primaryColor : "rgba(255,255,255,0.05)"};
-
-  box-shadow: ${(props) =>
-    props.$isActive
-      ? `0 0 25px ${props.theme.primaryColor}50`
-      : "0 4px 20px rgba(0,0,0,0.1)"};
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  height: 100%;
 
   &:hover {
-    transform: translateY(-5px);
-    border-color: ${(props) =>
-      props.$isActive ? props.theme.primaryColor : "rgba(255,255,255,0.2)"};
-    box-shadow: ${(props) =>
-      props.$isActive
-        ? `0 0 25px ${props.theme.primaryColor}50`
-        : "0 10px 25px rgba(0,0,0,0.2)"};
+    transform: translateY(-6px);
+    border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(240, 122, 72, 0.1);
+  }
+
+  &:hover .footer-action {
+    color: ${(props) => props.theme.primaryColor || "#F07A48"};
+    transform: translateX(${(props) => (props.$isArabic ? "-4px" : "4px")});
   }
 `;
 
-// 🔴 LIQUIDGLASS PRODUCT IMAGE CONTAINER (With dynamic multi-light backdrop gradients)
-const ImageContainer = styled.div`
+const BlueprintStage = styled.div`
+  width: 100%;
+  aspect-ratio: 1 / 1.05;
   position: relative;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
-  overflow: hidden;
-  box-sizing: border-box;
-
-  /* Premium LiquidGlass Backdrop Glares */
-  background-image:
-    /* Light source 1 (Top-Left glow) */
-    radial-gradient(circle at 15% 15%, ${(props) => props.$glow1 || "rgba(255, 255, 255, 0.08)"} 0%, transparent 60%),
-    /* Light source 2 (Bottom-Right glow) */
-    radial-gradient(circle at 85% 85%, ${(props) => props.$glow2 || "rgba(240, 122, 72, 0.04)"} 0%, transparent 60%),
-    /* Center focal glow */
-    radial-gradient(circle at center, ${(props) => props.$center || "rgba(255, 255, 255, 0.04)"} 0%, transparent 75%);
+  background-color: #111214;
   
-  background-color: #0c0c0e;
-  backdrop-filter: blur(25px) saturate(160%);
-  -webkit-backdrop-filter: blur(25px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 
-    inset 0 0 30px rgba(255, 255, 255, 0.02),
-    0 10px 30px rgba(0, 0, 0, 0.4);
+  /* Technical Grid Background */
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center;
 
-  ${(props) =>
-    props.$layoutType === "grid"
-      ? `
-    width: 100%;
-    padding-top: 100%;
-  `
-      : `
-    width: 110px;
-    height: 110px;
-    flex-shrink: 0;
-    padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
 
-    @media(max-width: 600px) {
-      width: 100%;
-      height: 200px;
-    }
-  `}
+  /* Ambient Lamp Glows */
+  &::before {
+    content: "";
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, ${(props) => props.$glow || "rgba(255,255,255,0.05)"} 0%, transparent 70%);
+    filter: blur(30px);
+    pointer-events: none;
+    z-index: 0;
+  }
 
   img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.55));
+    padding: 1.5rem;
+    box-sizing: border-box;
     position: absolute;
     inset: 0;
-    padding: 1rem;
-    box-sizing: border-box;
     z-index: 2;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.5));
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
   ${CardWrapper}:hover & img {
-    transform: scale(1.04) translateY(-4px);
+    transform: scale(1.08) translateY(-4px);
   }
 `;
 
-const Content = styled.div`
+const SkuBadge = styled.div`
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #71717a;
+  font-family: monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  z-index: 10;
+`;
+
+
+
+const ContentBlock = styled.div`
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   flex: 1;
-
-  ${(props) =>
-    props.$layoutType === "grid"
-      ? `
-    padding: 1.25rem;
-    gap: 0.5rem;
-  `
-      : `
-    gap: 0.35rem;
-    text-align: left;
-  `}
+  gap: 1rem;
 `;
 
-const SerialTag = styled.span`
-  font-family: monospace;
-  font-size: 0.7rem;
-  color: #71717a;
-  font-weight: 700;
-  letter-spacing: 1px;
-`;
-
-const Brand = styled.span`
-  font-size: 0.75rem;
-  color: ${(props) => props.theme.primaryColor};
-  text-transform: uppercase;
-  font-weight: 800;
-  letter-spacing: 1px;
-`;
-
-const ProductName = styled.h3`
-  font-weight: 700;
-  color: white;
+const ProductTitle = styled.h3`
   margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
   font-family: "Tajawal", sans-serif;
-  cursor: pointer;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-
-  ${(props) =>
-    props.$layoutType === "grid"
-      ? `
-    font-size: 1rem;
-    line-height: 1.4;
-  `
-      : `
-    font-size: 1.25rem;
-    line-height: 1.2;
-  `}
 `;
 
-const SpecSheet = styled.div`
+const TechSpecsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+`;
+
+const SpecBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 0.25rem;
-  font-family: "Cairo", sans-serif;
-`;
+  text-align: start;
 
-const SpecLine = styled.span`
-  font-size: 0.8rem;
-  color: #a1a1aa;
-  font-weight: 500;
-`;
+  .label {
+    font-size: 0.65rem;
+    color: #52525b;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: "Tajawal", sans-serif;
+  }
 
-const PriceRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  ${(props) =>
-    props.$layoutType === "grid"
-      ? `
-    margin-top: auto;
-    padding-top: 1rem;
-  `
-      : `
-    margin: 0;
-  `}
-`;
-
-const Price = styled.span`
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: white;
-`;
-
-const StudioActionBtn = styled.button`
-  background: ${(props) => props.theme.primaryColor};
-  color: #000;
-  border: none;
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 10px;
-  font-weight: 800;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-family: "Tajawal", sans-serif;
-  transition: all 0.2s;
-
-  ${(props) =>
-    props.$layoutType === "grid"
-      ? `
-    margin-top: 1rem;
-  `
-      : `
-    margin: 0;
-  `}
-
-  &:hover {
-    filter: brightness(1.15);
-    transform: translateY(-2px);
+  .value {
+    font-size: 0.8rem;
+    color: #d4d4d8;
+    font-weight: 700;
+    font-family: monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
 
+const ColorSwatchesRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+  }
+
+  .extra {
+    font-size: 0.7rem;
+    color: #a1a1aa;
+    font-weight: 700;
+    font-family: monospace;
+    margin-left: 2px;
+  }
+`;
+
+const CardFooter = styled.div`
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const BasePrice = styled.div`
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+
+  span:first-child {
+    font-size: 0.65rem;
+    color: #71717a;
+    text-transform: uppercase;
+    font-weight: 800;
+  }
+
+  span:last-child {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: white;
+    font-family: "Tajawal", sans-serif;
+  }
+`;
+
+const ActionArrow = styled.div`
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #71717a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  font-family: "Tajawal", sans-serif;
+`;
+
+// E-commerce Fallback Cart Controller
 const QuantityController = styled.div`
   display: flex;
   align-items: center;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 2px;
 `;
 
@@ -282,11 +268,7 @@ const QtyBtn = styled.button`
   justify-content: center;
   cursor: pointer;
   font-weight: bold;
-  font-size: 0.85rem;
-
-  &:hover {
-    color: ${(props) => props.theme.primaryColor};
-  }
+  &:hover { color: ${(props) => props.theme.primaryColor}; }
 `;
 
 const QtyValue = styled.span`
@@ -297,6 +279,10 @@ const QtyValue = styled.span`
   text-align: center;
 `;
 
+// ===========================================================================
+// COMPONENT LOGIC
+// ===========================================================================
+
 const PremiumProductCard = ({
   product,
   index,
@@ -304,70 +290,69 @@ const PremiumProductCard = ({
   onUpdateQuantity,
   isOrderingEnabled,
   quantityInCart = 0,
-  cartItems = [],
-  $isActive = false,
   isPodShop = false,
-  layoutType = "grid",
-  imageOverrideId = null,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
+  
   const [imageBuffer, setImageBuffer] = useState(null);
   const [hoverImageBuffer, setHoverImageBuffer] = useState(null);
-  const [isCardHovered, setIsCardHovered] = useState(false);
-
-  // Dynamic Ambient Glass Glow Coordinates and Colors State
-  const [ambientGlows, setAmbientGlows] = useState({
-    glow1: "rgba(255, 255, 255, 0.06)",
-    glow2: "rgba(240, 122, 72, 0.04)",
-    center: "rgba(255, 255, 255, 0.04)"
-  });
+  const [isHovered, setIsHovered] = useState(false);
+  const [ambientGlow, setAmbientGlow] = useState("rgba(255,255,255,0.03)");
 
   const defaultAvailability = product?.availabilities?.[0];
   const defaultSize = defaultAvailability?.sizes?.[0];
+  const price = parseInt(defaultSize?.sellingPrice || product?.sellingPrice || 0);
 
-  const previews = product?.previewImages ?? [];
-  const activeImageId =
-    imageOverrideId ||
-    getPreferredProductImageId(product, 0, defaultAvailability?.color);
-  const hoverImageId =
-    previews.length > 1
-      ? getPreferredProductImageId(product, 1, defaultAvailability?.color)
-      : null;
+  // Extract High-Density Data for the Blueprint Specs
+  const uniqueColors = useMemo(() => {
+    if (!product.availabilities) return [];
+    return [...new Set(product.availabilities.map(a => a.color))].filter(Boolean);
+  }, [product]);
+
+  const uniqueSizes = useMemo(() => {
+    if (!product.availabilities) return [];
+    const sizes = product.availabilities.flatMap(a => a.sizes?.map(s => s.size) || []);
+    const unique = [...new Set(sizes)].filter(Boolean);
+    // If standard 4-5 sizes, join them. If too many, show first and last.
+    if (unique.length <= 4) return unique.join(" • ");
+    if (unique.length > 4) return `${unique[0]} ➔ ${unique[unique.length - 1]}`;
+    return "N/A";
+  }, [product]);
+
+  const gsmValue = useMemo(() => {
+    return product.specifications?.find((s) => s.name?.toLowerCase() === "gsm")?.value;
+  }, [product]);
+
+  const hasBackPrint = product.hasBackPrintSurface;
+
+  // Image Loading Logic
+  const activeImageId = getPreferredProductImageId(product, 0, defaultAvailability?.color);
+  const hoverImageId = (product?.previewImages?.length > 1) 
+    ? getPreferredProductImageId(product, 1, defaultAvailability?.color) 
+    : null;
 
   useEffect(() => {
     let isMounted = true;
-    if (!activeImageId) return;
-
     if (activeImageId) {
       getImage(activeImageId).then((res) => {
-        if (isMounted && res.data) {
-          setImageBuffer(res.data);
-        }
+        if (isMounted && res.data) setImageBuffer(res.data);
       });
     }
-
     if (hoverImageId) {
       getImage(hoverImageId).then((res) => {
-        if (isMounted && res.data) {
-          setHoverImageBuffer(res.data);
-        }
+        if (isMounted && res.data) setHoverImageBuffer(res.data);
       });
-    } else {
-      if (isMounted) setHoverImageBuffer(null);
     }
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [activeImageId, hoverImageId]);
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
   const hoverImageUrl = useMemo(() => getImageUrl(hoverImageBuffer), [hoverImageBuffer]);
 
-  // 🔴 DYNAMIC AMBIENT GLASS SCANNER: Determines product background colors from loaded pixels
+  // Ambient Color Scanner
   useEffect(() => {
     if (!imageUrl) return;
-
     const img = new Image();
     img.crossOrigin = "Anonymous";
     img.src = imageUrl;
@@ -375,260 +360,131 @@ const PremiumProductCard = ({
       try {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
-        canvas.width = 10;
-        canvas.height = 10;
+        canvas.width = 10; canvas.height = 10;
         ctx.drawImage(img, 0, 0, 10, 10);
-        
         const imgData = ctx.getImageData(0, 0, 10, 10).data;
         let rSum = 0, gSum = 0, bSum = 0, count = 0;
 
         for (let i = 0; i < imgData.length; i += 4) {
-          const r = imgData[i];
-          const g = imgData[i+1];
-          const b = imgData[i+2];
-          const a = imgData[i+3];
-
-          if (a > 50) { // Only analyze non-transparent visible product fabric pixels
-            rSum += r;
-            gSum += g;
-            bSum += b;
-            count++;
-          }
+          if (imgData[i+3] > 50) { rSum += imgData[i]; gSum += imgData[i+1]; bSum += imgData[i+2]; count++; }
         }
-
         if (count > 0) {
-          const avgR = Math.round(rSum / count);
-          const avgG = Math.round(gSum / count);
-          const avgB = Math.round(bSum / count);
-          
-          const brightness = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
-
-          if (brightness < 100) {
-            // Dark Product (e.g. Sacoch/Black Tee): Emit high-contrast gold/blue glares to pop
-            setAmbientGlows({
-              glow1: "rgba(240, 122, 72, 0.16)", // Sunset Orange
-              glow2: "rgba(57, 127, 249, 0.12)", // Electric Blue
-              center: "rgba(255, 255, 255, 0.08)"
-            });
-          } else {
-            // Light Product: Emit a soft matching brand accent color
-            setAmbientGlows({
-              glow1: "rgba(57, 161, 112, 0.08)", // Soft Emerald Green
-              glow2: "rgba(255, 255, 255, 0.04)",
-              center: "rgba(240, 122, 72, 0.06)"
-            });
-          }
+          const brightness = 0.299 * (rSum/count) + 0.587 * (gSum/count) + 0.114 * (bSum/count);
+          setAmbientGlow(brightness < 100 ? "rgba(240, 122, 72, 0.12)" : "rgba(255, 255, 255, 0.06)");
         }
-      } catch (err) {
-        console.warn("Canvas image pixel scan skipped due to CORS:", err);
-      }
+      } catch (err) {}
     };
   }, [imageUrl]);
-  
-  const productName = product.name;
 
-  const activeCartItemForThisProduct = useMemo(() => {
-    return cartItems.find((item) => {
-      const cartProdId = (
-        item.productId ||
-        item.product?._id ||
-        item.product?.id
-      )?.toString();
-      return cartProdId === product._id?.toString();
-    });
-  }, [cartItems, product]);
-
-  const handleCardSelect = () => {
-    onCardClick(product, false);
-  };
-
-  const handleDecrement = (e) => {
-    e.stopPropagation();
-    if (!defaultSize || !onUpdateQuantity) return;
-    const targetVariantId =
-      activeCartItemForThisProduct?.variantId ||
-      `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
-    const currentQty = activeCartItemForThisProduct?.quantity || quantityInCart;
-    onUpdateQuantity(targetVariantId, currentQty - 1);
-  };
-
-  const handleIncrement = (e) => {
-    e.stopPropagation();
-    if (!defaultSize || !onUpdateQuantity) return;
-    const targetVariantId =
-      activeCartItemForThisProduct?.variantId ||
-      `${product._id}_${defaultAvailability.color}_${defaultSize.size}`;
-    const currentQty = activeCartItemForThisProduct?.quantity || quantityInCart;
-    onUpdateQuantity(targetVariantId, currentQty + 1);
-  };
-
-  const mappedSpecs = useMemo(() => {
-    if (!product.specifications || product.specifications.length === 0)
-      return [];
-    return product.specifications
-      .slice(0, 2)
-      .map(formatSpecification)
-      .filter(Boolean);
-  }, [product]);
-
-  const renderSpecs = () => {
-    if (isPodShop && mappedSpecs.length > 0) {
-      return (
-        <SpecSheet>
-          {mappedSpecs.map((specText, i) => (
-            <SpecLine key={i}>• {specText}</SpecLine>
-          ))}
-          <SpecLine
-            style={{
-              color: "#39A170",
-              fontSize: "0.75rem",
-              marginTop: "4px",
-              fontWeight: "bold",
-            }}
-          >
-            Ready for your design
-          </SpecLine>
-        </SpecSheet>
-      );
-    }
-    if (isPodShop && product.shortDescription) {
-      return (
-        <SpecSheet>
-          <SpecLine
-            style={{
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {product.shortDescription}
-          </SpecLine>
-        </SpecSheet>
-      );
-    }
-    return null;
-  };
-
-  const targetId = useMemo(() => {
-    return product?._id || product?.id || product?.productId || product?.name || "";
-  }, [product]);
+  const sku = product.sku || `CANVAS-${String(product._id || product.id).substring(0, 4).toUpperCase()}`;
 
   return (
     <CardWrapper
-      onClick={handleCardSelect}
-      $isActive={$isActive}
-      $layoutType="grid"
-      onMouseEnter={() => setIsCardHovered(true)}
-      onMouseLeave={() => setIsCardHovered(false)}
+      $isArabic={isArabic}
+      onClick={() => onCardClick(product, false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <ImageContainer 
-        $layoutType="grid"
-        $glow1={ambientGlows.glow1}
-        $glow2={ambientGlows.glow2}
-        $center={ambientGlows.center}
-      >
+      <BlueprintStage $glow={ambientGlow}>
+        <SkuBadge>{sku}</SkuBadge>
+        
         <AnimatePresence mode="wait">
-          {isCardHovered && hoverImageUrl ? (
+          {isHovered && hoverImageUrl ? (
             <motion.img
               key="hover"
               src={hoverImageUrl}
-              alt={productName}
+              alt={product.name}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.3 }}
             />
           ) : imageUrl ? (
             <motion.img
               key="main"
               src={imageUrl}
-              alt={productName}
+              alt={product.name}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.3 }}
             />
           ) : (
-            <motion.div
-              key="emoji"
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{
-                fontSize: "4rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                position: "absolute",
-                inset: 0,
-              }}
-            >
-              {getStableEmoji(targetId, index)}
-            </motion.div>
+            <div style={{ fontSize: "4rem", zIndex: 5, filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.5))" }}>
+              {getStableEmoji(product._id || product.id, index)}
+            </div>
           )}
         </AnimatePresence>
-      </ImageContainer>
+      </BlueprintStage>
 
-      <Content $layoutType="grid">
-        {isPodShop ? (
-          <IconRow>
-            <SerialTag>
-              {t("pod_studio_base_label")} / {String(index + 1).padStart(3, "0")}
-            </SerialTag>
-          </IconRow>
-        ) : (
-          product.brand && <Brand>{product.brand}</Brand>
-        )}
-        <ProductName $layoutType="grid">{productName}</ProductName>
-        {renderSpecs()}
-
-        <PriceRow $layoutType="grid">
-          <Price>
-            {parseInt(defaultSize?.sellingPrice || 0)} {t("zd", "DA")}
-          </Price>
-          {isOrderingEnabled &&
-            defaultSize &&
-            !isPodShop &&
-            (quantityInCart > 0 ? (
-              <QuantityController>
-                <QtyBtn onClick={handleDecrement}>
-                  <FaMinus />
-                </QtyBtn>
-                <QtyValue>{quantityInCart}</QtyValue>
-                <QtyBtn onClick={handleIncrement}>
-                  <FaPlus />
-                </QtyBtn>
-              </QuantityController>
-            ) : (
-              <QtyBtn
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCardClick(product, true);
-                }}
-              >
-                <FaPlus />
-              </QtyBtn>
-            ))}
-        </PriceRow>
-
+      <ContentBlock>
+        <ProductTitle>{product.name}</ProductTitle>
+        
+        {/* HIGH DENSITY TECH SPECS */}
         {isPodShop && (
-          <StudioActionBtn
-            type="button"
-            onClick={handleCardSelect}
-            $layoutType="grid"
-          >
-            <FaTshirt /> {t("pod_studio_start_designing_btn", "Design")}
-          </StudioActionBtn>
+          <TechSpecsGrid>
+            <SpecBox>
+              <span className="label">Colors</span>
+              {uniqueColors.length > 0 ? (
+                <ColorSwatchesRow>
+                  {uniqueColors.slice(0, 4).map((c, i) => (
+                    <div key={i} className="swatch" style={{ backgroundColor: getHex(c) }} title={c} />
+                  ))}
+                  {uniqueColors.length > 4 && <span className="extra">+{uniqueColors.length - 4}</span>}
+                </ColorSwatchesRow>
+              ) : (
+                <span className="value">---</span>
+              )}
+            </SpecBox>
+            
+            <SpecBox>
+              <span className="label">Sizes</span>
+              <span className="value">{uniqueSizes || "---"}</span>
+            </SpecBox>
+
+            <SpecBox>
+              <span className="label">Surfaces</span>
+              <span className="value" style={{ color: hasBackPrint ? "#39A170" : "#d4d4d8" }}>
+                {hasBackPrint ? "FRONT & BACK" : "FRONT ONLY"}
+              </span>
+            </SpecBox>
+
+            <SpecBox>
+              <span className="label">Fabric Weight</span>
+              <span className="value">{gsmValue ? `${gsmValue} GSM` : "Standard"}</span>
+            </SpecBox>
+          </TechSpecsGrid>
         )}
-      </Content>
+
+        <CardFooter>
+          <BasePrice>
+            <span>{isPodShop ? "Base Cost" : "Price"}</span>
+            <span>{price} {t("dzd", "DA")}</span>
+          </BasePrice>
+
+          {isPodShop ? (
+            <ActionArrow className="footer-action">
+              {isArabic ? "اختر الخامة" : "Select Canvas"} {isArabic ? "←" : "➔"}
+            </ActionArrow>
+          ) : (
+            isOrderingEnabled && (
+              quantityInCart > 0 ? (
+                <QuantityController onClick={(e) => e.stopPropagation()}>
+                  <QtyBtn onClick={() => onUpdateQuantity(product._id, quantityInCart - 1)}><FaMinus size={10} /></QtyBtn>
+                  <QtyValue style={{ color: "white", minWidth: "20px", textAlign: "center", fontSize: "0.85rem", fontWeight: "bold" }}>{quantityInCart}</QtyValue>
+                  <QtyBtn onClick={() => onUpdateQuantity(product._id, quantityInCart + 1)}><FaPlus size={10} /></QtyBtn>
+                </QuantityController>
+              ) : (
+                <ActionArrow className="footer-action" onClick={(e) => { e.stopPropagation(); onCardClick(product, true); }}>
+                  <FaPlus /> Add to Cart
+                </ActionArrow>
+              )
+            )
+          )}
+        </CardFooter>
+      </ContentBlock>
     </CardWrapper>
   );
 };
-
-const IconRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
 
 export default PremiumProductCard;

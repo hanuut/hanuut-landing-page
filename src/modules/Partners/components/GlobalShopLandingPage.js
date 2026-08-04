@@ -406,8 +406,8 @@ const GlobalShopLandingPage = ({
             activeProductId={activeProduct?._id}
             hasActive={!!activeProduct}
             imageOverrides={imageOverrides}
-            layoutType={isPodShop ? "list" : "grid"}
-            isPodShop={isPodShop}
+            layoutType={isPodShop ? "grid" : "list"} // <--- Changed default from list to grid
+            isPodShop={isPodShop} // <--- ENFORCED
           />
         </div>
       )}
@@ -429,8 +429,8 @@ const GlobalShopLandingPage = ({
         activeProductId={activeProduct?._id}
         hasActive={!!activeProduct}
         imageOverrides={imageOverrides}
-        layoutType={isPodShop ? "list" : "grid"}
-        isPodShop={isPodShop}
+        layoutType={isPodShop ? "grid" : "list"} // <--- Changed default from list to grid
+        isPodShop={isPodShop} // <--- ENFORCED
       />
     </>
   );
