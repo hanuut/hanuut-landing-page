@@ -1,8 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { FaBorderAll, FaFillDrip } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaBorderAll, FaFillDrip, FaSearchPlus, FaSearchMinus, FaExpand, FaShoppingCart } from "react-icons/fa";
 import {
   getFittedPrintZoneRatios,
   useGarmentAlphaBounds,
@@ -11,7 +12,7 @@ import PrintableArea from "./PrintableArea";
 
 const StageOuter = styled.div`
   width: 100%;
-  height: 100%; /* PHASE 8: Flex to fill the container */
+  height: 100%; 
   min-height: 480px;
   background-color: #0c0c0e;
   border-radius: 24px;
@@ -79,19 +80,85 @@ const FloatingColorWheel = styled.div`
   input[type="color"] { border: none; background: none; width: 20px; height: 20px; cursor: pointer; padding: 0; }
 `;
 
+const ZoomControls = styled.div`
+  position: absolute;
+  right: 15px;
+  top: 40%; 
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  padding: 8px 4px;
+  z-index: 100;
+  gap: 6px;
+`;
+
+const ZoomBtn = styled.button`
+  background: transparent;
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: background 0.2s;
+  
+  &:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
+`;
+
+const Divider = styled.div`
+  width: 60%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 2px 0;
+`;
+
+const ZoomText = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #a1a1aa;
+  min-width: 45px;
+  cursor: pointer;
+  font-family: monospace;
+  transition: color 0.2s;
+  &:hover { color: white; }
+`;
+
 const WorkspaceContainer = styled.div`
   position: relative;
   width: 95%;
   height: 95%;
-  max-width: 600px; /* Increased from 440 to fill the new 70% Layout smoothly */
+  max-width: 600px;
   max-height: 600px;
   aspect-ratio: 1 / 1;
   background: transparent;
+  box-sizing: border-box;
+  z-index: 2;
+  overflow: hidden; 
+  border-radius: 16px;
+`;
+
+const ZoomableStage = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  z-index: 2;
 `;
 
 const BackgroundTemplate = styled.img`
@@ -108,7 +175,6 @@ const BoundingBox = styled.div`
   z-index: 2;
   box-sizing: border-box;
   pointer-events: none;
-  overflow: hidden;
   border-radius: 24px;
   background: transparent !important;
 `;
@@ -152,6 +218,93 @@ const GridLines = ({ visible, ratios }) => {
 
 GridLines.propTypes = { visible: PropTypes.bool, ratios: PropTypes.object };
 
+const FullscreenOverlay = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+`;
+
+const FullscreenCard = styled(motion.div)`
+  background: #111214;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 500px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+`;
+
+const FullscreenStage = styled.div`
+  width: 100%;
+  aspect-ratio: 1;
+  background: #050505;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+`;
+
+const ModalActions = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  
+  @media (max-width: 600px) {
+    flex-direction: column-reverse;
+  }
+`;
+
+const ModalBtn = styled.button`
+  flex: 1;
+  padding: 1rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: "Tajawal", sans-serif;
+  transition: all 0.2s;
+  border: none;
+
+  ${props => props.$primary ? `
+    background: ${props.theme.primaryColor || "#F07A48"};
+    color: #000;
+    &:hover { filter: brightness(1.1); transform: translateY(-2px); }
+  ` : `
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    &:hover { background: rgba(255, 255, 255, 0.1); }
+  `}
+`;
+
+const TemplateContentArea = styled.div`
+  position: absolute;
+  z-index: 2;
+  overflow: hidden;
+  top: ${(props) => props.$area.top}%;
+  left: ${(props) => props.$area.left}%;
+  width: ${(props) => props.$area.width}%;
+  height: ${(props) => props.$area.height}%;
+  pointer-events: none;
+`;
+
 const PreviewStage = ({
   canvas,
   activeTemplateUrl,
@@ -165,8 +318,18 @@ const PreviewStage = ({
   setShowSolidBg,
   solidBgColor,
   setSolidBgColor,
+  onAddToCart,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
+  const stageRef = useRef(null);
+  
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const handleZoomIn = (e) => { e.stopPropagation(); setZoomLevel(prev => Math.min(prev + 0.25, 3)); };
+  const handleZoomOut = (e) => { e.stopPropagation(); setZoomLevel(prev => Math.max(prev - 0.25, 0.25)); };
+  const handleZoomReset = (e) => { e.stopPropagation(); setZoomLevel(1); };
 
   const alphaBounds = useGarmentAlphaBounds(activeTemplateUrl);
 
@@ -181,36 +344,138 @@ const PreviewStage = ({
   }, [canvas.title, selectedSize, activeSide, canvas.sizeChart, alphaBounds]);
 
   return (
-    <StageOuter>
-      <SolidColorBackground $active={showSolidBg} $color={solidBgColor} />
+    <>
+      <StageOuter>
+        <SolidColorBackground $active={showSolidBg} $color={solidBgColor} />
 
-      <StageFloatingControls onClick={(e) => e.stopPropagation()}>
-        <FloatingToggleBtn type="button" $active={showGrid} onClick={() => setShowGrid(!showGrid)}>
-          <FaBorderAll /> {t("pod_studio_toggle_grid", "Show Alignment Grid")}
-        </FloatingToggleBtn>
-        <FloatingToggleBtn type="button" $active={showSolidBg} onClick={() => setShowSolidBg(!showSolidBg)}>
-          <FaFillDrip /> {t("pod_studio_toggle_bg", "Custom Canvas Color")}
-        </FloatingToggleBtn>
+        <StageFloatingControls onClick={(e) => e.stopPropagation()}>
+          <FloatingToggleBtn type="button" $active={showGrid} onClick={() => setShowGrid(!showGrid)}>
+            <FaBorderAll /> {t("pod_studio_toggle_grid", "Show Alignment Grid")}
+          </FloatingToggleBtn>
+          <FloatingToggleBtn type="button" $active={showSolidBg} onClick={() => setShowSolidBg(!showSolidBg)}>
+            <FaFillDrip /> {t("pod_studio_toggle_bg", "Custom Canvas Color")}
+          </FloatingToggleBtn>
 
-        {showSolidBg && (
-          <FloatingColorWheel>
-            <input type="color" value={solidBgColor} onChange={(e) => setSolidBgColor(e.target.value)} />
-          </FloatingColorWheel>
+          {showSolidBg && (
+            <FloatingColorWheel>
+              <input type="color" value={solidBgColor} onChange={(e) => setSolidBgColor(e.target.value)} />
+            </FloatingColorWheel>
+          )}
+        </StageFloatingControls>
+
+        <ZoomControls onClick={(e) => e.stopPropagation()}>
+           <ZoomBtn onClick={() => setIsFullscreen(true)} title="Full Preview">
+             <FaExpand size={14} />
+           </ZoomBtn>
+           <Divider />
+           <ZoomBtn onClick={handleZoomIn} disabled={zoomLevel >= 3}><FaSearchPlus size={14}/></ZoomBtn>
+           <ZoomText onClick={handleZoomReset} title="Click to reset zoom">{Math.round(zoomLevel * 100)}%</ZoomText>
+           <ZoomBtn onClick={handleZoomOut} disabled={zoomLevel <= 0.25}><FaSearchMinus size={14}/></ZoomBtn>
+        </ZoomControls>
+
+        <WorkspaceContainer ref={stageRef}>
+          {/* 🔴 FIXED: Replaced strict dragConstraints with a loose box 
+              so the user can pan freely when zoomed out. Auto-recenters when zoom=1. */}
+          <ZoomableStage
+            drag={zoomLevel !== 1}
+            dragConstraints={{ top: -600, bottom: 600, left: -600, right: 600 }}
+            dragElastic={0.1}
+            dragMomentum={false}
+            animate={{ 
+              scale: zoomLevel,
+              // Force recenter automatically ONLY when reset to 100%
+              ...(zoomLevel === 1 ? { x: 0, y: 0 } : {})
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            style={{ cursor: zoomLevel !== 1 ? "grab" : "default", touchAction: zoomLevel !== 1 ? "none" : "auto" }}
+            whileDrag={{ cursor: "grabbing" }}
+          >
+            {activeTemplateUrl ? (
+              <BackgroundTemplate src={activeTemplateUrl} alt="Active Substrate Template" />
+            ) : (
+              <div style={{ color: "#333", fontSize: "4rem", zIndex: 3 }}>👕</div>
+            )}
+            <BoundingBox>
+              <PrintableArea ratios={ratios} designState={designState} setDesignState={setDesignState} />
+              <GridLines visible={showGrid} ratios={ratios} />
+            </BoundingBox>
+          </ZoomableStage>
+        </WorkspaceContainer>
+      </StageOuter>
+
+      <AnimatePresence>
+        {isFullscreen && (
+          <FullscreenOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsFullscreen(false)}
+          >
+             <FullscreenCard
+               initial={{ scale: 0.9, y: 20 }}
+               animate={{ scale: 1, y: 0 }}
+               exit={{ scale: 0.9, y: 20 }}
+               onClick={e => e.stopPropagation()}
+             >
+                <div style={{ textAlign: "center", direction: isArabic ? "rtl" : "ltr" }}>
+                   <h3 style={{ margin: "0 0 4px 0", color: "white", fontSize: "1.2rem", fontWeight: 800, fontFamily: "Tajawal" }}>
+                     {isArabic ? "معاينة التصميم" : "Design Preview"}
+                   </h3>
+                   <p style={{ margin: 0, color: "#a1a1aa", fontSize: "0.85rem", fontFamily: "Cairo" }}>
+                     {canvas.title} - {activeSide === "front" ? (isArabic ? "الواجهة" : "Front") : (isArabic ? "الظهر" : "Back")}
+                   </p>
+                </div>
+
+                <FullscreenStage>
+                  {activeTemplateUrl ? (
+                    <BackgroundTemplate src={activeTemplateUrl} alt="Garment Base" />
+                  ) : (
+                    <div style={{ color: "#333", fontSize: "4rem", zIndex: 3 }}>👕</div>
+                  )}
+                  <TemplateContentArea $area={ratios.contentArea}>
+                    <div style={{
+                      position: "absolute",
+                      top: `${ratios.printArea.top}%`,
+                      left: `${ratios.printArea.left}%`,
+                      width: `${ratios.printArea.width}%`,
+                      height: `${ratios.printArea.height}%`,
+                      overflow: "visible"
+                    }}>
+                      {designState.previewUrl && (
+                        <img
+                          src={designState.previewUrl}
+                          alt="Custom Print"
+                          style={{
+                            position: "absolute",
+                            left: `${designState.x}%`,
+                            top: `${designState.y}%`,
+                            width: `${designState.scale}%`,
+                            transform: `translate(-50%, -50%) rotate(${designState.rotation || 0}deg)`,
+                            objectFit: "contain",
+                            pointerEvents: "none"
+                          }}
+                        />
+                      )}
+                    </div>
+                  </TemplateContentArea>
+                </FullscreenStage>
+
+                <ModalActions style={{ direction: isArabic ? "rtl" : "ltr" }}>
+                   <ModalBtn onClick={() => {
+                     setIsFullscreen(false);
+                     if(onAddToCart) onAddToCart();
+                   }}>
+                     <FaShoppingCart /> {t("pod_studio_btn_commit_tray", "Add to Cart")}
+                   </ModalBtn>
+                   <ModalBtn $primary onClick={() => setIsFullscreen(false)}>
+                     {isArabic ? "مواصلة التصميم" : "Continue Design"}
+                   </ModalBtn>
+                </ModalActions>
+             </FullscreenCard>
+          </FullscreenOverlay>
         )}
-      </StageFloatingControls>
-
-      <WorkspaceContainer>
-        {activeTemplateUrl ? (
-          <BackgroundTemplate src={activeTemplateUrl} alt="Active Substrate Template" />
-        ) : (
-          <div style={{ color: "#333", fontSize: "4rem", zIndex: 3 }}>👕</div>
-        )}
-        <BoundingBox>
-          <PrintableArea ratios={ratios} designState={designState} setDesignState={setDesignState} />
-          <GridLines visible={showGrid} ratios={ratios} />
-        </BoundingBox>
-      </WorkspaceContainer>
-    </StageOuter>
+      </AnimatePresence>
+    </>
   );
 };
 
@@ -227,6 +492,7 @@ PreviewStage.propTypes = {
   setShowSolidBg: PropTypes.func.isRequired,
   solidBgColor: PropTypes.string.isRequired,
   setSolidBgColor: PropTypes.func.isRequired,
+  onAddToCart: PropTypes.func,
 };
 
 export default PreviewStage;

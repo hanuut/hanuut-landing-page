@@ -21,6 +21,7 @@ import Loader from "../../../../components/Loader";
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
 
+// 🔴 FIXED IMPORT PATH FOR THE PREMIUM CARDS
 import PremiumProductCard from "../../../Product/components/landing/PremiumProductCard";
 
 // Global in-memory image cache dictionary (Zero-fetch lag)
@@ -770,7 +771,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
       {/* 🔴 IMPLEMENTED THE NEW BLUEPRINT CARDS FOR THE LIBRARY GRID */}
       <BlueprintCardsGrid>
         {filteredList.map((canvas) => {
-          // Adapt 'canvas' back to expected product shape for the PremiumProductCard
+          // 🔴 FIX: Map over all availableColors to populate the card swatches
           const pseudoProduct = {
             _id: canvas.canvasId,
             id: canvas.canvasId,
@@ -781,12 +782,12 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
               { name: "gsm", value: canvas.specifications?.gsm },
               { name: "material", value: canvas.specifications?.composition }
             ].filter(s => s.value),
-            availabilities: [{
-              color: canvas.availableColors?.[0]?.colorName || "white",
-              imageId: canvas.availableColors?.[0]?.imageId,
-              podFrontTemplateId: canvas.availableColors?.[0]?.podFrontTemplateId,
+            availabilities: canvas.availableColors?.map(colorObj => ({
+              color: colorObj.colorName || "white",
+              imageId: colorObj.imageId,
+              podFrontTemplateId: colorObj.podFrontTemplateId,
               sizes: canvas.sizes?.map(s => ({ size: s.sizeCode, sellingPrice: s.baseCost }))
-            }]
+            })) || []
           };
 
           return (
@@ -801,6 +802,7 @@ const CanvasLibrary = ({ shopId, onSelectCanvas, shop }) => {
           );
         })}
       </BlueprintCardsGrid>
+      
 
       <LoadMoreTrigger ref={observerRef}>
         {paginationLoading && <InlineSpinner />}

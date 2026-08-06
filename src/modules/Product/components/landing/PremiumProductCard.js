@@ -21,12 +21,31 @@ const getStableEmoji = (id, index) => {
 };
 
 const COLOR_MAP = {
-  black: "#000000", noir: "#000000", white: "#FFFFFF", blanc: "#FFFFFF",
-  red: "#EF4444", rouge: "#EF4444", blue: "#3B82F6", bleu: "#3B82F6", navy: "#1E3A8A",
-  green: "#10B981", vert: "#10B981", yellow: "#F59E0B", jaune: "#F59E0B",
-  grey: "#9CA3AF", gris: "#9CA3AF", pink: "#EC4899", rose: "#EC4899",
-  beige: "#F5F5DC", cream: "#FEF3C7", brown: "#78350F", marron: "#78350F",
-  purple: "#8B5CF6", mauve: "#8B5CF6", burgundy: "#7F1D1D", bordeaux: "#7F1D1D"
+  black: "#000000",
+  noir: "#000000",
+  white: "#FFFFFF",
+  blanc: "#FFFFFF",
+  red: "#EF4444",
+  rouge: "#EF4444",
+  blue: "#3B82F6",
+  bleu: "#3B82F6",
+  navy: "#1E3A8A",
+  green: "#10B981",
+  vert: "#10B981",
+  yellow: "#F59E0B",
+  jaune: "#F59E0B",
+  grey: "#9CA3AF",
+  gris: "#9CA3AF",
+  pink: "#EC4899",
+  rose: "#EC4899",
+  beige: "#F5F5DC",
+  cream: "#FEF3C7",
+  brown: "#78350F",
+  marron: "#78350F",
+  purple: "#8B5CF6",
+  mauve: "#8B5CF6",
+  burgundy: "#7F1D1D",
+  bordeaux: "#7F1D1D",
 };
 
 const getHex = (c) => COLOR_MAP[String(c).toLowerCase().trim()] || c;
@@ -51,7 +70,9 @@ const CardWrapper = styled(motion.div)`
   &:hover {
     transform: translateY(-6px);
     border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(240, 122, 72, 0.1);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.6),
+      0 0 20px rgba(240, 122, 72, 0.1);
   }
 
   &:hover .footer-action {
@@ -68,7 +89,7 @@ const BlueprintStage = styled.div`
   align-items: center;
   justify-content: center;
   background-color: #111214;
-  
+
   /* Technical Grid Background */
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
@@ -87,7 +108,11 @@ const BlueprintStage = styled.div`
     left: 20%;
     width: 60%;
     height: 60%;
-    background: radial-gradient(circle, ${(props) => props.$glow || "rgba(255,255,255,0.05)"} 0%, transparent 70%);
+    background: radial-gradient(
+      circle,
+      ${(props) => props.$glow || "rgba(255,255,255,0.05)"} 0%,
+      transparent 70%
+    );
     filter: blur(30px);
     pointer-events: none;
     z-index: 0;
@@ -128,8 +153,6 @@ const SkuBadge = styled.div`
   text-transform: uppercase;
   z-index: 10;
 `;
-
-
 
 const ContentBlock = styled.div`
   padding: 1.25rem;
@@ -195,7 +218,7 @@ const ColorSwatchesRow = styled.div`
     height: 14px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
   }
 
   .extra {
@@ -247,7 +270,6 @@ const ActionArrow = styled.div`
   font-family: "Tajawal", sans-serif;
 `;
 
-// E-commerce Fallback Cart Controller
 const QuantityController = styled.div`
   display: flex;
   align-items: center;
@@ -268,9 +290,12 @@ const QtyBtn = styled.button`
   justify-content: center;
   cursor: pointer;
   font-weight: bold;
-  &:hover { color: ${(props) => props.theme.primaryColor}; }
+  &:hover {
+    color: ${(props) => props.theme.primaryColor};
+  }
 `;
 
+// 🔴 THE MISSING STYLED COMPONENT:
 const QtyValue = styled.span`
   font-size: 0.9rem;
   font-weight: 700;
@@ -294,7 +319,7 @@ const PremiumProductCard = ({
 }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
-  
+
   const [imageBuffer, setImageBuffer] = useState(null);
   const [hoverImageBuffer, setHoverImageBuffer] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -302,35 +327,45 @@ const PremiumProductCard = ({
 
   const defaultAvailability = product?.availabilities?.[0];
   const defaultSize = defaultAvailability?.sizes?.[0];
-  const price = parseInt(defaultSize?.sellingPrice || product?.sellingPrice || 0);
+  const price = parseInt(
+    defaultSize?.sellingPrice || product?.sellingPrice || 0,
+  );
 
-  // Extract High-Density Data for the Blueprint Specs
   const uniqueColors = useMemo(() => {
     if (!product.availabilities) return [];
-    return [...new Set(product.availabilities.map(a => a.color))].filter(Boolean);
+    return [...new Set(product.availabilities.map((a) => a.color))].filter(
+      Boolean,
+    );
   }, [product]);
 
   const uniqueSizes = useMemo(() => {
     if (!product.availabilities) return [];
-    const sizes = product.availabilities.flatMap(a => a.sizes?.map(s => s.size) || []);
+    const sizes = product.availabilities.flatMap(
+      (a) => a.sizes?.map((s) => s.size) || [],
+    );
     const unique = [...new Set(sizes)].filter(Boolean);
-    // If standard 4-5 sizes, join them. If too many, show first and last.
     if (unique.length <= 4) return unique.join(" • ");
     if (unique.length > 4) return `${unique[0]} ➔ ${unique[unique.length - 1]}`;
     return "N/A";
   }, [product]);
 
-  const gsmValue = useMemo(() => {
-    return product.specifications?.find((s) => s.name?.toLowerCase() === "gsm")?.value;
-  }, [product]);
+const gsmValue = useMemo(() => {
+    const rawVal = product.specifications?.find((s) => s.name?.toLowerCase() === "gsm")?.value;
+    if (!rawVal) return null;
+    return String(rawVal).replace(/gsm/i, '').trim();
+  }, [product.specifications]);
 
   const hasBackPrint = product.hasBackPrintSurface;
 
-  // Image Loading Logic
-  const activeImageId = getPreferredProductImageId(product, 0, defaultAvailability?.color);
-  const hoverImageId = (product?.previewImages?.length > 1) 
-    ? getPreferredProductImageId(product, 1, defaultAvailability?.color) 
-    : null;
+  const activeImageId = getPreferredProductImageId(
+    product,
+    0,
+    defaultAvailability?.color,
+  );
+  const hoverImageId =
+    product?.previewImages?.length > 1
+      ? getPreferredProductImageId(product, 1, defaultAvailability?.color)
+      : null;
 
   useEffect(() => {
     let isMounted = true;
@@ -344,13 +379,17 @@ const PremiumProductCard = ({
         if (isMounted && res.data) setHoverImageBuffer(res.data);
       });
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [activeImageId, hoverImageId]);
 
   const imageUrl = useMemo(() => getImageUrl(imageBuffer), [imageBuffer]);
-  const hoverImageUrl = useMemo(() => getImageUrl(hoverImageBuffer), [hoverImageBuffer]);
+  const hoverImageUrl = useMemo(
+    () => getImageUrl(hoverImageBuffer),
+    [hoverImageBuffer],
+  );
 
-  // Ambient Color Scanner
   useEffect(() => {
     if (!imageUrl) return;
     const img = new Image();
@@ -360,23 +399,43 @@ const PremiumProductCard = ({
       try {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
-        canvas.width = 10; canvas.height = 10;
+        canvas.width = 10;
+        canvas.height = 10;
         ctx.drawImage(img, 0, 0, 10, 10);
         const imgData = ctx.getImageData(0, 0, 10, 10).data;
-        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+        let rSum = 0,
+          gSum = 0,
+          bSum = 0,
+          count = 0;
 
         for (let i = 0; i < imgData.length; i += 4) {
-          if (imgData[i+3] > 50) { rSum += imgData[i]; gSum += imgData[i+1]; bSum += imgData[i+2]; count++; }
+          if (imgData[i + 3] > 50) {
+            rSum += imgData[i];
+            gSum += imgData[i + 1];
+            bSum += imgData[i + 2];
+            count++;
+          }
         }
         if (count > 0) {
-          const brightness = 0.299 * (rSum/count) + 0.587 * (gSum/count) + 0.114 * (bSum/count);
-          setAmbientGlow(brightness < 100 ? "rgba(240, 122, 72, 0.12)" : "rgba(255, 255, 255, 0.06)");
+          const brightness =
+            0.299 * (rSum / count) +
+            0.587 * (gSum / count) +
+            0.114 * (bSum / count);
+          setAmbientGlow(
+            brightness < 100
+              ? "rgba(240, 122, 72, 0.12)"
+              : "rgba(255, 255, 255, 0.06)",
+          );
         }
       } catch (err) {}
     };
   }, [imageUrl]);
 
-  const sku = product.sku || `CANVAS-${String(product._id || product.id).substring(0, 4).toUpperCase()}`;
+  const sku =
+    product.sku ||
+    `CANVAS-${String(product._id || product.id)
+      .substring(0, 4)
+      .toUpperCase()}`;
 
   return (
     <CardWrapper
@@ -387,7 +446,7 @@ const PremiumProductCard = ({
     >
       <BlueprintStage $glow={ambientGlow}>
         <SkuBadge>{sku}</SkuBadge>
-        
+
         <AnimatePresence mode="wait">
           {isHovered && hoverImageUrl ? (
             <motion.img
@@ -410,7 +469,13 @@ const PremiumProductCard = ({
               transition={{ duration: 0.3 }}
             />
           ) : (
-            <div style={{ fontSize: "4rem", zIndex: 5, filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.5))" }}>
+            <div
+              style={{
+                fontSize: "4rem",
+                zIndex: 5,
+                filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.5))",
+              }}
+            >
               {getStableEmoji(product._id || product.id, index)}
             </div>
           )}
@@ -419,8 +484,7 @@ const PremiumProductCard = ({
 
       <ContentBlock>
         <ProductTitle>{product.name}</ProductTitle>
-        
-        {/* HIGH DENSITY TECH SPECS */}
+
         {isPodShop && (
           <TechSpecsGrid>
             <SpecBox>
@@ -428,15 +492,22 @@ const PremiumProductCard = ({
               {uniqueColors.length > 0 ? (
                 <ColorSwatchesRow>
                   {uniqueColors.slice(0, 4).map((c, i) => (
-                    <div key={i} className="swatch" style={{ backgroundColor: getHex(c) }} title={c} />
+                    <div
+                      key={i}
+                      className="swatch"
+                      style={{ backgroundColor: getHex(c) }}
+                      title={c}
+                    />
                   ))}
-                  {uniqueColors.length > 4 && <span className="extra">+{uniqueColors.length - 4}</span>}
+                  {uniqueColors.length > 4 && (
+                    <span className="extra">+{uniqueColors.length - 4}</span>
+                  )}
                 </ColorSwatchesRow>
               ) : (
                 <span className="value">---</span>
               )}
             </SpecBox>
-            
+
             <SpecBox>
               <span className="label">Sizes</span>
               <span className="value">{uniqueSizes || "---"}</span>
@@ -444,14 +515,19 @@ const PremiumProductCard = ({
 
             <SpecBox>
               <span className="label">Surfaces</span>
-              <span className="value" style={{ color: hasBackPrint ? "#39A170" : "#d4d4d8" }}>
+              <span
+                className="value"
+                style={{ color: hasBackPrint ? "#39A170" : "#d4d4d8" }}
+              >
                 {hasBackPrint ? "FRONT & BACK" : "FRONT ONLY"}
               </span>
             </SpecBox>
 
             <SpecBox>
               <span className="label">Fabric Weight</span>
-              <span className="value">{gsmValue ? `${gsmValue} GSM` : "Standard"}</span>
+              <span className="value">
+                {gsmValue ? `${gsmValue} GSM` : "Standard"}
+              </span>
             </SpecBox>
           </TechSpecsGrid>
         )}
@@ -459,27 +535,47 @@ const PremiumProductCard = ({
         <CardFooter>
           <BasePrice>
             <span>{isPodShop ? "Base Cost" : "Price"}</span>
-            <span>{price} {t("dzd", "DA")}</span>
+            <span>
+              {price} {t("dzd", "DA")}
+            </span>
           </BasePrice>
 
           {isPodShop ? (
             <ActionArrow className="footer-action">
-              {isArabic ? "اختر الخامة" : "Select Canvas"} {isArabic ? "←" : "➔"}
+              {isArabic ? "اختر الخامة" : "Select Canvas"}{" "}
+              {isArabic ? "←" : "➔"}
             </ActionArrow>
           ) : (
-            isOrderingEnabled && (
-              quantityInCart > 0 ? (
-                <QuantityController onClick={(e) => e.stopPropagation()}>
-                  <QtyBtn onClick={() => onUpdateQuantity(product._id, quantityInCart - 1)}><FaMinus size={10} /></QtyBtn>
-                  <QtyValue style={{ color: "white", minWidth: "20px", textAlign: "center", fontSize: "0.85rem", fontWeight: "bold" }}>{quantityInCart}</QtyValue>
-                  <QtyBtn onClick={() => onUpdateQuantity(product._id, quantityInCart + 1)}><FaPlus size={10} /></QtyBtn>
-                </QuantityController>
-              ) : (
-                <ActionArrow className="footer-action" onClick={(e) => { e.stopPropagation(); onCardClick(product, true); }}>
-                  <FaPlus /> Add to Cart
-                </ActionArrow>
-              )
-            )
+            isOrderingEnabled &&
+            (quantityInCart > 0 ? (
+              <QuantityController onClick={(e) => e.stopPropagation()}>
+                <QtyBtn
+                  onClick={() =>
+                    onUpdateQuantity(product._id, quantityInCart - 1)
+                  }
+                >
+                  <FaMinus size={10} />
+                </QtyBtn>
+                <QtyValue>{quantityInCart}</QtyValue>
+                <QtyBtn
+                  onClick={() =>
+                    onUpdateQuantity(product._id, quantityInCart + 1)
+                  }
+                >
+                  <FaPlus size={10} />
+                </QtyBtn>
+              </QuantityController>
+            ) : (
+              <ActionArrow
+                className="footer-action"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCardClick(product, true);
+                }}
+              >
+                <FaPlus /> Add to Cart
+              </ActionArrow>
+            ))
           )}
         </CardFooter>
       </ContentBlock>

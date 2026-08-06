@@ -21,7 +21,7 @@ const BillCard = styled.div`
   gap: 0.5rem;
   width: 100%;
   box-sizing: border-box;
-  margin-top: auto; /* Push to bottom of control panel */
+  margin-top: auto;
 `;
 
 const CostRow = styled.div`
@@ -82,7 +82,9 @@ const ProductionSummary = ({
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
-  const activeColorObj = canvas.availableColors.find((c) => c.colorName === selectedColor);
+  const activeColorObj = canvas.availableColors.find(
+    (c) => c.colorName === selectedColor,
+  );
 
   const baseCost = useMemo(() => {
     const matchedSize = canvas.sizes.find((s) => s.sizeCode === selectedSize);
@@ -97,9 +99,13 @@ const ProductionSummary = ({
     if (frontDesign.previewUrl) {
       const img = new Image();
       img.src = frontDesign.previewUrl;
-      img.onload = () => { if (isMounted) setFrontAspect(img.naturalWidth / img.naturalHeight); };
+      img.onload = () => {
+        if (isMounted) setFrontAspect(img.naturalWidth / img.naturalHeight);
+      };
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [frontDesign.previewUrl]);
 
   useEffect(() => {
@@ -107,9 +113,13 @@ const ProductionSummary = ({
     if (backDesign.previewUrl) {
       const img = new Image();
       img.src = backDesign.previewUrl;
-      img.onload = () => { if (isMounted) setBackAspect(img.naturalWidth / img.naturalHeight); };
+      img.onload = () => {
+        if (isMounted) setBackAspect(img.naturalWidth / img.naturalHeight);
+      };
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [backDesign.previewUrl]);
 
   const cfg = useMemo(() => getTemplateConfig(canvas.title), [canvas.title]);
@@ -122,24 +132,29 @@ const ProductionSummary = ({
 
   const frontPrintCost = useMemo(() => {
     if (!frontDesign.previewUrl) return 0;
+    
     const maxPrintWidthCm = garmentDims.B * printWidthRatio;
     const wCm = (frontDesign.scale / 100) * maxPrintWidthCm;
     const hCm = wCm / frontAspect;
+
     return getRawPrintCost(wCm, hCm) + 110;
   }, [frontDesign.previewUrl, frontDesign.scale, garmentDims, printWidthRatio, frontAspect]);
 
   const backPrintCost = useMemo(() => {
     if (!backDesign.previewUrl) return 0;
+
     const maxPrintWidthCm = garmentDims.B * printWidthRatio;
     const wCm = (backDesign.scale / 100) * maxPrintWidthCm;
     const hCm = wCm / backAspect;
+
     return getRawPrintCost(wCm, hCm) + 110;
   }, [backDesign.previewUrl, backDesign.scale, garmentDims, printWidthRatio, backAspect]);
 
   const totalPrintCost = frontPrintCost + backPrintCost;
   const totalCost = baseCost + totalPrintCost;
 
-  const apiProdUrl = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+  const apiProdUrl =
+    process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
 
   const frontTemplateUrl = useMemo(() => {
     return activeColorObj?.podFrontTemplateId
@@ -157,13 +172,21 @@ const ProductionSummary = ({
     const hasFront = !!frontDesign.previewUrl;
     const hasBack = !!backDesign.previewUrl;
 
-    const oldId = editingCartItem ? editingCartItem.variantId || editingCartItem.lineItemId : null;
-    const targetVariantId = oldId || `pod_${canvas.canvasId}_${selectedColor}_${selectedSize}_${Date.now()}`;
+    const oldId = editingCartItem
+      ? editingCartItem.variantId || editingCartItem.lineItemId
+      : null;
+    const targetVariantId =
+      oldId ||
+      `pod_${canvas.canvasId}_${selectedColor}_${selectedSize}_${Date.now()}`;
 
     if (hasFront) {
       if (frontDesign.file && typeof frontDesign.file !== "string") {
         await persistFile(`${targetVariantId}_front`, frontDesign.file);
-      } else if (frontDesign.file === "existing" && oldId && targetVariantId !== oldId) {
+      } else if (
+        frontDesign.file === "existing" &&
+        oldId &&
+        targetVariantId !== oldId
+      ) {
         const oldFile = await retrieveFile(`${oldId}_front`);
         if (oldFile) await persistFile(`${targetVariantId}_front`, oldFile);
       }
@@ -172,7 +195,11 @@ const ProductionSummary = ({
     if (hasBack) {
       if (backDesign.file && typeof backDesign.file !== "string") {
         await persistFile(`${targetVariantId}_back`, backDesign.file);
-      } else if (backDesign.file === "existing" && oldId && targetVariantId !== oldId) {
+      } else if (
+        backDesign.file === "existing" &&
+        oldId &&
+        targetVariantId !== oldId
+      ) {
         const oldFile = await retrieveFile(`${oldId}_back`);
         if (oldFile) await persistFile(`${targetVariantId}_back`, oldFile);
       }
@@ -198,24 +225,46 @@ const ProductionSummary = ({
         printSide: printSideKeyword,
         baseGarmentCost: baseCost,
         printCost: totalPrintCost,
-        front: hasFront ? {
-          imageId: frontDesign.file === "existing" ? frontDesign.previewUrl : `${targetVariantId}_front`,
-          imageUrl: frontDesign.previewUrl,
-          originalImageId: frontDesign.file === "existing" ? frontDesign.previewUrl : `${targetVariantId}_front`,
-          originalImageUrl: frontDesign.previewUrl,
-          width: frontDesign.scale, height: frontDesign.scale,
-          x: frontDesign.x, y: frontDesign.y, rotation: frontDesign.rotation,
-          templateUrl: frontTemplateUrl,
-        } : null,
-        back: hasBack ? {
-          imageId: backDesign.file === "existing" ? backDesign.previewUrl : `${targetVariantId}_back`,
-          imageUrl: backDesign.previewUrl,
-          originalImageId: backDesign.file === "existing" ? backDesign.previewUrl : `${targetVariantId}_back`,
-          originalImageUrl: backDesign.previewUrl,
-          width: backDesign.scale, height: backDesign.scale,
-          x: backDesign.x, y: backDesign.y, rotation: backDesign.rotation,
-          templateUrl: backTemplateUrl,
-        } : null,
+        front: hasFront
+          ? {
+              imageId:
+                frontDesign.file === "existing"
+                  ? frontDesign.previewUrl
+                  : `${targetVariantId}_front`,
+              imageUrl: frontDesign.previewUrl,
+              originalImageId:
+                frontDesign.file === "existing"
+                  ? frontDesign.previewUrl
+                  : `${targetVariantId}_front`,
+              originalImageUrl: frontDesign.previewUrl,
+              width: frontDesign.scale,
+              height: frontDesign.scale,
+              x: frontDesign.x,
+              y: frontDesign.y,
+              rotation: frontDesign.rotation,
+              templateUrl: frontTemplateUrl,
+            }
+          : null,
+        back: hasBack
+          ? {
+              imageId:
+                backDesign.file === "existing"
+                  ? backDesign.previewUrl
+                  : `${targetVariantId}_back`,
+              imageUrl: backDesign.previewUrl,
+              originalImageId:
+                backDesign.file === "existing"
+                  ? backDesign.previewUrl
+                  : `${targetVariantId}_back`,
+              originalImageUrl: backDesign.previewUrl,
+              width: backDesign.scale,
+              height: backDesign.scale,
+              x: backDesign.x,
+              y: backDesign.y,
+              rotation: backDesign.rotation,
+              templateUrl: backTemplateUrl,
+            }
+          : null,
       },
     };
 
@@ -226,27 +275,39 @@ const ProductionSummary = ({
   return (
     <BillCard>
       <CostRow>
-        <span>{t("pod_studio_item_base_cost", "Apparel Base")}</span>
-        <span>{baseCost} {t("zd", "DA")}</span>
+        <span>{t("pod_studio_item_base_cost")}</span>
+        <span>
+          {baseCost} {t("zd", "DA")}
+        </span>
       </CostRow>
       {frontPrintCost > 0 && (
         <CostRow>
-          <span>{t("pod_studio_item_front_cost", "Front Print")}</span>
-          <span>+{frontPrintCost} {t("zd", "DA")}</span>
+          <span>{t("pod_studio_item_front_cost")} (Front)</span>
+          <span>
+            +{frontPrintCost} {t("zd", "DA")}
+          </span>
         </CostRow>
       )}
       {backPrintCost > 0 && (
         <CostRow>
-          <span>{t("pod_studio_item_back_cost", "Back Print")}</span>
-          <span>+{backPrintCost} {t("zd", "DA")}</span>
+          <span>{t("pod_studio_item_front_cost")} (Back)</span>
+          <span>
+            +{backPrintCost} {t("zd", "DA")}
+          </span>
         </CostRow>
       )}
       <GrandTotalRow>
-        <span>{t("pod_studio_item_total_cost", "Total Due")}</span>
-        <span>{totalCost} {t("zd", "DA")}</span>
+        <span>{t("pod_studio_item_total_cost")}</span>
+        <span>
+          {totalCost} {t("zd", "DA")}
+        </span>
       </GrandTotalRow>
 
-      <CommitButton type="button" onClick={handleCommitToTray}>
+      <CommitButton
+        type="button"
+        onClick={handleCommitToTray}
+      >
+        {/* 🔴 FIXED: Dynamic Translation Key for Edit vs Add */}
         {editingCartItem ? t("pod_studio_btn_update_tray", "Update Design") : t("pod_studio_btn_commit_tray", "Add to Collection")}
       </CommitButton>
     </BillCard>

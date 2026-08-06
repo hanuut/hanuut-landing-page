@@ -3,8 +3,9 @@ export default async (request, context) => {
   const url = new URL(request.url);
   const path = url.pathname;
 
-  // 1. Bot Detection (Expanded to include major Search & AI crawler engines)
-  const botPattern = /facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|slackbot|googlebot|bingbot|applebot|duckduckbot|yandex|petalbot|gptbot|oai-searchbot|perplexitybot|claudebot|ccbot|amazonbot/i;
+  // 1. Bot Detection (Expanded to include Pomelli, Cloudflare, Semrush, Datanyze)
+  const botPattern = /facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|slackbot|googlebot|bingbot|applebot|duckduckbot|yandex|petalbot|gptbot|oai-searchbot|perplexitybot|claudebot|ccbot|amazonbot|pomelli|cloudflare-alwaysonline|datanyze|semrushbot/i;
+  
   const isBot = botPattern.test(userAgent);
   
   if (!isBot) {
@@ -24,7 +25,7 @@ export default async (request, context) => {
     const username = parts[1].replace(/\/$/, "");
     targetUrl = `${API_URL}/shop/share/${encodeURIComponent(username)}`;
   }
-  // === 🔴 NEW: AURAS LAB Storefront + SKU routing ===
+  // === AURAS LAB Storefront + SKU routing ===
   else if (path === "/aurasLab" || path === "/aurasLab/") {
     targetUrl = `${API_URL}/shop/share/aurasLab`;
   }
@@ -61,13 +62,13 @@ export default async (request, context) => {
 
   if (targetUrl) {
     try {
-      console.log(`[Edge] Proxying Bot ${url.href} to ${targetUrl}`);
+      console.log(`[Edge] Proxying Bot ${userAgent} to ${targetUrl}`);
       const response = await fetch(targetUrl);
       if (response.ok) {
         return new Response(response.body, {
           headers: {
-            "content-type": "text/html",
-            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/html; charset=utf-8",
+            "cache-control": "public, max-age=3600, s-maxage=86400", // Heavy cache for bots
             "access-control-allow-origin": "*" 
           },
         });
