@@ -15,12 +15,7 @@ import { ActionButton } from "../../../components/ActionButton";
 import CartElementsGrid from "../../Cart/components/CartElementsGrid";
 import AddressesDropDown from "../../../components/AddressesDropDown";
 import { useTranslation } from "react-i18next";
-import {
-  fetchImage,
-  selectSelectedShopImage,
-} from "../../Images/state/reducers";
 import { getImageUrl } from "../../../utils/imageUtils";
-import { getImage } from "../../Images/services/imageServices";
 import { motion, AnimatePresence } from "framer-motion";
 import Loader from "../../../components/Loader";
 import { useNavigate } from "react-router-dom";
@@ -41,8 +36,7 @@ import {
   FaArrowRight,
   FaCheckCircle,
   FaExclamationTriangle,
-  FaGift,
-  FaLock
+  FaLock,
 } from "react-icons/fa";
 import {
   detectUserLocation,
@@ -59,15 +53,15 @@ import PodMockupPreview from "../../PodStudio/components/Workspace/PodMockupPrev
 
 // Swiper.js Imports
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
 
-// ============================================================================
+// ===========================================================================
 // STYLED COMPONENTS
-// ============================================================================
+// ===========================================================================
 
 const ModalBackdrop = styled(motion.div)`
   position: fixed;
@@ -95,8 +89,10 @@ const MainCartPanel = styled(motion.div)`
   background-color: rgba(24, 24, 27, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-left: ${(props) => (props.$isArabic ? "none" : "1px solid rgba(255, 255, 255, 0.1)")};
-  border-right: ${(props) => (props.$isArabic ? "1px solid rgba(255, 255, 255, 0.1)" : "none")};
+  border-left: ${(props) =>
+    props.$isArabic ? "none" : "1px solid rgba(255, 255, 255, 0.1)"};
+  border-right: ${(props) =>
+    props.$isArabic ? "1px solid rgba(255, 255, 255, 0.1)" : "none"};
   padding: 2.5rem 1.5rem;
   display: flex;
   flex-direction: column;
@@ -108,6 +104,8 @@ const MainCartPanel = styled(motion.div)`
 
   @media (max-width: 480px) {
     width: 100%;
+    /* 🔴 MOBILE UX OVERHAUL: USE 100DVH TO ELIMINATE KEYBOARD/NAV CUTOFFS */
+    height: 100dvh;
     padding: 1.25rem 1rem;
   }
 `;
@@ -118,8 +116,10 @@ const FormPanel = styled(motion.div)`
   background-color: rgba(20, 20, 22, 0.98);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
-  border-left: ${(props) => (props.$isArabic ? "none" : "1px solid rgba(255, 255, 255, 0.08)")};
-  border-right: ${(props) => (props.$isArabic ? "1px solid rgba(255, 255, 255, 0.08)" : "none")};
+  border-left: ${(props) =>
+    props.$isArabic ? "none" : "1px solid rgba(255, 255, 255, 0.08)"};
+  border-right: ${(props) =>
+    props.$isArabic ? "1px solid rgba(255, 255, 255, 0.08)" : "none"};
   padding: 2.5rem 1.5rem;
   display: flex;
   flex-direction: column;
@@ -138,6 +138,7 @@ const FormPanel = styled(motion.div)`
     position: fixed;
     inset: 0;
     width: 100%;
+    height: 100dvh;
     z-index: 1330;
   }
 `;
@@ -156,6 +157,10 @@ const ScrollableFormBody = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+
+  /* 🔴 PREVENT KEYBOARD CUTOFF: Bottom spacing clearance */
+  padding-bottom: calc(140px + env(safe-area-inset-bottom));
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -375,11 +380,6 @@ const OptionLeft = styled.div`
   gap: 0.8rem;
 `;
 
-const OptionIcon = styled.div`
-  color: ${(props) => props.theme.primaryColor};
-  font-size: 1.2rem;
-`;
-
 const OptionText = styled.div`
   display: flex;
   flex-direction: column;
@@ -447,14 +447,29 @@ const DineInBanner = styled.div`
   margin-bottom: 1rem;
 `;
 
+// 🔴 STICKY CONSOLE-SAFE BOTTOM FOOTER GROUP FOR MAXIMUM CONVERSION
+const StickyMobileFooter = styled.div`
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #141416;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 0;
+  z-index: 100;
+  box-shadow: 0 -15px 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+`;
+
 const TotalContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
+  padding: 0 4px;
 `;
 
 const TotalLabel = styled.p`
@@ -473,19 +488,21 @@ const TotalValue = styled.p`
 
 const SubmitButton = styled.button`
   width: 100%;
-  padding: 0.85rem;
-  font-size: 1rem;
-  font-weight: 700;
+  padding: 1rem;
+  font-size: 1.05rem;
+  font-weight: 800;
   background-color: ${(props) => props.theme.primaryColor};
   color: #111;
   border: none;
   border-radius: 16px;
   cursor: pointer;
   margin-top: 1rem;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
+  transition: all 0.2s ease;
+  font-family: "Tajawal", sans-serif;
+  box-sizing: border-box;
+
   &:hover {
-    filter: brightness(1.1);
+    filter: brightness(1.15);
     transform: translateY(-2px);
   }
   &:disabled {
@@ -566,8 +583,6 @@ const CustomItemEditBtn = styled.button`
   }
 `;
 
-// --- CACHED ORDER HISTORY STYLES ---
-
 const HistorySection = styled.div`
   width: 100%;
   display: flex;
@@ -586,7 +601,7 @@ const HistoryHeader = styled.div`
   color: #a1a1aa;
   font-size: 0.85rem;
   font-weight: 700;
-  font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   &:hover {
     color: #fff;
   }
@@ -616,8 +631,14 @@ const HistoryText = styled.div`
   flex-direction: column;
   gap: 2px;
   text-align: start;
-  span.shop { font-weight: 700; color: white; }
-  span.meta { font-size: 0.72rem; color: #a1a1aa; }
+  span.shop {
+    font-weight: 700;
+    color: white;
+  }
+  span.meta {
+    font-size: 0.72rem;
+    color: #a1a1aa;
+  }
 `;
 
 const HistoryActions = styled.div`
@@ -626,8 +647,9 @@ const HistoryActions = styled.div`
 `;
 
 const HistoryButton = styled.button`
-  background: ${(props) => props.$primary ? props.theme.primaryColor : "rgba(255, 255, 255, 0.05)"};
-  color: ${(props) => props.$primary ? "#000" : "#ef4444"};
+  background: ${(props) =>
+    props.$primary ? props.theme.primaryColor : "rgba(255, 255, 255, 0.05)"};
+  color: ${(props) => (props.$primary ? "#000" : "#ef4444")};
   border: none;
   border-radius: 6px;
   padding: 4px 8px;
@@ -745,7 +767,10 @@ const SummaryCardButton = styled.button`
   align-items: center;
   gap: 1rem;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
   pointer-events: auto;
   text-decoration: none;
   box-sizing: border-box;
@@ -779,8 +804,12 @@ const StackedImage = styled.img`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   background-color: #1c1c1e;
   transition: transform 0.2s ease;
-  
-  transform: translate(${(props) => props.$offsetX}px, ${(props) => props.$offsetY}px) rotate(${(props) => props.$rotation}deg);
+
+  transform: translate(
+      ${(props) => props.$offsetX}px,
+      ${(props) => props.$offsetY}px
+    )
+    rotate(${(props) => props.$rotation}deg);
   z-index: ${(props) => props.$zIndex};
 `;
 
@@ -815,21 +844,10 @@ const HintArrow = styled.div`
   transition: transform 0.2s ease;
 
   ${SummaryCardButton}:hover & {
-    transform: ${(props) => (props.$isArabic ? "translateX(-4px)" : "translateX(4px)")};
+    transform: ${(props) =>
+      props.$isArabic ? "translateX(-4px)" : "translateX(4px)"};
   }
 `;
-
-const HeaderSpacer = styled.div`
-  height: 44px;
-  margin-bottom: 1rem;
-  flex-shrink: 0;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-// --- NEW COMPONENT STYLES FOR RECOVERY & PROMO SYSTEM ---
 
 const PromoSection = styled.div`
   display: flex;
@@ -845,9 +863,11 @@ const PromoInput = styled(Input)`
 `;
 
 const PromoButton = styled.button`
-  background: ${(props) => props.$applied ? "rgba(239, 68, 68, 0.1)" : "rgba(255, 255, 255, 0.05)"};
-  color: ${(props) => props.$applied ? "#ef4444" : "white"};
-  border: 1px solid ${(props) => props.$applied ? "#ef4444" : "rgba(255, 255, 255, 0.1)"};
+  background: ${(props) =>
+    props.$applied ? "rgba(239, 68, 68, 0.1)" : "rgba(255, 255, 255, 0.05)"};
+  color: ${(props) => (props.$applied ? "#ef4444" : "white")};
+  border: 1px solid
+    ${(props) => (props.$applied ? "#ef4444" : "rgba(255, 255, 255, 0.1)")};
   border-radius: 10px;
   padding: 0.65rem 1.25rem;
   font-weight: 700;
@@ -857,7 +877,8 @@ const PromoButton = styled.button`
   font-family: "Tajawal", sans-serif;
 
   &:hover:not(:disabled) {
-    background: ${(props) => props.$applied ? "rgba(239, 68, 68, 0.15)" : "rgba(255, 255, 255, 0.1)"};
+    background: ${(props) =>
+      props.$applied ? "rgba(239, 68, 68, 0.15)" : "rgba(255, 255, 255, 0.1)"};
   }
 
   &:disabled {
@@ -871,7 +892,7 @@ const PromoFeedback = styled.div`
   margin-top: 0.25rem;
   text-align: start;
   font-weight: 600;
-  color: ${(props) => props.$isError ? "#ef4444" : "#39A170"};
+  color: ${(props) => (props.$isError ? "#ef4444" : "#39A170")};
 `;
 
 const PolicyConfirmModalBackdrop = styled(motion.div)`
@@ -1016,11 +1037,9 @@ const PolicyScrollBlock = styled.div`
   text-align: start;
 `;
 
-// --- NEW COMPONENT FOR HANDSHAKE SECURE DISPLAY LOCKS ---
-
 const LockBadge = styled.div`
   position: absolute;
-  ${props => props.$isArabic ? "left: 12px;" : "right: 12px;"}
+  ${(props) => (props.$isArabic ? "left: 12px;" : "right: 12px;")}
   top: calc(50% + 8px);
   transform: translateY(-50%);
   color: #39a170;
@@ -1032,15 +1051,13 @@ const LockBadge = styled.div`
 const slideVariants = {
   hidden: (isArabic) => ({
     x: isArabic ? "-100%" : "100%",
-    transition: { type: "tween", duration: 0.3, ease: "easeInOut" }
+    transition: { type: "tween", duration: 0.3, ease: "easeInOut" },
   }),
   visible: {
     x: 0,
-    transition: { type: "tween", duration: 0.3, ease: "easeInOut" }
-  }
+    transition: { type: "tween", duration: 0.3, ease: "easeInOut" },
+  },
 };
-
-// src/modules/Partners/components/Cart.js — Batch 2 of 3
 
 const Cart = ({
   items,
@@ -1073,24 +1090,19 @@ const Cart = ({
   const [manualAddressLine, setManualAddressLine] = useState("");
 
   const [isCheckoutFormOpen, setIsCheckoutFormOpen] = useState(false);
-
-  // --- RECOVERY AUDIT HISTORY CACHE ---
   const [orderHistory, setOrderHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
 
-  // --- RECOVERY AUDIT DESIGN POLICY STATES ---
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
   const [designPolicyChecked, setDesignPolicyChecked] = useState(false);
 
-  // --- PROMO / INFLUENCER CODE STATE ---
   const [promoCode, setPromoCode] = useState("");
   const [appliedCode, setAppliedCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(null);
   const [isVerifyingPromo, setIsVerifyingPromo] = useState(false);
   const [promoError, setPromoError] = useState("");
 
-  // --- HANDSHAKE LOCK STATE FLAGS ---
   const [isHandshakeLocked, setIsHandshakeLocked] = useState(false);
 
   useEffect(() => {
@@ -1110,7 +1122,6 @@ const Cart = ({
     }
   }, [isCartOpen]);
 
-  // Load history list securely
   useEffect(() => {
     if (isCartOpen) {
       try {
@@ -1124,45 +1135,53 @@ const Cart = ({
     }
   }, [isCartOpen]);
 
-  // Intercept orderSuccessData to cache order parameters natively
   useEffect(() => {
     if (orderSuccessData) {
       try {
-        const history = JSON.parse(localStorage.getItem("hanuut_order_history")) || [];
-        const orderId = orderSuccessData.orderId || orderSuccessData.id || '';
-        
-        if (orderId && !history.some(item => item.orderId === orderId)) {
+        const history =
+          JSON.parse(localStorage.getItem("hanuut_order_history")) || [];
+        const orderId = orderSuccessData.orderId || orderSuccessData.id || "";
+
+        if (orderId && !history.some((item) => item.orderId === orderId)) {
           const newEntry = {
             orderId,
-            customerPhone: customerPhone || orderSuccessData.customerPhone || '',
-            shopName: orderSuccessData.shopName || 'AURAS LAB',
+            customerPhone:
+              customerPhone || orderSuccessData.customerPhone || "",
+            shopName: orderSuccessData.shopName || "AURAS LAB",
             totalPrice: finalTotal,
             createdAt: new Date().toISOString(),
           };
           const updatedHistory = [newEntry, ...history].slice(0, 20);
-          localStorage.setItem("hanuut_order_history", JSON.stringify(updatedHistory));
+          localStorage.setItem(
+            "hanuut_order_history",
+            JSON.stringify(updatedHistory),
+          );
           setOrderHistory(updatedHistory);
         }
       } catch (err) {
-        console.error("Failed to parse cached order history:", err);
+        console.error("Failed to save order metadata to cache:", err);
       }
     }
   }, [orderSuccessData]);
 
-  // --- INTERACTIVE MOBILE HANDSHAKE PARAMETERS LISTENER ---
   useEffect(() => {
     if (isCartOpen) {
       const queryParams = new URLSearchParams(window.location.search);
-      const customerId = queryParams.get("customerId");
+      const phone = queryParams.get("phone");
       const firstName = queryParams.get("firstName");
       const familyName = queryParams.get("familyName");
-      const phone = queryParams.get("phone");
-      const email = queryParams.get("email");
       const wilaya = queryParams.get("wilaya");
       const commune = queryParams.get("commune");
       const addressLine = queryParams.get("addressLine");
 
-      if (phone || firstName || familyName || wilaya || commune || addressLine) {
+      if (
+        phone ||
+        firstName ||
+        familyName ||
+        wilaya ||
+        commune ||
+        addressLine
+      ) {
         setIsHandshakeLocked(true);
 
         if (firstName || familyName) {
@@ -1175,14 +1194,13 @@ const Cart = ({
           setManualAddressLine(addressLine);
         }
 
-        // Set location dynamically in Redux to execute automated delivery rates calculations
         if (wilaya || commune) {
           dispatch(
             setManualLocation({
-              wilayaCode: "", 
+              wilayaCode: "",
               wilayaName: wilaya || "",
               communeName: commune || "",
-            })
+            }),
           );
         }
       }
@@ -1239,9 +1257,10 @@ const Cart = ({
   }, [filteredDeliveryOptions]);
 
   const selectedDeliveryOption = filteredDeliveryOptions[selectedDeliveryIndex];
-  const deliveryPrice = selectedDeliveryOption ? selectedDeliveryOption.price : 0;
+  const deliveryPrice = selectedDeliveryOption
+    ? selectedDeliveryOption.price
+    : 0;
 
-  // Recalculate billing using optional promo code variables
   const discountAmount = useMemo(() => {
     if (!appliedDiscount) return 0;
     if (appliedDiscount.type === "percent") {
@@ -1250,7 +1269,10 @@ const Cart = ({
     return appliedDiscount.value;
   }, [appliedDiscount, itemsTotal]);
 
-  const finalTotal = Math.max(0, itemsTotal + (isDineIn ? 0 : deliveryPrice) - discountAmount);
+  const finalTotal = Math.max(
+    0,
+    itemsTotal + (isDineIn ? 0 : deliveryPrice) - discountAmount,
+  );
 
   const handleClose = () => dispatch(closeCart());
   const handleLocationRequest = (e) => {
@@ -1293,18 +1315,19 @@ const Cart = ({
     setIsCheckoutFormOpen(false);
   };
 
-  // --- PROMO CODE INTEGRATION ---
   const handleApplyPromo = async (e) => {
     e.preventDefault();
     if (!promoCode.trim()) return;
-    
+
     setIsVerifyingPromo(true);
     setPromoError("");
     setAppliedDiscount(null);
     setAppliedCode("");
 
     try {
-      const response = await fetch(`/api/gift-card/verify/${promoCode.trim().toUpperCase()}`);
+      const response = await fetch(
+        `/api/gift-card/verify/${promoCode.trim().toUpperCase()}`,
+      );
       if (response.ok) {
         const data = await response.json();
         setAppliedDiscount(data);
@@ -1313,7 +1336,11 @@ const Cart = ({
         setPromoError(isArabic ? "رمز ترويجي غير صالح" : "Code promo invalide");
       }
     } catch (err) {
-      setPromoError(isArabic ? "حدث خطأ في الاتصال بالخادم" : "Connection error checking promo code");
+      setPromoError(
+        isArabic
+          ? "حدث خطأ في الاتصال بالخادم"
+          : "Connection error checking promo code",
+      );
     } finally {
       setIsVerifyingPromo(false);
     }
@@ -1327,15 +1354,20 @@ const Cart = ({
     setPromoError("");
   };
 
-  // --- CHECKOUT SUBMISSION WITH VERIFICATION MODAL INTERACTION ---
   const handleCheckoutSubmit = (event) => {
     event.preventDefault();
-    if (!customerName || !customerPhone || (!isDineIn && !manualAddressLine && shopDomain === "global")) {
-      alert(isArabic ? "يرجى ملء جميع البيانات الأساسية." : "Please fill in all required shipping fields.");
+    if (
+      !customerName ||
+      !customerPhone ||
+      (!isDineIn && !manualAddressLine && shopDomain === "global")
+    ) {
+      alert(
+        isArabic
+          ? "يرجى ملء جميع البيانات الأساسية."
+          : "Please fill in all required shipping fields.",
+      );
       return;
     }
-    
-    // Intercept checkout to open the Design Policy confirmation step
     setIsConfirmModalOpen(true);
   };
 
@@ -1385,7 +1417,7 @@ const Cart = ({
       { rotation: -6, offsetX: -8, offsetY: -6, zIndex: 10 },
       { rotation: 4, offsetX: 0, offsetY: 0, zIndex: 20 },
       { rotation: -3, offsetX: 8, offsetY: 4, zIndex: 30 },
-      { rotation: 2, offsetX: 16, offsetY: 8, zIndex: 40 }
+      { rotation: 2, offsetX: 16, offsetY: 8, zIndex: 40 },
     ];
     return configs[index % configs.length];
   };
@@ -1480,9 +1512,9 @@ const Cart = ({
                 onClick={() => setSelectedDeliveryIndex(idx)}
               >
                 <OptionLeft>
-                  <OptionIcon>
+                  <div style={{ color: "#F07A48", fontSize: "1.2rem" }}>
                     <FaMotorcycle />
-                  </OptionIcon>
+                  </div>
                   <OptionText>
                     <OptionTitle>{opt.name}</OptionTitle>
                     <OptionDesc>{opt.estimatedTime}</OptionDesc>
@@ -1502,17 +1534,27 @@ const Cart = ({
       return (
         <>
           {isHandshakeLocked ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
               <FormGroup>
                 <InputLabel>{t("wiz_label_wilaya")}</InputLabel>
-                <Input type="text" value={locationState.wilayaName || ""} disabled />
+                <Input
+                  type="text"
+                  value={locationState.wilayaName || ""}
+                  disabled
+                />
                 <LockBadge $isArabic={isArabic} style={{ top: "50%" }}>
                   <FaLock size={12} />
                 </LockBadge>
               </FormGroup>
               <FormGroup>
                 <InputLabel>{t("wiz_label_commune")}</InputLabel>
-                <Input type="text" value={locationState.communeName || ""} disabled />
+                <Input
+                  type="text"
+                  value={locationState.communeName || ""}
+                  disabled
+                />
                 <LockBadge $isArabic={isArabic} style={{ top: "50%" }}>
                   <FaLock size={12} />
                 </LockBadge>
@@ -1544,7 +1586,13 @@ const Cart = ({
               <InputLabel style={{ marginBottom: "0.5rem" }}>
                 {t("delivery_destination_label")}
               </InputLabel>
-              <SegmentedControl style={isHandshakeLocked ? { pointerEvents: "none", opacity: 0.85 } : {}}>
+              <SegmentedControl
+                style={
+                  isHandshakeLocked
+                    ? { pointerEvents: "none", opacity: 0.85 }
+                    : {}
+                }
+              >
                 <SegmentButton
                   type="button"
                   $active={fulfillmentType === "home"}
@@ -1572,7 +1620,9 @@ const Cart = ({
                     <DeliveryOptionRow
                       key={idx}
                       $selected={selectedDeliveryIndex === idx}
-                      onClick={() => !isHandshakeLocked && setSelectedDeliveryIndex(idx)}
+                      onClick={() =>
+                        !isHandshakeLocked && setSelectedDeliveryIndex(idx)
+                      }
                     >
                       <OptionLeft>
                         {opt.type === "STOP_DESK" ? (
@@ -1651,13 +1701,25 @@ const Cart = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", overflow: "hidden" }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+                width: "100%",
+                overflow: "hidden",
+              }}
             >
               <ScrollableFormBody>
                 {orderHistory.length > 0 && (
                   <HistorySection>
                     <HistoryHeader onClick={() => setShowHistory(!showHistory)}>
-                      <span><FaHistory style={{ marginRight: '6px', marginLeft: '6px' }} /> {t("recent_orders_title", "Recent Orders")} ({orderHistory.length})</span>
+                      <span>
+                        <FaHistory
+                          style={{ marginRight: "6px", marginLeft: "6px" }}
+                        />{" "}
+                        {t("recent_orders_title", "Recent Orders")} (
+                        {orderHistory.length})
+                      </span>
                       <span>{showHistory ? "▲" : "▼"}</span>
                     </HistoryHeader>
                     {showHistory && (
@@ -1666,14 +1728,35 @@ const Cart = ({
                           <HistoryItem key={hOrder.orderId}>
                             <HistoryText>
                               <span className="shop">{hOrder.shopName}</span>
-                              <span className="meta">{t("payment_order_id")}: {hOrder.orderId}</span>
-                              <span className="meta">{hOrder.totalPrice} DA • {new Date(hOrder.createdAt).toLocaleDateString()}</span>
+                              <span className="meta">
+                                {t("payment_order_id")}: {hOrder.orderId}
+                              </span>
+                              <span className="meta">
+                                {hOrder.totalPrice} DA •{" "}
+                                {new Date(
+                                  hOrder.createdAt,
+                                ).toLocaleDateString()}
+                              </span>
                             </HistoryText>
                             <HistoryActions>
-                              <HistoryButton type="button" $primary onClick={() => handleTrackHistoryItem(hOrder.customerPhone, hOrder.orderId)}>
+                              <HistoryButton
+                                type="button"
+                                $primary
+                                onClick={() =>
+                                  handleTrackHistoryItem(
+                                    hOrder.customerPhone,
+                                    hOrder.orderId,
+                                  )
+                                }
+                              >
                                 <FaEye />
                               </HistoryButton>
-                              <HistoryButton type="button" onClick={(e) => handleHideHistoryItem(e, hOrder.orderId)}>
+                              <HistoryButton
+                                type="button"
+                                onClick={(e) =>
+                                  handleHideHistoryItem(e, hOrder.orderId)
+                                }
+                              >
                                 <TrashAltIcon />
                               </HistoryButton>
                             </HistoryActions>
@@ -1685,12 +1768,27 @@ const Cart = ({
                 )}
 
                 <Column>
-                  <div style={{ paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                    <TotalValue style={{ fontSize: '1.8rem', color: '#39A170' }}>
+                  <div
+                    style={{
+                      paddingBottom: "0.5rem",
+                      borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                    }}
+                  >
+                    <TotalValue
+                      style={{ fontSize: "1.8rem", color: "#39A170" }}
+                    >
                       zd {finalTotal}
                     </TotalValue>
-                    <span style={{ fontSize: '0.85rem', color: '#a1a1aa', fontWeight: '700' }}>
-                      {t("total", "Total")} • {cleanItems.reduce((acc, item) => acc + item.quantity, 0)} {t("cart_items_count", "Items")}
+                    <span
+                      style={{
+                        fontSize: "0.85rem",
+                        color: "#a1a1aa",
+                        fontWeight: "700",
+                      }}
+                    >
+                      {t("total", "Total")} •{" "}
+                      {cleanItems.reduce((acc, item) => acc + item.quantity, 0)}{" "}
+                      {t("cart_items_count", "Items")}
                     </span>
                   </div>
 
@@ -1700,16 +1798,16 @@ const Cart = ({
                         {shopDomain === "global" && item.podCustomization ? (
                           <MiniMockupPreview
                             item={item}
-                            onClick={() => {
-                              setZoomedItem(item);
-                            }}
+                            onClick={() => setZoomedItem(item)}
                           />
                         ) : (
                           shopDomain === "global" &&
                           item.imageId && (
                             <GrowableImageWrapper
                               onClick={() =>
-                                setZoomedItem({ singleUrl: getImageUrl(item.imageId) })
+                                setZoomedItem({
+                                  singleUrl: getImageUrl(item.imageId),
+                                })
                               }
                             >
                               <ZoomOverlayIcon>
@@ -1730,8 +1828,8 @@ const Cart = ({
                           </ItemName>
                           {shopDomain === "global" && (
                             <ItemVariant>
-                              {t("color_prefix")}: {item.color}, {t("size_prefix")}:{" "}
-                              {item.size}
+                              {t("color_prefix")}: {item.color},{" "}
+                              {t("size_prefix")}: {item.size}
                               {item.podCustomization && (
                                 <span
                                   style={{
@@ -1742,7 +1840,8 @@ const Cart = ({
                                     fontSize: "0.75rem",
                                   }}
                                 >
-                                  ✨ Custom Print ({item.podCustomization.printSide})
+                                  ✨ Custom Print (
+                                  {item.podCustomization.printSide})
                                 </span>
                               )}
                               {item.podCustomization && onEditCustomItem && (
@@ -1756,7 +1855,7 @@ const Cart = ({
                             </ItemVariant>
                           )}
 
-                          {item.podCustomization ? (
+                          {item.podCustomization && (
                             <div
                               style={{
                                 display: "flex",
@@ -1765,18 +1864,24 @@ const Cart = ({
                                 marginTop: "4px",
                               }}
                             >
-                              <span style={{ fontSize: "0.8rem", color: "#888" }}>
+                              <span
+                                style={{ fontSize: "0.8rem", color: "#888" }}
+                              >
                                 {t("pod_studio_apparel_base")}:{" "}
-                                {parseInt(item.podCustomization.baseGarmentCost || 0)}{" "}
+                                {parseInt(
+                                  item.podCustomization.baseGarmentCost || 0,
+                                )}{" "}
                                 {t("zd")}
                               </span>
-                              <span style={{ fontSize: "0.8rem", color: "#39A170" }}>
+                              <span
+                                style={{ fontSize: "0.8rem", color: "#39A170" }}
+                              >
                                 {t("pod_studio_custom_print")}: +
                                 {parseInt(item.podCustomization.printCost || 0)}{" "}
                                 {t("zd")}
                               </span>
                             </div>
-                          ) : null}
+                          )}
 
                           <ItemPrice style={{ marginTop: "6px" }}>
                             {parseInt(item.sellingPrice)} {t("zd")}
@@ -1817,7 +1922,7 @@ const Cart = ({
                 type="button"
                 onClick={() => setIsCheckoutFormOpen(true)}
                 disabled={cleanItems.length === 0}
-                style={{ marginTop: 'auto' }}
+                style={{ marginTop: "auto" }}
               >
                 {t("place_order_button", "Confirm Order")}
               </SubmitButton>
@@ -1832,7 +1937,13 @@ const Cart = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", overflow: "hidden" }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+                width: "100%",
+                overflow: "hidden",
+              }}
             >
               <ScrollableFormBody>
                 <SummaryCardButton
@@ -1843,7 +1954,10 @@ const Cart = ({
                   <ImageStackContainer>
                     {resolvedImages.length > 0 ? (
                       resolvedImages.map((imgUrl, idx) => {
-                        const transform = getStackTransform(idx, resolvedImages.length);
+                        const transform = getStackTransform(
+                          idx,
+                          resolvedImages.length,
+                        );
                         return (
                           <StackedImage
                             key={idx}
@@ -1862,18 +1976,23 @@ const Cart = ({
                   </ImageStackContainer>
                   <SummaryCardText>
                     <span className="count">
-                      {cleanItems.reduce((acc, item) => acc + item.quantity, 0)} {t("cart_items_count", "Items")}
+                      {cleanItems.reduce((acc, item) => acc + item.quantity, 0)}{" "}
+                      {t("cart_items_count", "Items")}
                     </span>
                     <span className="total">
                       {finalTotal} {t("dzd", "DA")}
                     </span>
                   </SummaryCardText>
                   <HintArrow $isArabic={isArabic}>
-                    {isArabic ? <FaArrowLeft size={14} /> : <FaArrowRight size={14} />}
+                    {isArabic ? (
+                      <FaArrowLeft size={14} />
+                    ) : (
+                      <FaArrowRight size={14} />
+                    )}
                   </HintArrow>
                 </SummaryCardButton>
 
-                <Column style={{ marginTop: "0" }}>
+                <Column style={{ marginTop: "1rem" }}>
                   <FormGroup>
                     <InputLabel>{t("form_full_name")}</InputLabel>
                     <Input
@@ -1907,13 +2026,15 @@ const Cart = ({
                   {renderDeliverySection()}
                   <FormGroup>
                     <InputLabel>{t("form_preparation_note")}</InputLabel>
-                    <TextArea value={note} onChange={(e) => setNote(e.target.value)} />
+                    <TextArea
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                    />
                   </FormGroup>
                 </Column>
 
-                {/* 🔴 PROMO CODE COMPACT SECTION (Priority 2) */}
                 <PromoSection>
-                  <PromoInput 
+                  <PromoInput
                     type="text"
                     placeholder={t("promo_code_placeholder", "Code Promo")}
                     value={promoCode}
@@ -1924,60 +2045,85 @@ const Cart = ({
                     }}
                   />
                   {appliedCode ? (
-                    <PromoButton 
-                      type="button" 
-                      $applied 
+                    <PromoButton
+                      type="button"
+                      $applied
                       onClick={handleRemovePromo}
                     >
                       {isArabic ? "سحب" : "Retirer"}
                     </PromoButton>
                   ) : (
-                    <PromoButton 
-                      type="button" 
-                      disabled={isVerifyingPromo || !promoCode.trim()} 
+                    <PromoButton
+                      type="button"
+                      disabled={isVerifyingPromo || !promoCode.trim()}
                       onClick={handleApplyPromo}
                     >
-                      {isVerifyingPromo ? "..." : (isArabic ? "تطبيق" : "Appliquer")}
+                      {isVerifyingPromo
+                        ? "..."
+                        : isArabic
+                          ? "تطبيق"
+                          : "Appliquer"}
                     </PromoButton>
                   )}
                 </PromoSection>
 
-                {/* Promo Notifications Feed */}
-                {promoError && <PromoFeedback $isError>{promoError}</PromoFeedback>}
+                {promoError && (
+                  <PromoFeedback $isError>{promoError}</PromoFeedback>
+                )}
                 {appliedCode && (
                   <PromoFeedback>
-                    <FaCheckCircle style={{ marginRight: '4px', marginLeft: '4px' }} />
-                    {isArabic ? `تم تطبيق الكود ${appliedCode} بنجاح !` : `Code ${appliedCode} appliqué avec succès !`}
+                    <FaCheckCircle
+                      style={{ marginRight: "4px", marginLeft: "4px" }}
+                    />
+                    {isArabic
+                      ? `تم تطبيق الكود ${appliedCode} بنجاح !`
+                      : `Code ${appliedCode} appliqué avec succès !`}
                   </PromoFeedback>
                 )}
               </ScrollableFormBody>
 
-              <TotalContainer>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                  <TotalLabel>{t("total")}</TotalLabel>
-                  {discountAmount > 0 && (
-                    <span style={{ fontSize: "0.8rem", color: "#39A170", fontWeight: "bold", marginTop: "2px" }}>
-                      {t("discount_applied")}: -{discountAmount.toFixed(0)} DA
-                    </span>
-                  )}
-                </div>
-                <TotalValue>
-                  {finalTotal} {t("zd")}
-                </TotalValue>
-              </TotalContainer>
+              {/* 🔴 BUG 1 FIX: STICKY VIEWPORT CONTAINER SECURE FROM BROWSERS DOCKS */}
+              <StickyMobileFooter>
+                <TotalContainer>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <TotalLabel>{t("total")}</TotalLabel>
+                    {discountAmount > 0 && (
+                      <span
+                        style={{
+                          fontSize: "0.8rem",
+                          color: "#39A170",
+                          fontWeight: "bold",
+                          marginTop: "2px",
+                        }}
+                      >
+                        {t("discount_applied")}: -{discountAmount.toFixed(0)} DA
+                      </span>
+                    )}
+                  </div>
+                  <TotalValue>
+                    {finalTotal} {t("zd")}
+                  </TotalValue>
+                </TotalContainer>
 
-              <SubmitButton
-                type="submit"
-                disabled={
-                  isSubmitting ||
-                  calcError ||
-                  (!isDineIn && !isCalculated && shopDomain !== "global")
-                }
-              >
-                {isSubmitting === "submitting"
-                  ? t("placing_order")
-                  : t("place_order_button")}
-              </SubmitButton>
+                <SubmitButton
+                  type="submit"
+                  disabled={
+                    isSubmitting ||
+                    calcError ||
+                    (!isDineIn && !isCalculated && shopDomain !== "global")
+                  }
+                >
+                  {isSubmitting === "submitting"
+                    ? t("placing_order")
+                    : t("place_order_button")}
+                </SubmitButton>
+              </StickyMobileFooter>
             </motion.div>
           )}
         </AnimatePresence>
@@ -2048,7 +2194,6 @@ const Cart = ({
   };
 
   function LightboxComponent({ item, onClose, onEdit }) {
-    const { t } = useTranslation();
     const custom = item?.podCustomization;
     if (!custom) return null;
 
@@ -2091,10 +2236,8 @@ const Cart = ({
           </LbButton>
         </LightboxActions>
       </LightboxContent>
-    ); 
+    );
   }
-
-  // src/modules/Partners/components/Cart.js — Batch 3 of 3
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -2148,7 +2291,6 @@ const Cart = ({
         )}
       </AnimatePresence>
 
-      {/* 🔴 MANDATORY DESIGN POLICY CONFIRMATION MODAL & SWIPER CAROUSEL (Priority 1) */}
       <AnimatePresence>
         {isConfirmModalOpen && (
           <PolicyConfirmModalBackdrop
@@ -2165,29 +2307,44 @@ const Cart = ({
               $isArabic={isArabic}
             >
               <PolicyConfirmHeader>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f07a48' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    color: "#f07a48",
+                  }}
+                >
                   <FaShieldAlt />
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                    {isArabic ? "مراجعة سياسة التصميم للطلبية" : "Validation de la Charte de Création"}
+                  <h3 style={{ fontSize: "1.1rem", fontWeight: "bold" }}>
+                    {isArabic
+                      ? "مراجعة سياسة التصميم للطلبية"
+                      : "Validation de la Charte de Création"}
                   </h3>
                 </div>
-                <CloseButton onClick={() => setIsConfirmModalOpen(false)}>&times;</CloseButton>
+                <CloseButton onClick={() => setIsConfirmModalOpen(false)}>
+                  &times;
+                </CloseButton>
               </PolicyConfirmHeader>
 
               <PolicyConfirmBody>
-                <p style={{ fontSize: "0.85rem", color: "#a1a1aa", lineHeight: "1.5" }}>
-                  {isArabic 
-                    ? "يرجى مراجعة تصاميم طلبيتك بعناية للتأكد من خلوها من أي محتوى ينتهك حقوق الملكية الفكرية أو يتنافى مع الآداب العامة." 
-                    : "Veuillez revoir les produits de votre panier ci-dessous. Assurez-vous que chaque illustration ou visuel respecte nos politiques."
-                  }
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#a1a1aa",
+                    lineHeight: "1.5",
+                  }}
+                >
+                  {isArabic
+                    ? "يرجى مراجعة تصاميم طلبيتك بعناية للتأكد من خلوها من أي محتوى ينتهك حقوق الملكية الفكرية أو يتنافى مع الآداب العامة."
+                    : "Veuillez revoir les produits de votre panier ci-dessous. Assurez-vous que chaque illustration ou visuel respecte nos politiques."}
                 </p>
 
-                {/* swiper carousel rendering customized designs */}
                 <PolicySwiperWrapper>
                   <Swiper
                     modules={[Autoplay]}
                     autoplay={{ delay: 3000, disableOnInteraction: false }}
-                    spaceBetween={16} 
+                    spaceBetween={16}
                     slidesPerView={1}
                   >
                     {cleanItems.map((item, idx) => (
@@ -2195,12 +2352,32 @@ const Cart = ({
                         <PolicySlideCard>
                           <PolicySlideImage>
                             {item.podCustomization ? (
-                              <PodMockupPreview item={item} side="front" width="100px" height="100px" borderRadius="8px" />
+                              <PodMockupPreview
+                                item={item}
+                                side="front"
+                                width="100px"
+                                height="100px"
+                                borderRadius="8px"
+                              />
                             ) : (
-                              <img src={getImageUrl(item.imageId)} alt="" style={{ maxWidth: "100px", maxHeight: "100px", objectFit: "contain" }} />
+                              <img
+                                src={getImageUrl(item.imageId)}
+                                alt=""
+                                style={{
+                                  maxWidth: "100px",
+                                  maxHeight: "100px",
+                                  objectFit: "contain",
+                                }}
+                              />
                             )}
                           </PolicySlideImage>
-                          <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'white' }}>
+                          <span
+                            style={{
+                              fontSize: "0.85rem",
+                              fontWeight: "700",
+                              color: "white",
+                            }}
+                          >
                             {item.title || item.product?.name}
                           </span>
                         </PolicySlideCard>
@@ -2209,9 +2386,8 @@ const Cart = ({
                   </Swiper>
                 </PolicySwiperWrapper>
 
-                {/* Mandatory Checkbox */}
                 <CheckboxContainer>
-                  <input 
+                  <input
                     type="checkbox"
                     id="design-policy-chk"
                     checked={designPolicyChecked}
@@ -2221,8 +2397,13 @@ const Cart = ({
                     {isArabic ? (
                       <>
                         أوافق وأصرح بأن كل ملف وتصميم قمت برفعه يتوافق تماماً مع{" "}
-                        <span 
-                          style={{ color: "#f07a48", textDecoration: "underline", fontWeight: "bold", cursor: "pointer" }}
+                        <span
+                          style={{
+                            color: "#f07a48",
+                            textDecoration: "underline",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                          }}
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -2230,13 +2411,19 @@ const Cart = ({
                           }}
                         >
                           سياسة التصميم وحماية الملكية لأوراس لاب
-                        </span>.
+                        </span>
+                        .
                       </>
                     ) : (
                       <>
                         Je confirme que chaque visuel personnalisé respecte la{" "}
-                        <span 
-                          style={{ color: "#f07a48", textDecoration: "underline", fontWeight: "bold", cursor: "pointer" }}
+                        <span
+                          style={{
+                            color: "#f07a48",
+                            textDecoration: "underline",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                          }}
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -2244,7 +2431,8 @@ const Cart = ({
                           }}
                         >
                           Politique de Design d'AURAS LAB
-                        </span>.
+                        </span>
+                        .
                       </>
                     )}
                   </label>
@@ -2252,14 +2440,14 @@ const Cart = ({
               </PolicyConfirmBody>
 
               <PolicyConfirmFooter>
-                <LbButton 
+                <LbButton
                   style={{ flex: 1 }}
                   onClick={() => setIsConfirmModalOpen(false)}
                 >
                   {isArabic ? "رجوع" : "Retour"}
                 </LbButton>
-                <LbButton 
-                  $primary 
+                <LbButton
+                  $primary
                   style={{ flex: 1 }}
                   disabled={!designPolicyChecked}
                   onClick={executeOrderCreation}
@@ -2272,7 +2460,6 @@ const Cart = ({
         )}
       </AnimatePresence>
 
-      {/* --- NESTED DETAILED DESIGN POLICY DIALOG --- */}
       <AnimatePresence>
         {isPolicyModalOpen && (
           <NestedPolicyOverlay
@@ -2289,30 +2476,56 @@ const Cart = ({
               $isArabic={isArabic}
             >
               <PolicyConfirmHeader>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f07a48' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    color: "#f07a48",
+                  }}
+                >
                   <FaShieldAlt />
-                  <h4 style={{ fontSize: '1rem', fontWeight: 'bold' }}>
-                    {t('pod_studio_policy_title')}
+                  <h4 style={{ fontSize: "1rem", fontWeight: "bold" }}>
+                    {t("pod_studio_policy_title")}
                   </h4>
                 </div>
-                <CloseButton onClick={() => setIsPolicyModalOpen(false)}>&times;</CloseButton>
+                <CloseButton onClick={() => setIsPolicyModalOpen(false)}>
+                  &times;
+                </CloseButton>
               </PolicyConfirmHeader>
-
               <PolicyScrollBlock>
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                  <div key={num} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <h5 style={{ fontWeight: "bold", color: "white", fontSize: "0.9rem" }}>
+                  <div
+                    key={num}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "6px",
+                    }}
+                  >
+                    <h5
+                      style={{
+                        fontWeight: "bold",
+                        color: "white",
+                        fontSize: "0.9rem",
+                      }}
+                    >
                       {t(`pod_studio_policy_sec${num}_title`)}
                     </h5>
-                    <p style={{ fontSize: "0.8rem", color: "#a1a1aa", lineHeight: "1.5" }}>
+                    <p
+                      style={{
+                        fontSize: "0.8rem",
+                        color: "#a1a1aa",
+                        lineHeight: "1.5",
+                      }}
+                    >
                       {t(`pod_studio_policy_sec${num}_text`)}
                     </p>
                   </div>
                 ))}
               </PolicyScrollBlock>
-
               <PolicyConfirmFooter>
-                <LbButton 
+                <LbButton
                   $primary
                   style={{ width: "100%" }}
                   onClick={() => setIsPolicyModalOpen(false)}
@@ -2322,7 +2535,7 @@ const Cart = ({
               </PolicyConfirmFooter>
             </NestedPolicyCard>
           </NestedPolicyOverlay>
-        )} 
+        )}
       </AnimatePresence>
     </>
   );

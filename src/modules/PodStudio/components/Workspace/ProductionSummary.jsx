@@ -125,30 +125,42 @@ const ProductionSummary = ({
   const cfg = useMemo(() => getTemplateConfig(canvas.title), [canvas.title]);
   const garmentDims = useMemo(
     () => getGarmentDimensions(canvas.title, selectedSize, canvas.sizeChart),
-    [canvas.title, selectedSize, canvas.sizeChart]
+    [canvas.title, selectedSize, canvas.sizeChart],
   );
 
   const printWidthRatio = useMemo(() => cfg.printW_ref / cfg.B_ref, [cfg]);
 
   const frontPrintCost = useMemo(() => {
     if (!frontDesign.previewUrl) return 0;
-    
     const maxPrintWidthCm = garmentDims.B * printWidthRatio;
     const wCm = (frontDesign.scale / 100) * maxPrintWidthCm;
     const hCm = wCm / frontAspect;
 
-    return getRawPrintCost(wCm, hCm) + 110;
-  }, [frontDesign.previewUrl, frontDesign.scale, garmentDims, printWidthRatio, frontAspect]);
+    // 🔴 BUG 3: Recalibrated processing margin from 110 to 170
+    return getRawPrintCost(wCm, hCm) + 170;
+  }, [
+    frontDesign.previewUrl,
+    frontDesign.scale,
+    garmentDims,
+    printWidthRatio,
+    frontAspect,
+  ]);
 
   const backPrintCost = useMemo(() => {
     if (!backDesign.previewUrl) return 0;
-
     const maxPrintWidthCm = garmentDims.B * printWidthRatio;
     const wCm = (backDesign.scale / 100) * maxPrintWidthCm;
     const hCm = wCm / backAspect;
 
-    return getRawPrintCost(wCm, hCm) + 110;
-  }, [backDesign.previewUrl, backDesign.scale, garmentDims, printWidthRatio, backAspect]);
+    // 🔴 BUG 3: Recalibrated processing margin from 110 to 170
+    return getRawPrintCost(wCm, hCm) + 170;
+  }, [
+    backDesign.previewUrl,
+    backDesign.scale,
+    garmentDims,
+    printWidthRatio,
+    backAspect,
+  ]);
 
   const totalPrintCost = frontPrintCost + backPrintCost;
   const totalCost = baseCost + totalPrintCost;
@@ -209,7 +221,14 @@ const ProductionSummary = ({
       dispatch(updateCartQuantity({ variantId: oldId, quantity: 0 }));
     }
 
-    const printSideKeyword = hasFront && hasBack ? "double" : hasBack ? "back" : hasFront ? "front" : "blank";
+    const printSideKeyword =
+      hasFront && hasBack
+        ? "double"
+        : hasBack
+          ? "back"
+          : hasFront
+            ? "front"
+            : "blank";
 
     const cartPayload = {
       productId: canvas.canvasId,
@@ -303,12 +322,10 @@ const ProductionSummary = ({
         </span>
       </GrandTotalRow>
 
-      <CommitButton
-        type="button"
-        onClick={handleCommitToTray}
-      >
-        {/* 🔴 FIXED: Dynamic Translation Key for Edit vs Add */}
-        {editingCartItem ? t("pod_studio_btn_update_tray", "Update Design") : t("pod_studio_btn_commit_tray", "Add to Collection")}
+      <CommitButton type="button" onClick={handleCommitToTray}>
+        {editingCartItem
+          ? t("pod_studio_btn_update_tray", "Update Design")
+          : t("pod_studio_btn_commit_tray", "Add to Collection")}
       </CommitButton>
     </BillCard>
   );
