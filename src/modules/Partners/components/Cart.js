@@ -1315,32 +1315,39 @@ const Cart = ({
     setIsCheckoutFormOpen(false);
   };
 
+ // --- PROMO CODE INTEGRATION ---
   const handleApplyPromo = async (e) => {
     e.preventDefault();
     if (!promoCode.trim()) return;
-
+    
     setIsVerifyingPromo(true);
     setPromoError("");
     setAppliedDiscount(null);
     setAppliedCode("");
 
+    // 🔴 RESOLVED: Pull the absolute backend production API URL
+    const apiProdUrl = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+
     try {
-      const response = await fetch(
-        `/api/gift-card/verify/${promoCode.trim().toUpperCase()}`,
-      );
+      const params = new URLSearchParams();
+      // Pass phone number as customerId fallback for guest checkouts to prevent duplicate use
+      if (customerPhone) {
+        params.append("customerId", customerPhone);
+      }
+
+      // 🔴 RESOLVED: Correct route path (giftCard) and added absolute target URL
+      const response = await fetch(`${apiProdUrl}/giftCard/verify/${promoCode.trim().toUpperCase()}?${params.toString()}`);
+      
       if (response.ok) {
         const data = await response.json();
         setAppliedDiscount(data);
         setAppliedCode(promoCode.trim().toUpperCase());
       } else {
-        setPromoError(isArabic ? "رمز ترويجي غير صالح" : "Code promo invalide");
+        const errData = await response.json().catch(() => ({}));
+        setPromoError(errData.message || (isArabic ? "رمز ترويجي غير صالح" : "Code promo invalide"));
       }
     } catch (err) {
-      setPromoError(
-        isArabic
-          ? "حدث خطأ في الاتصال بالخادم"
-          : "Connection error checking promo code",
-      );
+      setPromoError(isArabic ? "حدث خطأ في الاتصال بالخادم" : "Connection error checking promo code");
     } finally {
       setIsVerifyingPromo(false);
     }
