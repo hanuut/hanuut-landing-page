@@ -515,7 +515,7 @@ const DesignWorkspace = ({
             {activeTab !== "cart" && isLockedToZero && (
               <SubStageCTA type="button" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} onClick={() => { setIsLockedToZero(false); setUiOpacity(1); setActiveTab("cart"); }}>
                 <FaShoppingCart />
-                <span>{isArabic ? "إكمال وتأكيد الطلبية ➔" : "Proceed with Order ➔"}</span>
+                <span>{isArabic ? "متابعة الشراء ➔" : "Checkout ➔"}</span>
               </SubStageCTA>
             )}
           </AnimatePresence>

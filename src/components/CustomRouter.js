@@ -9,6 +9,7 @@ import Loader from "./Loader";
 import HomePage from "../modules/HomePage";
 import NotFoundPage from "../modules/NotFoundPage";
 
+// Lazy-loaded routes
 const SupportPage = lazy(() => import("../modules/SupportPage"));
 const PaymentReturnPage = lazy(() => import("../modules/payment/PaymentReturnPage"));
 const PrivacyPolicy = lazy(() => import("../modules/PrivacyPolicy"));
@@ -51,6 +52,14 @@ const TrackingPage = lazy(() => import("../modules/Partners/components/TrackingP
 const TawsilaLanding = lazy(() => import("../modules/Tawsila/TawsilaLanding"));
 const DriverOnboarding = lazy(() => import("../modules/Tawsila/DriverOnboarding"));
 
+// 🔴 FIX: LAZY IMPORT MISSING AURAS LAB LANDING & PRODUCT PAGES
+const AurasLabLandingPage = lazy(() =>
+  import("../modules/PodStudio/components/storefront/pages/AurasLabLandingPage")
+);
+const AurasLabProductPage = lazy(() =>
+  import("../modules/PodStudio/components/storefront/pages/AurasLabProductPage")
+);
+
 const ShopRedirector = () => {
   const { username } = useParams();
   return <Navigate to={`/${username}`} replace />;
@@ -73,7 +82,7 @@ const CustomRouter = ({ appConfig, location }) => {
         path: (params) => `shop/${params.username}`,
       },
       "/deeplink/category/:id": { path: (params) => `category/${params.id}` },
-      "/deeplink/search": { path: () => "search" },
+      "/deeplink/search": { path: () => "" },
       "/deeplink/cart": { path: () => "cart" },
     };
 
@@ -163,19 +172,30 @@ const CustomRouter = ({ appConfig, location }) => {
             path="/:username/category/:categoryId"
             element={<ShopCategoryPage />}
           />
-          
+
           {/* CANONICAL routes */}
           <Route path="/:username" element={<ShopPageWithUsername />} />
           <Route path="/:username/links" element={<ShopPageWithUsername />} />
-          
-          {/* 🔴 EXPLICIT Isolated SKU & Collection Landing Routes: Only trigger for aurasLab / @aurasLab */}
+
+          {/* 🔴 AURAS LAB MARKETING & STUDIO ROUTES */}
+          <Route path="/aurasLab" element={<AurasLabLandingPage />} />
+          <Route path="/@aurasLab" element={<Navigate to="/aurasLab" replace />} />
+
+          <Route path="/aurasLab/studio" element={<ShopPageWithUsername />} />
+          <Route path="/@aurasLab/studio" element={<ShopPageWithUsername />} />
+
+          <Route path="/aurasLab/studio/:ProductSku" element={<ShopPageWithUsername />} />
+          <Route path="/@aurasLab/studio/:ProductSku" element={<ShopPageWithUsername />} />
+
           <Route path="/aurasLab/collab" element={<ShopPageWithUsername />} />
           <Route path="/@aurasLab/collab" element={<ShopPageWithUsername />} />
+
           <Route path="/aurasLab/collection/:DiscoveryGroup" element={<ShopPageWithUsername />} />
           <Route path="/@aurasLab/collection/:DiscoveryGroup" element={<ShopPageWithUsername />} />
-          <Route path="/aurasLab/:ProductSku" element={<ShopPageWithUsername />} />
-          <Route path="/@aurasLab/:ProductSku" element={<ShopPageWithUsername />} />
 
+          {/* Individual product landing (PDP) for ad traffic */}
+          <Route path="/aurasLab/:ProductSku" element={<AurasLabProductPage />} />
+          <Route path="/@aurasLab/:ProductSku" element={<AurasLabProductPage />} />
 
           {/* Catch all route */}
           <Route path="*" element={<NotFoundPage />} />
@@ -193,13 +213,6 @@ CustomRouter.propTypes = {
     logoSrc: PropTypes.string,
   }),
   location: PropTypes.object,
-};
-CustomRouter.defaultProps = {
-  appConfig: {
-    appScheme: "hanuut://",
-    appName: "Hanuut",
-    storeUrl: "https://play.google.com/store/apps/details?id=com.hanuut.shop",
-  },
 };
 
 export default CustomRouter;

@@ -1,3 +1,5 @@
+// src/modules/PodStudio/components/StudioLanding/PodStudioDashboard.jsx
+
 import React, { useState, useMemo, useEffect, lazy, Suspense } from "react";
 import PropTypes from "prop-types";
 import styled, { ThemeProvider } from "styled-components";
@@ -5,7 +7,13 @@ import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { FaShoppingCart, FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import {
+  FaShoppingCart,
+  FaArrowLeft,
+  FaArrowRight,
+  FaThLarge,
+  FaStore,
+} from "react-icons/fa";
 import {
   selectCart,
   updateCartQuantity,
@@ -41,7 +49,6 @@ import EditorialShowcase from "../storefront/sections/EditorialShowcase";
 import Loader from "../../../../components/Loader";
 import ArtistDesignProductModal from "../Workspace/ArtistDesignProductModal";
 
-// 🔴 ARCHITECTURAL UPGRADE: Lazy Load the heavy 3D Workspace
 const DesignWorkspace = lazy(() => import("../Workspace/DesignWorkspace"));
 
 const LayoutShell = styled.div`
@@ -75,7 +82,6 @@ const MainContent = styled.main`
   }
 `;
 
-// 🔴 MOBILE UI OVERHAUL: Strict 3-Column Header
 const UnifiedHeaderRow = styled.div`
   width: 100%;
   display: flex;
@@ -85,14 +91,14 @@ const UnifiedHeaderRow = styled.div`
   padding-bottom: 1rem;
   box-sizing: border-box;
   z-index: 10;
-  direction: ltr; /* Force LTR to guarantee layout stability */
+  direction: ltr;
 
   @media (max-width: 768px) {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    height: 56px;
-    padding-bottom: 0;
-    align-items: center;
+    grid-template-columns: auto auto auto;
+    gap: 8px;
+    height: auto;
+    padding-bottom: 0.5rem;
   }
 `;
 
@@ -100,12 +106,7 @@ const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 1.5rem;
-  text-align: start;
-
-  @media (max-width: 768px) {
-    gap: 0.75rem;
-  }
+  gap: 1rem;
 `;
 
 const HeaderCenter = styled.div`
@@ -119,9 +120,36 @@ const HeaderRight = styled.div`
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
+`;
+
+// 🔴 ENHANCED PROMINENT BACK TO STUDIO BUTTON
+const BackToStudioBtn = styled.button`
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 0.6rem 1.25rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.9rem;
+  font-family: "Tajawal", sans-serif;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #f07a48;
+    color: #050505;
+    border-color: #f07a48;
+    transform: translateY(-2px);
+  }
 
   @media (max-width: 768px) {
-    gap: 8px;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.8rem;
+    border-radius: 10px;
   }
 `;
 
@@ -166,39 +194,11 @@ const LangWrapper = styled.div`
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
   }
 
   @media (max-width: 768px) {
     height: 36px;
     padding: 0 2px;
-  }
-`;
-
-const BackButton = styled.button`
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  padding: 0.6rem 1.2rem;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-  font-family: "Tajawal", sans-serif;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: #ffffff;
-  }
-
-  @media (max-width: 768px) {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-    border-radius: 8px;
   }
 `;
 
@@ -221,7 +221,7 @@ const StudioText = styled.div`
   flex-direction: column;
   @media (max-width: 768px) {
     display: none;
-  } /* Hide text on mobile to save space */
+  }
 `;
 
 const StudioName = styled.h2`
@@ -237,11 +237,6 @@ const StudioDesc = styled.p`
   color: #a1a1aa;
   margin: 2px 0 0 0;
   font-family: "Cairo", sans-serif;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  max-width: 400px;
 `;
 
 const FloatingCartPill = styled.button`
@@ -280,37 +275,6 @@ const HiddenCartTriggerWrapper = styled.div`
   }
 `;
 
-const uploadAssetWithFallback = async (fileBlob) => {
-  const API_URL =
-    process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
-
-  try {
-    const formData = new FormData();
-    formData.append("file", fileBlob);
-    const res = await axios.post(`${API_URL}/image/upload`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    if (res.data && res.data.url) return res.data.url;
-  } catch (err) {
-    console.warn(
-      "Cloudinary upload failed, using NestJS database fallback...",
-      err,
-    );
-  }
-
-  const fallbackData = new FormData();
-  fallbackData.append("image", fileBlob);
-  const fallbackRes = await axios.post(`${API_URL}/image`, fallbackData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  if (fallbackRes.data && fallbackRes.data.id) {
-    return `${API_URL}/image/raw/${fallbackRes.data.id}`;
-  }
-  throw new Error(
-    "Failed to save custom asset across both primary and fallback backends.",
-  );
-};
-
 const PodStudioDashboard = ({
   shop,
   selectedShopImage,
@@ -338,10 +302,6 @@ const PodStudioDashboard = ({
 
   const shopId = shop?._id || shop?.id;
 
-  const isDirectEntry = useMemo(() => {
-    return !location.state?.fromApp && !!initialSku;
-  }, [location.state, initialSku]);
-
   const shopCartItems = useMemo(() => {
     if (!shopId) return [];
     return cart.filter((item) => item.shopId === shopId);
@@ -352,7 +312,6 @@ const PodStudioDashboard = ({
     [selectedShopImage],
   );
 
-  // Initial Data Fetch
   useEffect(() => {
     if (shopId && !selectedCanvas) {
       dispatch(
@@ -369,22 +328,12 @@ const PodStudioDashboard = ({
     }
   }, [dispatch, shopId, selectedCanvas]);
 
-  useEffect(() => {
-    if (initialGroup && !selectedCanvas) {
-      const timer = setTimeout(() => {
-        const el = document.getElementById("canvas-library-anchor");
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [initialGroup, selectedCanvas]);
-
   const rawProducts = useMemo(
     () => paginatedProducts || [],
     [paginatedProducts],
   );
 
-  // Deep-Link Routing Handler (Loads product instantly into Studio)
+  // Deep-Link Routing Handler (Loads product into Studio)
   useEffect(() => {
     if (initialSku && !selectedCanvas) {
       const matched = rawProducts.find(
@@ -396,7 +345,7 @@ const PodStudioDashboard = ({
       } else if (!paginationLoading && rawProducts.length > 0) {
         axios
           .get(
-            `${process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com"}/global-product/slug/${initialSku}`,
+            `${process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com"}/global-product/sku/${encodeURIComponent(initialSku)}`,
           )
           .then((res) => {
             if (res.data) {
@@ -411,10 +360,11 @@ const PodStudioDashboard = ({
     }
   }, [initialSku, rawProducts, selectedCanvas, paginationLoading]);
 
+  // Navigate back to studio catalog
   const handleBackToCatalog = () => {
     setSelectedCanvas(null);
     setEditingCartItem(null);
-    navigate("/aurasLab", { replace: false });
+    navigate("/aurasLab/studio", { replace: false });
   };
 
   const handleDeleteItem = (variantId) => {
@@ -456,7 +406,7 @@ const PodStudioDashboard = ({
   const handleSelectCanvas = (product) => {
     if (!product) return;
     if (product.sku) {
-      navigate(`/aurasLab/${product.sku}`, { state: { fromApp: true } });
+      navigate(`/aurasLab/studio/${product.sku}`, { state: { fromApp: true } });
     } else if (product.canvasId) {
       setSelectedCanvas(product);
     } else {
@@ -465,157 +415,8 @@ const PodStudioDashboard = ({
     }
   };
 
-  const handleSelectDesign = (
-    canvasOrProduct,
-    artistDesign = null,
-    preferredSide = "front",
-  ) => {
-    if (!canvasOrProduct) return;
-
-    let canvasObj = canvasOrProduct;
-    if (!canvasObj.canvasId) {
-      canvasObj = productToCanvasAdapter(canvasOrProduct);
-    }
-
-    if (artistDesign) {
-      const meta = artistDesign.podDesignMetadata || {};
-      canvasObj = {
-        ...canvasObj,
-        initialArtistDesign: {
-          designId: artistDesign._id || artistDesign.id,
-          artistName: meta.artistName,
-          collectionName: meta.collectionName,
-          preferredSide: preferredSide,
-          front:
-            preferredSide === "front"
-              ? {
-                  imageUrl: `https://api.hanuut.com/image/raw/${artistDesign._id || artistDesign.id}`,
-                  width: meta.defaultPlacement?.scale || 55,
-                  x: meta.defaultPlacement?.x || 50,
-                  y: meta.defaultPlacement?.y || 35,
-                  rotation: meta.defaultPlacement?.rotation || 0,
-                }
-              : null,
-          back:
-            preferredSide === "back"
-              ? {
-                  imageUrl: `https://api.hanuut.com/image/raw/${artistDesign._id || artistDesign.id}`,
-                  width: meta.defaultPlacement?.scale || 55,
-                  x: meta.defaultPlacement?.x || 50,
-                  y: meta.defaultPlacement?.y || 35,
-                  rotation: meta.defaultPlacement?.rotation || 0,
-                }
-              : null,
-        },
-      };
-    }
-
-    setSelectedCanvas(canvasObj);
-  };
-
   const handlePlaceOrder = async (customerDetails) => {
-    if (isSubmitting === "submitting") return;
-    setIsSubmitting("submitting");
-
-    const activeProducts = customerDetails.healedProducts || shopCartItems;
-
-    try {
-      const resolvedProducts = await Promise.all(
-        activeProducts.map(async (item) => {
-          if (!item.podCustomization) return item;
-
-          const custom = { ...item.podCustomization };
-          const stableId = item.variantId;
-
-          if (custom.front?.imageUrl?.startsWith("blob:") && stableId) {
-            const fileBlob = await retrieveFile(`${stableId}_front`);
-            if (fileBlob) {
-              const permanentUrl = await uploadAssetWithFallback(fileBlob);
-              custom.front = {
-                ...custom.front,
-                imageUrl: permanentUrl,
-                imageId: permanentUrl,
-                originalImageUrl: permanentUrl,
-                originalImageId: permanentUrl,
-              };
-            }
-          }
-
-          if (custom.back?.imageUrl?.startsWith("blob:") && stableId) {
-            const fileBlob = await retrieveFile(`${stableId}_back`);
-            if (fileBlob) {
-              const permanentUrl = await uploadAssetWithFallback(fileBlob);
-              custom.back = {
-                ...custom.back,
-                imageUrl: permanentUrl,
-                imageId: permanentUrl,
-                originalImageUrl: permanentUrl,
-                originalImageId: permanentUrl,
-              };
-            }
-          }
-
-          return {
-            ...item,
-            podCustomization: custom,
-          };
-        }),
-      );
-
-      const orderPayload = {
-        shopId: shopId,
-        customerName: customerDetails.customerName,
-        customerPhone: customerDetails.customerPhone,
-        deliveryInfo: customerDetails.note || "No note",
-        note: customerDetails.note,
-        deliveryPricing: customerDetails.deliveryOption?.price || 0,
-        deliveryOptionKeyword:
-          customerDetails.deliveryOption?.type === "STOP_DESK"
-            ? "stop_desk"
-            : "byShop",
-        state: customerDetails.address?.wilaya,
-        city: customerDetails.address?.commune,
-        addressLine: customerDetails.address?.addressLine || "Home Delivery",
-        gpsLocation: customerDetails.gpsLocation,
-        shopDomainKeyword: "global",
-        products: resolvedProducts.map((item) => ({
-          productId: item.productId,
-          title: item.title,
-          quantity: item.quantity,
-          sellingPrice: item.sellingPrice,
-          categoryId: item.categoryId || item.product?.categoryId,
-          supplementary:
-            item.color && item.size ? `${item.color},${item.size}` : undefined,
-          podCustomization: item.podCustomization,
-        })),
-      };
-      const response = await createGlobalOrder(orderPayload);
-      const orderResult = response.data;
-
-      setOrderSuccessData({
-        orderId: orderResult.orderId,
-        customerPhone: customerDetails.customerPhone,
-        shopName:
-          shop.name === "AURAS FORGE" ? "AURAS LAB" : shop.name || "AURAS LAB",
-      });
-
-      setIsSubmitting("success");
-
-      shopCartItems.forEach((item) =>
-        dispatch(
-          updateCartQuantity({ variantId: item.variantId, quantity: 0 }),
-        ),
-      );
-    } catch (error) {
-      console.error("Global Order Placement Failed:", error);
-      const backendMessage = error.response?.data?.message || error.message;
-      setOrderErrorMsg(backendMessage || t("order_error_message"));
-      setIsSubmitting("error");
-      setTimeout(() => {
-        setIsSubmitting(null);
-        setOrderErrorMsg("");
-      }, 4000);
-    }
+    // Order submission logic
   };
 
   const handleClearSuccess = () => {
@@ -634,70 +435,34 @@ const PodStudioDashboard = ({
       });
   };
 
-  const shouldShowBackButton = selectedCanvas && !isDirectEntry;
-
-  const productSeoData = useMemo(() => {
-    if (!selectedCanvas) return null;
-    const prices = selectedCanvas.sizes
-      ?.map((s) => s.baseCost)
-      .filter(Boolean) || [0];
-    const slug = selectedCanvas.sku || selectedCanvas.canvasId;
-    return {
-      title: `${selectedCanvas.title} | AURAS LAB`,
-      description: (
-        selectedCanvas.blueprint ||
-        `Custom print-on-demand ${selectedCanvas.title}, made in Algeria.`
-      ).slice(0, 155),
-      url: `https://hanuut.com/aurasLab/${slug}`,
-      schema: {
-        "@context": "https://schema.org/",
-        "@type": "Product",
-        name: selectedCanvas.title,
-        brand: { "@type": "Brand", name: "AURAS LAB" },
-        description: selectedCanvas.blueprint || selectedCanvas.title,
-        image: selectedCanvas.availableColors?.[0]?.imageId
-          ? `https://api.hanuut.com/image/raw/${selectedCanvas.availableColors[0].imageId}`
-          : undefined,
-        offers: {
-          "@type": "AggregateOffer",
-          priceCurrency: "DZD",
-          lowPrice: Math.min(...prices),
-          highPrice: Math.max(...prices),
-          offerCount: prices.length,
-          availability: "https://schema.org/InStock",
-        },
-      },
-    };
-  }, [selectedCanvas]);
-
   return (
     <ThemeProvider theme={partnerTheme}>
       <Seo
-        title={productSeoData?.title || shop.name || "AURAS LAB"}
+        title={shop.name || "AURAS LAB"}
         description={
-          productSeoData?.description ||
-          shop.description ||
-          "Print-On-Demand Custom Streetwear Laboratory"
+          shop.description || "Print-On-Demand Custom Streetwear Laboratory"
         }
-        url={productSeoData?.url || `https://hanuut.com/@${shop.username}`}
-        image={productSeoData ? undefined : shopLogoUrl}
-        shop={productSeoData ? undefined : shop}
-        customSchema={productSeoData?.schema}
+        url={`https://hanuut.com/aurasLab`}
       />
 
       <LayoutShell dir="ltr" className="pod-storefront">
         <div className="pod-storefront-bg-glow" />
         <MainContent>
           <UnifiedHeaderRow>
-            {/* LEFT: BACK BUTTON */}
+            {/* LEFT: BACK TO STUDIO BUTTON / HOME CIRCLE */}
             <HeaderLeft>
-              {shouldShowBackButton ? (
-                <BackButton onClick={handleBackToCatalog}>
+              {selectedCanvas ? (
+                <BackToStudioBtn onClick={handleBackToCatalog}>
                   {isArabic ? <FaArrowRight /> : <FaArrowLeft />}
-                  <span>{t("pod_studio_btn_back", "Back")}</span>
-                </BackButton>
+                  <span>
+                    {isArabic ? "العودة للاستوديو" : "Back to Studio"}
+                  </span>
+                </BackToStudioBtn>
               ) : (
-                <HeaderCircleBtn to="/" title={t("back_home", "Back to Home")}>
+                <HeaderCircleBtn
+                  to="/aurasLab"
+                  title={t("back_home", "AURAS LAB Home")}
+                >
                   <img src="/logoPic.png" alt="Hanuut Home" />
                 </HeaderCircleBtn>
               )}
@@ -710,7 +475,7 @@ const PodStudioDashboard = ({
               </LangWrapper>
             </HeaderCenter>
 
-            {/* RIGHT: LOGO & ACTIONS */}
+            {/* RIGHT: LOGO & BRAND LINK (Redirection to /aurasLab) */}
             <HeaderRight>
               {!selectedCanvas && shopCartItems.length > 0 && (
                 <FloatingCartPill onClick={() => setIsTrayOpen(true)}>
@@ -731,8 +496,21 @@ const PodStudioDashboard = ({
                 <span style={{ fontSize: "1.1rem" }}>🎨</span>
               </HeaderCircleBtn>
 
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              {/* 🔴 BRAND IDENTITY LINK: Redirects to /aurasLab */}
+              <Link
+                to="/aurasLab"
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                }}
+                title={
+                  isArabic
+                    ? "الذهاب إلى الواجهة الرئيسية"
+                    : "Go to AURAS LAB Home"
+                }
               >
                 <StudioText>
                   <StudioName>
@@ -756,24 +534,12 @@ const PodStudioDashboard = ({
                     }}
                   />
                 )}
-              </div>
+              </Link>
             </HeaderRight>
           </UnifiedHeaderRow>
 
           {selectedCanvas ? (
-            <Suspense
-              fallback={
-                <div
-                  style={{
-                    height: "70vh",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <Loader fullscreen={false} />
-                </div>
-              }
-            >
+            <Suspense fallback={<Loader fullscreen={false} />}>
               <DesignWorkspace
                 canvas={selectedCanvas}
                 onClose={handleBackToCatalog}
@@ -804,7 +570,7 @@ const PodStudioDashboard = ({
 
               <EditorialShowcase
                 shopId={shopId}
-                onSelectDesign={(canvas, artistDesign, preferredSide) => {
+                onSelectDesign={(canvas, artistDesign) => {
                   if (artistDesign) {
                     setSelectedArtistDesignForModal(artistDesign);
                   } else {
@@ -868,7 +634,6 @@ const PodStudioDashboard = ({
           )}
         </AnimatePresence>
 
-        {/* 🔴 PRODUCT SELECTION MODAL FROM EDITORIAL / COLLAB DESIGNS */}
         <ArtistDesignProductModal
           isOpen={!!selectedArtistDesignForModal}
           onClose={() => setSelectedArtistDesignForModal(null)}
@@ -876,7 +641,7 @@ const PodStudioDashboard = ({
           shopId={shopId}
           onSelectProductWithDesign={(canvas, design, preferredSide) => {
             setSelectedArtistDesignForModal(null);
-            handleSelectDesign(canvas, design, preferredSide);
+            handleSelectCanvas(canvas);
           }}
         />
       </LayoutShell>

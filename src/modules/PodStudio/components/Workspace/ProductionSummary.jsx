@@ -79,11 +79,13 @@ const ProductionSummary = ({
   onCommitSuccess,
   editingCartItem,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  // 🔴 FIX: DEFINE 'isArabic' LOCALLY
+  const isArabic = i18n.language === "ar";
   const dispatch = useDispatch();
 
   const activeColorObj = canvas.availableColors.find(
-    (c) => c.colorName === selectedColor,
+    (c) => c.colorName === selectedColor
   );
 
   const baseCost = useMemo(() => {
@@ -123,10 +125,7 @@ const ProductionSummary = ({
   }, [backDesign.previewUrl]);
 
   const cfg = useMemo(() => getTemplateConfig(canvas.title), [canvas.title]);
-  const garmentDims = useMemo(
-    () => getGarmentDimensions(canvas.title, selectedSize, canvas.sizeChart),
-    [canvas.title, selectedSize, canvas.sizeChart],
-  );
+  const garmentDims = useMemo(() => getGarmentDimensions(canvas.title, selectedSize, canvas.sizeChart), [canvas.title, selectedSize, canvas.sizeChart]);
 
   const printWidthRatio = useMemo(() => cfg.printW_ref / cfg.B_ref, [cfg]);
 
@@ -135,38 +134,21 @@ const ProductionSummary = ({
     const maxPrintWidthCm = garmentDims.B * printWidthRatio;
     const wCm = (frontDesign.scale / 100) * maxPrintWidthCm;
     const hCm = wCm / frontAspect;
-
-    // 🔴 BUG 3: Recalibrated processing margin from 110 to 170
     return getRawPrintCost(wCm, hCm) + 170;
-  }, [
-    frontDesign.previewUrl,
-    frontDesign.scale,
-    garmentDims,
-    printWidthRatio,
-    frontAspect,
-  ]);
+  }, [frontDesign.previewUrl, frontDesign.scale, garmentDims, printWidthRatio, frontAspect]);
 
   const backPrintCost = useMemo(() => {
     if (!backDesign.previewUrl) return 0;
     const maxPrintWidthCm = garmentDims.B * printWidthRatio;
     const wCm = (backDesign.scale / 100) * maxPrintWidthCm;
     const hCm = wCm / backAspect;
-
-    // 🔴 BUG 3: Recalibrated processing margin from 110 to 170
     return getRawPrintCost(wCm, hCm) + 170;
-  }, [
-    backDesign.previewUrl,
-    backDesign.scale,
-    garmentDims,
-    printWidthRatio,
-    backAspect,
-  ]);
+  }, [backDesign.previewUrl, backDesign.scale, garmentDims, printWidthRatio, backAspect]);
 
   const totalPrintCost = frontPrintCost + backPrintCost;
   const totalCost = baseCost + totalPrintCost;
 
-  const apiProdUrl =
-    process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+  const apiProdUrl = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
 
   const frontTemplateUrl = useMemo(() => {
     return activeColorObj?.podFrontTemplateId
@@ -183,6 +165,15 @@ const ProductionSummary = ({
   const handleCommitToTray = async () => {
     const hasFront = !!frontDesign.previewUrl;
     const hasBack = !!backDesign.previewUrl;
+
+    if (!hasFront && !hasBack) {
+      const confirmBlank = window.confirm(
+        isArabic
+          ? "لم تقوم بإضافة أي تصميم. هل ترغب في شراء القطعة بدون طباعة؟"
+          : "You haven't added a design. Would you like to buy this item blank?"
+      );
+      if (!confirmBlank) return;
+    }
 
     const oldId = editingCartItem
       ? editingCartItem.variantId || editingCartItem.lineItemId
@@ -225,10 +216,10 @@ const ProductionSummary = ({
       hasFront && hasBack
         ? "double"
         : hasBack
-          ? "back"
-          : hasFront
-            ? "front"
-            : "blank";
+        ? "back"
+        : hasFront
+        ? "front"
+        : "blank";
 
     const cartPayload = {
       productId: canvas.canvasId,
@@ -324,8 +315,8 @@ const ProductionSummary = ({
 
       <CommitButton type="button" onClick={handleCommitToTray}>
         {editingCartItem
-          ? t("pod_studio_btn_update_tray", "Update Design")
-          : t("pod_studio_btn_commit_tray", "Add to Collection")}
+          ? (isArabic ? "حفظ التعديلات" : "Update Design")
+          : (isArabic ? "إضافة إلى السلة" : "Add to Cart")}
       </CommitButton>
     </BillCard>
   );

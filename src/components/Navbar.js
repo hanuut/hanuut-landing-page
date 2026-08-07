@@ -575,9 +575,23 @@ const Navbar = () => {
                           {t("navPartners")}
                         </Link>
                       </MenuItem>
-                      <MenuItem $textColor={textColor}>
+                      {/* <MenuItem $textColor={textColor}>
                         <Link to="/blog" style={{ color: textColor }}>
                           {t("navBlog")}
+                        </Link>
+                      </MenuItem> */}
+                      <MenuItem $textColor={textColor}>
+                        <Link 
+                          to="/aurasLab" 
+                          style={{ 
+                            color: "#F07A48", 
+                            fontWeight: "800", 
+                            display: "flex", 
+                            alignItems: "center", 
+                            gap: "6px" 
+                          }}
+                        >
+                          <span>✨ AURAS LAB</span>
                         </Link>
                       </MenuItem>
                       <MenuItem $textColor={textColor}>

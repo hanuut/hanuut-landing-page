@@ -47,10 +47,10 @@ export default async (request, context) => {
   // --- NEW: AURAS LAB individual product pages ---
   else if (path.startsWith("/aurasLab/")) {
     const sku = path.split("/aurasLab/")[1]?.replace(/\/$/, "");
-    if (sku) {
+    if (sku && sku !== "studio" && sku !== "collab") {
       try {
         const apiResponse = await fetch(
-          `https://api.hanuut.com/global-product/slug/${encodeURIComponent(sku)}`,
+          `https://api.hanuut.com/global-product/sku/${encodeURIComponent(sku)}`
         );
         if (apiResponse.ok) {
           const product = await apiResponse.json();

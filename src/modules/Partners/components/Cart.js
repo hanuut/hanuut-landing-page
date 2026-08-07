@@ -1093,7 +1093,6 @@ const Cart = ({
   const [orderHistory, setOrderHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
 
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
   const [designPolicyChecked, setDesignPolicyChecked] = useState(false);
 
@@ -1315,18 +1314,19 @@ const Cart = ({
     setIsCheckoutFormOpen(false);
   };
 
- // --- PROMO CODE INTEGRATION ---
+  // --- PROMO CODE INTEGRATION ---
   const handleApplyPromo = async (e) => {
     e.preventDefault();
     if (!promoCode.trim()) return;
-    
+
     setIsVerifyingPromo(true);
     setPromoError("");
     setAppliedDiscount(null);
     setAppliedCode("");
 
     // 🔴 RESOLVED: Pull the absolute backend production API URL
-    const apiProdUrl = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+    const apiProdUrl =
+      process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
 
     try {
       const params = new URLSearchParams();
@@ -1336,18 +1336,27 @@ const Cart = ({
       }
 
       // 🔴 RESOLVED: Correct route path (giftCard) and added absolute target URL
-      const response = await fetch(`${apiProdUrl}/giftCard/verify/${promoCode.trim().toUpperCase()}?${params.toString()}`);
-      
+      const response = await fetch(
+        `${apiProdUrl}/giftCard/verify/${promoCode.trim().toUpperCase()}?${params.toString()}`,
+      );
+
       if (response.ok) {
         const data = await response.json();
         setAppliedDiscount(data);
         setAppliedCode(promoCode.trim().toUpperCase());
       } else {
         const errData = await response.json().catch(() => ({}));
-        setPromoError(errData.message || (isArabic ? "رمز ترويجي غير صالح" : "Code promo invalide"));
+        setPromoError(
+          errData.message ||
+            (isArabic ? "رمز ترويجي غير صالح" : "Code promo invalide"),
+        );
       }
     } catch (err) {
-      setPromoError(isArabic ? "حدث خطأ في الاتصال بالخادم" : "Connection error checking promo code");
+      setPromoError(
+        isArabic
+          ? "حدث خطأ في الاتصال بالخادم"
+          : "Connection error checking promo code",
+      );
     } finally {
       setIsVerifyingPromo(false);
     }
@@ -1363,19 +1372,27 @@ const Cart = ({
 
   const handleCheckoutSubmit = (event) => {
     event.preventDefault();
-    if (
-      !customerName ||
-      !customerPhone ||
-      (!isDineIn && !manualAddressLine && shopDomain === "global")
-    ) {
+
+    if (!designPolicyChecked) {
       alert(
         isArabic
-          ? "يرجى ملء جميع البيانات الأساسية."
-          : "Please fill in all required shipping fields.",
+          ? "يرجى الموافقة على شروط الملكية الفكرية للمتابعة."
+          : "Please agree to the design policy.",
       );
       return;
     }
-    setIsConfirmModalOpen(true);
+
+    if (!customerName || !customerPhone) {
+      alert(
+        isArabic
+          ? "يرجى ملء جميع البيانات الأساسية."
+          : "Please complete required fields.",
+      );
+      return;
+    }
+
+    // Execute order submission directly without opening a second modal
+    executeOrderCreation();
   };
 
   const executeOrderCreation = () => {
@@ -1412,8 +1429,6 @@ const Cart = ({
       discount: discountAmount,
       discountCode: appliedCode || undefined,
     });
-
-    setIsConfirmModalOpen(false);
   };
 
   const getStackTransform = (index, totalCount) => {
@@ -2087,32 +2102,58 @@ const Cart = ({
                       : `Code ${appliedCode} appliqué avec succès !`}
                   </PromoFeedback>
                 )}
+                {/* 🔴 FRICTION REDUCTION: INLINE IP POLICY CHECKBOX */}
+                <CheckboxContainer style={{ marginTop: "1.5rem" }}>
+                  <input
+                    type="checkbox"
+                    id="direct-ip-policy-check"
+                    checked={designPolicyChecked}
+                    onChange={(e) => setDesignPolicyChecked(e.target.checked)}
+                  />
+                  <label htmlFor="direct-ip-policy-check">
+                    {isArabic ? (
+                      <>
+                        أوافق على{" "}
+                        <span
+                          style={{
+                            color: "#F07A48",
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                        >
+                          شروط استخدام الحقوق والملكية الفكرية
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        I agree to the{" "}
+                        <span
+                          style={{
+                            color: "#F07A48",
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                        >
+                          Design & IP Terms
+                        </span>
+                      </>
+                    )}
+                  </label>
+                </CheckboxContainer>
               </ScrollableFormBody>
 
-              {/* 🔴 BUG 1 FIX: STICKY VIEWPORT CONTAINER SECURE FROM BROWSERS DOCKS */}
+              {/* 🔴 DIRECT ONE-TAP SUBMISSION */}
               <StickyMobileFooter>
                 <TotalContainer>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    <TotalLabel>{t("total")}</TotalLabel>
-                    {discountAmount > 0 && (
-                      <span
-                        style={{
-                          fontSize: "0.8rem",
-                          color: "#39A170",
-                          fontWeight: "bold",
-                          marginTop: "2px",
-                        }}
-                      >
-                        {t("discount_applied")}: -{discountAmount.toFixed(0)} DA
-                      </span>
-                    )}
-                  </div>
+                  <TotalLabel>{t("total")}</TotalLabel>
                   <TotalValue>
                     {finalTotal} {t("zd")}
                   </TotalValue>
@@ -2121,14 +2162,19 @@ const Cart = ({
                 <SubmitButton
                   type="submit"
                   disabled={
-                    isSubmitting ||
-                    calcError ||
-                    (!isDineIn && !isCalculated && shopDomain !== "global")
+                    isSubmitting === "submitting" ||
+                    !designPolicyChecked ||
+                    !customerName ||
+                    !customerPhone
                   }
                 >
                   {isSubmitting === "submitting"
-                    ? t("placing_order")
-                    : t("place_order_button")}
+                    ? isArabic
+                      ? "جاري إرسال الطلب..."
+                      : "Placing Order..."
+                    : isArabic
+                      ? "تأكيد وإتمام الطلب ➔"
+                      : "Complete Order ➔"}
                 </SubmitButton>
               </StickyMobileFooter>
             </motion.div>
@@ -2295,175 +2341,6 @@ const Cart = ({
           >
             {renderLightboxContent()}
           </LightboxOverlay>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isConfirmModalOpen && (
-          <PolicyConfirmModalBackdrop
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsConfirmModalOpen(false)}
-          >
-            <PolicyConfirmCard
-              onClick={(e) => e.stopPropagation()}
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              $isArabic={isArabic}
-            >
-              <PolicyConfirmHeader>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    color: "#f07a48",
-                  }}
-                >
-                  <FaShieldAlt />
-                  <h3 style={{ fontSize: "1.1rem", fontWeight: "bold" }}>
-                    {isArabic
-                      ? "مراجعة سياسة التصميم للطلبية"
-                      : "Validation de la Charte de Création"}
-                  </h3>
-                </div>
-                <CloseButton onClick={() => setIsConfirmModalOpen(false)}>
-                  &times;
-                </CloseButton>
-              </PolicyConfirmHeader>
-
-              <PolicyConfirmBody>
-                <p
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#a1a1aa",
-                    lineHeight: "1.5",
-                  }}
-                >
-                  {isArabic
-                    ? "يرجى مراجعة تصاميم طلبيتك بعناية للتأكد من خلوها من أي محتوى ينتهك حقوق الملكية الفكرية أو يتنافى مع الآداب العامة."
-                    : "Veuillez revoir les produits de votre panier ci-dessous. Assurez-vous que chaque illustration ou visuel respecte nos politiques."}
-                </p>
-
-                <PolicySwiperWrapper>
-                  <Swiper
-                    modules={[Autoplay]}
-                    autoplay={{ delay: 3000, disableOnInteraction: false }}
-                    spaceBetween={16}
-                    slidesPerView={1}
-                  >
-                    {cleanItems.map((item, idx) => (
-                      <SwiperSlide key={idx}>
-                        <PolicySlideCard>
-                          <PolicySlideImage>
-                            {item.podCustomization ? (
-                              <PodMockupPreview
-                                item={item}
-                                side="front"
-                                width="100px"
-                                height="100px"
-                                borderRadius="8px"
-                              />
-                            ) : (
-                              <img
-                                src={getImageUrl(item.imageId)}
-                                alt=""
-                                style={{
-                                  maxWidth: "100px",
-                                  maxHeight: "100px",
-                                  objectFit: "contain",
-                                }}
-                              />
-                            )}
-                          </PolicySlideImage>
-                          <span
-                            style={{
-                              fontSize: "0.85rem",
-                              fontWeight: "700",
-                              color: "white",
-                            }}
-                          >
-                            {item.title || item.product?.name}
-                          </span>
-                        </PolicySlideCard>
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                </PolicySwiperWrapper>
-
-                <CheckboxContainer>
-                  <input
-                    type="checkbox"
-                    id="design-policy-chk"
-                    checked={designPolicyChecked}
-                    onChange={(e) => setDesignPolicyChecked(e.target.checked)}
-                  />
-                  <label htmlFor="design-policy-chk">
-                    {isArabic ? (
-                      <>
-                        أوافق وأصرح بأن كل ملف وتصميم قمت برفعه يتوافق تماماً مع{" "}
-                        <span
-                          style={{
-                            color: "#f07a48",
-                            textDecoration: "underline",
-                            fontWeight: "bold",
-                            cursor: "pointer",
-                          }}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setIsPolicyModalOpen(true);
-                          }}
-                        >
-                          سياسة التصميم وحماية الملكية لأوراس لاب
-                        </span>
-                        .
-                      </>
-                    ) : (
-                      <>
-                        Je confirme que chaque visuel personnalisé respecte la{" "}
-                        <span
-                          style={{
-                            color: "#f07a48",
-                            textDecoration: "underline",
-                            fontWeight: "bold",
-                            cursor: "pointer",
-                          }}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setIsPolicyModalOpen(true);
-                          }}
-                        >
-                          Politique de Design d'AURAS LAB
-                        </span>
-                        .
-                      </>
-                    )}
-                  </label>
-                </CheckboxContainer>
-              </PolicyConfirmBody>
-
-              <PolicyConfirmFooter>
-                <LbButton
-                  style={{ flex: 1 }}
-                  onClick={() => setIsConfirmModalOpen(false)}
-                >
-                  {isArabic ? "رجوع" : "Retour"}
-                </LbButton>
-                <LbButton
-                  $primary
-                  style={{ flex: 1 }}
-                  disabled={!designPolicyChecked}
-                  onClick={executeOrderCreation}
-                >
-                  {isArabic ? "تأكيد الطلب" : "Confirmer"}
-                </LbButton>
-              </PolicyConfirmFooter>
-            </PolicyConfirmCard>
-          </PolicyConfirmModalBackdrop>
         )}
       </AnimatePresence>
 

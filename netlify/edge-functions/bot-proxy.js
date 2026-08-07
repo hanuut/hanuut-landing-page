@@ -31,7 +31,9 @@ export default async (request, context) => {
   }
   else if (path.startsWith("/aurasLab/")) {
     const sku = path.split("/aurasLab/")[1]?.replace(/\/$/, "");
-    if (sku) targetUrl = `${API_URL}/global-product/share-by-sku/${encodeURIComponent(sku)}`;
+    if (sku && sku !== "studio" && sku !== "collab") {
+      targetUrl = `${API_URL}/global-product/share-by-sku/${encodeURIComponent(sku)}`;
+    }
   }
   else if (path.startsWith("/blog/")) {
     const slug = path.split("/blog/")[1];
