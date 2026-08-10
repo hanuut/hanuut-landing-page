@@ -8,6 +8,7 @@ import {
   FaCropAlt,
   FaSlidersH,
   FaCompass,
+  FaPalette,
 } from "react-icons/fa";
 import {
   getGarmentDimensions,
@@ -66,46 +67,64 @@ const TabButton = styled.button`
   }
 `;
 
-const UploadZone = styled.div`
+// 🔴 COMPACT UPLOAD ROW (2-COLUMN GRID)
+const CompactUploadRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  width: 100%;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const CompactUploadZone = styled.label`
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 2rem 1rem;
-  border: 2px dashed ${(props) => props.theme.primaryColor || "#F07A48"}80;
-  border-radius: 16px;
-  background: ${(props) => props.theme.primaryColor || "#F07A48"}04;
+  gap: 8px;
+  padding: 0.85rem 1rem;
+  border: 1.5px dashed ${(props) => props.theme.primaryColor || "#F07A48"};
+  border-radius: 14px;
+  background: rgba(240, 122, 72, 0.05);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
+  transition: all 0.2s ease;
+  font-family: "Tajawal", sans-serif;
 
   &:hover {
-    background: ${(props) => props.theme.primaryColor || "#F07A48"}0a;
+    background: rgba(240, 122, 72, 0.12);
     border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
   }
 
   input[type="file"] {
-    position: absolute;
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    z-index: -1;
+    display: none;
   }
 `;
 
-const UploadLabel = styled.span`
-  font-size: 0.9rem;
-  font-weight: 700;
+const ArtistSelectBtn = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
   color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
   font-family: "Tajawal", sans-serif;
-`;
 
-const UploadSub = styled.span`
-  font-size: 0.7rem;
-  color: #71717a;
-  font-family: "Cairo", sans-serif;
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
 `;
 
 const SingleRowDimension = styled.div`
@@ -251,6 +270,7 @@ const DesignControls = ({
   activeTab,
   setActiveTab,
   isArtistLocked = false,
+  onToggleArtistTab,
 }) => {
   const { t, i18n } = useTranslation();
   const fileInputRef = useRef(null);
@@ -260,10 +280,9 @@ const DesignControls = ({
   const [aspectRatio, setAspectRatio] = useState(1);
   const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
 
-  const garmentDims = useMemo(
-    () => getGarmentDimensions(canvasName, selectedSize, sizeChart),
-    [canvasName, selectedSize, sizeChart],
-  );
+  const garmentDims = useMemo(() => {
+    return getGarmentDimensions(canvasName, selectedSize, sizeChart);
+  }, [canvasName, selectedSize, sizeChart]);
 
   useEffect(() => {
     let isMounted = true;
@@ -294,7 +313,7 @@ const DesignControls = ({
       designState.scale,
       garmentDims.B,
       garmentDims.A,
-      aspectRatio,
+      aspectRatio
     );
   }, [designState.scale, garmentDims, aspectRatio]);
 
@@ -353,24 +372,28 @@ const DesignControls = ({
               : "This original artwork is protected by the artist."}
           </div>
         ) : (
-          <UploadZone onClick={() => fileInputRef.current?.click()}>
-            <FaCloudUploadAlt style={{ fontSize: "2rem", color: "#F07A48" }} />
-            <UploadLabel>
-              {t("pod_studio_upload_design_title", "Import Artwork")}
-            </UploadLabel>
-            <UploadSub>
-              {t(
-                "pod_studio_upload_requirements",
-                "PNG image with transparent background",
-              )}
-            </UploadSub>
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="image/png, image/jpeg, image/*"
-              onChange={handleFileChange}
-            />
-          </UploadZone>
+          <CompactUploadRow>
+            <CompactUploadZone>
+              <FaCloudUploadAlt
+                style={{ fontSize: "1.2rem", color: "#F07A48" }}
+              />
+              <span>{isArabic ? "رفع تصميم PNG" : "Upload PNG"}</span>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/png, image/jpeg, image/*"
+                onChange={handleFileChange}
+              />
+            </CompactUploadZone>
+
+            <ArtistSelectBtn
+              type="button"
+              onClick={() => onToggleArtistTab && onToggleArtistTab()}
+            >
+              <FaPalette style={{ color: "#39A170" }} />
+              <span>{isArabic ? "تصاميم الفنانين" : "Artist Designs"}</span>
+            </ArtistSelectBtn>
+          </CompactUploadRow>
         )
       ) : (
         <ControlsCard>
@@ -400,8 +423,8 @@ const DesignControls = ({
                         ? "تصميم محمي"
                         : "Original Design"
                       : designState.file?.name
-                        ? designState.file.name.substring(0, 14) + "..."
-                        : "Artwork Layer"}
+                      ? designState.file.name.substring(0, 14) + "..."
+                      : "Artwork Layer"}
                   </span>
 
                   {dpiValue > 0 && (
@@ -577,6 +600,8 @@ DesignControls.propTypes = {
   sizeChart: PropTypes.object,
   activeTab: PropTypes.string.isRequired,
   setActiveTab: PropTypes.func.isRequired,
+  isArtistLocked: PropTypes.bool,
+  onToggleArtistTab: PropTypes.func,
 };
 
 export default DesignControls;

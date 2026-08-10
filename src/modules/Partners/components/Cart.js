@@ -37,6 +37,9 @@ import {
   FaCheckCircle,
   FaExclamationTriangle,
   FaLock,
+  FaCheck,
+  FaChevronDown,
+  FaChevronUp,
 } from "react-icons/fa";
 import {
   detectUserLocation,
@@ -51,13 +54,8 @@ import {
 } from "../../PodStudio/hooks/usePrintableArea";
 import PodMockupPreview from "../../PodStudio/components/Workspace/PodMockupPreview";
 
-// Swiper.js Imports
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/autoplay";
+// Storage Key for Checkout Profile Persistence
+const SAVED_PROFILE_KEY = "hanuut_saved_checkout_profile";
 
 // ===========================================================================
 // STYLED COMPONENTS
@@ -84,16 +82,16 @@ const DrawerContainer = styled.div`
 `;
 
 const MainCartPanel = styled(motion.div)`
-  width: 380px;
+  width: 420px;
   height: 100%;
-  background-color: rgba(24, 24, 27, 0.95);
+  background-color: rgba(24, 24, 27, 0.96);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-left: ${(props) =>
     props.$isArabic ? "none" : "1px solid rgba(255, 255, 255, 0.1)"};
   border-right: ${(props) =>
     props.$isArabic ? "1px solid rgba(255, 255, 255, 0.1)" : "none"};
-  padding: 2.5rem 1.5rem;
+  padding: 2rem 1.25rem;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -104,42 +102,8 @@ const MainCartPanel = styled(motion.div)`
 
   @media (max-width: 480px) {
     width: 100%;
-    /* 🔴 MOBILE UX OVERHAUL: USE 100DVH TO ELIMINATE KEYBOARD/NAV CUTOFFS */
     height: 100dvh;
     padding: 1.25rem 1rem;
-  }
-`;
-
-const FormPanel = styled(motion.div)`
-  width: 380px;
-  height: 100%;
-  background-color: rgba(20, 20, 22, 0.98);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border-left: ${(props) =>
-    props.$isArabic ? "none" : "1px solid rgba(255, 255, 255, 0.08)"};
-  border-right: ${(props) =>
-    props.$isArabic ? "1px solid rgba(255, 255, 255, 0.08)" : "none"};
-  padding: 2.5rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  box-shadow: -15px 0 35px rgba(0, 0, 0, 0.6);
-  color: #ffffff;
-  pointer-events: auto;
-  overflow-y: auto;
-  z-index: 1315;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  @media (max-width: 768px) {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100dvh;
-    z-index: 1330;
   }
 `;
 
@@ -158,7 +122,6 @@ const ScrollableFormBody = styled.div`
   flex-direction: column;
   gap: 1rem;
 
-  /* 🔴 PREVENT KEYBOARD CUTOFF: Bottom spacing clearance */
   padding-bottom: calc(140px + env(safe-area-inset-bottom));
 
   &::-webkit-scrollbar {
@@ -187,6 +150,7 @@ const CartTitle = styled.h2`
   font-weight: 800;
   color: #fff;
   font-family: "Tajawal", sans-serif;
+  margin: 0;
 `;
 
 const CloseButton = styled.button`
@@ -240,7 +204,7 @@ const ItemVariant = styled.p`
 
 const ItemPrice = styled.p`
   font-size: 0.9rem;
-  color: ${(props) => props.theme.primaryColor};
+  color: ${(props) => props.theme.primaryColor || "#F07A48"};
   font-weight: 700;
   margin: 4px 0 0 0;
 `;
@@ -294,7 +258,7 @@ const Input = styled.input`
   box-sizing: border-box;
   &:focus {
     outline: none;
-    border-color: ${(props) => props.theme.primaryColor};
+    border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
   }
   &:disabled {
     background-color: rgba(255, 255, 255, 0.04);
@@ -317,7 +281,7 @@ const TextArea = styled.textarea`
   min-height: 60px;
   &:focus {
     outline: none;
-    border-color: ${(props) => props.theme.primaryColor};
+    border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
   }
 `;
 
@@ -333,7 +297,7 @@ const SegmentedControl = styled.div`
 
 const SegmentButton = styled.button`
   background: ${(props) =>
-    props.$active ? props.theme.primaryColor : "transparent"};
+    props.$active ? props.theme.primaryColor || "#F07A48" : "transparent"};
   color: ${(props) => (props.$active ? "#000" : "white")};
   border: none;
   padding: 0.75rem;
@@ -405,7 +369,7 @@ const OptionPrice = styled.span`
 const LocationTriggerBtn = styled.button`
   width: 100%;
   padding: 1rem;
-  background: ${(props) => props.theme.primaryColor};
+  background: ${(props) => props.theme.primaryColor || "#F07A48"};
   color: #111;
   border: none;
   border-radius: 12px;
@@ -447,7 +411,6 @@ const DineInBanner = styled.div`
   margin-bottom: 1rem;
 `;
 
-// 🔴 STICKY CONSOLE-SAFE BOTTOM FOOTER GROUP FOR MAXIMUM CONVERSION
 const StickyMobileFooter = styled.div`
   position: sticky;
   bottom: 0;
@@ -482,7 +445,7 @@ const TotalLabel = styled.p`
 const TotalValue = styled.p`
   font-size: 1.35rem;
   font-weight: 700;
-  color: ${(props) => props.theme.primaryColor};
+  color: ${(props) => props.theme.primaryColor || "#F07A48"};
   margin: 0;
 `;
 
@@ -491,7 +454,7 @@ const SubmitButton = styled.button`
   padding: 1rem;
   font-size: 1.05rem;
   font-weight: 800;
-  background-color: ${(props) => props.theme.primaryColor};
+  background-color: ${(props) => props.theme.primaryColor || "#F07A48"};
   color: #111;
   border: none;
   border-radius: 16px;
@@ -501,7 +464,7 @@ const SubmitButton = styled.button`
   font-family: "Tajawal", sans-serif;
   box-sizing: border-box;
 
-  &:hover {
+  &:hover:not(:disabled) {
     filter: brightness(1.15);
     transform: translateY(-2px);
   }
@@ -509,7 +472,6 @@ const SubmitButton = styled.button`
     background-color: #333;
     color: #777;
     cursor: not-allowed;
-    transform: none;
   }
 `;
 
@@ -577,7 +539,7 @@ const CustomItemEditBtn = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: ${(props) => props.theme.primaryColor};
+    background: ${(props) => props.theme.primaryColor || "#F07A48"};
     color: #000;
     border-color: transparent;
   }
@@ -742,7 +704,7 @@ const LbButton = styled.button`
   ${(props) =>
     props.$primary
       ? `
-    background: ${props.theme.primaryColor};
+    background: ${props.theme.primaryColor || "#F07A48"};
     color: #000;
   `
       : `
@@ -895,98 +857,18 @@ const PromoFeedback = styled.div`
   color: ${(props) => (props.$isError ? "#ef4444" : "#39A170")};
 `;
 
-const PolicyConfirmModalBackdrop = styled(motion.div)`
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(10px);
-  z-index: 2100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  pointer-events: auto;
-`;
-
-const PolicyConfirmCard = styled(motion.div)`
-  width: 100%;
-  max-width: 520px;
-  background-color: #141416;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
-  display: flex;
-  flex-direction: column;
-  max-h: 90vh;
-  color: #fff;
-  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
-`;
-
-const PolicyConfirmHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-`;
-
-const PolicyConfirmBody = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const PolicyConfirmFooter = styled.div`
-  padding: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
-  gap: 1rem;
-  background: rgba(0, 0, 0, 0.15);
-`;
-
-const PolicySwiperWrapper = styled.div`
-  width: 100%;
-  padding: 1rem 0;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-`;
-
-const PolicySlideCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  text-align: center;
-`;
-
-const PolicySlideImage = styled.div`
-  width: 140px;
-  height: 140px;
-  background: #09090b;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 const CheckboxContainer = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 1.25rem;
-  background: rgba(240, 122, 72, 0.04);
-  border: 1px solid rgba(240, 122, 72, 0.12);
-  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
   text-align: start;
 
   input[type="checkbox"] {
-    accent-color: #f07a48;
+    accent-color: ${(props) => props.theme.primaryColor || "#F07A48"};
     width: 18px;
     height: 18px;
     margin-top: 2px;
@@ -994,8 +876,8 @@ const CheckboxContainer = styled.div`
   }
 
   label {
-    font-size: 0.85rem;
-    color: #e4e4e7;
+    font-size: 0.82rem;
+    color: #d4d4d8;
     line-height: 1.4;
     cursor: pointer;
     font-family: "Tajawal", sans-serif;
@@ -1048,6 +930,127 @@ const LockBadge = styled.div`
   pointer-events: none;
 `;
 
+// 🔴 PROGRESSIVE ACCORDION STEP COMPONENTS
+const AccordionStepCard = styled.div`
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid
+    ${(props) =>
+      props.$active
+        ? props.theme.primaryColor || "#F07A48"
+        : "rgba(255, 255, 255, 0.08)"};
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+`;
+
+const StepHeaderRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+
+  .step-title {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: ${(props) => (props.$active ? "#ffffff" : "#a1a1aa")};
+    font-family: "Tajawal", sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .step-number {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: ${(props) =>
+      props.$completed
+        ? "#39A170"
+        : props.$active
+        ? props.theme.primaryColor || "#F07A48"
+        : "rgba(255, 255, 255, 0.1)"};
+    color: ${(props) => (props.$completed || props.$active ? "#000" : "#fff")};
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+const StepContentBody = styled(motion.div)`
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+`;
+
+const StepSummaryChip = styled.div`
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+
+  .details {
+    display: flex;
+    flex-direction: column;
+    text-align: start;
+    gap: 2px;
+    .step-label {
+      font-size: 0.7rem;
+      color: #a1a1aa;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .step-val {
+      font-size: 0.9rem;
+      color: #ffffff;
+      font-weight: 700;
+      font-family: "Tajawal", sans-serif;
+    }
+  }
+
+  .edit-btn {
+    background: transparent;
+    border: none;
+    color: #f07a48;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: "Tajawal", sans-serif;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
+const StepAdvanceBtn = styled.button`
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: "Tajawal", sans-serif;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: ${(props) => props.theme.primaryColor || "#F07A48"};
+    color: #000;
+  }
+`;
+
 const slideVariants = {
   hidden: (isArabic) => ({
     x: isArabic ? "-100%" : "100%",
@@ -1078,6 +1081,7 @@ const Cart = ({
   const locationState = useSelector(selectLocation);
   const isArabic = i18n.language === "ar";
 
+  // --- Form State ---
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [tableNumber, setTableNumber] = useState("");
@@ -1094,7 +1098,11 @@ const Cart = ({
   const [showHistory, setShowHistory] = useState(false);
 
   const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
-  const [designPolicyChecked, setDesignPolicyChecked] = useState(false);
+  const [designPolicyChecked, setDesignPolicyChecked] = useState(true);
+
+  // --- Progressive Accordion & Persistence State ---
+  const [activeStep, setActiveStep] = useState(1); // 1: Contact, 2: Address, 3: Shipping, 4: Review
+  const [saveProfileOptIn, setSaveProfileOptIn] = useState(true);
 
   const [promoCode, setPromoCode] = useState("");
   const [appliedCode, setAppliedCode] = useState("");
@@ -1103,6 +1111,30 @@ const Cart = ({
   const [promoError, setPromoError] = useState("");
 
   const [isHandshakeLocked, setIsHandshakeLocked] = useState(false);
+
+  // --- Hydrate Saved Profile from LocalStorage ---
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(SAVED_PROFILE_KEY);
+      if (cached) {
+        const profile = JSON.parse(cached);
+        if (profile.customerName) setCustomerName(profile.customerName);
+        if (profile.customerPhone) setCustomerPhone(profile.customerPhone);
+        if (profile.addressLine) setManualAddressLine(profile.addressLine);
+        if (profile.wilayaCode) {
+          dispatch(
+            setManualLocation({
+              wilayaCode: profile.wilayaCode,
+              wilayaName: profile.wilayaName,
+              communeName: profile.communeName,
+            })
+          );
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load saved profile", e);
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     if (isCartOpen) {
@@ -1324,18 +1356,15 @@ const Cart = ({
     setAppliedDiscount(null);
     setAppliedCode("");
 
-    // 🔴 RESOLVED: Pull the absolute backend production API URL
     const apiProdUrl =
       process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
 
     try {
       const params = new URLSearchParams();
-      // Pass phone number as customerId fallback for guest checkouts to prevent duplicate use
       if (customerPhone) {
         params.append("customerId", customerPhone);
       }
 
-      // 🔴 RESOLVED: Correct route path (giftCard) and added absolute target URL
       const response = await fetch(
         `${apiProdUrl}/giftCard/verify/${promoCode.trim().toUpperCase()}?${params.toString()}`,
       );
@@ -1391,12 +1420,26 @@ const Cart = ({
       return;
     }
 
-    // Execute order submission directly without opening a second modal
     executeOrderCreation();
   };
 
   const executeOrderCreation = () => {
     if (!designPolicyChecked) return;
+
+    // Handle Profile Persistence
+    if (saveProfileOptIn) {
+      const profileToSave = {
+        customerName,
+        customerPhone,
+        addressLine: manualAddressLine,
+        wilayaCode: locationState.wilayaCode,
+        wilayaName: locationState.wilayaName,
+        communeName: locationState.communeName,
+      };
+      localStorage.setItem(SAVED_PROFILE_KEY, JSON.stringify(profileToSave));
+    } else {
+      localStorage.removeItem(SAVED_PROFILE_KEY);
+    }
 
     const finalNote =
       selectedDeliveryOption?.type === "STOP_DESK"
@@ -1604,7 +1647,7 @@ const Cart = ({
           )}
 
           {deliveryOptions.length > 0 && !calcLoading && (
-            <div style={{ marginTop: "1.5rem" }}>
+            <div style={{ marginTop: "1rem" }}>
               <InputLabel style={{ marginBottom: "0.5rem" }}>
                 {t("delivery_destination_label")}
               </InputLabel>
@@ -1951,7 +1994,7 @@ const Cart = ({
             </motion.div>
           ) : (
             /* ======================================================================== */
-            /* VIEW 2: CHECKOUT FULFILLMENT FORM STATE                                   */
+            /* VIEW 2: PROGRESSIVE ACCORDION CHECKOUT FLOW                             */
             /* ======================================================================== */
             <motion.div
               key="checkout-view"
@@ -1968,6 +2011,7 @@ const Cart = ({
               }}
             >
               <ScrollableFormBody>
+                {/* Header Summary Card */}
                 <SummaryCardButton
                   type="button"
                   $isArabic={isArabic}
@@ -2014,140 +2058,293 @@ const Cart = ({
                   </HintArrow>
                 </SummaryCardButton>
 
-                <Column style={{ marginTop: "1rem" }}>
-                  <FormGroup>
-                    <InputLabel>{t("form_full_name")}</InputLabel>
-                    <Input
-                      type="text"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      disabled={isHandshakeLocked}
-                      required
-                    />
-                    {isHandshakeLocked && (
-                      <LockBadge $isArabic={isArabic}>
-                        <FaLock size={12} />
-                      </LockBadge>
-                    )}
-                  </FormGroup>
-                  <FormGroup>
-                    <InputLabel>{t("form_phone_number")}</InputLabel>
-                    <Input
-                      type="tel"
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      disabled={isHandshakeLocked}
-                      required
-                    />
-                    {isHandshakeLocked && (
-                      <LockBadge $isArabic={isArabic}>
-                        <FaLock size={12} />
-                      </LockBadge>
-                    )}
-                  </FormGroup>
-                  {renderDeliverySection()}
-                  <FormGroup>
-                    <InputLabel>{t("form_preparation_note")}</InputLabel>
-                    <TextArea
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                    />
-                  </FormGroup>
-                </Column>
-
-                <PromoSection>
-                  <PromoInput
-                    type="text"
-                    placeholder={t("promo_code_placeholder", "Code Promo")}
-                    value={promoCode}
-                    disabled={appliedCode.length > 0}
-                    onChange={(e) => {
-                      setPromoCode(e.target.value);
-                      setPromoError("");
-                    }}
-                  />
-                  {appliedCode ? (
-                    <PromoButton
+                {/* 🔴 ACCORDION STEP 1: CONTACT INFORMATION */}
+                {activeStep > 1 ? (
+                  <StepSummaryChip $isArabic={isArabic}>
+                    <div className="details">
+                      <span className="step-label">1. Contact</span>
+                      <span className="step-val">
+                        {customerName} • {customerPhone}
+                      </span>
+                    </div>
+                    <button
                       type="button"
-                      $applied
-                      onClick={handleRemovePromo}
+                      className="edit-btn"
+                      onClick={() => setActiveStep(1)}
                     >
-                      {isArabic ? "سحب" : "Retirer"}
-                    </PromoButton>
-                  ) : (
-                    <PromoButton
-                      type="button"
-                      disabled={isVerifyingPromo || !promoCode.trim()}
-                      onClick={handleApplyPromo}
-                    >
-                      {isVerifyingPromo
-                        ? "..."
-                        : isArabic
-                          ? "تطبيق"
-                          : "Appliquer"}
-                    </PromoButton>
-                  )}
-                </PromoSection>
+                      {isArabic ? "تعديل" : "Edit"}
+                    </button>
+                  </StepSummaryChip>
+                ) : (
+                  <AccordionStepCard $active={activeStep === 1}>
+                    <StepHeaderRow $active={true} $isArabic={isArabic}>
+                      <div className="step-title">
+                        <span className="step-number">1</span>
+                        <span>{isArabic ? "معلومات الاتصال" : "Contact Details"}</span>
+                      </div>
+                    </StepHeaderRow>
+                    <StepContentBody>
+                      <FormGroup>
+                        <InputLabel>{t("form_full_name")}</InputLabel>
+                        <Input
+                          type="text"
+                          value={customerName}
+                          onChange={(e) => setCustomerName(e.target.value)}
+                          disabled={isHandshakeLocked}
+                          required
+                        />
+                        {isHandshakeLocked && (
+                          <LockBadge $isArabic={isArabic}>
+                            <FaLock size={12} />
+                          </LockBadge>
+                        )}
+                      </FormGroup>
+                      <FormGroup>
+                        <InputLabel>{t("form_phone_number")}</InputLabel>
+                        <Input
+                          type="tel"
+                          value={customerPhone}
+                          onChange={(e) => setCustomerPhone(e.target.value)}
+                          disabled={isHandshakeLocked}
+                          required
+                        />
+                        {isHandshakeLocked && (
+                          <LockBadge $isArabic={isArabic}>
+                            <FaLock size={12} />
+                          </LockBadge>
+                        )}
+                      </FormGroup>
+                      <StepAdvanceBtn
+                        type="button"
+                        onClick={() => {
+                          if (customerName && customerPhone) setActiveStep(2);
+                          else alert(isArabic ? "يرجى ملء الحقول" : "Fill required fields");
+                        }}
+                      >
+                        {isArabic ? "المتابعة إلى العنوان ➔" : "Continue to Address ➔"}
+                      </StepAdvanceBtn>
+                    </StepContentBody>
+                  </AccordionStepCard>
+                )}
 
-                {promoError && (
-                  <PromoFeedback $isError>{promoError}</PromoFeedback>
-                )}
-                {appliedCode && (
-                  <PromoFeedback>
-                    <FaCheckCircle
-                      style={{ marginRight: "4px", marginLeft: "4px" }}
-                    />
-                    {isArabic
-                      ? `تم تطبيق الكود ${appliedCode} بنجاح !`
-                      : `Code ${appliedCode} appliqué avec succès !`}
-                  </PromoFeedback>
-                )}
-                {/* 🔴 FRICTION REDUCTION: INLINE IP POLICY CHECKBOX */}
-                <CheckboxContainer style={{ marginTop: "1.5rem" }}>
-                  <input
-                    type="checkbox"
-                    id="direct-ip-policy-check"
-                    checked={designPolicyChecked}
-                    onChange={(e) => setDesignPolicyChecked(e.target.checked)}
-                  />
-                  <label htmlFor="direct-ip-policy-check">
-                    {isArabic ? (
-                      <>
-                        أوافق على{" "}
-                        <span
-                          style={{
-                            color: "#F07A48",
-                            textDecoration: "underline",
-                            cursor: "pointer",
-                          }}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setIsPolicyModalOpen(true);
-                          }}
+                {/* 🔴 ACCORDION STEP 2: SHIPPING ADDRESS */}
+                {activeStep > 2 ? (
+                  <StepSummaryChip $isArabic={isArabic}>
+                    <div className="details">
+                      <span className="step-label">2. Address</span>
+                      <span className="step-val">
+                        {locationState.wilayaName || "Selected Wilaya"},{" "}
+                        {locationState.communeName || "Commune"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="edit-btn"
+                      onClick={() => setActiveStep(2)}
+                    >
+                      {isArabic ? "تعديل" : "Edit"}
+                    </button>
+                  </StepSummaryChip>
+                ) : (
+                  activeStep >= 2 && (
+                    <AccordionStepCard $active={activeStep === 2}>
+                      <StepHeaderRow $active={true} $isArabic={isArabic}>
+                        <div className="step-title">
+                          <span className="step-number">2</span>
+                          <span>{isArabic ? "عنوان التوصيل" : "Shipping Address"}</span>
+                        </div>
+                      </StepHeaderRow>
+                      <StepContentBody>
+                        <AddressesDropDown
+                          target="partners"
+                          onChooseAddress={handleAddressChange}
+                        />
+                        <StepAdvanceBtn
+                          type="button"
+                          onClick={() => setActiveStep(3)}
                         >
-                          شروط استخدام الحقوق والملكية الفكرية
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        I agree to the{" "}
-                        <span
-                          style={{
-                            color: "#F07A48",
-                            textDecoration: "underline",
-                            cursor: "pointer",
-                          }}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setIsPolicyModalOpen(true);
-                          }}
+                          {isArabic ? "خيارات الشحن ➔" : "Select Shipping ➔"}
+                        </StepAdvanceBtn>
+                      </StepContentBody>
+                    </AccordionStepCard>
+                  )
+                )}
+
+                {/* 🔴 ACCORDION STEP 3: DELIVERY OPTIONS */}
+                {activeStep > 3 ? (
+                  <StepSummaryChip $isArabic={isArabic}>
+                    <div className="details">
+                      <span className="step-label">3. Shipping</span>
+                      <span className="step-val">
+                        {selectedDeliveryOption?.name || "Delivery Method"} (
+                        {deliveryPrice} DA)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="edit-btn"
+                      onClick={() => setActiveStep(3)}
+                    >
+                      {isArabic ? "تعديل" : "Edit"}
+                    </button>
+                  </StepSummaryChip>
+                ) : (
+                  activeStep >= 3 && (
+                    <AccordionStepCard $active={activeStep === 3}>
+                      <StepHeaderRow $active={true} $isArabic={isArabic}>
+                        <div className="step-title">
+                          <span className="step-number">3</span>
+                          <span>{isArabic ? "طريقة التوصيل" : "Delivery Method"}</span>
+                        </div>
+                      </StepHeaderRow>
+                      <StepContentBody>
+                        {renderDeliverySection()}
+                        <StepAdvanceBtn
+                          type="button"
+                          onClick={() => setActiveStep(4)}
                         >
-                          Design & IP Terms
-                        </span>
-                      </>
-                    )}
-                  </label>
-                </CheckboxContainer>
+                          {isArabic ? "مراجعة الطلب ➔" : "Review Order ➔"}
+                        </StepAdvanceBtn>
+                      </StepContentBody>
+                    </AccordionStepCard>
+                  )
+                )}
+
+                {/* 🔴 ACCORDION STEP 4: REVIEW, PROMO, & DIRECT SUBMISSION */}
+                {activeStep === 4 && (
+                  <AccordionStepCard $active={true}>
+                    <StepHeaderRow $active={true} $isArabic={isArabic}>
+                      <div className="step-title">
+                        <span className="step-number">4</span>
+                        <span>{isArabic ? "مراجعة الطلب" : "Review & Place Order"}</span>
+                      </div>
+                    </StepHeaderRow>
+                    <StepContentBody>
+                      <FormGroup>
+                        <InputLabel>{t("form_preparation_note")}</InputLabel>
+                        <TextArea
+                          value={note}
+                          onChange={(e) => setNote(e.target.value)}
+                          placeholder={
+                            isArabic
+                              ? "تعليمات خاصة بالتوصيل..."
+                              : "Delivery instructions..."
+                          }
+                        />
+                      </FormGroup>
+
+                      <PromoSection>
+                        <PromoInput
+                          type="text"
+                          placeholder={t("promo_code_placeholder", "Code Promo")}
+                          value={promoCode}
+                          disabled={appliedCode.length > 0}
+                          onChange={(e) => {
+                            setPromoCode(e.target.value);
+                            setPromoError("");
+                          }}
+                        />
+                        {appliedCode ? (
+                          <PromoButton
+                            type="button"
+                            $applied
+                            onClick={handleRemovePromo}
+                          >
+                            {isArabic ? "سحب" : "Retirer"}
+                          </PromoButton>
+                        ) : (
+                          <PromoButton
+                            type="button"
+                            disabled={isVerifyingPromo || !promoCode.trim()}
+                            onClick={handleApplyPromo}
+                          >
+                            {isVerifyingPromo
+                              ? "..."
+                              : isArabic
+                              ? "تطبيق"
+                              : "Appliquer"}
+                          </PromoButton>
+                        )}
+                      </PromoSection>
+
+                      {promoError && (
+                        <PromoFeedback $isError>{promoError}</PromoFeedback>
+                      )}
+                      {appliedCode && (
+                        <PromoFeedback>
+                          <FaCheckCircle
+                            style={{ marginRight: "4px", marginLeft: "4px" }}
+                          />
+                          {isArabic
+                            ? `تم تطبيق الكود ${appliedCode} بنجاح !`
+                            : `Code ${appliedCode} appliqué avec succès !`}
+                        </PromoFeedback>
+                      )}
+
+                      {/* Save Profile Checkbox */}
+                      <CheckboxContainer style={{ marginTop: "1rem" }}>
+                        <input
+                          type="checkbox"
+                          id="save-profile-optin"
+                          checked={saveProfileOptIn}
+                          onChange={(e) => setSaveProfileOptIn(e.target.checked)}
+                        />
+                        <label htmlFor="save-profile-optin">
+                          {isArabic
+                            ? "حفظ معلوماتي لطلبيات القادمة"
+                            : "Save my information for future orders"}
+                        </label>
+                      </CheckboxContainer>
+
+                      {/* IP Policy Checkbox */}
+                      <CheckboxContainer style={{ marginTop: "0.5rem" }}>
+                        <input
+                          type="checkbox"
+                          id="direct-ip-policy-check"
+                          checked={designPolicyChecked}
+                          onChange={(e) => setDesignPolicyChecked(e.target.checked)}
+                        />
+                        <label htmlFor="direct-ip-policy-check">
+                          {isArabic ? (
+                            <>
+                              أوافق على{" "}
+                              <span
+                                style={{
+                                  color: "#F07A48",
+                                  textDecoration: "underline",
+                                  cursor: "pointer",
+                                }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setIsPolicyModalOpen(true);
+                                }}
+                              >
+                                شروط استخدام الحقوق والملكية الفكرية
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              I agree to the{" "}
+                              <span
+                                style={{
+                                  color: "#F07A48",
+                                  textDecoration: "underline",
+                                  cursor: "pointer",
+                                }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setIsPolicyModalOpen(true);
+                                }}
+                              >
+                                Design & IP Terms
+                              </span>
+                            </>
+                          )}
+                        </label>
+                      </CheckboxContainer>
+                    </StepContentBody>
+                  </AccordionStepCard>
+                )}
               </ScrollableFormBody>
 
               {/* 🔴 DIRECT ONE-TAP SUBMISSION */}
@@ -2173,8 +2370,8 @@ const Cart = ({
                       ? "جاري إرسال الطلب..."
                       : "Placing Order..."
                     : isArabic
-                      ? "تأكيد وإتمام الطلب ➔"
-                      : "Complete Order ➔"}
+                    ? "تأكيد وإتمام الطلب ➔"
+                    : "Complete Order ➔"}
                 </SubmitButton>
               </StickyMobileFooter>
             </motion.div>
