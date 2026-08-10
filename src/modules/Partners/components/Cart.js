@@ -1,18 +1,11 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
-import styled, { css, keyframes } from "styled-components";
-import ButtonWithIcon from "../../../components/ButtonWithIcon";
-import { light } from "../../../config/Themes";
-import CartIcon from "../../../assets/icons/cart.svg";
+import React, { useEffect, useState, useMemo } from "react";
+import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  selectCart,
   selectIsCartOpen,
-  openCart,
   closeCart,
   updateCartQuantity,
 } from "../../Cart/state/reducers";
-import { ActionButton } from "../../../components/ActionButton";
-import CartElementsGrid from "../../Cart/components/CartElementsGrid";
 import AddressesDropDown from "../../../components/AddressesDropDown";
 import { useTranslation } from "react-i18next";
 import { getImageUrl } from "../../../utils/imageUtils";
@@ -35,11 +28,7 @@ import {
   FaArrowLeft,
   FaArrowRight,
   FaCheckCircle,
-  FaExclamationTriangle,
   FaLock,
-  FaCheck,
-  FaChevronDown,
-  FaChevronUp,
 } from "react-icons/fa";
 import {
   detectUserLocation,
@@ -47,11 +36,6 @@ import {
   selectLocation,
 } from "../../Location/state/reducers";
 import useDeliveryCalculator from "../../../hooks/useDeliveryCalculator";
-import { retrieveFile } from "../../PodStudio/utils/indexedDbHelper";
-import {
-  getFittedPrintZoneRatios,
-  getGarmentDimensions,
-} from "../../PodStudio/hooks/usePrintableArea";
 import PodMockupPreview from "../../PodStudio/components/Workspace/PodMockupPreview";
 
 // Storage Key for Checkout Profile Persistence
@@ -112,6 +96,7 @@ const FormWrapper = styled.form`
   flex-direction: column;
   height: 100%;
   width: 100%;
+  overflow: hidden;
 `;
 
 const ScrollableFormBody = styled.div`
@@ -909,6 +894,22 @@ const NestedPolicyCard = styled(motion.div)`
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 `;
 
+const PolicyConfirmHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+`;
+
+const PolicyConfirmFooter = styled.div`
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.15);
+`;
+
 const PolicyScrollBlock = styled.div`
   flex: 1;
   overflow-y: auto;
@@ -970,8 +971,8 @@ const StepHeaderRow = styled.div`
       props.$completed
         ? "#39A170"
         : props.$active
-        ? props.theme.primaryColor || "#F07A48"
-        : "rgba(255, 255, 255, 0.1)"};
+          ? props.theme.primaryColor || "#F07A48"
+          : "rgba(255, 255, 255, 0.1)"};
     color: ${(props) => (props.$completed || props.$active ? "#000" : "#fff")};
     font-size: 0.75rem;
     font-weight: 800;
@@ -1127,7 +1128,7 @@ const Cart = ({
               wilayaCode: profile.wilayaCode,
               wilayaName: profile.wilayaName,
               communeName: profile.communeName,
-            })
+            }),
           );
         }
       }
@@ -2080,7 +2081,9 @@ const Cart = ({
                     <StepHeaderRow $active={true} $isArabic={isArabic}>
                       <div className="step-title">
                         <span className="step-number">1</span>
-                        <span>{isArabic ? "معلومات الاتصال" : "Contact Details"}</span>
+                        <span>
+                          {isArabic ? "معلومات الاتصال" : "Contact Details"}
+                        </span>
                       </div>
                     </StepHeaderRow>
                     <StepContentBody>
@@ -2118,10 +2121,17 @@ const Cart = ({
                         type="button"
                         onClick={() => {
                           if (customerName && customerPhone) setActiveStep(2);
-                          else alert(isArabic ? "يرجى ملء الحقول" : "Fill required fields");
+                          else
+                            alert(
+                              isArabic
+                                ? "يرجى ملء الحقول"
+                                : "Fill required fields",
+                            );
                         }}
                       >
-                        {isArabic ? "المتابعة إلى العنوان ➔" : "Continue to Address ➔"}
+                        {isArabic
+                          ? "المتابعة إلى العنوان ➔"
+                          : "Continue to Address ➔"}
                       </StepAdvanceBtn>
                     </StepContentBody>
                   </AccordionStepCard>
@@ -2151,7 +2161,9 @@ const Cart = ({
                       <StepHeaderRow $active={true} $isArabic={isArabic}>
                         <div className="step-title">
                           <span className="step-number">2</span>
-                          <span>{isArabic ? "عنوان التوصيل" : "Shipping Address"}</span>
+                          <span>
+                            {isArabic ? "عنوان التوصيل" : "Shipping Address"}
+                          </span>
                         </div>
                       </StepHeaderRow>
                       <StepContentBody>
@@ -2194,7 +2206,9 @@ const Cart = ({
                       <StepHeaderRow $active={true} $isArabic={isArabic}>
                         <div className="step-title">
                           <span className="step-number">3</span>
-                          <span>{isArabic ? "طريقة التوصيل" : "Delivery Method"}</span>
+                          <span>
+                            {isArabic ? "طريقة التوصيل" : "Delivery Method"}
+                          </span>
                         </div>
                       </StepHeaderRow>
                       <StepContentBody>
@@ -2216,7 +2230,9 @@ const Cart = ({
                     <StepHeaderRow $active={true} $isArabic={isArabic}>
                       <div className="step-title">
                         <span className="step-number">4</span>
-                        <span>{isArabic ? "مراجعة الطلب" : "Review & Place Order"}</span>
+                        <span>
+                          {isArabic ? "مراجعة الطلب" : "Review & Place Order"}
+                        </span>
                       </div>
                     </StepHeaderRow>
                     <StepContentBody>
@@ -2236,7 +2252,10 @@ const Cart = ({
                       <PromoSection>
                         <PromoInput
                           type="text"
-                          placeholder={t("promo_code_placeholder", "Code Promo")}
+                          placeholder={t(
+                            "promo_code_placeholder",
+                            "Code Promo",
+                          )}
                           value={promoCode}
                           disabled={appliedCode.length > 0}
                           onChange={(e) => {
@@ -2261,8 +2280,8 @@ const Cart = ({
                             {isVerifyingPromo
                               ? "..."
                               : isArabic
-                              ? "تطبيق"
-                              : "Appliquer"}
+                                ? "تطبيق"
+                                : "Appliquer"}
                           </PromoButton>
                         )}
                       </PromoSection>
@@ -2287,7 +2306,9 @@ const Cart = ({
                           type="checkbox"
                           id="save-profile-optin"
                           checked={saveProfileOptIn}
-                          onChange={(e) => setSaveProfileOptIn(e.target.checked)}
+                          onChange={(e) =>
+                            setSaveProfileOptIn(e.target.checked)
+                          }
                         />
                         <label htmlFor="save-profile-optin">
                           {isArabic
@@ -2302,7 +2323,9 @@ const Cart = ({
                           type="checkbox"
                           id="direct-ip-policy-check"
                           checked={designPolicyChecked}
-                          onChange={(e) => setDesignPolicyChecked(e.target.checked)}
+                          onChange={(e) =>
+                            setDesignPolicyChecked(e.target.checked)
+                          }
                         />
                         <label htmlFor="direct-ip-policy-check">
                           {isArabic ? (
@@ -2370,8 +2393,8 @@ const Cart = ({
                       ? "جاري إرسال الطلب..."
                       : "Placing Order..."
                     : isArabic
-                    ? "تأكيد وإتمام الطلب ➔"
-                    : "Complete Order ➔"}
+                      ? "تأكيد وإتمام الطلب ➔"
+                      : "Complete Order ➔"}
                 </SubmitButton>
               </StickyMobileFooter>
             </motion.div>
