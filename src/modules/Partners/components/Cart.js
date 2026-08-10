@@ -106,8 +106,7 @@ const ScrollableFormBody = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-
-  padding-bottom: calc(140px + env(safe-area-inset-bottom));
+  padding-bottom: 260px;
 
   &::-webkit-scrollbar {
     display: none;
@@ -931,7 +930,7 @@ const LockBadge = styled.div`
   pointer-events: none;
 `;
 
-// 🔴 PROGRESSIVE ACCORDION STEP COMPONENTS
+// 🔴 1. DYNAMIC EXPANDING STEP CARD
 const AccordionStepCard = styled.div`
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid
@@ -940,8 +939,13 @@ const AccordionStepCard = styled.div`
         ? props.theme.primaryColor || "#F07A48"
         : "rgba(255, 255, 255, 0.08)"};
   border-radius: 16px;
-  overflow: hidden;
-  transition: all 0.3s ease;
+  /* 🔴 FIX: Overflow visible & auto height allows dynamic expansion for all inputs */
+  overflow: visible;
+  height: auto;
+  min-height: fit-content;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 `;
 
 const StepHeaderRow = styled.div`
@@ -952,6 +956,8 @@ const StepHeaderRow = styled.div`
   background: rgba(255, 255, 255, 0.02);
   cursor: pointer;
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+  /* 🔴 FIX: Rounded top corners retained for open card header */
+  border-radius: 16px 16px 0 0;
 
   .step-title {
     font-size: 0.9rem;
@@ -982,12 +988,17 @@ const StepHeaderRow = styled.div`
   }
 `;
 
+// 🔴 2. DYNAMIC CONTENT BODY
 const StepContentBody = styled(motion.div)`
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+  /* 🔴 FIX: Unconstrained height so address dropdown & inputs expand fully */
+  height: auto;
+  min-height: fit-content;
+  overflow: visible;
 `;
 
 const StepSummaryChip = styled.div`
@@ -1424,10 +1435,39 @@ const Cart = ({
     executeOrderCreation();
   };
 
-  const executeOrderCreation = () => {
-    if (!designPolicyChecked) return;
+  const executeOrderCreation = (e) => {
+    if (e) e.preventDefault();
 
-    // Handle Profile Persistence
+    if (!customerName.trim() || !customerPhone.trim()) {
+      alert(
+        isArabic
+          ? "يرجى ملء الاسم الكامل ورقم الهاتف."
+          : "Please enter your name and phone number.",
+      );
+      setActiveStep(1);
+      return;
+    }
+
+    if (!locationState.wilayaName) {
+      alert(
+        isArabic
+          ? "يرجى تحديد ولاية التوصيل."
+          : "Please select a shipping Wilaya.",
+      );
+      setActiveStep(2);
+      return;
+    }
+
+    if (!designPolicyChecked) {
+      alert(
+        isArabic
+          ? "يرجى الموافقة على شروط الملكية الفكرية للمتابعة."
+          : "Please agree to the design policy.",
+      );
+      return;
+    }
+
+    // Persist Profile if opt-in is checked
     if (saveProfileOptIn) {
       const profileToSave = {
         customerName,
@@ -1596,43 +1636,10 @@ const Cart = ({
       );
     }
 
+    // 🔴 E-COMMERCE / GLOBAL SHOPS (STEP 3: SHIPPING ONLY, NO REPEATED ADDRESS FORM)
     if (shopDomain === "global") {
       return (
         <>
-          {isHandshakeLocked ? (
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-            >
-              <FormGroup>
-                <InputLabel>{t("wiz_label_wilaya")}</InputLabel>
-                <Input
-                  type="text"
-                  value={locationState.wilayaName || ""}
-                  disabled
-                />
-                <LockBadge $isArabic={isArabic} style={{ top: "50%" }}>
-                  <FaLock size={12} />
-                </LockBadge>
-              </FormGroup>
-              <FormGroup>
-                <InputLabel>{t("wiz_label_commune")}</InputLabel>
-                <Input
-                  type="text"
-                  value={locationState.communeName || ""}
-                  disabled
-                />
-                <LockBadge $isArabic={isArabic} style={{ top: "50%" }}>
-                  <FaLock size={12} />
-                </LockBadge>
-              </FormGroup>
-            </div>
-          ) : (
-            <AddressesDropDown
-              target="partners"
-              onChooseAddress={handleAddressChange}
-            />
-          )}
-
           {calcLoading && (
             <div style={{ padding: "1rem", textAlign: "center" }}>
               <Loader fullscreen={false} />
@@ -1648,7 +1655,7 @@ const Cart = ({
           )}
 
           {deliveryOptions.length > 0 && !calcLoading && (
-            <div style={{ marginTop: "1rem" }}>
+            <div>
               <InputLabel style={{ marginBottom: "0.5rem" }}>
                 {t("delivery_destination_label")}
               </InputLabel>
@@ -2371,6 +2378,7 @@ const Cart = ({
               </ScrollableFormBody>
 
               {/* 🔴 DIRECT ONE-TAP SUBMISSION */}
+              {/* 🔴 STEP-AWARE DYNAMIC ACTION FOOTER */}
               <StickyMobileFooter>
                 <TotalContainer>
                   <TotalLabel>{t("total")}</TotalLabel>
@@ -2379,23 +2387,93 @@ const Cart = ({
                   </TotalValue>
                 </TotalContainer>
 
-                <SubmitButton
-                  type="submit"
-                  disabled={
-                    isSubmitting === "submitting" ||
-                    !designPolicyChecked ||
-                    !customerName ||
-                    !customerPhone
-                  }
-                >
-                  {isSubmitting === "submitting"
-                    ? isArabic
-                      ? "جاري إرسال الطلب..."
-                      : "Placing Order..."
-                    : isArabic
-                      ? "تأكيد وإتمام الطلب ➔"
-                      : "Complete Order ➔"}
-                </SubmitButton>
+                {/* STEP 1 ACTION */}
+                {activeStep === 1 && (
+                  <SubmitButton
+                    type="button"
+                    onClick={() => {
+                      if (customerName.trim() && customerPhone.trim()) {
+                        setActiveStep(2);
+                      } else {
+                        alert(
+                          isArabic
+                            ? "يرجى ملء الاسم ورقم الهاتف."
+                            : "Please enter your name and phone.",
+                        );
+                      }
+                    }}
+                  >
+                    {isArabic
+                      ? "المتابعة إلى العنوان ➔"
+                      : "Continue to Address ➔"}
+                  </SubmitButton>
+                )}
+
+                {/* STEP 2 ACTION */}
+                {activeStep === 2 && (
+                  <SubmitButton
+                    type="button"
+                    onClick={() => {
+                      if (locationState.wilayaName || manualAddressLine) {
+                        setActiveStep(3);
+                      } else {
+                        alert(
+                          isArabic
+                            ? "يرجى تحديد ولاية وبلدية التوصيل."
+                            : "Please select your shipping location.",
+                        );
+                      }
+                    }}
+                  >
+                    {isArabic
+                      ? "المتابعة إلى خيارات الشحن ➔"
+                      : "Select Shipping ➔"}
+                  </SubmitButton>
+                )}
+
+                {/* STEP 3 ACTION */}
+                {activeStep === 3 && (
+                  <SubmitButton
+                    type="button"
+                    onClick={() => {
+                      if (selectedDeliveryOption || shopDomain === "food") {
+                        setActiveStep(4);
+                      } else {
+                        alert(
+                          isArabic
+                            ? "يرجى اختيار طريقة التوصيل."
+                            : "Please select a delivery option.",
+                        );
+                      }
+                    }}
+                  >
+                    {isArabic
+                      ? "المتابعة إلى مراجعة الطلب ➔"
+                      : "Review Order ➔"}
+                  </SubmitButton>
+                )}
+
+                {/* STEP 4 FINAL SUBMISSION */}
+                {activeStep === 4 && (
+                  <SubmitButton
+                    type="button"
+                    onClick={executeOrderCreation}
+                    disabled={
+                      isSubmitting === "submitting" ||
+                      !designPolicyChecked ||
+                      !customerName ||
+                      !customerPhone
+                    }
+                  >
+                    {isSubmitting === "submitting"
+                      ? isArabic
+                        ? "جاري إرسال الطلب..."
+                        : "Placing Order..."
+                      : isArabic
+                        ? "تأكيد وإتمام الطلب ➔"
+                        : "Complete Order ➔"}
+                  </SubmitButton>
+                )}
               </StickyMobileFooter>
             </motion.div>
           )}

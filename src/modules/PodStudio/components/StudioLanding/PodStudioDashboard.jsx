@@ -275,6 +275,38 @@ const HiddenCartTriggerWrapper = styled.div`
   }
 `;
 
+const uploadAssetWithFallback = async (fileBlob) => {
+  const API_URL =
+    process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+
+  try {
+    const formData = new FormData();
+    formData.append("file", fileBlob);
+    const res = await axios.post(`${API_URL}/image/upload`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    if (res.data && res.data.url) return res.data.url;
+  } catch (err) {
+    console.warn(
+      "Cloudinary upload failed, using NestJS database fallback...",
+      err,
+    );
+  }
+
+  const fallbackData = new FormData();
+  fallbackData.append("image", fileBlob);
+  const fallbackRes = await axios.post(`${API_URL}/image`, fallbackData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  if (fallbackRes.data && fallbackRes.data.id) {
+    return `${API_URL}/image/raw/${fallbackRes.data.id}`;
+  }
+  throw new Error(
+    "Failed to save custom asset across both primary and fallback backends.",
+  );
+};
+// ----------------------------------------
+
 const PodStudioDashboard = ({
   shop,
   selectedShopImage,
@@ -416,7 +448,111 @@ const PodStudioDashboard = ({
   };
 
   const handlePlaceOrder = async (customerDetails) => {
-    // Order submission logic
+    if (isSubmitting === "submitting") return;
+    setIsSubmitting("submitting");
+
+    const activeProducts = customerDetails.healedProducts || shopCartItems;
+
+    try {
+      const resolvedProducts = await Promise.all(
+        activeProducts.map(async (item) => {
+          if (!item.podCustomization) return item;
+
+          const custom = { ...item.podCustomization };
+          const stableId = item.variantId;
+
+          if (custom.front?.imageUrl?.startsWith("blob:") && stableId) {
+            const fileBlob = await retrieveFile(`${stableId}_front`);
+            if (fileBlob) {
+              const permanentUrl = await uploadAssetWithFallback(fileBlob);
+              custom.front = {
+                ...custom.front,
+                imageUrl: permanentUrl,
+                imageId: permanentUrl,
+                originalImageUrl: permanentUrl,
+                originalImageId: permanentUrl,
+              };
+            }
+          }
+
+          if (custom.back?.imageUrl?.startsWith("blob:") && stableId) {
+            const fileBlob = await retrieveFile(`${stableId}_back`);
+            if (fileBlob) {
+              const permanentUrl = await uploadAssetWithFallback(fileBlob);
+              custom.back = {
+                ...custom.back,
+                imageUrl: permanentUrl,
+                imageId: permanentUrl,
+                originalImageUrl: permanentUrl,
+                originalImageId: permanentUrl,
+              };
+            }
+          }
+
+          return {
+            ...item,
+            podCustomization: custom,
+          };
+        }),
+      );
+
+      const orderPayload = {
+        shopId: shopId,
+        customerName: customerDetails.customerName,
+        customerPhone: customerDetails.customerPhone,
+        deliveryInfo: customerDetails.note || "No note",
+        note: customerDetails.note,
+        deliveryPricing: customerDetails.deliveryOption?.price || 0,
+        deliveryOptionKeyword:
+          customerDetails.deliveryOption?.type === "STOP_DESK"
+            ? "stop_desk"
+            : "byShop",
+        state: customerDetails.address?.wilaya,
+        city: customerDetails.address?.commune,
+        addressLine: customerDetails.address?.addressLine || "Home Delivery",
+        gpsLocation: customerDetails.gpsLocation,
+        shopDomainKeyword: "global",
+        discount: customerDetails.discount || 0,           // 🔴 Restored Promo Code Support
+        discountCode: customerDetails.discountCode || "",  // 🔴 Restored Promo Code Support
+        products: resolvedProducts.map((item) => ({
+          productId: item.productId,
+          title: item.title,
+          quantity: item.quantity,
+          sellingPrice: item.sellingPrice,
+          categoryId: item.categoryId || item.product?.categoryId,
+          supplementary:
+            item.color && item.size ? `${item.color},${item.size}` : undefined,
+          podCustomization: item.podCustomization,
+        })),
+      };
+      
+      const response = await createGlobalOrder(orderPayload);
+      const orderResult = response.data;
+
+      setOrderSuccessData({
+        orderId: orderResult.orderId,
+        customerPhone: customerDetails.customerPhone,
+        shopName:
+          shop.name === "AURAS FORGE" ? "AURAS LAB" : shop.name || "AURAS LAB",
+      });
+
+      setIsSubmitting("success");
+
+      shopCartItems.forEach((item) =>
+        dispatch(
+          updateCartQuantity({ variantId: item.variantId, quantity: 0 }),
+        ),
+      );
+    } catch (error) {
+      console.error("Global Order Placement Failed:", error);
+      const backendMessage = error.response?.data?.message || error.message;
+      setOrderErrorMsg(backendMessage || t("order_error_message"));
+      setIsSubmitting("error");
+      setTimeout(() => {
+        setIsSubmitting(null);
+        setOrderErrorMsg("");
+      }, 4000);
+    }
   };
 
   const handleClearSuccess = () => {
