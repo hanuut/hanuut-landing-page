@@ -869,7 +869,7 @@
   "qna_ecom_1_q": "Je vends des articles avec tailles et couleurs.",
   "qna_ecom_1_a": "Nous gérons ça. Le système **Global Product** permet de gérer des variantes complexes (Rouge/Bleu, S/M/L) avec des prix et des niveaux de stock spécifiques pour chacune.",
   "qna_ecom_2_q": "Je veux vendre à l'échelle nationale.",
-  "qna_ecom_2_a": "Passez à l'échelle. Votre boutique obtient une **Page Web** dédiée. Les clients des 58 Wilayas peuvent commander, et vous gérez l'expédition depuis le tableau de bord.",
+  "qna_ecom_2_a": "Passez à l'échelle. Votre boutique obtient une **Page Web** dédiée. Les clients des 69 Wilayas peuvent commander, et vous gérez l'expédition depuis le tableau de bord.",
   "qna_ecom_3_q": "Comment calculer mon bénéfice réel ?",
   "qna_ecom_3_a": "Suivez tout. Saisissez votre **Prix d'Achat** contre votre **Prix de Vente**. Le tableau de bord analytique calcule votre bénéfice net automatiquement, pas seulement le chiffre d'affaires.",
   "navTrack": "Suivi de Commande",
@@ -964,7 +964,7 @@
     "shop_desc_food": "Commandez de délicieux repas chez {{shopName}} à {{commune}}. Consultez notre menu et profitez d'une livraison rapide avec Hanuut Express.",
     "shop_title_grocery": "{{shopName}} | Supermarché & Livraison à {{commune}}",
     "shop_desc_grocery": "Faites vos courses quotidiennes chez {{shopName}} à {{commune}}. Livraison locale rapide avec Hanuut.",
-    "shop_title_global": "{{shopName}} | Boutique en Ligne Algérie - Livraison 58 Wilayas",
+    "shop_title_global": "{{shopName}} | Boutique en Ligne Algérie - Livraison 69 Wilayas",
     "shop_desc_global": "Découvrez les produits de {{shopName}}. Achetez en ligne en toute sécurité avec une livraison partout en Algérie via la plateforme Hanuut.",
     "explore_title": "Meilleurs {{category}} à {{location}} | Hanuut",
     "explore_desc": "Découvrez et commandez parmi les meilleurs {{category}} à {{location}}. Livraison rapide et commerces locaux vérifiés."
@@ -1042,7 +1042,7 @@
 
   "pain_ecom_1": "Gérer les couleurs et tailles est un cauchemar.",
   "sol_ecom_1": "**Matrice de Variantes** avancée pour un suivi sans effort des vêtements.",
-  "pain_ecom_2": "Calculer la livraison pour 58 wilayas.",
+  "pain_ecom_2": "Calculer la livraison pour 69 wilayas.",
   "sol_ecom_2": "**Calculateur de livraison dynamique** intégré lors du paiement.",
   "pain_ecom_3": "Créer un site web coûte des millions.",
   "sol_ecom_3": "Obtenez un **site e-commerce gratuit et personnalisable** en 3 minutes.",
@@ -1059,7 +1059,7 @@
   "feat_food_4_t": "Studio de Création de Flyers", "feat_food_4_d": "Générez de superbes flyers promotionnels directement depuis l'application.",
 
   "feat_ecom_1_t": "Matrice de Variantes", "feat_ecom_1_d": "Gérez facilement le stock pour différentes tailles, couleurs et modèles.",
-  "feat_ecom_2_t": "Livraison 58 Wilayas", "feat_ecom_2_d": "Calcul automatisé des frais de livraison pour toute l'Algérie.",
+  "feat_ecom_2_t": "Livraison 69 Wilayas", "feat_ecom_2_d": "Calcul automatisé des frais de livraison pour toute l'Algérie.",
   "feat_ecom_3_t": "Créateur de Page de Vente", "feat_ecom_3_d": "Votre lien hanuut.com/@votre-boutique avec image de marque personnalisée.",
   "feat_ecom_4_t": "Calculateur de Bénéfice Net", "feat_ecom_4_d": "Suivez vos marges de profit exactes après frais de livraison et coûts.",
   
@@ -1075,7 +1075,7 @@
 
   "pain_global_1": "Répondre 'Prix svp?' 100 fois par jour.",
   "sol_global_1": "Partagez votre **Boutique Link-in-Bio**. Les clients commandent direct.",
-  "pain_global_2": "Calculer les tarifs de livraison pour 58 Wilayas.",
+  "pain_global_2": "Calculer les tarifs de livraison pour 69 Wilayas.",
   "sol_global_2": "**Calculateur d'expédition automatisé** intégré.",
   "pain_global_3": "Perdre le fil des tailles et couleurs disponibles.",
   "sol_global_3": "**Gestion des Variantes** pour suivre votre stock automatiquement.",
@@ -1110,7 +1110,7 @@
   "feat_grow_2_t": "Studio Promo", "feat_grow_2_d": "Générez des flyers pour vos réseaux sociaux.",
   "feat_grow_3_t": "Calcul du Bénéfice Net", "feat_grow_3_d": "Sachez exactement ce que vous avez gagné à la fin de la journée.",
 
-  "feat_log_1_t": "Livraison 58 Wilayas", "feat_log_1_d": "Calcul dynamique des frais pour l'expédition nationale.",
+  "feat_log_1_t": "Livraison 69 Wilayas", "feat_log_1_d": "Calcul dynamique des frais pour l'expédition nationale.",
   "feat_log_2_t": "Mode Auto-Livraison", "feat_log_2_d": "Définissez des rayons de livraison pour vos livreurs.",
   "cat_sales_pos": "Point de Vente (Caisse)",
   "cat_inventory": "Stock & Inventaire",
@@ -1138,14 +1138,14 @@
   "domain_grocery_desc": "Pour les alimentations générales et supérettes.",
 
   "global_b1": "Répondre 'Prix svp ?' 100x/jour en DM",
-  "global_b2": "Calculer les tarifs de livraison pour 58 Wilayas",
+  "global_b2": "Calculer les tarifs de livraison pour 69 Wilayas",
   "global_b3": "Perdre le fil des tailles et couleurs disponibles",
   "global_a1_t": "Boutique Link-in-Bio où les clients commandent directement", "global_a1_f": "Vitrine",
   "global_a2_t": "Calculateur d'expédition automatisé intégré", "global_a2_f": "Logistique",
   "global_a3_t": "Matrice de variantes pour suivre tailles et couleurs", "global_a3_f": "Inventaire",
   "global_f1_n": "Boutique Link-in-Bio", "global_f1_d": "Un lien pour toutes vos ventes sociales.",
   "global_f2_n": "Matrice de Variantes", "global_f2_d": "Gérez tailles, couleurs et modèles.",
-  "global_f3_n": "Livraison 58 Wilayas", "global_f3_d": "Frais automatisés pour l'Algérie.",
+  "global_f3_n": "Livraison 69 Wilayas", "global_f3_d": "Frais automatisés pour l'Algérie.",
   "global_f4_n": "Calcul Bénéfice Net", "global_f4_d": "Marges réelles après frais de livraison.",
   "global_f5_n": "Studio Promo", "global_f5_d": "Générez des flyers pro en quelques secondes.",
 
@@ -1191,7 +1191,7 @@
   "industry_grocery_hook": "L'inventaire jusqu'à minuit et les produits périmés, c'est fini.",
   "industry_grocery_subhook": "Une caisse qui marche sans internet, un scanner avec 4000+ produits DZ, et des alertes de péremption.",
   "industry_global_hook": "Marre de répondre 'Prix svp ?' 100 fois par jour en DM ?",
-  "industry_global_subhook": "Ouvrez votre boutique en ligne, laissez les clients commander, et automatisez la livraison sur 58 wilayas.",
+  "industry_global_subhook": "Ouvrez votre boutique en ligne, laissez les clients commander, et automatisez la livraison sur 69 wilayas.",
   
   "demo_title_food": "Voyez comment modifier un prix en 5 secondes ⏱️",
   "demo_title_grocery": "Voyez comment scanner un produit sans rien taper ⏱️",
@@ -1233,7 +1233,7 @@
   "specifications_header": "Caractéristiques",
     "pod_studio_hero_badge": "Supports Vides Premium",
     "pod_studio_hero_title": "Créez une pièce unique au monde.",
-    "pod_studio_hero_desc": "Concevez vos vêtements haut de gamme sur des supports en coton biologique lourd. Livraison dans les 58 Wilayas d'Algérie.",
+    "pod_studio_hero_desc": "Concevez vos vêtements haut de gamme sur des supports en coton biologique lourd. Livraison dans les 69 Wilayas d'Algérie.",
     "pod_studio_scroll_down": "Découvrir",
     "pod_studio_transformation_title": "Que pouvez-vous créer ?",
     "pod_studio_transformation_subtitle": "Traduisez vos idées visuelles en collections physiques.",
@@ -1347,7 +1347,7 @@
   "pod_studio_reviewed_notice": "Vérifié avant production",
   "pod_studio_join_creators_btn": "Rejoindre en tant que Créateur 🎨",
   "creator_collab_hero_title": "Monétisez votre Art. Sans frais de fabrication.",
-  "creator_collab_hero_subtitle": "Publiez vos visuels sur les supports AURAS LAB. Gagnez des commissions sur chaque vente à travers les 58 Wilayas pendant que nous gérons l'impression et la livraison.",
+  "creator_collab_hero_subtitle": "Publiez vos visuels sur les supports AURAS LAB. Gagnez des commissions sur chaque vente à travers les 69 Wilayas pendant que nous gérons l'impression et la livraison.",
   "creator_collab_step1_title": "1. Candidater",
   "creator_collab_step1_desc": "Soumettez votre nom d'artiste et vos visuels.",
   "creator_collab_step2_title": "2. Validation Qualité",
@@ -1364,5 +1364,29 @@
   "editorial_showcase_title" : "AURASLAB X CREATORS",
   "pod_studio_billing_breakdown": "FACTURATION & PRODUCTION",
   "pod_studio_btn_update_tray": "Mettre à jour le design",
-  "pod_studio_btn_commit_tray": "Ajouter à la collection"
+  "pod_studio_btn_commit_tray": "Ajouter à la collection",
+  "aurasLab": {
+    "common": {
+      "enterStudio": "Entrer dans l'Atelier",
+      "createFit": "Créer mon Style"
+    },
+    "hero": {
+      "slide1": {
+        "tagline": "COTON LOURD 100%",
+        "headline": "Porte ton identité.<br/>Pas un logo.",
+        "subtext": "Pièces street premium conçues pour une liberté totale. Porte-les brutes ou imprime tes propres idées."
+      },
+      "slide2": {
+        "tagline": "ZÉRO TAXE DE MARQUE",
+        "headline": "Approprie-toi la pièce.<br/>Crée le style.",
+        "subtext": "Des tissus de qualité sans payer les prix gonflés d'une marque. Ton style, tes règles."
+      }
+    },
+    "features": {
+      "quality": "Coton Lourd Premium",
+      "pricing": "Prix Direct Atelier",
+      "shipping": "Livraison 69 Wilayas"
+    }
+  }
+
 }

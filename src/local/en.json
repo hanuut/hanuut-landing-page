@@ -864,7 +864,7 @@
   "qna_ecom_1_q": "I sell sizes and colors.",
   "qna_ecom_1_a": "The **Global Product** system lets you manage complex variants (Red/Blue, S/M/L) with specific prices and stock levels.",
   "qna_ecom_2_q": "I want to sell nationwide.",
-  "qna_ecom_2_a": "Scale up. Your shop gets a **Web Landing Page**. Customers from all 58 Wilayas can order, and you manage fulfillment easily.",
+  "qna_ecom_2_a": "Scale up. Your shop gets a **Web Landing Page**. Customers from all 69 Wilayas can order, and you manage fulfillment easily.",
   "qna_ecom_3_q": "What is my real profit?",
   "qna_ecom_3_a": "Input your **Buying Price** vs. **Selling Price**. The analytics dashboard calculates your net profit automatically.",
   "navTrack": "Order Tracking",
@@ -958,7 +958,7 @@
     "shop_desc_food": "Order delicious food from {{shopName}} in {{commune}}. View our menu, prices, and enjoy fast delivery via Hanuut Express.",
     "shop_title_grocery": "{{shopName}} | Grocery Delivery in {{commune}}",
     "shop_desc_grocery": "Shop daily groceries and fresh produce from {{shopName}} in {{commune}}. Fast local delivery with Hanuut.",
-    "shop_title_global": "{{shopName}} | Shop Online in Algeria - Delivery to 58 Wilayas",
+    "shop_title_global": "{{shopName}} | Shop Online in Algeria - Delivery to 69 Wilayas",
     "shop_desc_global": "Discover products from {{shopName}}. Shop securely online with nationwide delivery across Algeria on the Hanuut platform.",
      "explore_title": "Best {{category}} in {{location}} | Hanuut",
     "explore_desc": "Discover and order from the best {{category}} in {{location}}. Fast delivery and trusted local shops."
@@ -1037,7 +1037,7 @@
   
   "pain_ecom_1": "Managing colors and sizes is a nightmare.",
   "sol_ecom_1": "Advanced **Variant Matrix** for effortless tracking of clothes and gear.",
-  "pain_ecom_2": "Calculating shipping for 58 wilayas.",
+  "pain_ecom_2": "Calculating shipping for 69 wilayas.",
   "sol_ecom_2": "**Dynamic shipping calculator** integrated directly at checkout.",
   "pain_ecom_3": "Building an online store costs millions.",
   "sol_ecom_3": "Get a **Free customizable e-commerce website** in 3 minutes.",
@@ -1054,7 +1054,7 @@
   "feat_food_4_t": "Flyer Design Studio", "feat_food_4_d": "Generate beautiful promotional flyers directly from the app.",
 
   "feat_ecom_1_t": "Variant Matrix", "feat_ecom_1_d": "Easily manage stock for different sizes, colors, and models.",
-  "feat_ecom_2_t": "58 Wilayas Shipping", "feat_ecom_2_d": "Automated delivery fee calculation across all of Algeria.",
+  "feat_ecom_2_t": "69 Wilayas Shipping", "feat_ecom_2_d": "Automated delivery fee calculation across all of Algeria.",
   "feat_ecom_3_t": "Landing Page Builder", "feat_ecom_3_d": "Your own hanuut.com/@yourshop link with customizable branding.",
   "feat_ecom_4_t": "Net Profit Calculator", "feat_ecom_4_d": "Track exact profit margins after shipping and product costs.",
   "seo_partners_title": "Free POS Software & QR Menu Algeria | My Hanuut",
@@ -1069,7 +1069,7 @@
 
   "pain_global_1": "Answering 'Price?' 100 times a day in DMs.",
   "sol_global_1": "Share your **Link-in-Bio store**. Customers order directly.",
-  "pain_global_2": "Calculating delivery for 58 Wilayas manually.",
+  "pain_global_2": "Calculating delivery for 69 Wilayas manually.",
   "sol_global_2": "**Automated shipping calculator** built into checkout.",
   "pain_global_3": "Losing track of available colors and sizes.",
   "sol_global_3": "Advanced **Variant Matrix** manages your stock automatically.",
@@ -1104,7 +1104,7 @@
   "feat_grow_2_t": "Promo Studio", "feat_grow_2_d": "Generate branded flyers for social media instantly.",
   "feat_grow_3_t": "Net Profit Analytics", "feat_grow_3_d": "Know exactly what you earned at the end of the day.",
 
-  "feat_log_1_t": "58 Wilayas Shipping", "feat_log_1_d": "Dynamic delivery fee calculation for national shipping.",
+  "feat_log_1_t": "69 Wilayas Shipping", "feat_log_1_d": "Dynamic delivery fee calculation for national shipping.",
   "feat_log_2_t": "Self-Delivery Mode", "feat_log_2_d": "Set custom radiuses for your own delivery boys.",
   "cat_sales_pos": "Point of Sale (POS)",
   "cat_inventory": "Stock & Inventory",
@@ -1132,14 +1132,14 @@
   "domain_grocery_desc": "For general grocery stores and local markets.",
 
   "global_b1": "Answering 'Price?' 100x/day in DMs",
-  "global_b2": "Calculating delivery for 58 Wilayas by hand",
+  "global_b2": "Calculating delivery for 69 Wilayas by hand",
   "global_b3": "Losing track of sizes and colors in stock",
   "global_a1_t": "Link-in-Bio store where customers order directly", "global_a1_f": "Storefront",
   "global_a2_t": "Automated shipping calculator in checkout", "global_a2_f": "Logistics",
   "global_a3_t": "Variant Matrix manages sizes and colors automatically", "global_a3_f": "Inventory",
   "global_f1_n": "Link-in-Bio Store", "global_f1_d": "One link for all your social media sales.",
   "global_f2_n": "Variant Matrix", "global_f2_d": "Track stock by size, color, and model.",
-  "global_f3_n": "58 Wilayas Shipping", "global_f3_d": "Automated delivery fees for Algeria.",
+  "global_f3_n": "69 Wilayas Shipping", "global_f3_d": "Automated delivery fees for Algeria.",
   "global_f4_n": "Net Profit Calc", "global_f4_d": "Real margins after product & shipping costs.",
   "global_f5_n": "Promo Studio", "global_f5_d": "Generate professional ad flyers in seconds.",
 
@@ -1186,7 +1186,7 @@
   "industry_grocery_hook": "Midnight inventory counts and expired product losses end here.",
   "industry_grocery_subhook": "An offline-first POS, a scanner with 4000+ DZ products, and smart expiration alerts.",
   "industry_global_hook": "Tired of answering 'Price?' 100 times a day in DMs?",
-  "industry_global_subhook": "Launch your Link-in-Bio store, let customers order directly, and automate 58-wilaya shipping.",
+  "industry_global_subhook": "Launch your Link-in-Bio store, let customers order directly, and automate 69-wilaya shipping.",
   
   "demo_title_food": "Watch how to change a price in 5 seconds ⏱️",
   "demo_title_grocery": "Watch how to scan products instantly ⏱️",
@@ -1229,7 +1229,7 @@
   
     "pod_studio_hero_badge": "Premium Blanks",
     "pod_studio_hero_title": "Create something that exists only once.",
-    "pod_studio_hero_desc": "Design premium custom apparel on heavy organic cotton blanks. Shipped to all 58 Wilayas across Algeria.",
+    "pod_studio_hero_desc": "Design premium custom apparel on heavy organic cotton blanks. Shipped to all 69 Wilayas across Algeria.",
     "pod_studio_scroll_down": "Explore",
     "pod_studio_transformation_title": "What Can You Create?",
     "pod_studio_transformation_subtitle": "Translate your visual ideas into physical collections.",
@@ -1342,7 +1342,7 @@
   "pod_studio_reviewed_notice": "Reviewed before production",
   "pod_studio_join_creators_btn": "Join as a Creator 🎨",
   "creator_collab_hero_title": "Monetize Your Art. Zero Manufacturing Friction.",
-  "creator_collab_hero_subtitle": "Publish your graphics on AURAS LAB blanks. Earn royalties on every sale across 58 Wilayas while we handle production, printing, and logistics.",
+  "creator_collab_hero_subtitle": "Publish your graphics on AURAS LAB blanks. Earn royalties on every sale across 69 Wilayas while we handle production, printing, and logistics.",
   "creator_collab_step1_title": "1. Apply",
   "creator_collab_step1_desc": "Submit your artistic alias and artwork samples.",
   "creator_collab_step2_title": "2. Quality Review",
@@ -1359,6 +1359,28 @@
   "editorial_showcase_title" : "AURASLAB X CREATORS",
   "pod_studio_billing_breakdown": "BILLING & FULFILLMENT",
   "pod_studio_btn_update_tray": "Update Design",
-  "pod_studio_btn_commit_tray": "Add to Collection"
-
+  "pod_studio_btn_commit_tray": "Add to Collection",
+  "aurasLab": {
+    "common": {
+      "enterStudio": "Enter Studio",
+      "createFit": "Create Your Fit"
+    },
+    "hero": {
+      "slide1": {
+        "tagline": "100% HEAVYWEIGHT COTTON",
+        "headline": "Wear Your Identity.<br/>Not a Logo.",
+        "subtext": "Premium street blanks engineered for total freedom. Wear them clean or print your own creations."
+      },
+      "slide2": {
+        "tagline": "ZERO BRAND TAX",
+        "headline": "Own the Blank.<br/>Create the Fit.",
+        "subtext": "Quality fabrics without paying inflated prices for someone else's logo. Your style, your terms."
+      }
+    },
+    "features": {
+      "quality": "Heavy Cotton Blanks",
+      "pricing": "Fair Direct Value",
+      "shipping": "69 Wilayas Delivery"
+    }
+  }
 }
