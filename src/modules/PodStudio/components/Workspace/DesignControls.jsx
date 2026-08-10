@@ -445,38 +445,48 @@ const DesignControls = ({
                 </div>
               </ArtworkInfo>
 
-              {!isArtistLocked && (
-                <ActionRow>
-                  <MiniActionButton
-                    type="button"
-                    title="Replace Artwork"
-                    onClick={() => replacementInputRef.current?.click()}
-                  >
-                    <FaCloudUploadAlt />
-                    <input
-                      type="file"
-                      ref={replacementInputRef}
-                      accept="image/png, image/jpeg, image/*"
-                      onChange={handleFileChange}
-                      style={{
-                        position: "absolute",
-                        width: "0.1px",
-                        height: "0.1px",
-                        opacity: 0,
-                        zIndex: -1,
-                      }}
-                    />
-                  </MiniActionButton>
-                  <MiniActionButton
-                    type="button"
-                    className="danger"
-                    title="Remove Artwork"
-                    onClick={handleReset}
-                  >
-                    <FaTrash />
-                  </MiniActionButton>
-                </ActionRow>
-              )}
+              <ActionRow>
+                
+              <MiniActionButton
+                type="button"
+                title="Replace Artwork"
+                onClick={() => replacementInputRef.current?.click()}
+              >
+                <FaCloudUploadAlt />
+                <input
+                  type="file"
+                  ref={replacementInputRef}
+                  accept="image/png, image/jpeg, image/*"
+                  onChange={handleFileChange}
+                  style={{
+                    position: "absolute",
+                    width: "0.1px",
+                    height: "0.1px",
+                    opacity: 0,
+                    zIndex: -1,
+                  }}
+                />
+              </MiniActionButton>
+              
+              {/* Add the Artist Catalog Button right next to it! */}
+              <MiniActionButton
+                type="button"
+                title="Artist Catalog"
+                onClick={() => onToggleArtistTab && onToggleArtistTab()}
+              >
+                <FaPalette style={{ color: "#39A170" }} />
+              </MiniActionButton>
+
+              <MiniActionButton
+                type="button"
+                className="danger"
+                title="Remove Artwork"
+                onClick={handleReset}
+              >
+                <FaTrash />
+              </MiniActionButton>
+            </ActionRow>
+
             </ArtworkManager>
           )}
 

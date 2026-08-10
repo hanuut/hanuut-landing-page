@@ -1,18 +1,18 @@
+// src/modules/PodStudio/components/storefront/sections/EditorialShowcase.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import PropTypes from "prop-types";
 import styled, { createGlobalStyle } from "styled-components";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaCheckCircle, FaTimes, FaPalette, FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { FaCheckCircle, FaTimes, FaPalette, FaPaintBrush } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../../../../components/Loader";
 import ArtistDesignProductModal from "../../Workspace/ArtistDesignProductModal";
 
 // ===========================================================================
-// GLOBALS & STYLES
+// STYLED COMPONENTS & DYNAMIC HEIGHT ENGINE
 // ===========================================================================
-
 const ModalBodyLock = createGlobalStyle`
   body {
     overflow: hidden !important;
@@ -22,15 +22,35 @@ const ModalBodyLock = createGlobalStyle`
 
 const ShowcaseSection = styled.section`
   width: 100%;
-  padding: 5rem 0;
   position: relative;
-  background-color: #050505;
+  background-color: #000000;
   box-sizing: border-box;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid #171717;
+  border-bottom: 1px solid #171717;
+  transition: all 0.5s ease-out;
+
+  /* 🔴 DYNAMIC SECTION HEIGHT CONSTRAINT */
+  ${(props) => {
+    if (props.$artistCount <= 4) {
+      return `
+        min-height: 35vh;
+        padding: 3rem 0;
+      `;
+    } else if (props.$artistCount <= 8) {
+      return `
+        min-height: 60vh;
+        padding: 5rem 0;
+      `;
+    } else {
+      return `
+        height: 100vh;
+        padding: 2rem 0;
+        overflow-y: auto;
+      `;
+    }
+  }}
 `;
 
 const HeaderRow = styled.div`
@@ -56,7 +76,7 @@ const SectionHeader = styled.div`
 const CategoryLabel = styled.span`
   font-family: monospace;
   font-size: 0.75rem;
-  color: ${(props) => props.theme.primaryColor || "#F07A48"};
+  color: #f07a48;
   letter-spacing: 2px;
   text-transform: uppercase;
   font-weight: 700;
@@ -74,7 +94,7 @@ const Title = styled.h2`
 const JoinCreatorBtn = styled.button`
   background: rgba(240, 122, 72, 0.1);
   border: 1px solid rgba(240, 122, 72, 0.3);
-  color: ${(props) => props.theme.primaryColor || "#F07A48"};
+  color: #f07a48;
   padding: 0.8rem 1.75rem;
   border-radius: 50px;
   font-weight: 800;
@@ -87,14 +107,14 @@ const JoinCreatorBtn = styled.button`
   font-family: "Tajawal", sans-serif;
 
   &:hover {
-    background: ${(props) => props.theme.primaryColor || "#F07A48"};
+    background: #f07a48;
     color: #050505;
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(240, 122, 72, 0.3);
   }
 `;
 
-// --- NEW COMPACT BENTO GRID FOR ARTISTS ---
+// --- ARTIST CARD REFINEMENTS ---
 const ArtistBentoGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -131,14 +151,20 @@ const ArtistCardWrapper = styled(motion.div)`
   }
 `;
 
-const FanningStage = styled.div`
+const FanningStage = styled(motion.div)`
   position: absolute;
   inset: 0;
-  bottom: 80px; /* Leave space for the text footer */
+  bottom: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  ${ArtistCardWrapper}:hover & {
+    opacity: 1;
+  }
 `;
 
 const CardArtwork = styled(motion.div)`
@@ -159,8 +185,40 @@ const CardArtwork = styled(motion.div)`
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
   }
+`;
+
+// 🔴 BASE STATE: Avatar & Details centered, pushes down on hover
+const BaseStateView = styled(motion.div)`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 2;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+
+  ${ArtistCardWrapper}:hover & {
+    transform: translateY(-20px);
+    opacity: 0;
+    pointer-events: none;
+  }
+`;
+
+const AvatarCircle = styled.div`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #f07a48;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 900;
+  box-shadow: 0 10px 25px rgba(240, 122, 72, 0.3);
 `;
 
 const ArtistCardFooter = styled(motion.div)`
@@ -170,7 +228,7 @@ const ArtistCardFooter = styled(motion.div)`
   right: 0;
   padding: 3rem 1.5rem 1.5rem 1.5rem;
   background: linear-gradient(to top, rgba(5, 5, 5, 1) 0%, rgba(5, 5, 5, 0.8) 50%, transparent 100%);
-  z-index: 2;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -202,8 +260,7 @@ const ArtistMetaPill = styled.span`
 `;
 
 const HoverCtaBtn = styled(motion.div)`
-  margin-top: 1rem;
-  background: ${(props) => props.theme.primaryColor || "#F07A48"};
+  background: #f07a48;
   color: #000;
   padding: 0.6rem 1.2rem;
   border-radius: 12px;
@@ -213,9 +270,10 @@ const HoverCtaBtn = styled(motion.div)`
   display: flex;
   align-items: center;
   gap: 8px;
+  overflow: hidden;
 `;
 
-// --- IMMERSIVE TAKEOVER MODAL ---
+// --- IMMERSIVE TAKEOVER MODAL & STICKY TABS ---
 const Overlay = styled(motion.div)`
   position: fixed;
   inset: 0;
@@ -258,7 +316,6 @@ const ModalHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   background: #111214;
   flex-shrink: 0;
 `;
@@ -278,13 +335,6 @@ const ModalHeaderInfo = styled.div`
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-
-  p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #a1a1aa;
-    font-family: "Cairo", sans-serif;
   }
 `;
 
@@ -308,13 +358,44 @@ const CloseBtn = styled.button`
   }
 `;
 
+// 🔴 STICKY CATEGORY TABS
+const StickyTabsBar = styled.div`
+  position: sticky;
+  top: 0;
+  background: rgba(11, 11, 13, 0.95);
+  backdrop-filter: blur(12px);
+  z-index: 10;
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-x: auto;
+
+  &::-webkit-scrollbar { display: none; }
+`;
+
+const TabButton = styled.button`
+  background: ${(props) => (props.$active ? "#f07a48" : "rgba(255,255,255,0.05)")};
+  color: ${(props) => (props.$active ? "#000" : "#a1a1aa")};
+  border: 1px solid ${(props) => (props.$active ? "#f07a48" : "rgba(255,255,255,0.1)")};
+  padding: 0.5rem 1.25rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-family: "Tajawal", sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+
+  &:hover {
+    color: ${(props) => (props.$active ? "#000" : "#fff")};
+    border-color: ${(props) => (props.$active ? "#f07a48" : "rgba(255,255,255,0.2)")};
+  }
+`;
+
 const ModalBody = styled.div`
   flex: 1;
   overflow-y: auto;
   padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
   box-sizing: border-box;
 
   &::-webkit-scrollbar { width: 6px; }
@@ -323,52 +404,21 @@ const ModalBody = styled.div`
   @media (max-width: 768px) { padding: 1.5rem; }
 `;
 
-const CollectionSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const CollectionTitleRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  
-  h4 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: white;
-    font-family: "Tajawal", sans-serif;
-  }
-
-  span {
-    background: rgba(240, 122, 72, 0.1);
-    color: #F07A48;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    font-family: monospace;
-  }
-`;
-
+// 🔴 BALANCED CSS GRID
 const DesignsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.25rem;
 
-  @media (max-width: 600px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
+  @media (max-width: 1024px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 640px) { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 `;
 
 const PureTextDesignCard = styled(motion.div)`
   position: relative;
-  background: #09090b;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
+  background: rgba(23, 23, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
@@ -378,44 +428,58 @@ const PureTextDesignCard = styled(motion.div)`
   box-sizing: border-box;
   cursor: pointer;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   transition: all 0.3s ease;
 
   img {
-    max-width: 75%;
-    max-height: 75%;
+    max-width: 70%;
+    max-height: 70%;
     object-fit: contain;
-    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
     transition: transform 0.4s ease;
   }
 
+  .hover-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-weight: 800;
+    color: #f07a48;
+    font-family: "Tajawal", sans-serif;
+  }
+
   &:hover {
-    border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
-    transform: translateY(-4px);
-    img { transform: scale(1.06); }
+    border-color: rgba(240, 122, 72, 0.5);
+    box-shadow: 0 0 20px rgba(240, 122, 72, 0.15);
+    transform: scale(1.02);
+    
+    .hover-overlay { opacity: 1; }
   }
 `;
 
 const DirectTextOverlay = styled.div`
   position: absolute;
-  bottom: 1rem;
-  left: 1.25rem;
-  right: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+  bottom: 0.75rem;
+  left: 1rem;
+  right: 1rem;
+  text-align: center;
   pointer-events: none;
+  z-index: 2;
 
   .art-title {
-    font-size: 0.85rem;
-    font-weight: 800;
-    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #a1a1aa;
     font-family: "Tajawal", sans-serif;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: block;
   }
 `;
 
@@ -436,41 +500,23 @@ const EmptyContainer = styled.div`
 // ===========================================================================
 // ANIMATION VARIANTS (THE FANNING EFFECT)
 // ===========================================================================
-
 const getFanVariants = (index, total) => {
-  // Default messy stacked state
   const initial = {
-    x: 0,
-    y: index * 4,
-    rotate: (index % 2 === 0 ? 1 : -1) * (index * 2.5),
-    scale: 1 - (index * 0.05),
-    zIndex: total - index
+    x: 0, y: index * 2, rotate: 0, scale: 0.9, zIndex: total - index
   };
 
-  // Fanned out elegant state on hover
   let hoverX = 0, hoverY = -15, hoverRot = 0;
-
-  if (total === 1) { 
-    hoverX = 0; hoverRot = 0; hoverY = -15; 
-  } else if (total === 2) {
-    if (index === 0) { hoverX = -35; hoverRot = -12; hoverY = 0; }
-    else { hoverX = 35; hoverRot = 12; hoverY = 0; }
+  if (total === 1) { hoverX = 0; hoverRot = 0; hoverY = -15; } 
+  else if (total === 2) {
+    if (index === 0) { hoverX = -35; hoverRot = -12; } else { hoverX = 35; hoverRot = 12; }
   } else {
-    if (index === 0) { hoverX = -55; hoverRot = -18; hoverY = 10; } // Left
-    else if (index === 1) { hoverX = 0; hoverRot = 0; hoverY = -25; } // Center High
-    else if (index === 2) { hoverX = 55; hoverRot = 18; hoverY = 10; } // Right
-    else { hoverX = (index % 2 === 0 ? 70 : -70); hoverRot = (index % 2 === 0 ? 25 : -25); hoverY = 30; } // Hidden backs
+    if (index === 0) { hoverX = -50; hoverRot = -15; hoverY = 10; } 
+    else if (index === 1) { hoverX = 0; hoverRot = 0; hoverY = -20; } 
+    else if (index === 2) { hoverX = 50; hoverRot = 15; hoverY = 10; } 
+    else { hoverX = (index % 2 === 0 ? 60 : -60); hoverRot = (index % 2 === 0 ? 20 : -20); hoverY = 20; }
   }
 
-  const hover = {
-    x: hoverX,
-    y: hoverY,
-    rotate: hoverRot,
-    scale: index === 1 && total > 2 ? 1.05 : 1, // Center pops out more
-    zIndex: total - index
-  };
-
-  return { initial, hover };
+  return { initial, hover: { x: hoverX, y: hoverY, rotate: hoverRot, scale: index === 1 ? 1 : 0.9, zIndex: total - index } };
 };
 
 // ===========================================================================
@@ -486,33 +532,19 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
   const [loading, setLoading] = useState(true);
   const [activeCreator, setActiveCreator] = useState(null);
   const [selectedArtistDesign, setSelectedArtistDesign] = useState(null);
+  const [activeTab, setActiveTab] = useState("All");
 
-  const API_URL = useMemo(() => {
-    return process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
-  }, []);
+  const API_URL = useMemo(() => process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com", []);
 
   useEffect(() => {
     let isMounted = true;
-    axios
-      .get(`${API_URL}/image/pod-designs/catalog`)
-      .then((res) => {
-        if (isMounted && res.data) {
-          setDesigns(res.data);
-        }
-      })
-      .catch((err) => {
-        console.warn("Failed to fetch pre-prepared designs:", err);
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
+    axios.get(`${API_URL}/image/pod-designs/catalog`)
+      .then((res) => { if (isMounted && res.data) setDesigns(res.data); })
+      .catch((err) => console.warn("Failed to fetch designs:", err))
+      .finally(() => { if (isMounted) setLoading(false); });
+    return () => { isMounted = false; };
   }, [API_URL]);
 
-  // Transform flat array into Artist -> Collections hierarchy
   const creators = useMemo(() => {
     const map = {};
     designs.forEach(design => {
@@ -521,14 +553,8 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
       const collectionName = meta.collectionName || "Studio Drop";
 
       if (!map[artistName]) {
-        map[artistName] = {
-          artistName,
-          totalDesigns: 0,
-          collections: {},
-          previewImages: [] // Cap at 3 for the fanning effect
-        };
+        map[artistName] = { artistName, totalDesigns: 0, collections: {}, previewImages: [] };
       }
-
       if (!map[artistName].collections[collectionName]) {
         map[artistName].collections[collectionName] = [];
       }
@@ -540,17 +566,19 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
         map[artistName].previewImages.push(design);
       }
     });
-
     return Object.values(map);
   }, [designs]);
 
-  if (loading) {
-    return <Loader fullscreen={false} />;
-  }
+  // Reset tab when modal opens
+  useEffect(() => {
+    if (activeCreator) setActiveTab("All");
+  }, [activeCreator]);
+
+  if (loading) return <Loader fullscreen={false} />;
 
   if (creators.length === 0) {
     return (
-      <ShowcaseSection>
+      <ShowcaseSection $artistCount={0}>
         <HeaderRow $isArabic={isArabic}>
           <SectionHeader>
             <CategoryLabel>{t("pod_studio_hero_badge", "CURATED LAB")}</CategoryLabel>
@@ -567,8 +595,20 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
     );
   }
 
+  // Generate Filtered Designs for the active modal
+  let displayedDesigns = [];
+  let collectionNames = [];
+  if (activeCreator) {
+    collectionNames = Object.keys(activeCreator.collections);
+    if (activeTab === "All") {
+      displayedDesigns = Object.values(activeCreator.collections).flat();
+    } else {
+      displayedDesigns = activeCreator.collections[activeTab] || [];
+    }
+  }
+
   return (
-    <ShowcaseSection className="editorial-showcase-section">
+    <ShowcaseSection className="editorial-showcase-section" $artistCount={creators.length}>
       <HeaderRow $isArabic={isArabic}>
         <SectionHeader>
           <CategoryLabel>{t("pod_studio_hero_badge", "PREMIUM BLANKS")}</CategoryLabel>
@@ -579,51 +619,47 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
         </JoinCreatorBtn>
       </HeaderRow>
 
-      {/* 🔴 THE COMPACT CREATOR BENTO GRID */}
       <ArtistBentoGrid>
-        {creators.map((creator, idx) => (
-          <ArtistCardWrapper
-            key={idx}
-            initial="initial"
-            whileHover="hover"
-            onClick={() => setActiveCreator(creator)}
-          >
-            <FanningStage>
-              {creator.previewImages.map((img, i) => {
-                const total = creator.previewImages.length;
-                return (
-                  <CardArtwork
-                    key={img._id || img.id}
-                    variants={getFanVariants(i, total)}
-                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  >
-                    <img src={`${API_URL}/image/raw/${img._id || img.id}`} alt="Artwork preview" />
-                  </CardArtwork>
-                );
-              })}
-            </FanningStage>
+        {creators.map((creator, idx) => {
+          const creatorKey = creator.artistName || `creator-${idx}`;
+          return (
+            <ArtistCardWrapper
+              key={creatorKey}
+              initial="initial"
+              whileHover="hover"
+              onClick={() => setActiveCreator(creator)}
+            >
+              <BaseStateView>
+                <AvatarCircle>{creator.artistName.charAt(0).toUpperCase()}</AvatarCircle>
+                <ArtistName>
+                  {creator.artistName}
+                  <FaCheckCircle color="#39A170" size={16} title="Verified Creator" />
+                </ArtistName>
+                <ArtistMetaPill>
+                  {Object.keys(creator.collections).length} {isArabic ? "تشكيلات" : "Collections"} • {creator.totalDesigns} {isArabic ? "تصاميم" : "Designs"}
+                </ArtistMetaPill>
+              </BaseStateView>
 
-            <ArtistCardFooter $isArabic={isArabic}>
-              <ArtistName>
-                {creator.artistName}
-                <FaCheckCircle color="#39A170" size={16} title="Verified Creator" />
-              </ArtistName>
-              <ArtistMetaPill>
-                {Object.keys(creator.collections).length} {isArabic ? "تشكيلات" : "Collections"} • {creator.totalDesigns} {isArabic ? "تصاميم" : "Designs"}
-              </ArtistMetaPill>
-              
-              <HoverCtaBtn
-                variants={{
-                  initial: { opacity: 0, y: 15, height: 0, marginTop: 0 },
-                  hover: { opacity: 1, y: 0, height: "auto", marginTop: "1rem" }
-                }}
-              >
-                <FaPalette /> {isArabic ? "استكشاف الفنان" : "View Creator"}
-              </HoverCtaBtn>
-            </ArtistCardFooter>
-          </ArtistCardWrapper>
-        ))}
+              <FanningStage>
+                {creator.previewImages.map((img, i) => {
+                  const total = creator.previewImages.length;
+                  const imgKey = img._id || img.id || `img-${i}`;
+                  return (
+                    <CardArtwork
+                      key={imgKey}
+                      variants={getFanVariants(i, total)}
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    >
+                      <img src={`${API_URL}/image/raw/${img._id || img.id}`} alt="Artwork preview" />
+                    </CardArtwork>
+                  );
+                })}
+              </FanningStage>
+            </ArtistCardWrapper>
+          );
+        })}
       </ArtistBentoGrid>
+
 
       {/* 🔴 IMMERSIVE CREATOR TAKEOVER MODAL */}
       <AnimatePresence>
@@ -631,10 +667,11 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
           <>
             <ModalBodyLock />
             <Overlay
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setActiveCreator(null)}
+               key="creator-takeover-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActiveCreator(null)}
             >
               <ModalContainer
                 $isArabic={isArabic}
@@ -650,49 +687,50 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
                       {activeCreator.artistName}
                       <FaCheckCircle color="#39A170" size={20} />
                     </h2>
-                    <p>
-                      {activeCreator.totalDesigns} {isArabic ? "تصميم متاح" : "Exclusive Designs"}
-                    </p>
                   </ModalHeaderInfo>
                   <CloseBtn onClick={() => setActiveCreator(null)}>
                     <FaTimes />
                   </CloseBtn>
                 </ModalHeader>
 
-                <ModalBody>
-                  {Object.entries(activeCreator.collections).map(([colName, items]) => (
-                    <CollectionSection key={colName}>
-                      <CollectionTitleRow>
-                        <h4>{colName}</h4>
-                        <span>{items.length} {isArabic ? "عناصر" : "Items"}</span>
-                      </CollectionTitleRow>
-                      
-                      <DesignsGrid>
-                        {items.map((design) => {
-                          const cleanTitle = (design.originalname || "").split(".")[0].replace(/[_-]/g, " ");
-                          return (
-                            <PureTextDesignCard
-                              key={design._id || design.id}
-                              onClick={() => {
-                                setSelectedArtistDesign(design);
-                                setActiveCreator(null); // Close profile, open product selector
-                              }}
-                              whileHover={{ scale: 1.03 }}
-                            >
-                              <img
-                                src={`${API_URL}/image/raw/${design._id || design.id}`}
-                                alt={cleanTitle}
-                                loading="lazy"
-                              />
-                              <DirectTextOverlay $isArabic={isArabic}>
-                                <span className="art-title">{cleanTitle}</span>
-                              </DirectTextOverlay>
-                            </PureTextDesignCard>
-                          );
-                        })}
-                      </DesignsGrid>
-                    </CollectionSection>
+                <StickyTabsBar>
+                  <TabButton $active={activeTab === "All"} onClick={() => setActiveTab("All")}>
+                    {isArabic ? "الكل" : "All"}
+                  </TabButton>
+                  {collectionNames.map(colName => (
+                    <TabButton key={colName} $active={activeTab === colName} onClick={() => setActiveTab(colName)}>
+                      {colName}
+                    </TabButton>
                   ))}
+                </StickyTabsBar>
+
+                <ModalBody>
+                  <DesignsGrid>
+                    {displayedDesigns.map((design) => {
+                      const cleanTitle = (design.originalname || "").split(".")[0].replace(/[_-]/g, " ");
+                      return (
+                        <PureTextDesignCard
+                          key={design._id || design.id}
+                          onClick={() => {
+                            setSelectedArtistDesign(design);
+                            setActiveCreator(null); 
+                          }}
+                        >
+                          <img
+                            src={`${API_URL}/image/raw/${design._id || design.id}`}
+                            alt={cleanTitle}
+                            loading="lazy"
+                          />
+                          <DirectTextOverlay $isArabic={isArabic}>
+                            <span className="art-title">{cleanTitle}</span>
+                          </DirectTextOverlay>
+                          <div className="hover-overlay">
+                             {isArabic ? "اختر التصميم" : "Select Design"}
+                          </div>
+                        </PureTextDesignCard>
+                      );
+                    })}
+                  </DesignsGrid>
                 </ModalBody>
               </ModalContainer>
             </Overlay>
@@ -700,7 +738,6 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
         )}
       </AnimatePresence>
 
-      {/* RE-USE EXISTING PRODUCT SELECTION MODAL ONCE A DESIGN IS CLICKED */}
       <ArtistDesignProductModal
         isOpen={!!selectedArtistDesign}
         onClose={() => setSelectedArtistDesign(null)}
