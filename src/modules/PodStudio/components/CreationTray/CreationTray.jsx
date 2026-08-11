@@ -1,3 +1,5 @@
+// src/modules/PodStudio/components/CreationTray/CreationTray.jsx
+
 import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
@@ -213,34 +215,36 @@ const CreationTray = ({
                     title: item.title,
                     sizeSelected: item.sizeSelected,
                     variantId: item.lineItemId,
-                    podCustomization: {
-                      printSide: item.customization.printSide,
-                      front: item.customization.front
-                        ? {
-                            x: item.customization.front.xOffsetPercent,
-                            y: item.customization.front.yOffsetPercent,
-                            width: item.customization.front.widthPercent,
-                            rotation: item.customization.front.rotation,
-                            templateUrl: item.customization.front.templateUrl,
-                            imageUrl: item.customization.front.artworkUrl,
-                          }
-                        : null,
-                      back: item.customization.back
-                        ? {
-                            x: item.customization.back.xOffsetPercent,
-                            y: item.customization.back.yOffsetPercent,
-                            width: item.customization.back.widthPercent,
-                            rotation: item.customization.back.rotation,
-                            templateUrl: item.customization.back.templateUrl,
-                            imageUrl: item.customization.back.artworkUrl,
-                          }
-                        : null,
-                    },
+                    podCustomization: item.customization
+                      ? {
+                          printSide: item.customization.printSide || "blank",
+                          front: item.customization.front
+                            ? {
+                                x: item.customization.front.xOffsetPercent,
+                                y: item.customization.front.yOffsetPercent,
+                                width: item.customization.front.widthPercent,
+                                rotation: item.customization.front.rotation,
+                                templateUrl: item.customization.front.templateUrl,
+                                imageUrl: item.customization.front.artworkUrl,
+                              }
+                            : null,
+                          back: item.customization.back
+                            ? {
+                                x: item.customization.back.xOffsetPercent,
+                                y: item.customization.back.yOffsetPercent,
+                                width: item.customization.back.widthPercent,
+                                rotation: item.customization.back.rotation,
+                                templateUrl: item.customization.back.templateUrl,
+                                imageUrl: item.customization.back.artworkUrl,
+                              }
+                            : null,
+                        }
+                      : null,
                   };
 
                   return (
                     <ItemRow key={item.lineItemId}>
-                      {item.customization && (
+                      {item.customization ? (
                         <PreviewsContainer>
                           {hasFront && (
                             <PodMockupPreview
@@ -273,7 +277,36 @@ const CreationTray = ({
                             />
                           )}
                         </PreviewsContainer>
+                      ) : (
+                        <div
+                          style={{
+                            width: "64px",
+                            height: "64px",
+                            borderRadius: "8px",
+                            background: "#18181b",
+                            border: "1px solid rgba(255, 255, 255, 0.1)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {item.thumbnailImageId ? (
+                            <img
+                              src={`https://api.hanuut.com/image/raw/${item.thumbnailImageId}`}
+                              alt=""
+                              style={{
+                                width: "90%",
+                                height: "90%",
+                                objectFit: "contain",
+                              }}
+                            />
+                          ) : (
+                            <span style={{ fontSize: "1.5rem" }}>👕</span>
+                          )}
+                        </div>
                       )}
+
                       <DetailsBlock>
                         <ItemTitle>{item.title}</ItemTitle>
                         <MetaText>
@@ -284,9 +317,11 @@ const CreationTray = ({
                         <PriceText>
                           Base: {item.baseCost} {t("dzd")}
                         </PriceText>
-                        <PriceText>
-                          Print: +{item.printCost} {t("dzd")}
-                        </PriceText>
+                        {item.printCost > 0 && (
+                          <PriceText>
+                            Print: +{item.printCost} {t("dzd")}
+                          </PriceText>
+                        )}
                       </DetailsBlock>
 
                       <div
@@ -296,9 +331,11 @@ const CreationTray = ({
                           gap: "0.25rem",
                         }}
                       >
-                        <ActionButton onClick={() => onEdit(item)}>
-                          <FaEdit />
-                        </ActionButton>
+                        {item.customization && (
+                          <ActionButton onClick={() => onEdit(item)}>
+                            <FaEdit />
+                          </ActionButton>
+                        )}
                         <ActionButton
                           $danger
                           onClick={() => handleDelete(item.lineItemId)}

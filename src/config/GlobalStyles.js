@@ -19,8 +19,8 @@ import TajawalLight from "../fonts/Tajawal-Light.ttf";
 import TajawalRegular from "../fonts/Tajawal-Regular.ttf";
 import TajawalMedium from "../fonts/Tajawal-Medium.ttf";
 import TajawalBold from "../fonts/Tajawal-Bold.ttf";
-import TajawalExtraBold from "../fonts/Tajawal-ExtraBold.ttf";
-import TajawalBlack from "../fonts/Tajawal-Black.ttf";
+import TajawalSemiBold from "../fonts/Tajawal-SemiBold.ttf";
+
 
 const GlobalStyles = createGlobalStyle`
   /* --- 2. DEFINE @FONT-FACE USING THE IMPORTED VARIABLES --- */
@@ -47,9 +47,8 @@ const GlobalStyles = createGlobalStyle`
   @font-face { font-family: 'Tajawal'; src: url(${TajawalLight}) format('truetype'); font-weight: 300; font-display: swap; }
   @font-face { font-family: 'Tajawal'; src: url(${TajawalRegular}) format('truetype'); font-weight: 400; font-display: swap; }
   @font-face { font-family: 'Tajawal'; src: url(${TajawalMedium}) format('truetype'); font-weight: 500; font-display: swap; }
+  @font-face { font-family: 'Tajawal'; src: url(${TajawalSemiBold}) format('truetype'); font-weight: 700; font-display: swap; }
   @font-face { font-family: 'Tajawal'; src: url(${TajawalBold}) format('truetype'); font-weight: 700; font-display: swap; }
-  @font-face { font-family: 'Tajawal'; src: url(${TajawalExtraBold}) format('truetype'); font-weight: 800; font-display: swap; }
-  @font-face { font-family: 'Tajawal'; src: url(${TajawalBlack}) format('truetype'); font-weight: 900; font-display: swap; }
 
   /* --- 3. DYNAMIC FONT ASSIGNMENT --- */
   :root {

@@ -1,5 +1,3 @@
-// src/modules/PodStudio/components/Workspace/PreviewStage.jsx
-
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
@@ -35,6 +33,12 @@ const StageOuter = styled.div`
   overflow: hidden;
   user-select: none;
   transition: background-color 0.4s ease, border-color 0.4s ease;
+
+  @media (max-width: 1024px) {
+    border-radius: 0;
+    border: none;
+    min-height: auto;
+  }
 `;
 
 const SolidColorBackground = styled.div`
@@ -50,12 +54,19 @@ const SolidColorBackground = styled.div`
 const StageFloatingControls = styled.div`
   position: absolute;
   top: 15px;
-  left: 15px;
+  right: 15px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   z-index: 100;
   flex-wrap: wrap;
+
+  @media (max-width: 1024px) {
+    top: auto;
+    bottom: 60px;
+    right: 15px;
+    flex-direction: column;
+  }
 `;
 
 const FloatingToggleBtn = styled.button`
@@ -103,20 +114,22 @@ const FloatingColorWheel = styled.div`
 
 const ZoomControls = styled.div`
   position: absolute;
-  right: 15px;
-  top: 40%;
-  transform: translateY(-50%);
+  left: 15px;
+  bottom: 15px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 50px;
-  padding: 8px 4px;
+  padding: 4px 10px;
   z-index: 100;
-  gap: 6px;
+  gap: 8px;
+
+  @media (max-width: 1024px) {
+    bottom: 60px;
+  }
 `;
 
 const ZoomBtn = styled.button`
@@ -415,14 +428,14 @@ const PreviewStage = ({
             $active={showGrid}
             onClick={() => setShowGrid(!showGrid)}
           >
-            <FaBorderAll /> {t("pod_studio_toggle_grid", "Show Alignment Grid")}
+            <FaBorderAll /> {t("pod_studio_toggle_grid", "Grid")}
           </FloatingToggleBtn>
           <FloatingToggleBtn
             type="button"
             $active={showSolidBg}
             onClick={() => setShowSolidBg(!showSolidBg)}
           >
-            <FaFillDrip /> {t("pod_studio_toggle_bg", "Custom Canvas Color")}
+            <FaFillDrip /> {t("pod_studio_toggle_bg", "Bg")}
           </FloatingToggleBtn>
 
           {showSolidBg && (

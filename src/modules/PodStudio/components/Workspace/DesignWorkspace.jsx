@@ -2,32 +2,347 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import PropTypes from "prop-types";
 import styled, { createGlobalStyle } from "styled-components";
 import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 import {
-  FaBookOpen,
   FaUndo,
   FaRedo,
   FaArrowsAlt,
   FaExpandAlt,
   FaSyncAlt,
   FaShoppingCart,
+  FaTimes,
+  FaTshirt,
+  FaPalette,
+  FaSlidersH,
   FaEye,
   FaEyeSlash,
+  FaBookOpen,
 } from "react-icons/fa";
+
+// Redux & State Imports (FIXED ESLINT ERRORS)
+import { selectCart, addToCart, updateCartQuantity, openCart, closeCart } from "../../../Cart/state/reducers";
+import { fetchPaginatedProducts, selectProducts, fetchProductById } from "../../../Product/state/reducers";
+import { createGlobalOrder } from "../../../Partners/services/orderServices";
+
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
+import { retrieveFile, persistFile } from "../../utils/indexedDbHelper";
+import { productToCanvasAdapter } from "../../adapters/productToCanvasAdapter";
+import { getGarmentDimensions, getTemplateConfig, getRawPrintCost, calculatePhysicalMetrics, calculateScaleFromPhysicalWidth } from "../../hooks/usePrintableArea";
+import { useDesignHistory } from "../../hooks/useDesignHistory";
+
 import PreviewStage from "./PreviewStage";
 import DesignControls from "./DesignControls";
 import ProductionSummary from "./ProductionSummary";
-import PartnerSizingWidget from "./PartnerSizingWidget";
-import { useDesignHistory } from "../../hooks/useDesignHistory";
-import { motion, AnimatePresence } from "framer-motion";
-import PrePreparedDesignsTab from "./PrePreparedDesignsTab";
 import CollapsibleSizingWidget from "./CollapsibleSizingWidget";
-import { retrieveFile } from "../../utils/indexedDbHelper";
+import PrePreparedDesignsTab from "./PrePreparedDesignsTab";
+import ArtistDesignProductModal from "./ArtistDesignProductModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MobilePageLock = createGlobalStyle`
   @media (max-width: 1024px) {
     body { overflow: hidden !important; position: fixed; width: 100%; height: 100%; }
+  }
+`;
+
+// ============================================================================
+// STYLED COMPONENTS (DESKTOP & RESPONSIVE STRUCTURE)
+// ============================================================================
+
+const InspectorContainer = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #111214;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
+
+  @media (max-width: 1024px) {
+    border: none;
+    background: transparent;
+    border-radius: 0;
+  }
+`;
+
+const ControlDrawer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1.25rem;
+  overflow: hidden;
+  height: 100%;
+
+  @media (max-width: 1024px) {
+    display: none; /* Desktop controls hidden on mobile */
+  }
+`;
+
+const CanvaDock = styled.div`
+  width: 72px;
+  height: 100%;
+  background: #09090b;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 0;
+  gap: 1.75rem;
+  flex-shrink: 0;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+`;
+
+const DockItem = styled.button`
+  background: transparent;
+  border: none;
+  width: 100%;
+  max-width: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: ${props => props.$active ? props.theme.primaryColor || "#F07A48" : "#a1a1aa"};
+  cursor: pointer;
+  font-family: "Tajawal", sans-serif;
+  transition: all 0.2s ease;
+  padding: 0;
+
+  &:hover {
+    color: ${props => props.$active ? props.theme.primaryColor || "#F07A48" : "white"};
+    transform: translateY(-2px);
+  }
+
+  svg {
+    font-size: 1.35rem;
+  }
+
+  span {
+    font-size: 11px;
+    font-weight: ${props => props.$active ? "700" : "400"};
+    text-align: center;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+`;
+
+const InlineHeaderRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.85rem;
+  flex-shrink: 0;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+`;
+
+const HeaderLeftGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: start;
+  
+  h2 {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #e4e4e7 !important;
+    margin: 0;
+  }
+  
+  span.sku {
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    color: #71717a !important;
+    font-family: monospace;
+  }
+`;
+
+const HeaderRightGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const TopCartButton = styled.button`
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  height: 42px;
+  border-radius: 50px;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: "Tajawal", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .badge {
+    background: #F07A48;
+    color: #000;
+    font-weight: 800;
+    border-radius: 20px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+  }
+`;
+
+const SideViewToggleGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+`;
+
+const CompactViewBtn = styled.button`
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: ${props => props.$active ? "rgba(240, 122, 72, 0.12)" : "rgba(255,255,255,0.03)"};
+  border: 1px solid ${props => props.$active ? props.theme.primaryColor || "#F07A48" : "rgba(255,255,255,0.08)"};
+  color: ${props => props.$active ? props.theme.primaryColor || "#F07A48" : "#a1a1aa"};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: ${props => props.theme.primaryColor || "#F07A48"};
+  }
+`;
+
+const MiniOverlayThumbnail = styled.img`
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  bottom: -2px;
+  right: -2px;
+  background: #111214;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+`;
+
+const ShirtIcon = ({ side }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.38 3.46L16 1.7a2 2 0 0 0-1.42 0l-1.92.77a2 2 0 0 1-1.32 0l-1.92-.77a2 2 0 0 0-1.42 0L3.62 3.46a2 2 0 0 0-1.24 1.84v4.54a2 2 0 0 0 1.24 1.84L6 12.6V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.4l2.38-1a2 2 0 0 0 1.24-1.84V5.3a2 2 0 0 0-1.24-1.84z" />
+    {side === 'back' && <path d="M12 4v4M10 5h4" />}
+  </svg>
+);
+
+const LightboxOverlay = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+`;
+
+const LibraryModalCard = styled(motion.div)`
+  width: 100%;
+  max-width: 900px;
+  height: 85vh;
+  background: #0b0b0d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 50px 100px rgba(0, 0, 0, 0.95);
+  color: white;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+
+  @media (max-width: 768px) {
+    border-radius: 24px 24px 0 0;
+    height: 92vh;
+  }
+`;
+
+const LibraryModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: #111214;
+  flex-shrink: 0;
+
+  h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-family: "Tajawal", sans-serif;
+  }
+`;
+
+const LibraryModalBody = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 10px; }
+`;
+
+const CloseBtn = styled.button`
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #a1a1aa;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+  &:hover { background: rgba(255, 255, 255, 0.12); color: white; }
+`;
+
+const ScrollableInspector = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-right: 8px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
   }
 `;
 
@@ -40,20 +355,21 @@ const WorkspaceWrapper = styled.div`
   max-height: 900px;
 
   @media (max-width: 1024px) {
-    /* 🔴 MOBILE-FIRST 100DVH IMPLEMENTATION */
-    height: calc(100dvh - 60px); 
-    min-height: calc(100dvh - 60px);
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
   }
 `;
 
-/* 🔴 NEW 70/30 SPLIT LAYOUT */
-const WorkspaceGrid = styled.div`
+ const WorkspaceGrid = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
+  grid-template-columns: minmax(0, 1fr) 420px;
   gap: 2rem;
   width: 100%;
   height: 100%;
   align-items: stretch;
+  overflow: hidden;
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
@@ -74,39 +390,11 @@ const StageArea = styled.div`
   position: relative;
 
   @media (max-width: 1024px) {
-    /* Stage dominates the mobile screen */
-    height: calc(100dvh - 180px); 
+    height: calc(100dvh - 80px);
     flex-shrink: 0;
     padding: 0;
-    border-radius: 12px;
+    border-radius: 0;
   }
-`;
-
-const ControlPanel = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  height: 100%;
-  overflow-y: auto;
-  padding-right: 8px;
-
-  &::-webkit-scrollbar { width: 6px; }
-  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
-
-  @media (max-width: 1024px) {
-    display: none; /* Handled by mobile dock */
-  }
-`;
-
-const ProductHeaderGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 1rem;
-
-  h2 { font-size: 1.6rem; font-weight: 800; color: white; margin: 0; font-family: "Tajawal", sans-serif; }
-  .sku { font-family: monospace; color: #F07A48; font-weight: 700; font-size: 0.85rem; letter-spacing: 1px; }
 `;
 
 const OptionRow = styled.div`
@@ -123,8 +411,8 @@ const OptionSection = styled.div`
 
 const SectionLabel = styled.span`
   font-size: 0.75rem;
-  color: #71717a;
-  font-weight: 800;
+  color: #a1a1aa;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-family: "Tajawal", sans-serif;
@@ -142,14 +430,23 @@ const SizePill = styled.button`
   padding: 0.35rem 0.85rem;
   border-radius: 8px;
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: ${(props) => props.$active ? "700" : "500"};
   cursor: pointer;
   transition: all 0.2s;
-  background: ${(props) => props.$active ? "#ffffff" : "rgba(255, 255, 255, 0.03)"};
-  border: 1px solid ${(props) => props.$active ? props.theme.primaryColor || "#F07A48" : "rgba(255, 255, 255, 0.1)"};
-  color: ${(props) => (props.$active ? "#000000" : "#d4d4d8")};
+  background: ${(props) =>
+    props.$active ? "#ffffff" : "rgba(255, 255, 255, 0.03)"};
+  border: 1px solid
+    ${(props) =>
+      props.$active
+        ? props.theme.primaryColor || "#F07A48"
+        : "rgba(255, 255, 255, 0.1)"};
+  color: ${(props) => (props.$active ? "#000000" : "#a1a1aa")};
 
-  &:hover { background: ${(props) => props.$active ? "#ffffff" : "rgba(255, 255, 255, 0.08)"}; }
+  &:hover {
+    background: ${(props) =>
+      props.$active ? "#ffffff" : "rgba(255, 255, 255, 0.08)"};
+    color: ${(props) => (props.$active ? "#000000" : "#ffffff")};
+  }
 `;
 
 const ColorSwatch = styled.button`
@@ -159,148 +456,233 @@ const ColorSwatch = styled.button`
   cursor: pointer;
   transition: all 0.2s;
   background-color: ${(props) => props.$hex};
-  border: 2px solid ${(props) => (props.$active ? "#ffffff" : "rgba(0,0,0,0.4)")};
-  box-shadow: ${(props) => props.$active ? `0 0 10px ${props.theme.primaryColor || "#F07A48"}` : "none"};
+  border: 2px solid
+    ${(props) => (props.$active ? "#ffffff" : "rgba(0,0,0,0.4)")};
+  box-shadow: ${(props) =>
+    props.$active
+      ? `0 0 10px ${props.theme.primaryColor || "#F07A48"}`
+      : "none"};
 
-  &:hover { transform: scale(1.1); }
-`;
-
-const ActionToolbar = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-`;
-
-const ToolbarBtn = styled.button`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: "Tajawal", sans-serif;
-  transition: all 0.2s;
-
-  &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #f07a48;
-    color: #f07a48;
-  }
-
-  &:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+  &:hover {
+    transform: scale(1.1);
   }
 `;
 
-const SegmentedSideControl = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 0.5rem;
-`;
+// ============================================================================
+// MOBILE-SPECIFIC STYLED COMPONENTS
+// ============================================================================
 
-const SideBtn = styled.button`
-  background: ${(props) => props.$active ? "rgba(255, 255, 255, 0.1)" : "transparent"};
-  color: ${(props) => props.$active ? "#ffffff" : "#a1a1aa"};
-  border: 1px solid ${(props) => props.$active ? props.theme.primaryColor || "#F07A48" : "transparent"};
-  padding: 0.6rem;
-  border-radius: 8px;
-  font-weight: 800;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: "Tajawal", sans-serif;
-`;
-
-const MobileBottomDock = styled.div`
+const MobileHeaderOverlay = styled.div`
   display: none;
   @media (max-width: 1024px) {
-    display: flex; position: fixed; bottom: 0; left: 0; right: 0; 
-    height: 60px; /* Safe touch area */
-    background: rgba(18, 18, 20, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 1000;
-    justify-content: space-around; align-items: center; 
-    padding-bottom: env(safe-area-inset-bottom);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    z-index: 100;
+    pointer-events: none;
   }
 `;
 
-const DockTab = styled.button`
-  background: transparent; border: none; color: ${(props) => (props.$active ? "#F07A48" : "#a1a1aa")};
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; 
-  font-size: 0.65rem; font-weight: 700; font-family: "Tajawal", sans-serif; cursor: pointer; 
-  transition: color 0.2s ease;
-  min-height: 44px; /* 🔴 APPLE HIG 44px TOUCH TARGET */
-  min-width: 44px;
-  svg { font-size: 1.25rem; }
+const MobileHeaderContent = styled.div`
+  pointer-events: auto;
+  text-align: start;
+  h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #e4e4e7;
+    margin: 0;
+    font-family: "Tajawal", sans-serif;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+  }
+  span {
+    font-size: 10px;
+    font-family: monospace;
+    color: #d4d4d8;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    font-weight: 500;
+  }
+`;
+
+const HeaderCircleBtn = styled.button`
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 42px;
+  width: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s;
+  pointer-events: auto;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+`;
+
+const CartBadge = styled.span`
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #F07A48;
+  color: #000;
+  font-size: 10px;
+  font-weight: 800;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #0c0c0e;
+`;
+
+const FloatingToolbar = styled.div`
+  display: none;
+  @media (max-width: 1024px) {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    background: #09090b;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 10px 0;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+  }
+`;
+
+const ToolIconButton = styled.button`
+  background: ${(props) => (props.$active ? "rgba(240, 122, 72, 0.15)" : "transparent")};
+  color: ${(props) => (props.$active ? props.theme.primaryColor || "#F07A48" : "#a1a1aa")};
+  border: 1px solid ${(props) => (props.$active ? props.theme.primaryColor || "#F07A48" : "transparent")};
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  &:hover {
+    color: white;
+  }
 `;
 
 const MobileToolPanel = styled(motion.div)`
   display: none;
   @media (max-width: 1024px) {
-    display: flex; flex-direction: column; position: fixed; 
-    bottom: calc(125px + env(safe-area-inset-bottom)); 
-    left: 10px; right: 10px; max-height: 40%;
-    background: rgba(18, 18, 20, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; 
+    display: flex;
+    flex-direction: column;
+    position: absolute; /* Using absolute inside WorkspaceWrapper */
+    bottom: calc(75px + env(safe-area-inset-bottom));
+    left: 12px;
+    right: 12px;
+    height: auto;
+    max-height: 45vh; 
+    background: rgba(17, 18, 20, 0.95);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
     z-index: 980;
-    padding: 1rem;
-    box-sizing: border-box; overflow-y: auto; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    padding: 1.25rem 1rem;
+    box-sizing: border-box;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    overflow-y: auto;
     &::-webkit-scrollbar { display: none; }
   }
 `;
 
-const MobileFloatingPurchaseCTA = styled(motion.button)`
+const MobileSummaryBox = styled(motion.div)`
   display: none;
   @media (max-width: 1024px) {
-    display: flex; position: fixed; 
-    bottom: calc(75px + env(safe-area-inset-bottom)); 
-    left: 16px; right: 16px; 
-    min-height: 48px; /* 🔴 Premium Touch Target */
-    background: ${(props) => props.theme.primaryColor || "#F07A48"}; color: #050505; border: none;
-    border-radius: 16px; font-weight: 800; font-size: 1.05rem; align-items: center; justify-content: center;
-    gap: 8px; z-index: 990; 
-    box-shadow: 0 8px 25px rgba(240, 122, 72, 0.4);
-    cursor: pointer; font-family: "Tajawal", sans-serif;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    bottom: calc(75px + env(safe-area-inset-bottom));
+    left: 12px;
+    right: 12px;
+    background: rgba(15, 15, 18, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 1rem;
+    z-index: 100;
+    pointer-events: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
   }
 `;
 
-const SwitchTrack = styled.div`
-  width: 66px; height: 30px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 15px; position: relative; display: flex; align-items: center; padding: 2px; box-sizing: border-box;
-  cursor: pointer; pointer-events: auto !important;
+const PriceRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: #a1a1aa;
+  font-family: "Cairo", sans-serif;
+  
+  &.total {
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-top: 0.5rem;
+    margin-bottom: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: ${(props) => props.theme.primaryColor || "#F07A48"};
+  }
 `;
 
-const SwitchThumb = styled(motion.div)`
-  width: 24px; height: 24px; border-radius: 50%; background: ${(props) => props.$active ? "#39A170" : props.theme.primaryColor || "#F07A48"};
-  display: flex; align-items: center; justify-content: center; color: #050505; font-size: 0.8rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); cursor: grab; &:active { cursor: grabbing; }
-`;
-
-const SubStageCTA = styled(motion.button)`
+const MobileFloatingPurchaseCTA = styled.button`
   display: none;
   @media (max-width: 1024px) {
-    display: flex; width: calc(100% - 24px); margin: 10px auto; height: 44px;
-    background: ${(props) => props.theme.primaryColor || "#F07A48"}; color: #050505; border: none;
-    border-radius: 22px; font-weight: 800; align-items: center; justify-content: center; gap: 8px;
-    box-shadow: 0 6px 20px rgba(240, 122, 72, 0.35); font-family: "Tajawal", sans-serif; z-index: 1002; cursor: pointer;
+    display: flex;
+    width: 100%;
+    margin-top: 1rem;
+    min-height: 48px; 
+    background: ${(props) => props.theme.primaryColor || "#F07A48"};
+    color: #050505;
+    border: none;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 1.05rem;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    font-family: "Tajawal", sans-serif;
   }
 `;
 
 const COLOR_MAP = {
-  black: "#000000", noir: "#000000", white: "#FFFFFF", blanc: "#FFFFFF", red: "#EF4444", blue: "#3B82F6", green: "#10B981", grey: "#6B7280",
+  black: "#000000",
+  noir: "#000000",
+  white: "#FFFFFF",
+  blanc: "#FFFFFF",
+  red: "#EF4444",
+  blue: "#3B82F6",
+  green: "#10B981",
+  grey: "#6B7280",
 };
 
 const getDisplayColorHex = (colorName) => {
-  const normalized = String(colorName || "").trim().toLowerCase();
+  const normalized = String(colorName || "")
+    .trim()
+    .toLowerCase();
   return COLOR_MAP[normalized] || colorName;
 };
 
@@ -315,16 +697,66 @@ const DesignWorkspace = ({
   editingCartItem,
   onCommitSuccess,
 }) => {
-  const { t, i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const dispatch = useDispatch();
   const isArabic = i18n.language === "ar";
+
+  const { cart } = useSelector(selectCart);
+  
+  const shopCartItems = useMemo(() => {
+    if (!shopId) return [];
+    return cart.filter((item) => item.shopId === shopId);
+  }, [cart, shopId]);
+
+  const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
+  const [activePanel, setActivePanel] = useState("variants"); // Desktop
+  const [activeMobilePanel, setActiveMobilePanel] = useState(null); // Mobile
+
+  const toggleMobilePanel = (panel) => {
+    setActiveMobilePanel((prev) => (prev === panel ? null : panel));
+  };
+
+  // SWAPS ARTWORK DIRECTLY ON THE ACTIVE CANVAS IN STATE
+  const handleSwapArtworkFromLibrary = (
+    canvasObj,
+    artistDesign,
+    preferredSide = "front",
+  ) => {
+    setIsDesignLibraryOpen(false);
+    if (!artistDesign) return;
+
+    const imgUrl = `https://api.hanuut.com/image/raw/${artistDesign._id || artistDesign.id}`;
+    const meta = artistDesign.podDesignMetadata || {};
+
+    const newDesignState = {
+      file: "library_design",
+      previewUrl: imgUrl,
+      scale: meta.defaultPlacement?.scale || 55,
+      x: meta.defaultPlacement?.x || 50,
+      y: meta.defaultPlacement?.y || 35,
+      rotation: meta.defaultPlacement?.rotation || 0,
+    };
+
+    if (preferredSide === "back") {
+      setActiveSide("back");
+      setBackDesign(newDesignState);
+    } else {
+      setActiveSide("front");
+      setFrontDesign(newDesignState);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const [selectedColor, setSelectedColor] = useState(canvas.availableColors[0]?.colorName || "");
-  const [selectedSize, setSelectedSize] = useState(canvas.sizes[0]?.sizeCode || "");
-  
+  const [selectedColor, setSelectedColor] = useState(
+    canvas.availableColors[0]?.colorName || "",
+  );
+  const [selectedSize, setSelectedSize] = useState(
+    canvas.sizes[0]?.sizeCode || "",
+  );
+
   const artistDesign = canvas.initialArtistDesign;
   const isArtistLocked = !!artistDesign;
   const preferredSide = artistDesign?.preferredSide || "front";
@@ -335,49 +767,77 @@ const DesignWorkspace = ({
   const [showGrid, setShowGrid] = useState(false);
   const [showSolidBg, setShowSolidBg] = useState(false);
   const [solidBgColor, setSolidBgColor] = useState("#FFFFFF");
-  const [uiOpacity, setUiOpacity] = useState(1);
-  const [isLockedToZero, setIsLockedToZero] = useState(false);
 
-  const [frontDesign, setFrontDesign, undoFront, redoFront, canUndoFront, canRedoFront, resetFront] =
-    useDesignHistory({
-      file: (isArtistLocked && preferredSide === "front") ? "artist_locked" : null,
-      previewUrl: (artistDesign && preferredSide === "front") ? artistDesign.front?.imageUrl : null,
-      x: preferredSide === "front" ? (artistDesign?.front?.x ?? 50) : 50,
-      y: preferredSide === "front" ? (artistDesign?.front?.y ?? 35) : 50,
-      scale: preferredSide === "front" ? (artistDesign?.front?.width ?? 55) : 50,
-      rotation: preferredSide === "front" ? (artistDesign?.front?.rotation ?? 0) : 0,
-    });
+  const [
+    frontDesign,
+    setFrontDesign,
+    undoFront,
+    redoFront,
+    canUndoFront,
+    canRedoFront,
+    resetFront,
+  ] = useDesignHistory({
+    file: isArtistLocked && preferredSide === "front" ? "artist_locked" : null,
+    previewUrl:
+      artistDesign && preferredSide === "front"
+        ? artistDesign.front?.imageUrl
+        : null,
+    x: preferredSide === "front" ? (artistDesign?.front?.x ?? 50) : 50,
+    y: preferredSide === "front" ? (artistDesign?.front?.y ?? 35) : 50,
+    scale: preferredSide === "front" ? (artistDesign?.front?.width ?? 55) : 50,
+    rotation:
+      preferredSide === "front" ? (artistDesign?.front?.rotation ?? 0) : 0,
+  });
 
-  const [backDesign, setBackDesign, undoBack, redoBack, canUndoBack, canRedoBack, resetBack] =
-    useDesignHistory({
-      file: (isArtistLocked && preferredSide === "back") ? "artist_locked" : null,
-      previewUrl: (artistDesign && preferredSide === "back") ? artistDesign.back?.imageUrl : null,
-      x: preferredSide === "back" ? (artistDesign?.back?.x ?? 50) : 50,
-      y: preferredSide === "back" ? (artistDesign?.back?.y ?? 35) : 50,
-      scale: preferredSide === "back" ? (artistDesign?.back?.width ?? 55) : 50,
-      rotation: preferredSide === "back" ? (artistDesign?.back?.rotation ?? 0) : 0,
-    });
+  const [
+    backDesign,
+    setBackDesign,
+    undoBack,
+    redoBack,
+    canUndoBack,
+    canRedoBack,
+    resetBack,
+  ] = useDesignHistory({
+    file: isArtistLocked && preferredSide === "back" ? "artist_locked" : null,
+    previewUrl:
+      artistDesign && preferredSide === "back"
+        ? artistDesign.back?.imageUrl
+        : null,
+    x: preferredSide === "back" ? (artistDesign?.back?.x ?? 50) : 50,
+    y: preferredSide === "back" ? (artistDesign?.back?.y ?? 35) : 50,
+    scale: preferredSide === "back" ? (artistDesign?.back?.width ?? 55) : 50,
+    rotation:
+      preferredSide === "back" ? (artistDesign?.back?.rotation ?? 0) : 0,
+  });
 
   // Hydrates the entire studio state perfectly from the editing payload
   useEffect(() => {
     let isMounted = true;
     if (editingCartItem) {
-      const custom = editingCartItem.podCustomization || editingCartItem.customization;
+      const custom =
+        editingCartItem.podCustomization || editingCartItem.customization;
       if (!custom) return;
 
       const loadSavedDesign = async () => {
-        const stableId = editingCartItem.variantId || editingCartItem.lineItemId;
-        
-        let frontUrl = custom.front?.imageUrl || custom.front?.artworkUrl || custom.front?.originalImageUrl;
-        let backUrl = custom.back?.imageUrl || custom.back?.artworkUrl || custom.back?.originalImageUrl;
-        
+        const stableId =
+          editingCartItem.variantId || editingCartItem.lineItemId;
+
+        let frontUrl =
+          custom.front?.imageUrl ||
+          custom.front?.artworkUrl ||
+          custom.front?.originalImageUrl;
+        let backUrl =
+          custom.back?.imageUrl ||
+          custom.back?.artworkUrl ||
+          custom.back?.originalImageUrl;
+
         if (frontUrl?.startsWith("blob:") && stableId) {
-           const blob = await retrieveFile(`${stableId}_front`);
-           if (blob && isMounted) frontUrl = URL.createObjectURL(blob);
+          const blob = await retrieveFile(`${stableId}_front`);
+          if (blob && isMounted) frontUrl = URL.createObjectURL(blob);
         }
         if (backUrl?.startsWith("blob:") && stableId) {
-           const blob = await retrieveFile(`${stableId}_back`);
-           if (blob && isMounted) backUrl = URL.createObjectURL(blob);
+          const blob = await retrieveFile(`${stableId}_back`);
+          if (blob && isMounted) backUrl = URL.createObjectURL(blob);
         }
 
         if (isMounted) {
@@ -388,7 +848,7 @@ const DesignWorkspace = ({
               x: custom.front.x ?? custom.front.xOffsetPercent ?? 50,
               y: custom.front.y ?? custom.front.yOffsetPercent ?? 35,
               scale: custom.front.width ?? custom.front.widthPercent ?? 55,
-              rotation: custom.front.rotation ?? 0
+              rotation: custom.front.rotation ?? 0,
             });
           }
           if (custom.back) {
@@ -398,17 +858,21 @@ const DesignWorkspace = ({
               x: custom.back.x ?? custom.back.xOffsetPercent ?? 50,
               y: custom.back.y ?? custom.back.yOffsetPercent ?? 35,
               scale: custom.back.width ?? custom.back.widthPercent ?? 55,
-              rotation: custom.back.rotation ?? 0
+              rotation: custom.back.rotation ?? 0,
             });
           }
 
           if (editingCartItem.color || editingCartItem.colorSelected) {
-            setSelectedColor(editingCartItem.color || editingCartItem.colorSelected);
+            setSelectedColor(
+              editingCartItem.color || editingCartItem.colorSelected,
+            );
           }
           if (editingCartItem.size || editingCartItem.sizeSelected) {
-            setSelectedSize(editingCartItem.size || editingCartItem.sizeSelected);
+            setSelectedSize(
+              editingCartItem.size || editingCartItem.sizeSelected,
+            );
           }
-          
+
           if (custom.printSide === "back" || (!custom.front && custom.back)) {
             setActiveSide("back");
           } else {
@@ -421,16 +885,43 @@ const DesignWorkspace = ({
   }, [editingCartItem, resetFront, resetBack]);
 
   const activeDesignState = activeSide === "back" ? backDesign : frontDesign;
-  const setActiveDesignState = activeSide === "back" ? setBackDesign : setFrontDesign;
+  const setActiveDesignState =
+    activeSide === "back" ? setBackDesign : setFrontDesign;
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable) return;
+      if (
+        e.target.tagName === "INPUT" ||
+        e.target.tagName === "TEXTAREA" ||
+        e.target.isContentEditable
+      )
+        return;
       const step = e.shiftKey ? 5 : 1;
-      if (e.key === "ArrowLeft") { e.preventDefault(); setActiveDesignState((prev) => ({ ...prev, x: Math.max(0, prev.x - step) })); }
-      else if (e.key === "ArrowRight") { e.preventDefault(); setActiveDesignState((prev) => ({ ...prev, x: Math.min(100, prev.x + step) })); }
-      else if (e.key === "ArrowUp") { e.preventDefault(); setActiveDesignState((prev) => ({ ...prev, y: Math.max(0, prev.y - step) })); }
-      else if (e.key === "ArrowDown") { e.preventDefault(); setActiveDesignState((prev) => ({ ...prev, y: Math.min(100, prev.y + step) })); }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setActiveDesignState((prev) => ({
+          ...prev,
+          x: Math.max(0, prev.x - step),
+        }));
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        setActiveDesignState((prev) => ({
+          ...prev,
+          x: Math.min(100, prev.x + step),
+        }));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveDesignState((prev) => ({
+          ...prev,
+          y: Math.max(0, prev.y - step),
+        }));
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveDesignState((prev) => ({
+          ...prev,
+          y: Math.min(100, prev.y + step),
+        }));
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -439,7 +930,9 @@ const DesignWorkspace = ({
   const activeColorObj = useMemo(() => {
     if (!canvas?.availableColors || !selectedColor) return null;
     const target = String(selectedColor).trim().toLowerCase();
-    return canvas.availableColors.find((c) => String(c.colorName).trim().toLowerCase() === target);
+    return canvas.availableColors.find(
+      (c) => String(c.colorName).trim().toLowerCase() === target,
+    );
   }, [canvas, selectedColor]);
 
   const activeTemplateId = useMemo(() => {
@@ -458,34 +951,188 @@ const DesignWorkspace = ({
     } else {
       setTemplateUrl(null);
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [activeTemplateId]);
 
-  const handleDragEnd = (event, info) => {
-    if (isLockedToZero) return;
-    const threshold = isArabic ? -12 : 12;
-    const offset = info.offset.x;
-    if ((isArabic && offset < threshold) || (!isArabic && offset > threshold)) {
-      setIsLockedToZero(true);
-      setUiOpacity(0);
+  const DOCK_ITEMS = [
+    { id: "variants", label: isArabic ? "الألوان والمقاسات" : "Colors & Sizes", icon: <FaTshirt />, tooltip: isArabic ? "تغيير اللون والمقاس" : "Change Color & Size" },
+    { id: "layer", label: isArabic ? "التصميم والطبقات" : "Artwork & Layers", icon: <FaPalette />, tooltip: isArabic ? "إدارة تصميمك والطبقات" : "Manage Artwork Layers" },
+    { id: "transform", label: isArabic ? "التعديل والموقع" : "Transform & Align", icon: <FaSlidersH />, tooltip: isArabic ? "ضبط الحجم والدوران" : "Scale, Rotate & Align" },
+    { id: "collections", label: isArabic ? "مكتبة التصاميم" : "Art Library", icon: <FaBookOpen />, tooltip: isArabic ? "تصفح تصاميم الفنانين" : "Browse Creator Designs" },
+  ];
+
+  const MOBILE_DOCK_ITEMS = [
+    { id: "variants", label: isArabic ? "الألوان" : "Colors", icon: <FaTshirt /> },
+    { id: "layer", label: isArabic ? "التصميم" : "Design", icon: <FaPalette /> },
+    { id: "scale", label: isArabic ? "الحجم" : "Scale", icon: <FaExpandAlt /> },
+    { id: "position", label: isArabic ? "الموقع" : "Position", icon: <FaArrowsAlt /> },
+    { id: "rotation", label: isArabic ? "الدوران" : "Rotate", icon: <FaSyncAlt /> },
+  ];
+
+  const handleDockClick = (id) => {
+    if (id === "collections") {
+      setIsDesignLibraryOpen(true);
     } else {
-      setUiOpacity(1);
+      setActivePanel(id);
     }
   };
-
-  const handleSwitchClick = () => {
-    if (isLockedToZero) { setIsLockedToZero(false); setUiOpacity(1); }
+  
+  const handleMobileDockClick = (id) => {
+    setActiveMobilePanel((prev) => (prev === id ? null : id));
   };
 
-  const computedOpacity = isLockedToZero ? 0 : uiOpacity;
-  const isCurrentSideLocked = isArtistLocked && preferredSide === activeSide;
+  const frontDesignThumbnail = useMemo(() => frontDesign?.previewUrl || null, [frontDesign]);
+  const backDesignThumbnail = useMemo(() => backDesign?.previewUrl || null, [backDesign]);
+
+  // LIVE PRICING CALCULATION FOR MOBILE OVERLAY
+  const baseApparelCost = useMemo(() => {
+    const matchedSize = canvas.sizes?.find((s) => s.sizeCode === selectedSize);
+    return matchedSize ? matchedSize.baseCost : 0;
+  }, [canvas, selectedSize]);
+
+  const garmentDims = useMemo(
+    () => getGarmentDimensions(canvas.title, selectedSize, canvas.sizeChart),
+    [canvas.title, selectedSize, canvas.sizeChart]
+  );
+  
+  const cfg = useMemo(() => getTemplateConfig(canvas.title), [canvas.title]);
+  const printWidthRatio = cfg.printW_ref / cfg.B_ref;
+
+  const frontPrintCost = useMemo(() => {
+    if (!frontDesign.previewUrl) return 0;
+    const maxPrintWidthCm = garmentDims.B * printWidthRatio;
+    const wCm = (frontDesign.scale / 100) * maxPrintWidthCm;
+    const hCm = wCm / (frontDesign.aspectRatio || 1);
+    return getRawPrintCost(wCm, hCm) + 50;
+  }, [frontDesign, garmentDims, printWidthRatio]);
+
+  const backPrintCost = useMemo(() => {
+    if (!backDesign.previewUrl) return 0;
+    const maxPrintWidthCm = garmentDims.B * printWidthRatio;
+    const wCm = (backDesign.scale / 100) * maxPrintWidthCm;
+    const hCm = wCm / (backDesign.aspectRatio || 1);
+    return getRawPrintCost(wCm, hCm);
+  }, [backDesign, garmentDims, printWidthRatio]);
+
+  const finalCost = baseApparelCost + frontPrintCost + backPrintCost;
+
+  // DIRECT CART COMMIT FUNCTION FOR MOBILE
+  const commitToCartAndCheckout = async () => {
+    const hasFront = !!frontDesign.previewUrl;
+    const hasBack = !!backDesign.previewUrl;
+
+    if (!hasFront && !hasBack) {
+      const confirmBlank = window.confirm(
+        isArabic
+          ? "لم تقوم بإضافة أي تصميم. هل ترغب في شراء القطعة بدون طباعة؟"
+          : "You haven't added a design. Would you like to buy this item blank?"
+      );
+      if (!confirmBlank) return;
+    }
+
+    const targetVariantId = `pod_${canvas.canvasId}_${selectedColor}_${selectedSize}_${Date.now()}`;
+
+    if (hasFront && frontDesign.file && typeof frontDesign.file !== "string") {
+      await persistFile(`${targetVariantId}_front`, frontDesign.file);
+    }
+    if (hasBack && backDesign.file && typeof backDesign.file !== "string") {
+      await persistFile(`${targetVariantId}_back`, backDesign.file);
+    }
+
+    const printSideKeyword = hasFront && hasBack ? "double" : hasBack ? "back" : hasFront ? "front" : "blank";
+    const apiProdUrl = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+    
+    const activeColorObj = canvas.availableColors.find((c) => c.colorName === selectedColor);
+    const frontTemplateUrl = activeColorObj?.podFrontTemplateId ? `${apiProdUrl}/image/raw/${activeColorObj.podFrontTemplateId}` : null;
+    const backTemplateUrl = activeColorObj?.podBackTemplateId ? `${apiProdUrl}/image/raw/${activeColorObj.podBackTemplateId}` : null;
+
+    const cartPayload = {
+      productId: canvas.canvasId,
+      variantId: targetVariantId,
+      title: canvas.title,
+      color: selectedColor,
+      size: selectedSize,
+      sellingPrice: finalCost,
+      imageId: canvas.previewImageId,
+      quantity: 1,
+      shopId: shopId,
+      podCustomization: {
+        printSide: printSideKeyword,
+        baseGarmentCost: baseApparelCost,
+        printCost: frontPrintCost + backPrintCost,
+        front: hasFront ? {
+          imageId: `${targetVariantId}_front`,
+          imageUrl: frontDesign.previewUrl,
+          originalImageId: `${targetVariantId}_front`,
+          originalImageUrl: frontDesign.previewUrl,
+          width: frontDesign.scale, height: frontDesign.scale,
+          x: frontDesign.x, y: frontDesign.y, rotation: frontDesign.rotation,
+          templateUrl: frontTemplateUrl,
+        } : null,
+        back: hasBack ? {
+          imageId: `${targetVariantId}_back`,
+          imageUrl: backDesign.previewUrl,
+          originalImageId: `${targetVariantId}_back`,
+          originalImageUrl: backDesign.previewUrl,
+          width: backDesign.scale, height: backDesign.scale,
+          x: backDesign.x, y: backDesign.y, rotation: backDesign.rotation,
+          templateUrl: backTemplateUrl,
+        } : null,
+      },
+    };
+
+    dispatch(addToCart(cartPayload));
+    if (onCommitSuccess) onCommitSuccess();
+    dispatch(openCart()); // Trigger cart open
+  };
 
   return (
     <WorkspaceWrapper>
       <MobilePageLock />
       <WorkspaceGrid>
-        
         <StageArea>
+          <MobileHeaderOverlay>
+            <MobileHeaderContent>
+              <h2>{canvas.title}</h2>
+              <span>{canvas.sku || canvas.serialNumber}</span>
+            </MobileHeaderContent>
+            <div style={{ display: 'flex', gap: '8px', pointerEvents: 'auto' }}>
+              {canvas.specifications?.printableSurfaces?.includes("back") && (
+                <SideViewToggleGroup>
+                  <CompactViewBtn
+                    type="button"
+                    $active={activeSide === "front"}
+                    onClick={() => setActiveSide("front")}
+                    title={isArabic ? "الواجهة الأمامية" : "Front Side"}
+                  >
+                    <ShirtIcon side="front" />
+                    {frontDesignThumbnail && (
+                      <MiniOverlayThumbnail src={frontDesignThumbnail} alt="Front Print" />
+                    )}
+                  </CompactViewBtn>
+                  <CompactViewBtn
+                    type="button"
+                    $active={activeSide === "back"}
+                    onClick={() => setActiveSide("back")}
+                    title={isArabic ? "الظهر" : "Back Side"}
+                  >
+                    <ShirtIcon side="back" />
+                    {backDesignThumbnail && (
+                      <MiniOverlayThumbnail src={backDesignThumbnail} alt="Back Print" />
+                    )}
+                  </CompactViewBtn>
+                </SideViewToggleGroup>
+              )}
+              
+              <HeaderCircleBtn onClick={() => dispatch(openCart())} title={t("pod_studio_tray_title", "Bag")} style={{ position: 'relative' }}>
+                <FaShoppingCart size={16} />
+                {shopCartItems.length > 0 && <CartBadge>{shopCartItems.reduce((acc, item) => acc + item.quantity, 0)}</CartBadge>}
+              </HeaderCircleBtn>
+            </div>
+          </MobileHeaderOverlay>
+
           <PreviewStage
             canvas={canvas}
             activeTemplateUrl={templateUrl}
@@ -499,164 +1146,205 @@ const DesignWorkspace = ({
             setShowSolidBg={setShowSolidBg}
             solidBgColor={solidBgColor}
             setSolidBgColor={setSolidBgColor}
-            onAddToCart={() => {
-              setIsLockedToZero(false);
-              setUiOpacity(1);
-              setActiveTab("cart");
-            }}
           />
-          
-          <CollapsibleSizingWidget
-            canvas={canvas}
-            selectedSize={selectedSize}
-          />
-          
+
+          {/* 🔴 NEW MOBILE PRICING & SIZING OVERLAY (VISIBLE ONLY WHEN NO TOOL PANEL IS OPEN) */}
           <AnimatePresence>
-            {activeTab !== "cart" && isLockedToZero && (
-              <SubStageCTA type="button" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} onClick={() => { setIsLockedToZero(false); setUiOpacity(1); setActiveTab("cart"); }}>
-                <FaShoppingCart />
-                <span>{isArabic ? "متابعة الشراء ➔" : "Checkout ➔"}</span>
-              </SubStageCTA>
+            {!activeMobilePanel && (
+              <MobileSummaryBox
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'white' }}>
+                    {isArabic ? `المقاس الحالي: ${selectedSize}` : `Active Size: ${selectedSize}`}
+                  </span>
+                  <span style={{ fontSize: '0.8rem', color: '#a1a1aa', fontWeight: 600 }}>
+                    A: {garmentDims.A}cm B: {garmentDims.B}cm
+                  </span>
+                </div>
+                
+                <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "1rem" }}>
+                  <PriceRow>
+                    <span>{isArabic ? "قيمة القطعة الأساسية:" : "Base Apparel:"}</span>
+                    <span>{baseApparelCost} DA</span>
+                  </PriceRow>
+                  {(frontPrintCost > 0 || backPrintCost > 0) && (
+                    <PriceRow>
+                      <span>{isArabic ? "قيمة الطباعة:" : "Custom Print:"}</span>
+                      <span>+{frontPrintCost + backPrintCost} DA</span>
+                    </PriceRow>
+                  )}
+                  <PriceRow className="total">
+                    <span>{isArabic ? "الإجمالي المستحق للمشروع:" : "Total Cost:"}</span>
+                    <span>{finalCost} DA</span>
+                  </PriceRow>
+                </div>
+                
+                <MobileFloatingPurchaseCTA
+                  type="button"
+                  onClick={() => commitToCartAndCheckout()}
+                >
+                  <FaShoppingCart />
+                  <span>{isArabic ? "إكمال وتأكيد الطلبية ➔" : "Proceed with Order ➔"}</span>
+                </MobileFloatingPurchaseCTA>
+              </MobileSummaryBox>
             )}
           </AnimatePresence>
         </StageArea>
 
-        <ControlPanel>
-          <ProductHeaderGroup>
-            <h2>{canvas.title}</h2>
-            <span className="sku">{canvas.serialNumber}</span>
-          </ProductHeaderGroup>
+        {/* Dynamic Two-Tier Pro Design Inspector (Desktop) */}
+        <InspectorContainer>
+          <ControlDrawer>
+            <InlineHeaderRow>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <HeaderLeftGroup>
+                  <h2>{canvas.title}</h2>
+                  <span className="sku">{canvas.sku || canvas.serialNumber}</span>
+                </HeaderLeftGroup>
 
-          {canvas.specifications?.printableSurfaces?.includes("back") && (
-            <SegmentedSideControl>
-              <SideBtn type="button" $active={activeSide === "front"} onClick={() => setActiveSide("front")}>
-                {isArabic ? "الواجهة الأمامية" : "Front Side"}
-              </SideBtn>
-              <SideBtn type="button" $active={activeSide === "back"} onClick={() => setActiveSide("back")}>
-                {isArabic ? "الظهر" : "Back Side"}
-              </SideBtn>
-            </SegmentedSideControl>
-          )}
+                {canvas.specifications?.printableSurfaces?.includes("back") && (
+                  <SideViewToggleGroup>
+                    <CompactViewBtn
+                      type="button"
+                      $active={activeSide === "front"}
+                      onClick={() => setActiveSide("front")}
+                      title={isArabic ? "الواجهة الأمامية" : "Front Side"}
+                    >
+                      <ShirtIcon side="front" />
+                      {frontDesignThumbnail && (
+                        <MiniOverlayThumbnail src={frontDesignThumbnail} alt="Front Print" />
+                      )}
+                    </CompactViewBtn>
+                    <CompactViewBtn
+                      type="button"
+                      $active={activeSide === "back"}
+                      onClick={() => setActiveSide("back")}
+                      title={isArabic ? "الظهر" : "Back Side"}
+                    >
+                      <ShirtIcon side="back" />
+                      {backDesignThumbnail && (
+                        <MiniOverlayThumbnail src={backDesignThumbnail} alt="Back Print" />
+                      )}
+                    </CompactViewBtn>
+                  </SideViewToggleGroup>
+                )}
+              </div>
 
-          <OptionRow>
-            <OptionSection>
-              <SectionLabel>{t("pod_studio_colors_title", "Colors")}</SectionLabel>
-              <CollapsiblePills>
-                {canvas.availableColors.map((col) => (
-                  <ColorSwatch
-                    key={col.colorName}
-                    $active={selectedColor === col.colorName}
-                    $hex={getDisplayColorHex(col.colorName)}
-                    onClick={() => setSelectedColor(col.colorName)}
+              <HeaderRightGroup>
+                <TopCartButton onClick={() => dispatch(openCart())}>
+                  <FaShoppingCart size={16} />
+                  {shopCartItems.length > 0 && (
+                    <span className="badge">
+                      {shopCartItems.reduce((acc, item) => acc + item.quantity, 0)}
+                    </span>
+                  )}
+                </TopCartButton>
+              </HeaderRightGroup>
+            </InlineHeaderRow>
+
+            <ScrollableInspector>
+              {/* Panel A: Colors & Sizes */}
+              {activePanel === "variants" && (
+                <OptionRow style={{ marginTop: "1rem" }}>
+                  <OptionSection>
+                    <SectionLabel>
+                      {t("pod_studio_colors_title", "Colors")}
+                    </SectionLabel>
+                    <CollapsiblePills>
+                      {canvas.availableColors.map((col) => (
+                        <ColorSwatch
+                          key={col.colorName}
+                          $active={selectedColor === col.colorName}
+                          $hex={getDisplayColorHex(col.colorName)}
+                          onClick={() => setSelectedColor(col.colorName)}
+                        />
+                      ))}
+                    </CollapsiblePills>
+                  </OptionSection>
+
+                  <OptionSection>
+                    <SectionLabel>
+                      {t("pod_studio_sizes_title", "Sizes")}
+                    </SectionLabel>
+                    <CollapsiblePills>
+                      {canvas.sizes.map((s) => (
+                        <SizePill
+                          key={s.sizeCode}
+                          $active={selectedSize === s.sizeCode}
+                          onClick={() => setSelectedSize(s.sizeCode)}
+                        >
+                          {s.sizeCode}
+                        </SizePill>
+                      ))}
+                    </CollapsiblePills>
+                  </OptionSection>
+                </OptionRow>
+              )}
+
+              {/* Panel B & C: Unified Design Controls */}
+              {(activePanel === "layer" || activePanel === "transform") && (
+                <div style={{ marginTop: "1rem" }}>
+                  <DesignControls
+                    designState={activeDesignState}
+                    setDesignState={setActiveDesignState}
+                    canvasName={canvas.title}
+                    selectedSize={selectedSize}
+                    sizeChart={canvas.sizeChart}
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    onOpenDesignLibrary={() => setIsDesignLibraryOpen(true)}
+                    activePanel={activePanel}
                   />
-                ))}
-              </CollapsiblePills>
-            </OptionSection>
+                </div>
+              )}
+            </ScrollableInspector>
 
-            <OptionSection>
-              <SectionLabel>{t("pod_studio_sizes_title", "Sizes")}</SectionLabel>
-              <CollapsiblePills>
-                {canvas.sizes.map((s) => (
-                  <SizePill
-                    key={s.sizeCode}
-                    $active={selectedSize === s.sizeCode}
-                    onClick={() => setSelectedSize(s.sizeCode)}
-                  >
-                    {s.sizeCode}
-                  </SizePill>
-                ))}
-              </CollapsiblePills>
-            </OptionSection>
-          </OptionRow>
+            {/* Pinned Pricing & Checkout summary */}
+            <ProductionSummary
+              canvas={canvas}
+              frontDesign={frontDesign}
+              backDesign={backDesign}
+              selectedColor={selectedColor}
+              selectedSize={selectedSize}
+              shopId={shopId}
+              onCommitSuccess={onCommitSuccess}
+              editingCartItem={editingCartItem}
+            />
+          </ControlDrawer>
 
-          <DesignControls
-            designState={activeDesignState}
-            setDesignState={setActiveDesignState}
-            canvasName={canvas.title}
-            selectedSize={selectedSize}
-            sizeChart={canvas.sizeChart}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            isArtistLocked={isCurrentSideLocked}
-          />
-
-          {activeTab === "transform" && isArtistLocked && (
-            <div style={{ marginTop: "0.5rem" }}>
-              <PrePreparedDesignsTab
-                activeCategory={artistDesign.collectionName}
-                onSelectArtwork={(artworkUrl, defaultPlacement) => {
-                  setActiveDesignState({
-                    file: "artist_locked",
-                    previewUrl: artworkUrl,
-                    scale: defaultPlacement?.scale || 55,
-                    x: defaultPlacement?.x || 50,
-                    y: defaultPlacement?.y || 35,
-                    rotation: defaultPlacement?.rotation || 0,
-                  });
-                }}
-              />
-            </div>
-          )}
-
-          <ProductionSummary
-            canvas={canvas}
-            frontDesign={frontDesign}
-            backDesign={backDesign}
-            selectedColor={selectedColor}
-            selectedSize={selectedSize}
-            shopId={shopId}
-            onCommitSuccess={onCommitSuccess}
-            editingCartItem={editingCartItem}
-          />
-        </ControlPanel>
+          <CanvaDock>
+            {DOCK_ITEMS.map((item) => (
+              <DockItem
+                key={item.id}
+                $active={activePanel === item.id}
+                onClick={() => handleDockClick(item.id)}
+                title={item.tooltip}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </DockItem>
+            ))}
+          </CanvaDock>
+        </InspectorContainer>
       </WorkspaceGrid>
 
       {/* MOBILE ACTIVE TOOL PANEL */}
       <AnimatePresence mode="wait">
-        {activeTab !== "cart" && (
+        {activeMobilePanel && (
           <MobileToolPanel
-            key={activeTab}
+            key={activeMobilePanel}
             initial={{ y: "100%", opacity: 0 }}
-            animate={{ y: 0, opacity: computedOpacity }}
+            animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
-            style={{ opacity: computedOpacity, transition: "opacity 0.15s ease", pointerEvents: isLockedToZero ? "none" : "auto" }}
             transition={{ type: "spring", damping: 25, stiffness: 260 }}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "0.75rem",
-                borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-                paddingBottom: "0.5rem",
-                flexShrink: 0,
-              }}
-            >
-              <span style={{ fontSize: "0.85rem", fontWeight: "800", color: "#a1a1aa", display: "flex", alignItems: "center", gap: "10px" }}>
-                <SwitchTrack onClick={handleSwitchClick}>
-                  <SwitchThumb
-                    drag="x"
-                    dragElastic={0.08}
-                    dragConstraints={isArabic ? { left: -32, right: 0 } : { left: 0, right: 32 }}
-                    dragMomentum={false}
-                    onDragEnd={handleDragEnd}
-                    onPointerDown={() => !isLockedToZero && setUiOpacity(0.1)}
-                    onPointerUp={() => !isLockedToZero && setUiOpacity(1)}
-                    onTouchStart={() => !isLockedToZero && setUiOpacity(0.1)}
-                    onTouchEnd={() => !isLockedToZero && setUiOpacity(1)}
-                    $active={isLockedToZero}
-                    animate={{ x: isLockedToZero ? (isArabic ? -32 : 32) : 0 }}
-                    transition={{ type: "spring", stiffness: 350, damping: 20 }}
-                  >
-                    {isLockedToZero ? <FaEyeSlash /> : <FaEye />}
-                  </SwitchThumb>
-                </SwitchTrack>
-
-                {activeTab === "transform" && (isArabic ? "حجم التصميم" : "SCALE CONTROLS")}
-                {activeTab === "position" && (isArabic ? "موقع التصميم" : "POSITION CONTROLS")}
-                {activeTab === "rotation" && (isArabic ? "زاوية الدوران" : "ROTATION CONTROLS")}
-                {activeTab === "info" && (isArabic ? "الخيارات" : "OPTIONS")}
+            {/* Minimal Header with Undo/Redo */}
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+              <span style={{ fontWeight: 700, color: "white", fontSize: "0.95rem" }}>
+                {MOBILE_DOCK_ITEMS.find(i => i.id === activeMobilePanel)?.label}
               </span>
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button
@@ -676,81 +1364,106 @@ const DesignWorkspace = ({
               </div>
             </div>
 
-            <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "1rem" }}>
-              {activeTab === "info" && (
-                <>
-                  {canvas.specifications?.printableSurfaces?.includes("back") && (
-                    <SegmentedSideControl>
-                      <SideBtn type="button" $active={activeSide === "front"} onClick={() => setActiveSide("front")}>
-                        {isArabic ? "الواجهة الأمامية" : "Front Side"}
-                      </SideBtn>
-                      <SideBtn type="button" $active={activeSide === "back"} onClick={() => setActiveSide("back")}>
-                        {isArabic ? "الظهر" : "Back Side"}
-                      </SideBtn>
-                    </SegmentedSideControl>
-                  )}
-                  
-                  <OptionRow>
-                    <OptionSection>
-                      <SectionLabel>{t("pod_studio_colors_title", "Colors")}</SectionLabel>
-                      <CollapsiblePills>
-                        {canvas.availableColors.map((col) => (
-                          <ColorSwatch
-                            key={col.colorName}
-                            $active={selectedColor === col.colorName}
-                            $hex={getDisplayColorHex(col.colorName)}
-                            onClick={() => setSelectedColor(col.colorName)}
-                          />
-                        ))}
-                      </CollapsiblePills>
-                    </OptionSection>
+            <div
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+              }}
+            >
+              {activeMobilePanel === "variants" && (
+                <OptionRow style={{ marginTop: "4px" }}>
+                  <OptionSection>
+                    <SectionLabel style={{ fontSize: "0.7rem" }}>
+                      {t("pod_studio_colors_title", "Colors")}
+                    </SectionLabel>
+                    <CollapsiblePills>
+                      {canvas.availableColors.map((col) => (
+                        <ColorSwatch
+                          key={col.colorName}
+                          $active={selectedColor === col.colorName}
+                          $hex={getDisplayColorHex(col.colorName)}
+                          onClick={() => setSelectedColor(col.colorName)}
+                          style={{ width: "24px", height: "24px" }}
+                        />
+                      ))}
+                    </CollapsiblePills>
+                  </OptionSection>
 
-                    <OptionSection>
-                      <SectionLabel>{t("pod_studio_sizes_title", "Sizes")}</SectionLabel>
-                      <CollapsiblePills>
-                        {canvas.sizes.map((s) => (
-                          <SizePill
-                            key={s.sizeCode}
-                            $active={selectedSize === s.sizeCode}
-                            onClick={() => setSelectedSize(s.sizeCode)}
-                          >
-                            {s.sizeCode}
-                          </SizePill>
-                        ))}
-                      </CollapsiblePills>
-                    </OptionSection>
-                  </OptionRow>
-                </>
+                  <OptionSection>
+                    <SectionLabel style={{ fontSize: "0.7rem" }}>
+                      {t("pod_studio_sizes_title", "Sizes")}
+                    </SectionLabel>
+                    <CollapsiblePills>
+                      {canvas.sizes.map((s) => (
+                        <SizePill
+                          key={s.sizeCode}
+                          $active={selectedSize === s.sizeCode}
+                          onClick={() => setSelectedSize(s.sizeCode)}
+                          style={{ padding: "0.25rem 0.65rem", fontSize: "0.75rem" }}
+                        >
+                          {s.sizeCode}
+                        </SizePill>
+                      ))}
+                    </CollapsiblePills>
+                  </OptionSection>
+                </OptionRow>
               )}
 
-              {activeTab === "transform" && isArtistLocked && (
-                <div style={{ marginBottom: "1rem" }}>
-                  <PrePreparedDesignsTab
-                    activeCategory={artistDesign.collectionName}
-                    onSelectArtwork={(artworkUrl, defaultPlacement) => {
-                      setActiveDesignState({
-                        file: "artist_locked",
-                        previewUrl: artworkUrl,
-                        scale: defaultPlacement?.scale || 55,
-                        x: defaultPlacement?.x || 50,
-                        y: defaultPlacement?.y || 35,
-                        rotation: defaultPlacement?.rotation || 0,
-                      });
-                    }}
-                  />
-                </div>
-              )}
-
-              {(activeTab === "transform" || activeTab === "position" || activeTab === "rotation") && (
+              {activeMobilePanel === "layer" && (
                 <DesignControls
                   designState={activeDesignState}
                   setDesignState={setActiveDesignState}
                   canvasName={canvas.title}
                   selectedSize={selectedSize}
                   sizeChart={canvas.sizeChart}
-                  activeTab={activeTab}
+                  activeTab="layer"
                   setActiveTab={setActiveTab}
-                  isArtistLocked={isCurrentSideLocked}
+                  onOpenDesignLibrary={() => setIsDesignLibraryOpen(true)}
+                  activePanel="layer"
+                />
+              )}
+
+              {activeMobilePanel === "scale" && (
+                <DesignControls
+                  designState={activeDesignState}
+                  setDesignState={setActiveDesignState}
+                  canvasName={canvas.title}
+                  selectedSize={selectedSize}
+                  sizeChart={canvas.sizeChart}
+                  activeTab="transform"
+                  setActiveTab={setActiveTab}
+                  activePanel="transform"
+                  hideTabs={true}
+                />
+              )}
+
+              {activeMobilePanel === "position" && (
+                <DesignControls
+                  designState={activeDesignState}
+                  setDesignState={setActiveDesignState}
+                  canvasName={canvas.title}
+                  selectedSize={selectedSize}
+                  sizeChart={canvas.sizeChart}
+                  activeTab="position"
+                  setActiveTab={setActiveTab}
+                  activePanel="transform"
+                  hideTabs={true}
+                />
+              )}
+
+              {activeMobilePanel === "rotation" && (
+                <DesignControls
+                  designState={activeDesignState}
+                  setDesignState={setActiveDesignState}
+                  canvasName={canvas.title}
+                  selectedSize={selectedSize}
+                  sizeChart={canvas.sizeChart}
+                  activeTab="rotation"
+                  setActiveTab={setActiveTab}
+                  activePanel="transform"
+                  hideTabs={true}
                 />
               )}
             </div>
@@ -758,88 +1471,62 @@ const DesignWorkspace = ({
         )}
       </AnimatePresence>
 
-      <MobileFloatingPurchaseCTA
-        type="button"
-        whileTap={{ scale: 0.96 }}
-        onClick={() => {
-          setIsLockedToZero(false);
-          setUiOpacity(1);
-          setActiveTab("cart");
-        }}
-        style={{ opacity: computedOpacity, transition: "opacity 0.15s ease", pointerEvents: isLockedToZero ? "none" : "auto" }}
-      >
-        <FaShoppingCart />
-        <span>{isArabic ? "إكمال وتأكيد الطلبية ➔" : "Proceed with Order ➔"}</span>
-      </MobileFloatingPurchaseCTA>
+      {/* MOBILE BOTTOM TOOLBAR (4 Clean Icons) */}
+      <FloatingToolbar>
+        {MOBILE_DOCK_ITEMS.map((item) => (
+          <ToolIconButton
+            key={item.id}
+            $active={activeMobilePanel === item.id}
+            onClick={() => handleMobileDockClick(item.id)}
+          >
+            {item.icon}
+            {item.id === "cart" && shopCartItems.length > 0 && (
+              <div style={{
+                position: 'absolute', top: -2, right: -2, background: '#F07A48', color: 'black',
+                fontSize: '10px', fontWeight: 'bold', width: '16px', height: '16px', borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                {shopCartItems.reduce((acc, cartItem) => acc + cartItem.quantity, 0)}
+              </div>
+            )}
+          </ToolIconButton>
+        ))}
+      </FloatingToolbar>
 
-      {/* MOBILE TRAY OVERLAY SHEET */}
       <AnimatePresence>
-        {activeTab === "cart" && (
-          <OverlayBackdrop onClick={() => setActiveTab("transform")}>
-            <SummaryModalSheet onClick={(e) => e.stopPropagation()}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", borderBottom: "1px solid rgba(255, 255, 255, 0.05)", paddingBottom: "0.5rem" }}>
-                <span style={{ fontWeight: 800 }}>{t("pod_studio_billing_breakdown", "BILLING & FULFILLMENT")}</span>
-                <button style={{ background: "transparent", border: "none", color: "#a1a1aa", fontSize: "1.25rem", cursor: "pointer" }} onClick={() => setActiveTab("transform")}>
-                  &times;
-                </button>
-              </div>
-              <div style={{ flex: 1, overflowY: "auto" }}>
-                <ProductionSummary
-                  canvas={canvas}
-                  frontDesign={frontDesign}
-                  backDesign={backDesign}
-                  selectedColor={selectedColor}
-                  selectedSize={selectedSize}
-                  shopId={shopId}
-                  onCommitSuccess={onCommitSuccess}
-                  editingCartItem={editingCartItem}
+        {isDesignLibraryOpen && (
+          <LightboxOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsDesignLibraryOpen(false)}
+            style={{ zIndex: 3000 }}
+          >
+            <LibraryModalCard
+              $isArabic={isArabic}
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.95, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 30 }}
+            >
+              <LibraryModalHeader>
+                <h3>{isArabic ? "مكتبة التصاميم" : "Artwork Library"}</h3>
+                <CloseBtn onClick={() => setIsDesignLibraryOpen(false)}>
+                  <FaTimes />
+                </CloseBtn>
+              </LibraryModalHeader>
+              <LibraryModalBody>
+                <PrePreparedDesignsTab 
+                  onSelectArtwork={(url, placement, art) => handleSwapArtworkFromLibrary(canvas, art, activeSide)}
                 />
-              </div>
-            </SummaryModalSheet>
-          </OverlayBackdrop>
+              </LibraryModalBody>
+            </LibraryModalCard>
+          </LightboxOverlay>
         )}
       </AnimatePresence>
-
-      <MobileBottomDock style={{ opacity: computedOpacity, transition: "opacity 0.15s ease", pointerEvents: isLockedToZero ? "none" : "auto" }}>
-        <DockTab $active={activeTab === "info"} onClick={() => setActiveTab("info")}>
-          <FaBookOpen /><span>{t("pod_studio_blank_specifications", "Specs")}</span>
-        </DockTab>
-        <DockTab $active={activeTab === "rotation"} onClick={() => setActiveTab("rotation")}>
-          <FaSyncAlt /><span>{t("pod_studio_angle_rotation", "Rotate")}</span>
-        </DockTab>
-        <DockTab $active={activeTab === "transform"} onClick={() => setActiveTab("transform")}>
-          <FaExpandAlt /><span>{t("pod_studio_scale_percentage", "Scale")}</span>
-        </DockTab>
-        <DockTab $active={activeTab === "position"} onClick={() => setActiveTab("position")}>
-          <FaArrowsAlt /><span>{t("position_title", "Position")}</span>
-        </DockTab>
-        <DockTab $active={activeTab === "cart"} onClick={() => setActiveTab("cart")}>
-          <FaShoppingCart /><span>{t("pod_studio_tray_title", "Bag")}</span>
-        </DockTab>
-      </MobileBottomDock>
-
-      {isLockedToZero && (
-        <div style={{ position: "fixed", bottom: "18px", right: isArabic ? "auto" : "18px", left: isArabic ? "18px" : "auto", zIndex: 1010 }}>
-          <SwitchTrack onClick={handleSwitchClick}>
-            <SwitchThumb $active={isLockedToZero} animate={{ x: isArabic ? -32 : 32 }}>
-              <FaEyeSlash />
-            </SwitchThumb>
-          </SwitchTrack>
-        </div>
-      )}
     </WorkspaceWrapper>
   );
 };
-
-const OverlayBackdrop = styled.div`
-  display: none;
-  @media (max-width: 1024px) { display: flex; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 1100; align-items: flex-end; }
-`;
-
-const SummaryModalSheet = styled.div`
-  width: 100%; max-height: 75vh; background: #141416; border-top: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px 24px 0 0; padding: 1.5rem; box-sizing: border-box; display: flex; flex-direction: column; box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.8);
-  z-index: 1200;
-`;
 
 DesignWorkspace.propTypes = {
   canvas: PropTypes.object.isRequired,

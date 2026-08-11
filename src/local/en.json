@@ -1382,5 +1382,18 @@
       "pricing": "Fair Direct Value",
       "shipping": "69 Wilayas Delivery"
     }
-  }
+  },
+  "filter_title": "Filters",
+  "filter_clear_all": "Clear All",
+  "filter_print_surface": "Print Surface",
+  "filter_front_back_accessible": "Front & Back Accessible",
+  "filter_collection_group": "Collection Group",
+  "filter_fabric_weight": "Fabric Weight",
+  "filter_material": "Material",
+  "filter_cut_fit": "Cut & Fit",
+  "filter_colors": "Colors",
+  "group_kids": "Kids",
+  "group_fashion": "Fashion",
+  "group_accessories": "Accessories",
+  "group_sports": "Sports"
 }

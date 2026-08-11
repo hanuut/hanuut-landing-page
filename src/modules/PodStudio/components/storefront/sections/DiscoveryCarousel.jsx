@@ -1,4 +1,6 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+// src/modules/PodStudio/components/storefront/sections/DiscoveryCarousel.jsx
+
+import React, { useMemo, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -15,10 +17,6 @@ import "swiper/css/pagination";
 
 import { getImage } from "../../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../../utils/imageUtils";
-
-// ============================================================================
-// DISCOVERY GROUP MARKETING CONFIGURATIONS
-// ============================================================================
 
 const GROUP_CONFIGS = {
   fashion: {
@@ -116,20 +114,15 @@ const getGroupConfig = (groupKey, index, t, isArabic) => {
   };
 };
 
-// ============================================================================
-// STYLED COMPONENTS - NIKE x APPLE SYSTEM COHESION
-// ============================================================================
-
 const CarouselSection = styled.section`
   width: 100%;
-  height: calc(100vh - 80px);
-  min-height: 600px;
+  height: ${(props) => (props.$compact ? "100%" : "calc(100vh - 80px)")};
+  min-height: ${(props) => (props.$compact ? "100%" : "600px")};
   position: relative;
   background-color: #050505;
   overflow: hidden;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: ${(props) => (props.$compact ? "none" : "1px solid rgba(255, 255, 255, 0.05)")};
 
-  /* Subtle Blueprint Grid overlay */
   &::before {
     content: "";
     position: absolute;
@@ -152,7 +145,6 @@ const CarouselSection = styled.section`
     bottom: 25px !important;
   }
 
-  /* Interactive Growing Bullets on Hover */
   .swiper-pagination-bullet {
     background: rgba(255, 255, 255, 0.25);
     opacity: 1;
@@ -178,12 +170,13 @@ const SlideLayout = styled.div`
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  grid-template-columns: ${(props) => (props.$compact ? "1fr" : "1fr 1fr")};
+  grid-template-rows: ${(props) => (props.$compact ? "auto 1fr" : "1fr")};
+  gap: ${(props) => (props.$compact ? "1.5rem" : "4rem")};
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: ${(props) => (props.$compact ? "1.5rem" : "0 2rem")};
   box-sizing: border-box;
   position: relative;
   z-index: 2;
@@ -198,21 +191,6 @@ const SlideLayout = styled.div`
   }
 `;
 
-const TextColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 1.5rem;
-  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
-  z-index: 5;
-
-  @media (max-width: 900px) {
-    align-items: center;
-    text-align: center;
-  }
-`;
-
 const GroupEmoji = styled.div`
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
@@ -220,7 +198,7 @@ const GroupEmoji = styled.div`
 `;
 
 const EditorialTitle = styled.h2`
-  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-size: ${(props) => (props.$compact ? "clamp(1.5rem, 3.5vw, 2.2rem)" : "clamp(2.4rem, 5vw, 4rem)")};
   font-weight: 900;
   color: #ffffff;
   line-height: 1.1;
@@ -235,7 +213,7 @@ const EditorialTitle = styled.h2`
 `;
 
 const EditorialDescription = styled.p`
-  font-size: 1.1rem;
+  font-size: ${(props) => (props.$compact ? "0.95rem" : "1.1rem")};
   color: #a1a1aa;
   line-height: 1.6;
   font-family: "Cairo", sans-serif;
@@ -247,7 +225,7 @@ const PrimaryCTAButton = styled(motion.button)`
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 1.1rem 2.6rem;
+  padding: ${(props) => (props.$compact ? "0.85rem 1.8rem" : "1.1rem 2.6rem")};
   border-radius: 50px;
   background: ${(props) => props.$color || "#F07A48"};
   color: #050505;
@@ -263,23 +241,6 @@ const PrimaryCTAButton = styled(motion.button)`
   }
 `;
 
-// ============================================================================
-// ASYMMETRIC VISUAL COMPOSITIONS (Slide-Specific Art Structures)
-// ============================================================================
-
-const ArtStage = styled.div`
-  position: relative;
-  width: 100%;
-  height: 480px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  @media (max-width: 900px) {
-    height: 320px;
-  }
-`;
-
 const AmbientGlow = styled.div`
   position: absolute;
   inset: -15%;
@@ -290,15 +251,14 @@ const AmbientGlow = styled.div`
   opacity: 0.65;
 `;
 
-// Slide 1 Layout: Overlapping Asymmetric Fan (Fashion)
 const StaggeredStackCard = styled(motion.div)`
   position: absolute;
-  width: 190px;
-  height: 250px;
+  width: ${(props) => (props.$compact ? "140px" : "190px")};
+  height: ${(props) => (props.$compact ? "180px" : "250px")};
   background: rgba(18, 18, 20, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
-  padding: 1.25rem;
+  padding: ${(props) => (props.$compact ? "1rem" : "1.25rem")};
   box-sizing: border-box;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -326,11 +286,10 @@ const StaggeredStackCard = styled(motion.div)`
   }
 `;
 
-// Slide 2 Layout: Dense Layered Overlapping Stack (Accessories)
 const DenseLayeredStackCard = styled(motion.div)`
   position: absolute;
-  width: 185px;
-  height: 240px;
+  width: ${(props) => (props.$compact ? "140px" : "185px")};
+  height: ${(props) => (props.$compact ? "180px" : "240px")};
   background: rgba(22, 22, 25, 0.9);
   border: 1.5px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
@@ -340,7 +299,7 @@ const DenseLayeredStackCard = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 1.25rem;
+  padding: ${(props) => (props.$compact ? "1rem" : "1.25rem")};
   box-sizing: border-box;
   box-shadow: 0 30px 55px rgba(0, 0, 0, 0.7);
 
@@ -363,40 +322,10 @@ const DenseLayeredStackCard = styled(motion.div)`
   }
 `;
 
-// Slide 3 Layout: Glassmorphic Blueprint Matrix (Sports)
-const IsometricStage = styled.div`
-  position: relative;
-  width: 340px;
-  height: 340px;
-  background: rgba(255, 255, 255, 0.01);
-  border: 1.5px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.02);
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(57, 161, 112, 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(57, 161, 112, 0.08) 1px, transparent 1px);
-    background-size: 20px 20px;
-    border-radius: 24px;
-  }
-
-  @media (max-width: 768px) {
-    width: 250px;
-    height: 250px;
-  }
-`;
-
 const IsoApparelCard = styled(motion.div)`
   position: absolute;
-  width: 175px;
-  height: 220px;
+  width: ${(props) => (props.$compact ? "130px" : "175px")};
+  height: ${(props) => (props.$compact ? "165px" : "220px")};
   background: rgba(18, 18, 20, 0.9);
   border: 1.5px solid rgba(57, 161, 112, 0.3);
   border-radius: 20px;
@@ -504,7 +433,7 @@ const CloseButton = styled.button`
 const ArtCol = styled.div`
   position: relative;
   width: 100%;
-  height: 480px;
+  height: ${(props) => (props.$compact ? "320px" : "480px")};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -513,10 +442,6 @@ const ArtCol = styled.div`
     height: 320px;
   }
 `;
-
-// ============================================================================
-// DYNAMIC GRID OVERLAY SELECTION MODAL
-// ============================================================================
 
 const GridOverlayBackdrop = styled(motion.div)`
   position: fixed;
@@ -655,11 +580,64 @@ const CardDetailsRow = styled.div`
   }
 `;
 
-// ============================================================================
-// ASYMMETRIC FLOATING PRODUCT COMPONENT (RESOLVES BUFFER ASYNC)
-// ============================================================================
+const OptionGridCard = ({ product, color, onSelect }) => {
+  const [imgUrl, setImgUrl] = useState(null);
 
-const ResolvedFloatingProduct = ({ product, index, config, layoutType }) => {
+  useEffect(() => {
+    let isMounted = true;
+    const imgId =
+      product?.previewImages?.[0] ||
+      product?.availabilities?.[0]?.imageId ||
+      product?.imageId;
+
+    if (imgId) {
+      if (
+        typeof imgId === "string" &&
+        (imgId.startsWith("http") || imgId.startsWith("data:"))
+      ) {
+        setImgUrl(imgId);
+      } else {
+        getImage(imgId).then((res) => {
+          if (isMounted && res.data) {
+            setImgUrl(getImageUrl(res.data));
+          }
+        });
+      }
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [product]);
+
+  const price =
+    product.availabilities?.[0]?.sizes?.[0]?.sellingPrice ||
+    product.sellingPrice ||
+    0;
+
+  return (
+    <OptionProductCard
+      $color={color}
+      onClick={onSelect}
+      whileHover={{ scale: 1.02, y: -4 }}
+    >
+      <CardImageStage>
+        {imgUrl ? <img src={imgUrl} alt="" /> : <span style={{ fontSize: "2rem" }}>👕</span>}
+      </CardImageStage>
+      <CardDetailsRow $color={color}>
+        <span className="name">{product.name}</span>
+        <span className="price">{price} DA</span>
+      </CardDetailsRow>
+    </OptionProductCard>
+  );
+};
+
+OptionGridCard.propTypes = {
+  product: PropTypes.object.isRequired,
+  color: PropTypes.string,
+  onSelect: PropTypes.func.isRequired,
+};
+
+const ResolvedFloatingProduct = ({ product, index, config, layoutType, compact }) => {
   const [imgUrl, setImgUrl] = useState(null);
 
   useEffect(() => {
@@ -696,7 +674,11 @@ const ResolvedFloatingProduct = ({ product, index, config, layoutType }) => {
     0;
 
   if (layoutType === "xbox") {
-    const offsets = [
+    const offsets = compact ? [
+      { rotate: -8, x: -40, y: 15, zIndex: 1 },
+      { rotate: 4, x: 5, y: -25, zIndex: 3 },
+      { rotate: -12, x: 50, y: 35, zIndex: 1 },
+    ] : [
       { rotate: -8, x: -90, y: 15, zIndex: 1 },
       { rotate: 4, x: 10, y: -25, zIndex: 3 },
       { rotate: -12, x: 95, y: 35, zIndex: 1 },
@@ -705,6 +687,7 @@ const ResolvedFloatingProduct = ({ product, index, config, layoutType }) => {
 
     return (
       <StaggeredStackCard
+        $compact={compact}
         $color={config.accentColor}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{
@@ -730,7 +713,11 @@ const ResolvedFloatingProduct = ({ product, index, config, layoutType }) => {
   }
 
   if (layoutType === "playstation") {
-    const offsets = [
+    const offsets = compact ? [
+      { rotate: -10, x: -40, y: 25, zIndex: 1 },
+      { rotate: 6, x: 10, y: -15, zIndex: 3 },
+      { rotate: -14, x: 50, y: 45, zIndex: 2 },
+    ] : [
       { rotate: -10, x: -85, y: 25, zIndex: 1 },
       { rotate: 6, x: 15, y: -15, zIndex: 3 },
       { rotate: -14, x: 100, y: 45, zIndex: 2 },
@@ -739,6 +726,7 @@ const ResolvedFloatingProduct = ({ product, index, config, layoutType }) => {
 
     return (
       <DenseLayeredStackCard
+        $compact={compact}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{
           opacity: 1,
@@ -762,7 +750,10 @@ const ResolvedFloatingProduct = ({ product, index, config, layoutType }) => {
     );
   }
 
-  const offsets = [
+  const offsets = compact ? [
+    { rotate: -12, x: -35, y: -20, zIndex: 2 },
+    { rotate: 8, x: 30, y: 35, zIndex: 3 },
+  ] : [
     { rotate: -12, x: -75, y: -20, zIndex: 2 },
     { rotate: 8, x: 65, y: 35, zIndex: 3 },
   ];
@@ -770,6 +761,7 @@ const ResolvedFloatingProduct = ({ product, index, config, layoutType }) => {
 
   return (
     <IsoApparelCard
+      $compact={compact}
       initial={{ opacity: 0, y: 50 }}
       animate={{
         opacity: 1,
@@ -793,11 +785,15 @@ const ResolvedFloatingProduct = ({ product, index, config, layoutType }) => {
   );
 };
 
-// ============================================================================
-// MAIN DISCOVERY CAROUSEL COMPONENT
-// ============================================================================
+ResolvedFloatingProduct.propTypes = {
+  product: PropTypes.object.isRequired,
+  index: PropTypes.number.isRequired,
+  config: PropTypes.object.isRequired,
+  layoutType: PropTypes.string.isRequired,
+  compact: PropTypes.bool,
+};
 
-const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
+const DiscoveryCarousel = ({ products, onSelectCanvas, compact = false }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
@@ -852,7 +848,6 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
     return groups;
   }, [products]);
 
-  // 🔴 DYNAMICALLY REGISTER 'kids' IF AN ITEM BELONGS TO IT IN THE DATABASE
   const groupKeys = useMemo(() => {
     const keys = ["fashion", "accessories", "sports"];
     const hasKids = products.some(
@@ -866,11 +861,11 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
   }, [products]);
 
   const getLayoutTypeByIndex = (index) => {
-    const remainder = index % 4; // Mapped dynamically up to 4 groups
+    const remainder = index % 4;
     if (remainder === 0) return "xbox";
     if (remainder === 1) return "playstation";
     if (remainder === 2) return "nintendo";
-    return "playstation"; // Kids slide adopts beautiful playstation fanned orbits
+    return "playstation";
   };
 
   const handleSecondaryCtaClick = () => {
@@ -881,7 +876,7 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
   };
 
   return (
-    <CarouselSection>
+    <CarouselSection $compact={compact}>
       <Swiper
         modules={[Autoplay, Keyboard, Pagination]}
         loop={true}
@@ -902,25 +897,25 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
 
           const layoutType = getLayoutTypeByIndex(index);
 
-          // Render Slide 1: Xbox Style Layout (Fashion)
           if (layoutType === "xbox") {
             return (
               <SwiperSlide key={groupKey}>
-                <SlideLayout $isArabic={isArabic}>
+                <SlideLayout $isArabic={isArabic} $compact={compact}>
                   <AmbientGlow $gradient={config.bgGradient} />
                   <XboxTextColumn $isArabic={isArabic}>
                     <GroupEmoji $color={config.accentColor}>
                       {config.emoji}
                     </GroupEmoji>
-                    <EditorialTitle $color={config.accentColor}>
+                    <EditorialTitle $color={config.accentColor} $compact={compact}>
                       {config.title}
                     </EditorialTitle>
-                    <EditorialDescription>{config.desc}</EditorialDescription>
+                    <EditorialDescription $compact={compact}>{config.desc}</EditorialDescription>
 
                     <XboxActionRow>
                       <PrimaryCTAButton
                         type="button"
                         $color={config.accentColor}
+                        $compact={compact}
                         onClick={() => setActiveOverlayGroup(groupKey)}
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.98 }}
@@ -938,7 +933,7 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
                     </XboxActionRow>
                   </XboxTextColumn>
 
-                  <ArtCol>
+                  <ArtCol $compact={compact}>
                     {items.slice(0, 3).map((prod, pIdx) => (
                       <ResolvedFloatingProduct
                         key={prod._id || prod.id}
@@ -946,6 +941,7 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
                         index={pIdx}
                         config={config}
                         layoutType="xbox"
+                        compact={compact}
                       />
                     ))}
                   </ArtCol>
@@ -954,25 +950,25 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
             );
           }
 
-          // Render Slide 2 & Slide 4: PlayStation Style Layout (Accessories & Kids)
           if (layoutType === "playstation") {
             return (
               <SwiperSlide key={groupKey}>
-                <SlideLayout $isArabic={isArabic}>
+                <SlideLayout $isArabic={isArabic} $compact={compact}>
                   <AmbientGlow $gradient={config.bgGradient} />
                   
                   <PlayStationTextCol $isArabic={isArabic}>
                     <GroupEmoji $color={config.accentColor}>
                       {config.emoji}
                     </GroupEmoji>
-                    <EditorialTitle $color={config.accentColor}>
+                    <EditorialTitle $color={config.accentColor} $compact={compact}>
                       {config.title}
                     </EditorialTitle>
-                    <EditorialDescription>{config.desc}</EditorialDescription>
+                    <EditorialDescription $compact={compact}>{config.desc}</EditorialDescription>
 
                     <PrimaryCTAButton
                       type="button"
                       $color={config.accentColor}
+                      $compact={compact}
                       onClick={() => setActiveOverlayGroup(groupKey)}
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
@@ -983,7 +979,7 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
                     </PrimaryCTAButton>
                   </PlayStationTextCol>
 
-                  <ArtCol>
+                  <ArtCol $compact={compact}>
                     {items.slice(0, 3).map((prod, pIdx) => (
                       <ResolvedFloatingProduct
                         key={prod._id || prod.id}
@@ -991,6 +987,7 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
                         index={pIdx}
                         config={config}
                         layoutType="playstation"
+                        compact={compact}
                       />
                     ))}
                   </ArtCol>
@@ -999,24 +996,24 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
             );
           }
 
-          // Render Slide 3: Nintendo Style Layout (Sports)
           return (
             <SwiperSlide key={groupKey}>
-              <SlideLayout $isArabic={isArabic}>
+              <SlideLayout $isArabic={isArabic} $compact={compact}>
                 <AmbientGlow $gradient={config.bgGradient} />
                 
                 <NintendoTextCol $isArabic={isArabic}>
                   <GroupEmoji $color={config.accentColor}>
                     {config.emoji}
                   </GroupEmoji>
-                  <EditorialTitle $color={config.accentColor}>
+                  <EditorialTitle $color={config.accentColor} $compact={compact}>
                     {config.title}
                   </EditorialTitle>
-                  <EditorialDescription>{config.desc}</EditorialDescription>
+                  <EditorialDescription $compact={compact}>{config.desc}</EditorialDescription>
 
                   <PrimaryCTAButton
                     type="button"
                     $color={config.accentColor}
+                    $compact={compact}
                     onClick={() => setActiveOverlayGroup(groupKey)}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
@@ -1027,7 +1024,7 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
                   </PrimaryCTAButton>
                 </NintendoTextCol>
 
-                <ArtCol>
+                <ArtCol $compact={compact}>
                   {items.slice(0, 2).map((prod, pIdx) => (
                     <ResolvedFloatingProduct
                       key={prod._id || prod.id}
@@ -1035,6 +1032,7 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
                       index={pIdx}
                       config={config}
                       layoutType="nintendo"
+                      compact={compact}
                     />
                   ))}
                 </ArtCol>
@@ -1044,7 +1042,6 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
         })}
       </Swiper>
 
-      {/* 4xN VERTICAL SELECTION GRID OVERLAY */}
       <AnimatePresence>
         {activeOverlayGroup && (
           <GridOverlayBackdrop
@@ -1072,8 +1069,7 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
               </ModalHeader>
 
               <VerticalScrollGrid>
-                {/* Fail-safe grid population to prevent empty scroll results */}
-                {((groupedProducts[activeOverlayGroup] || []).length > 0 ? (groupedProducts[activeOverlayGroup] || []) : products).map((product, pIdx) => {
+                {((groupedProducts[activeOverlayGroup] || []).length > 0 ? (groupedProducts[activeOverlayGroup] || []) : products).map((product) => {
                   const themeColor = getGroupConfig(
                     activeOverlayGroup,
                     groupKeys.indexOf(activeOverlayGroup),
@@ -1102,60 +1098,10 @@ const DiscoveryCarousel = ({ products, onSelectCanvas }) => {
   );
 };
 
-const OptionGridCard = ({ product, color, onSelect }) => {
-  const [imgUrl, setImgUrl] = useState(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    const imgId =
-      product?.previewImages?.[0] ||
-      product?.availabilities?.[0]?.imageId ||
-      product?.imageId;
-
-    if (imgId) {
-      if (
-        typeof imgId === "string" &&
-        (imgId.startsWith("http") || imgId.startsWith("data:"))
-      ) {
-        setImgUrl(imgId);
-      } else {
-        getImage(imgId).then((res) => {
-          if (isMounted && res.data) {
-            setImgUrl(getImageUrl(res.data));
-          }
-        });
-      }
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, [product]);
-
-  const price =
-    product.availabilities?.[0]?.sizes?.[0]?.sellingPrice ||
-    product.sellingPrice ||
-    0;
-
-  return (
-    <OptionProductCard
-      $color={color}
-      onClick={onSelect}
-      whileHover={{ scale: 1.02, y: -4 }}
-    >
-      <CardImageStage>
-        {imgUrl ? <img src={imgUrl} alt="" /> : <span style={{ fontSize: "2rem" }}>👕</span>}
-      </CardImageStage>
-      <CardDetailsRow $color={color}>
-        <span className="name">{product.name}</span>
-        <span className="price">{price} DA</span>
-      </CardDetailsRow>
-    </OptionProductCard>
-  );
-};
-
 DiscoveryCarousel.propTypes = {
   products: PropTypes.array,
   onSelectCanvas: PropTypes.func.isRequired,
+  compact: PropTypes.bool
 };
 
 export default DiscoveryCarousel;

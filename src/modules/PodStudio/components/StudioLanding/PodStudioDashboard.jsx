@@ -17,6 +17,7 @@ import {
   updateCartQuantity,
   openCart,
   closeCart,
+  addToCart,
 } from "../../../Cart/state/reducers";
 import { partnerTheme } from "../../../../config/Themes";
 import { getImageUrl } from "../../../../utils/imageUtils";
@@ -64,7 +65,7 @@ const LayoutShell = styled.div`
 const MainContent = styled.main`
   flex: 1;
   width: 100%;
-  max-width: 1280px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 4rem 1.5rem;
   box-sizing: border-box;
@@ -72,11 +73,11 @@ const MainContent = styled.main`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 2.5rem;
+  gap: 3.5rem;
 
   @media (max-width: 768px) {
     padding: 1rem 1rem 3rem 1rem;
-    gap: 1.5rem;
+    gap: 2rem;
   }
 `;
 
@@ -272,6 +273,52 @@ const HiddenCartTriggerWrapper = styled.div`
   }
 `;
 
+const HeroTripleRow = styled.div`
+  width: 100%;
+  height: 78vh;
+  max-height: 80vh;
+  display: grid;
+  grid-template-columns: 5fr 11fr 8fr;
+  gap: 1.25rem;
+  padding: 0;
+  box-sizing: border-box;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr 1fr;
+    height: auto;
+    max-height: none;
+  }
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+    height: auto;
+    max-height: none;
+  }
+`;
+
+const TripleCol = styled.div`
+  height: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #08080a;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  @media (max-width: 1100px) {
+    max-height: 70vh;
+  }
+`;
+
+const HiddenOnMobileCol = styled(TripleCol)`
+  @media (max-width: 1100px) {
+    display: none;
+  }
+`;
+
 const uploadAssetWithFallback = async (fileBlob) => {
   const API_URL =
     process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
@@ -284,10 +331,7 @@ const uploadAssetWithFallback = async (fileBlob) => {
     });
     if (res.data && res.data.url) return res.data.url;
   } catch (err) {
-    console.warn(
-      "Cloudinary upload failed, using NestJS database fallback...",
-      err,
-    );
+    console.warn("Cloudinary upload failed, using fallback backend...", err);
   }
 
   const fallbackData = new FormData();
@@ -298,9 +342,7 @@ const uploadAssetWithFallback = async (fileBlob) => {
   if (fallbackRes.data && fallbackRes.data.id) {
     return `${API_URL}/image/raw/${fallbackRes.data.id}`;
   }
-  throw new Error(
-    "Failed to save custom asset across both primary and fallback backends.",
-  );
+  throw new Error("Failed to save custom asset across backends.");
 };
 
 const PodStudioDashboard = ({
@@ -334,10 +376,7 @@ const PodStudioDashboard = ({
     return cart.filter((item) => item.shopId === shopId);
   }, [cart, shopId]);
 
-  const shopLogoUrl = useMemo(
-    () => getImageUrl(selectedShopImage),
-    [selectedShopImage]
-  );
+  const shopLogoUrl = useMemo(() => getImageUrl(selectedShopImage), [selectedShopImage]);
 
   useEffect(() => {
     if (shopId && !selectedCanvas) {
@@ -440,7 +479,42 @@ const PodStudioDashboard = ({
     }
   };
 
-  // 🔴 THE MISSING FUNCTION THAT CONNECTS THE MODAL TO THE STUDIO
+  // 🟢 DIRECT BLANK ITEM ADD WITH AUTOMATIC CART OPENING
+  const handleDirectBlankOrder = (product) => {
+    if (!product) return;
+
+    const defaultAvail = product.availabilities?.[0];
+    const defaultSize = defaultAvail?.sizes?.[0];
+    const price = defaultSize?.sellingPrice || product.sellingPrice || 0;
+    const selectedColorVal = defaultAvail?.color || "white";
+    const selectedSizeVal = defaultSize?.size || "M";
+
+    const uniqueVariantId = `blank_${product._id || product.id}_${selectedColorVal}_${selectedSizeVal}`;
+    const resolvedCartImageId =
+      defaultAvail?.podFrontTemplateId ||
+      defaultAvail?.imageId ||
+      product.previewImages?.[0] ||
+      product.imageId ||
+      null;
+
+    const blankCartPayload = {
+      product,
+      productId: product._id || product.id,
+      variantId: uniqueVariantId,
+      title: product.name,
+      color: selectedColorVal,
+      size: selectedSizeVal,
+      sellingPrice: price,
+      imageId: resolvedCartImageId,
+      quantity: 1,
+      shopId: shopId,
+      podCustomization: null, // explicit null for blank items
+    };
+
+    dispatch(addToCart(blankCartPayload));
+    dispatch(openCart()); // 🟢 AUTOMATICALLY OPEN CART
+  };
+
   const handleSelectDesign = (canvasOrProduct, artistDesign = null, preferredSide = "front") => {
     if (!canvasOrProduct) return;
 
@@ -478,8 +552,6 @@ const PodStudioDashboard = ({
       };
     }
     setSelectedCanvas(canvasObj);
-    
-    // Smoothly scroll to top so the user sees the workspace
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -619,7 +691,6 @@ const PodStudioDashboard = ({
         <div className="pod-storefront-bg-glow" />
         <MainContent>
           <UnifiedHeaderRow>
-            {/* LEFT: BACK TO STUDIO BUTTON / HOME CIRCLE */}
             <HeaderLeft>
               {selectedCanvas ? (
                 <BackToStudioBtn onClick={handleBackToCatalog}>
@@ -633,14 +704,12 @@ const PodStudioDashboard = ({
               )}
             </HeaderLeft>
 
-            {/* CENTER: LANGUAGE DROPDOWN */}
             <HeaderCenter>
               <LangWrapper>
                 <LanguagesDropDown textColor="#ffffff" />
               </LangWrapper>
             </HeaderCenter>
 
-            {/* RIGHT: LOGO & BRAND LINK (Redirection to /aurasLab) */}
             <HeaderRight>
               {!selectedCanvas && shopCartItems.length > 0 && (
                 <FloatingCartPill onClick={() => setIsTrayOpen(true)}>
@@ -658,7 +727,6 @@ const PodStudioDashboard = ({
                 <span style={{ fontSize: "1.1rem" }}>🎨</span>
               </HeaderCircleBtn>
 
-              {/* 🔴 BRAND IDENTITY LINK: Redirects to /aurasLab */}
               <Link
                 to="/aurasLab"
                 style={{
@@ -706,34 +774,54 @@ const PodStudioDashboard = ({
               />
             </Suspense>
           ) : (
-            <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "5rem" }}>
+            <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "4rem" }}>
               <HeroSection
                 onScrollToCatalog={handleScrollToCatalog}
                 sampleProducts={rawProducts}
                 onSelectCanvas={handleSelectCanvas}
               />
 
-              <DiscoveryCarousel
-                products={rawProducts}
-                onSelectCanvas={handleSelectCanvas}
-              />
+              <HeroTripleRow $isArabic={isArabic}>
+                <HiddenOnMobileCol style={{ background: "#050507" }}>
+                  <CanvasLibrary
+                    shopId={shopId}
+                    onSelectCanvas={handleSelectCanvas}
+                    onBlankOrderClick={handleDirectBlankOrder}
+                    shop={shop}
+                    displayMode="marquee"
+                  />
+                </HiddenOnMobileCol>
 
-              <EditorialShowcase
-                shopId={shopId}
-                onSelectDesign={(canvas, artistDesign, preferredSide) => {
-                  if (artistDesign) {
-                    setSelectedArtistDesignForModal(artistDesign);
-                  } else {
-                    handleSelectDesign(canvas, artistDesign, preferredSide);
-                  }
-                }}
-              />
+                <TripleCol>
+                  <DiscoveryCarousel
+                    products={rawProducts}
+                    onSelectCanvas={handleSelectCanvas}
+                    compact={true}
+                  />
+                </TripleCol>
+
+                <TripleCol>
+                  <EditorialShowcase
+                    shopId={shopId}
+                    onSelectDesign={(canvas, artistDesign, preferredSide) => {
+                      if (artistDesign) {
+                        setSelectedArtistDesignForModal(artistDesign);
+                      } else {
+                        handleSelectDesign(canvas, artistDesign, preferredSide);
+                      }
+                    }}
+                    compact={true}
+                  />
+                </TripleCol>
+              </HeroTripleRow>
 
               <div id="canvas-library-anchor" style={{ scrollMarginTop: "100px" }}>
                 <CanvasLibrary
                   shopId={shopId}
                   onSelectCanvas={handleSelectCanvas}
+                  onBlankOrderClick={handleDirectBlankOrder}
                   shop={shop}
+                  displayMode="grid"
                 />
               </div>
 
@@ -781,7 +869,6 @@ const PodStudioDashboard = ({
           )}
         </AnimatePresence>
 
-        {/* Modal handles selection inside it */}
         <ArtistDesignProductModal
           isOpen={!!selectedArtistDesignForModal}
           onClose={() => setSelectedArtistDesignForModal(null)}
@@ -800,7 +887,7 @@ const PodStudioDashboard = ({
 PodStudioDashboard.propTypes = {
   shop: PropTypes.object.isRequired,
   selectedShopImage: PropTypes.object,
-  initialSku: PropTypes.string,
+  initialSku : PropTypes.string,
   initialGroup: PropTypes.string,
 };
 

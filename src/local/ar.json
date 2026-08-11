@@ -1393,5 +1393,18 @@
       "pricing": "سومة معقولة",
       "shipping": "توصيل 69 ولاية"
     }
-  }
+  },
+  "filter_title": "الفلاتر",
+  "filter_clear_all": "إلغاء الكل",
+  "filter_print_surface": "سطح الطباعة",
+  "filter_front_back_accessible": "وجه وظهر قابل للطباعة",
+  "filter_collection_group": "مجموعة التشكيلة",
+  "filter_fabric_weight": "وزن القماش",
+  "filter_material": "نوع الخامة",
+  "filter_cut_fit": "القَصّة والمقاس",
+  "filter_colors": "الألوان المتاحة",
+  "group_kids": "أطفال",
+  "group_fashion": "أزياء",
+  "group_accessories": "إكسسوارات",
+  "group_sports": "رياضة"
 }

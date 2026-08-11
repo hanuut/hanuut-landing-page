@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import {
   FaCloudUploadAlt,
   FaTrash,
@@ -9,6 +10,8 @@ import {
   FaSlidersH,
   FaCompass,
   FaPalette,
+  FaCheckCircle,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import {
   getGarmentDimensions,
@@ -19,55 +22,22 @@ import {
 import JoystickPositionPad from "./JoystickPositionPad";
 import RadialRotationDial from "./RadialRotationDial";
 
+// ===========================================================================
+// STYLED COMPONENTS - PRO INSPECTOR PANEL (PHOTOSHOP / FIGMA STYLE)
+// ===========================================================================
+
 const ControlsCard = styled.div`
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.75rem;
   box-sizing: border-box;
+  width: 100%;
 `;
 
-const TabBar = styled.div`
-  display: flex;
-  gap: 0.25rem;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 4px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  margin-bottom: 0.5rem;
-
-  @media (max-width: 1024px) {
-    display: none;
-  }
-`;
-
-const TabButton = styled.button`
-  flex: 1;
-  background: ${(props) =>
-    props.$active ? props.theme.primaryColor || "#F07A48" : "transparent"};
-  color: ${(props) => (props.$active ? "#050505" : "#a1a1aa")};
-  border: none;
-  padding: 0.55rem 0.25rem;
-  border-radius: 8px;
-  font-weight: 800;
-  font-size: 0.75rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  font-family: "Tajawal", sans-serif;
-  transition: all 0.2s;
-
-  &:hover {
-    color: ${(props) => (props.$active ? "#050505" : "#ffffff")};
-  }
-`;
-
-// 🔴 COMPACT UPLOAD ROW (2-COLUMN GRID)
 const CompactUploadRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -84,12 +54,12 @@ const CompactUploadZone = styled.label`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0.85rem 1rem;
+  padding: 0.75rem;
   border: 1.5px dashed ${(props) => props.theme.primaryColor || "#F07A48"};
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(240, 122, 72, 0.05);
   color: #ffffff;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -110,12 +80,12 @@ const ArtistSelectBtn = styled.button`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0.85rem 1rem;
+  padding: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
   color: #ffffff;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -127,6 +97,163 @@ const ArtistSelectBtn = styled.button`
   }
 `;
 
+// 🔴 3D STACKED HOVER & 5s TIMER ANIMATED ARTWORK WIDGET
+const StackedWidgetWrapper = styled(motion.div)`
+  background: rgba(18, 18, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 0.6rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+
+  &:hover {
+    border-color: rgba(240, 122, 72, 0.6);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  }
+`;
+
+const StackedImageContainer = styled.div`
+  position: relative;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+`;
+
+const StackLayer = styled(motion.div)`
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #18181b;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 2px;
+    box-sizing: border-box;
+  }
+`;
+
+const ActiveArtDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+  overflow: hidden;
+
+  .title {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #ffffff;
+    font-family: "Tajawal", sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dpi-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    font-family: monospace;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .dpi-good {
+    background: rgba(57, 161, 112, 0.15);
+    color: #39a170;
+  }
+
+  .dpi-low {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+  }
+`;
+
+const WidgetActionGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const IconActionButton = styled.button`
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #d4d4d8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  &.palette:hover {
+    background: #f07a48;
+    color: #000000;
+    border-color: #f07a48;
+  }
+
+  &.danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border-color: #ef4444;
+  }
+`;
+
+// 🔴 SEGMENTED INSPECTOR TAB BAR
+const TabBar = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+`;
+
+const TabButton = styled.button`
+  background: ${(props) =>
+    props.$active ? props.theme.primaryColor || "#F07A48" : "transparent"};
+  color: ${(props) => (props.$active ? "#050505" : "#a1a1aa")};
+  border: none;
+  padding: 0.45rem 0.2rem;
+  border-radius: 7px;
+  font-weight: ${(props) => (props.$active ? "700" : "500")};
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-family: "Tajawal", sans-serif;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: ${(props) => (props.$active ? "#050505" : "#ffffff")};
+  }
+`;
+
 const SingleRowDimension = styled.div`
   display: flex;
   align-items: center;
@@ -134,15 +261,15 @@ const SingleRowDimension = styled.div`
   gap: 0.75rem;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
   direction: ltr;
 
-  .dim-label {
-    font-size: 0.75rem;
-    font-weight: 800;
+   .dim-label {
+    font-size: 0.7rem;
+    font-weight: 500;
     color: #a1a1aa;
-    min-width: 50px;
+    min-width: 42px;
     text-transform: uppercase;
     font-family: "Tajawal", sans-serif;
   }
@@ -159,16 +286,16 @@ const SingleRowDimension = styled.div`
   .input-wrap {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
 
     input[type="number"] {
-      width: 55px;
+      width: 48px;
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 6px;
       color: white;
-      padding: 4px;
-      font-size: 0.8rem;
+      padding: 3px;
+      font-size: 0.75rem;
       text-align: center;
       outline: none;
       font-family: monospace;
@@ -184,80 +311,10 @@ const SingleRowDimension = styled.div`
     }
 
     span {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: #a1a1aa;
       font-weight: 700;
     }
-  }
-`;
-
-const ArtworkManager = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 0.5rem 0.75rem;
-  width: 100%;
-  box-sizing: border-box;
-  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
-`;
-
-const ArtworkInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-`;
-
-const ArtworkThumbnailWrap = styled.div`
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #27272a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  img {
-    max-width: 90%;
-    max-height: 90%;
-    object-fit: contain;
-  }
-`;
-
-const ActionRow = styled.div`
-  display: flex;
-  gap: 0.4rem;
-`;
-
-const MiniActionButton = styled.button`
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.02);
-  color: #a1a1aa;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  font-size: 0.95rem;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  &.danger:hover {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
-    border-color: #ef4444;
   }
 `;
 
@@ -269,8 +326,9 @@ const DesignControls = ({
   sizeChart = null,
   activeTab,
   setActiveTab,
-  isArtistLocked = false,
-  onToggleArtistTab,
+  onOpenDesignLibrary = () => {},
+  activePanel = "layer",
+  hideTabs = false,
 }) => {
   const { t, i18n } = useTranslation();
   const fileInputRef = useRef(null);
@@ -279,10 +337,23 @@ const DesignControls = ({
 
   const [aspectRatio, setAspectRatio] = useState(1);
   const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
+  const [isWidgetHovered, setIsWidgetHovered] = useState(false);
+  const [autoFanTrigger, setAutoFanTrigger] = useState(false);
 
   const garmentDims = useMemo(() => {
     return getGarmentDimensions(canvasName, selectedSize, sizeChart);
   }, [canvasName, selectedSize, sizeChart]);
+
+  // 🔴 5-SECOND AUTOMATED FANNING ANIMATION TIMER
+  useEffect(() => {
+    if (!designState.previewUrl) return;
+    const timer = setInterval(() => {
+      setAutoFanTrigger(true);
+      setTimeout(() => setAutoFanTrigger(false), 1200);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [designState.previewUrl]);
 
   useEffect(() => {
     let isMounted = true;
@@ -323,6 +394,15 @@ const DesignControls = ({
     return Math.round(imgDimensions.width / widthInInches);
   }, [imgDimensions, physicalMetrics.width]);
 
+  // 🔴 ZERO ROUTE NAVIGATION HANDLER FOR PALETTE & LAYER CARD
+  const handleOpenLibraryClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onOpenDesignLibrary) {
+      onOpenDesignLibrary();
+    }
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -355,27 +435,21 @@ const DesignControls = ({
     });
   };
 
-  const isDesktop = typeof window !== "undefined" && window.innerWidth > 1024;
-  const showTransform = isDesktop || activeTab === "transform";
-  const showPosition = isDesktop || activeTab === "position";
-  const showRotation = isDesktop || activeTab === "rotation";
+  // 🔴 STRICT SEGMENTED TAB INSPECTOR (Applied to both Desktop & Mobile)
+  const showTransform = activeTab === "transform";
+  const showPosition = activeTab === "position";
+  const showRotation = activeTab === "rotation";
+
+  const isFanned = isWidgetHovered || autoFanTrigger;
 
   return (
     <div id="design-controls-section" style={{ width: "100%" }}>
-      {!designState.previewUrl ? (
-        isArtistLocked ? (
-          <div
-            style={{ color: "#71717a", textAlign: "center", padding: "2rem" }}
-          >
-            {isArabic
-              ? "هذا التصميم محمي بواسطة الفنان."
-              : "This original artwork is protected by the artist."}
-          </div>
-        ) : (
+      {activePanel === "layer" && (
+        !designState.previewUrl ? (
           <CompactUploadRow>
             <CompactUploadZone>
               <FaCloudUploadAlt
-                style={{ fontSize: "1.2rem", color: "#F07A48" }}
+                style={{ fontSize: "1.1rem", color: "#F07A48" }}
               />
               <span>{isArabic ? "رفع تصميم PNG" : "Upload PNG"}</span>
               <input
@@ -388,69 +462,85 @@ const DesignControls = ({
 
             <ArtistSelectBtn
               type="button"
-              onClick={() => onToggleArtistTab && onToggleArtistTab()}
+              onClick={handleOpenLibraryClick}
             >
               <FaPalette style={{ color: "#39A170" }} />
               <span>{isArabic ? "تصاميم الفنانين" : "Artist Designs"}</span>
             </ArtistSelectBtn>
           </CompactUploadRow>
-        )
-      ) : (
-        <ControlsCard>
-          {showTransform && (
-            <ArtworkManager $isArabic={isArabic}>
-              <ArtworkInfo>
-                <ArtworkThumbnailWrap>
-                  <img src={designState.previewUrl} alt="Thumbnail" />
-                </ArtworkThumbnailWrap>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "2px",
-                    textAlign: "start",
-                  }}
+        ) : (
+          <StackedWidgetWrapper
+            $isArabic={isArabic}
+            onMouseEnter={() => setIsWidgetHovered(true)}
+            onMouseLeave={() => setIsWidgetHovered(false)}
+            onClick={handleOpenLibraryClick}
+            title={isArabic ? "تغيير التصميم" : "Change Artwork"}
+          >
+            <StackedImageContainer>
+              <StackLayer
+                animate={
+                  isFanned
+                    ? { x: -8, rotate: -6, opacity: 0.5 }
+                    : { x: 0, rotate: 0, opacity: 0.3 }
+                }
+                transition={{ duration: 0.25 }}
+              >
+                <img src={designState.previewUrl} alt="" />
+              </StackLayer>
+
+              <StackLayer
+                animate={
+                  isFanned
+                    ? { x: -4, rotate: -3, opacity: 0.75 }
+                    : { x: 0, rotate: 0, opacity: 0.6 }
+                }
+                transition={{ duration: 0.25 }}
+              >
+                <img src={designState.previewUrl} alt="" />
+              </StackLayer>
+
+              <StackLayer style={{ zIndex: 5, opacity: 1 }}>
+                <img src={designState.previewUrl} alt="Active Artwork" />
+              </StackLayer>
+            </StackedImageContainer>
+
+            <ActiveArtDetails $isArabic={isArabic}>
+              <span className="title">
+                {designState.file?.name
+                  ? designState.file.name.substring(0, 15) + "..."
+                  : "Artwork Layer"}
+              </span>
+
+              {dpiValue > 0 && (
+                <span
+                  className={`dpi-badge ${
+                    dpiValue >= 150 ? "dpi-good" : "dpi-low"
+                  }`}
                 >
-                  <span
-                    style={{
-                      fontSize: "0.85rem",
-                      fontWeight: "700",
-                      color: "#FFF",
-                    }}
-                  >
-                    {isArtistLocked
-                      ? isArabic
-                        ? "تصميم محمي"
-                        : "Original Design"
-                      : designState.file?.name
-                      ? designState.file.name.substring(0, 14) + "..."
-                      : "Artwork Layer"}
-                  </span>
+                  {dpiValue >= 150 ? <FaCheckCircle /> : <FaExclamationTriangle />}
+                  DPI {dpiValue}
+                </span>
+              )}
+            </ActiveArtDetails>
 
-                  {dpiValue > 0 && (
-                    <span
-                      style={{
-                        fontSize: "0.72rem",
-                        color: dpiValue >= 150 ? "#39A170" : "#ef4444",
-                        fontWeight: "700",
-                      }}
-                    >
-                      {dpiValue} DPI (
-                      {dpiValue >= 150
-                        ? t("pod_studio_status_artwork_ok", "High Quality")
-                        : "Low Quality"}
-                      )
-                    </span>
-                  )}
-                </div>
-              </ArtworkInfo>
-
-              <ActionRow>
-                
-              <MiniActionButton
+            <WidgetActionGroup>
+              <IconActionButton
                 type="button"
-                title="Replace Artwork"
-                onClick={() => replacementInputRef.current?.click()}
+                className="palette"
+                title={isArabic ? "تغيير التصميم" : "Change Artwork"}
+                onClick={handleOpenLibraryClick}
+              >
+                <FaPalette />
+              </IconActionButton>
+
+              <IconActionButton
+                type="button"
+                title="Replace File"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  replacementInputRef.current?.click();
+                }}
               >
                 <FaCloudUploadAlt />
                 <input
@@ -458,72 +548,59 @@ const DesignControls = ({
                   ref={replacementInputRef}
                   accept="image/png, image/jpeg, image/*"
                   onChange={handleFileChange}
-                  style={{
-                    position: "absolute",
-                    width: "0.1px",
-                    height: "0.1px",
-                    opacity: 0,
-                    zIndex: -1,
-                  }}
+                  style={{ display: "none" }}
                 />
-              </MiniActionButton>
-              
-              {/* Add the Artist Catalog Button right next to it! */}
-              <MiniActionButton
-                type="button"
-                title="Artist Catalog"
-                onClick={() => onToggleArtistTab && onToggleArtistTab()}
-              >
-                <FaPalette style={{ color: "#39A170" }} />
-              </MiniActionButton>
+              </IconActionButton>
 
-              <MiniActionButton
+              <IconActionButton
                 type="button"
                 className="danger"
                 title="Remove Artwork"
-                onClick={handleReset}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  handleReset();
+                }}
               >
                 <FaTrash />
-              </MiniActionButton>
-            </ActionRow>
+              </IconActionButton>
+            </WidgetActionGroup>
+          </StackedWidgetWrapper>
+        )
+      )}
 
-            </ArtworkManager>
+      {activePanel === "transform" && (
+        <ControlsCard style={{ padding: hideTabs ? "0" : "0.75rem", border: hideTabs ? "none" : "1px solid rgba(255, 255, 255, 0.06)", background: hideTabs ? "transparent" : "rgba(255, 255, 255, 0.02)" }}>
+          {!hideTabs && (
+            <TabBar>
+              <TabButton
+                type="button"
+                $active={activeTab === "transform"}
+                onClick={() => setActiveTab("transform")}
+              >
+                <FaCropAlt /> {isArabic ? "الحجم" : "Size"}
+              </TabButton>
+
+              <TabButton
+                type="button"
+                $active={activeTab === "position"}
+                onClick={() => setActiveTab("position")}
+              >
+                <FaCompass /> {isArabic ? "الموقع" : "Position"}
+              </TabButton>
+
+              <TabButton
+                type="button"
+                $active={activeTab === "rotation"}
+                onClick={() => setActiveTab("rotation")}
+              >
+                <FaSlidersH /> {isArabic ? "الدوران" : "Rotate"}
+              </TabButton>
+            </TabBar>
           )}
 
-          <TabBar>
-            <TabButton
-              type="button"
-              $active={activeTab === "transform"}
-              onClick={() => setActiveTab("transform")}
-            >
-              <FaCropAlt /> {isArabic ? "الحجم" : "Scale"}
-            </TabButton>
-
-            <TabButton
-              type="button"
-              $active={activeTab === "position"}
-              onClick={() => setActiveTab("position")}
-            >
-              <FaCompass /> {isArabic ? "الموقع" : "Position"}
-            </TabButton>
-
-            <TabButton
-              type="button"
-              $active={activeTab === "rotation"}
-              onClick={() => setActiveTab("rotation")}
-            >
-              <FaSlidersH /> {isArabic ? "الدوران" : "Rotate"}
-            </TabButton>
-          </TabBar>
-
           {showTransform && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.75rem",
-              }}
-            >
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               <SingleRowDimension>
                 <span className="dim-label">
                   {isArabic ? "العرض" : "Width"}
@@ -574,7 +651,7 @@ const DesignControls = ({
           )}
 
           {showPosition && (
-            <div style={{ marginTop: isDesktop ? "0.5rem" : "0" }}>
+            <div style={{ marginTop: "0.1rem" }}>
               <JoystickPositionPad
                 x={designState.x}
                 y={designState.y}
@@ -587,7 +664,7 @@ const DesignControls = ({
           )}
 
           {showRotation && (
-            <div style={{ marginTop: isDesktop ? "0.5rem" : "0" }}>
+            <div style={{ marginTop: "0.1rem" }}>
               <RadialRotationDial
                 rotation={designState.rotation}
                 onChange={(rot) =>
@@ -610,8 +687,9 @@ DesignControls.propTypes = {
   sizeChart: PropTypes.object,
   activeTab: PropTypes.string.isRequired,
   setActiveTab: PropTypes.func.isRequired,
-  isArtistLocked: PropTypes.bool,
-  onToggleArtistTab: PropTypes.func,
+  onOpenDesignLibrary: PropTypes.func,
+  activePanel: PropTypes.string,
+  hideTabs: PropTypes.bool,
 };
 
 export default DesignControls;

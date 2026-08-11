@@ -1,18 +1,16 @@
 // src/modules/PodStudio/components/storefront/sections/EditorialShowcase.jsx
+
 import React, { useEffect, useState, useMemo } from "react";
 import PropTypes from "prop-types";
 import styled, { createGlobalStyle } from "styled-components";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaCheckCircle, FaTimes, FaPalette, FaPaintBrush } from "react-icons/fa";
+import { FaCheckCircle, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../../../../components/Loader";
 import ArtistDesignProductModal from "../../Workspace/ArtistDesignProductModal";
 
-// ===========================================================================
-// STYLED COMPONENTS & DYNAMIC HEIGHT ENGINE
-// ===========================================================================
 const ModalBodyLock = createGlobalStyle`
   body {
     overflow: hidden !important;
@@ -22,130 +20,119 @@ const ModalBodyLock = createGlobalStyle`
 
 const ShowcaseSection = styled.section`
   width: 100%;
+  height: 100%;
   position: relative;
-  background-color: #000000;
+  background-color: #08080a;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid #171717;
-  border-bottom: 1px solid #171717;
-  transition: all 0.5s ease-out;
+  padding: ${(props) => (props.$compact ? "1.75rem" : "3rem 1.5rem")};
+  overflow-y: auto;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 
-  /* 🔴 DYNAMIC SECTION HEIGHT CONSTRAINT */
-  ${(props) => {
-    if (props.$artistCount <= 4) {
-      return `
-        min-height: 35vh;
-        padding: 3rem 0;
-      `;
-    } else if (props.$artistCount <= 8) {
-      return `
-        min-height: 60vh;
-        padding: 5rem 0;
-      `;
-    } else {
-      return `
-        height: 100vh;
-        padding: 2rem 0;
-        overflow-y: auto;
-      `;
-    }
-  }}
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
 `;
 
 const HeaderRow = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 3.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
-  gap: 1.5rem;
-  max-width: 1280px;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
+  gap: 1rem;
+  width: 100%;
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 `;
 
 const SectionHeader = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 `;
 
 const CategoryLabel = styled.span`
   font-family: monospace;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #f07a48;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   font-weight: 700;
 `;
 
 const Title = styled.h2`
-  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-size: ${(props) => (props.$compact ? "1.25rem" : "clamp(1.8rem, 3vw, 2.5rem)")};
   font-weight: 900;
   color: #ffffff;
   margin: 0;
   font-family: "Tajawal", sans-serif;
-  letter-spacing: -1px;
+  line-height: 1.2;
 `;
 
 const JoinCreatorBtn = styled.button`
   background: rgba(240, 122, 72, 0.1);
   border: 1px solid rgba(240, 122, 72, 0.3);
   color: #f07a48;
-  padding: 0.8rem 1.75rem;
+  padding: 0.5rem 1rem;
   border-radius: 50px;
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   transition: all 0.25s;
   font-family: "Tajawal", sans-serif;
+  flex-shrink: 0;
 
   &:hover {
     background: #f07a48;
     color: #050505;
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(240, 122, 72, 0.3);
   }
 `;
 
-// --- ARTIST CARD REFINEMENTS ---
+/* 🔴 2-ELEMENTS PER LINE GRID WITH FULL-WIDTH EXPANSION ON HOVER */
 const ArtistBentoGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  max-width: 1280px;
-  width: 90%;
-  margin: 0 auto;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+  box-sizing: border-box;
 
-  @media (max-width: 768px) {
+  @media (max-width: 600px) {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
   }
 `;
 
 const ArtistCardWrapper = styled(motion.div)`
-  aspect-ratio: 4 / 4.5;
-  background: #0c0c0e;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 24px;
+  height: 220px;
+  background: #0f1013;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
   position: relative;
   overflow: hidden;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  transition: grid-column 0.3s ease, border-color 0.3s ease;
+
+  &:hover {
+    grid-column: 1 / -1;
+    border-color: rgba(240, 122, 72, 0.4);
+  }
 
   &::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(240, 122, 72, 0.04) 0%, transparent 70%);
     z-index: 0;
     pointer-events: none;
   }
@@ -154,7 +141,7 @@ const ArtistCardWrapper = styled(motion.div)`
 const FanningStage = styled(motion.div)`
   position: absolute;
   inset: 0;
-  bottom: 80px;
+  bottom: 55px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -169,16 +156,16 @@ const FanningStage = styled(motion.div)`
 
 const CardArtwork = styled(motion.div)`
   position: absolute;
-  width: 160px;
-  height: 200px;
+  width: 110px;
+  height: 130px;
   background: #18181b;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 8px;
   box-sizing: border-box;
 
   img {
@@ -188,7 +175,7 @@ const CardArtwork = styled(motion.div)`
   }
 `;
 
-// 🔴 BASE STATE: Avatar & Details centered, pushes down on hover
+/* 🔴 BASE STATE WITH DESIGN PREVIEW TILE STACK INSTEAD OF LETTER CIRCLE */
 const BaseStateView = styled(motion.div)`
   position: absolute;
   inset: 0;
@@ -196,84 +183,91 @@ const BaseStateView = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
   z-index: 2;
-  transition: transform 0.4s ease, opacity 0.4s ease;
+  padding: 1rem;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 
   ${ArtistCardWrapper}:hover & {
-    transform: translateY(-20px);
+    transform: translateY(-15px);
     opacity: 0;
     pointer-events: none;
   }
 `;
 
-const AvatarCircle = styled.div`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: #f07a48;
-  color: #000;
+const DesignStackPreview = styled.div`
+  width: 68px;
+  height: 68px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 4px;
+  box-sizing: border-box;
+  overflow: hidden;
+`;
+
+const MiniDesignTile = styled.div`
+  width: 100%;
+  height: 100%;
+  background: #18181c;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  font-weight: 900;
-  box-shadow: 0 10px 25px rgba(240, 122, 72, 0.3);
+  overflow: hidden;
+
+  img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+  }
+
+  span {
+    font-size: 0.65rem;
+    color: #52525b;
+  }
 `;
 
-const ArtistCardFooter = styled(motion.div)`
+const ArtistCardFooter = styled.div`
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 3rem 1.5rem 1.5rem 1.5rem;
-  background: linear-gradient(to top, rgba(5, 5, 5, 1) 0%, rgba(5, 5, 5, 0.8) 50%, transparent 100%);
+  padding: 0.75rem 1rem;
+  background: rgba(10, 10, 12, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   z-index: 3;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+  justify-content: space-between;
+  align-items: center;
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
-  ${(props) => (props.$isArabic ? "align-items: flex-end; text-align: right;" : "")}
 `;
 
 const ArtistName = styled.h3`
-  font-size: 1.4rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: white;
-  margin: 0 0 6px 0;
+  margin: 0;
   font-family: "Tajawal", sans-serif;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 `;
 
 const ArtistMetaPill = styled.span`
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: #a1a1aa;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 50px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   font-family: "Cairo", sans-serif;
 `;
 
-const HoverCtaBtn = styled(motion.div)`
-  background: #f07a48;
-  color: #000;
-  padding: 0.6rem 1.2rem;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 800;
-  font-family: "Tajawal", sans-serif;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  overflow: hidden;
-`;
-
-// --- IMMERSIVE TAKEOVER MODAL & STICKY TABS ---
 const Overlay = styled(motion.div)`
   position: fixed;
   inset: 0;
@@ -358,7 +352,6 @@ const CloseBtn = styled.button`
   }
 `;
 
-// 🔴 STICKY CATEGORY TABS
 const StickyTabsBar = styled.div`
   position: sticky;
   top: 0;
@@ -404,7 +397,6 @@ const ModalBody = styled.div`
   @media (max-width: 768px) { padding: 1.5rem; }
 `;
 
-// 🔴 BALANCED CSS GRID
 const DesignsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -484,46 +476,38 @@ const DirectTextOverlay = styled.div`
 `;
 
 const EmptyContainer = styled.div`
-  padding: 4rem 1rem;
-  width: 90%;
-  max-width: 1280px;
-  margin: 0 auto;
+  padding: 2rem 1rem;
+  width: 100%;
   border: 1px dashed rgba(255, 255, 255, 0.08);
-  border-radius: 28px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #71717a;
   font-family: "Cairo", sans-serif;
+  font-size: 0.85rem;
 `;
 
-// ===========================================================================
-// ANIMATION VARIANTS (THE FANNING EFFECT)
-// ===========================================================================
 const getFanVariants = (index, total) => {
   const initial = {
     x: 0, y: index * 2, rotate: 0, scale: 0.9, zIndex: total - index
   };
 
-  let hoverX = 0, hoverY = -15, hoverRot = 0;
-  if (total === 1) { hoverX = 0; hoverRot = 0; hoverY = -15; } 
+  let hoverX = 0, hoverY = -10, hoverRot = 0;
+  if (total === 1) { hoverX = 0; hoverRot = 0; hoverY = -10; } 
   else if (total === 2) {
-    if (index === 0) { hoverX = -35; hoverRot = -12; } else { hoverX = 35; hoverRot = 12; }
+    if (index === 0) { hoverX = -25; hoverRot = -10; } else { hoverX = 25; hoverRot = 10; }
   } else {
-    if (index === 0) { hoverX = -50; hoverRot = -15; hoverY = 10; } 
-    else if (index === 1) { hoverX = 0; hoverRot = 0; hoverY = -20; } 
-    else if (index === 2) { hoverX = 50; hoverRot = 15; hoverY = 10; } 
-    else { hoverX = (index % 2 === 0 ? 60 : -60); hoverRot = (index % 2 === 0 ? 20 : -20); hoverY = 20; }
+    if (index === 0) { hoverX = -35; hoverRot = -12; hoverY = 5; } 
+    else if (index === 1) { hoverX = 0; hoverRot = 0; hoverY = -15; } 
+    else if (index === 2) { hoverX = 35; hoverRot = 12; hoverY = 5; } 
+    else { hoverX = (index % 2 === 0 ? 40 : -40); hoverRot = (index % 2 === 0 ? 15 : -15); hoverY = 10; }
   }
 
   return { initial, hover: { x: hoverX, y: hoverY, rotate: hoverRot, scale: index === 1 ? 1 : 0.9, zIndex: total - index } };
 };
 
-// ===========================================================================
-// MAIN COMPONENT
-// ===========================================================================
-
-const EditorialShowcase = ({ shopId, onSelectDesign }) => {
+const EditorialShowcase = ({ shopId, onSelectDesign, compact = false }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const navigate = useNavigate();
@@ -549,7 +533,7 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
     const map = {};
     designs.forEach(design => {
       const meta = design.podDesignMetadata || {};
-      const artistName = meta.artistName || "Studio Collaborator";
+      const artistName = meta.artistName || "Studio Creator";
       const collectionName = meta.collectionName || "Studio Drop";
 
       if (!map[artistName]) {
@@ -562,14 +546,13 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
       map[artistName].collections[collectionName].push(design);
       map[artistName].totalDesigns += 1;
 
-      if (map[artistName].previewImages.length < 3) {
+      if (map[artistName].previewImages.length < 4) {
         map[artistName].previewImages.push(design);
       }
     });
     return Object.values(map);
   }, [designs]);
 
-  // Reset tab when modal opens
   useEffect(() => {
     if (activeCreator) setActiveTab("All");
   }, [activeCreator]);
@@ -578,14 +561,14 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
 
   if (creators.length === 0) {
     return (
-      <ShowcaseSection $artistCount={0}>
+      <ShowcaseSection $compact={compact} $isArabic={isArabic}>
         <HeaderRow $isArabic={isArabic}>
           <SectionHeader>
             <CategoryLabel>{t("pod_studio_hero_badge", "CURATED LAB")}</CategoryLabel>
-            <Title>{t("editorial_showcase_title", "Featured Collaborations")}</Title>
+            <Title $compact={compact}>{t("editorial_showcase_title", "AURASLAB X CREATORS")}</Title>
           </SectionHeader>
           <JoinCreatorBtn onClick={() => navigate("collab")}>
-            <span>🎨</span> {t("pod_studio_join_creators_btn", "Join as a Creator")}
+            <span>🎨</span> {t("pod_studio_join_creators_btn", "Join")}
           </JoinCreatorBtn>
         </HeaderRow>
         <EmptyContainer>
@@ -595,7 +578,6 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
     );
   }
 
-  // Generate Filtered Designs for the active modal
   let displayedDesigns = [];
   let collectionNames = [];
   if (activeCreator) {
@@ -608,20 +590,25 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
   }
 
   return (
-    <ShowcaseSection className="editorial-showcase-section" $artistCount={creators.length}>
+    <ShowcaseSection $compact={compact} $isArabic={isArabic}>
       <HeaderRow $isArabic={isArabic}>
         <SectionHeader>
-          <CategoryLabel>{t("pod_studio_hero_badge", "PREMIUM BLANKS")}</CategoryLabel>
-          <Title>{t("editorial_showcase_title", "AURASLAB X CREATORS")}</Title>
+          <CategoryLabel>{t("pod_studio_hero_badge", "COLLABORATIONS")}</CategoryLabel>
+          <Title $compact={compact}>
+            {isArabic ? "الصنايعية X AURASLAB" : "AURASLAB X CREATORS"}
+          </Title>
         </SectionHeader>
         <JoinCreatorBtn onClick={() => navigate("collab")}>
-          <span>🎨</span> {t("pod_studio_join_creators_btn", "Join as a Creator")}
+          <span>🎨</span> {t("pod_studio_join_creators_btn", "Join")}
         </JoinCreatorBtn>
       </HeaderRow>
 
+      {/* 🔴 2-ELEMENT GRID WITH HOVER FULL-WIDTH EXPANSION */}
       <ArtistBentoGrid>
         {creators.map((creator, idx) => {
           const creatorKey = creator.artistName || `creator-${idx}`;
+          const previews = creator.previewImages.slice(0, 4);
+
           return (
             <ArtistCardWrapper
               key={creatorKey}
@@ -629,20 +616,28 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
               whileHover="hover"
               onClick={() => setActiveCreator(creator)}
             >
+              {/* BASE STATE: STACKED DESIGNS TILES */}
               <BaseStateView>
-                <AvatarCircle>{creator.artistName.charAt(0).toUpperCase()}</AvatarCircle>
-                <ArtistName>
-                  {creator.artistName}
-                  <FaCheckCircle color="#39A170" size={16} title="Verified Creator" />
-                </ArtistName>
-                <ArtistMetaPill>
-                  {Object.keys(creator.collections).length} {isArabic ? "تشكيلات" : "Collections"} • {creator.totalDesigns} {isArabic ? "تصاميم" : "Designs"}
-                </ArtistMetaPill>
+                <DesignStackPreview>
+                  {[0, 1, 2, 3].map((tileIdx) => {
+                    const imgObj = previews[tileIdx];
+                    return (
+                      <MiniDesignTile key={tileIdx}>
+                        {imgObj ? (
+                          <img src={`${API_URL}/image/raw/${imgObj._id || imgObj.id}`} alt="Design tile" />
+                        ) : (
+                          <span>✨</span>
+                        )}
+                      </MiniDesignTile>
+                    );
+                  })}
+                </DesignStackPreview>
               </BaseStateView>
 
+              {/* HOVER STATE: FANNING ARTWORK PREVIEWS */}
               <FanningStage>
-                {creator.previewImages.map((img, i) => {
-                  const total = creator.previewImages.length;
+                {previews.map((img, i) => {
+                  const total = previews.length;
                   const imgKey = img._id || img.id || `img-${i}`;
                   return (
                     <CardArtwork
@@ -655,23 +650,32 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
                   );
                 })}
               </FanningStage>
+
+              <ArtistCardFooter $isArabic={isArabic}>
+                <ArtistName>
+                  {creator.artistName}
+                  <FaCheckCircle color="#39A170" size={14} title="Verified Creator" />
+                </ArtistName>
+                <ArtistMetaPill>
+                  {creator.totalDesigns} {isArabic ? "تصاميم" : "Designs"}
+                </ArtistMetaPill>
+              </ArtistCardFooter>
             </ArtistCardWrapper>
           );
         })}
       </ArtistBentoGrid>
 
-
-      {/* 🔴 IMMERSIVE CREATOR TAKEOVER MODAL */}
+      {/* MODAL TAKEOVER */}
       <AnimatePresence>
         {activeCreator && (
           <>
             <ModalBodyLock />
             <Overlay
-               key="creator-takeover-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setActiveCreator(null)}
+              key="creator-takeover-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActiveCreator(null)}
             >
               <ModalContainer
                 $isArabic={isArabic}
@@ -697,7 +701,7 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
                   <TabButton $active={activeTab === "All"} onClick={() => setActiveTab("All")}>
                     {isArabic ? "الكل" : "All"}
                   </TabButton>
-                  {collectionNames.map(colName => (
+                  {collectionNames.map((colName) => (
                     <TabButton key={colName} $active={activeTab === colName} onClick={() => setActiveTab(colName)}>
                       {colName}
                     </TabButton>
@@ -725,7 +729,7 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
                             <span className="art-title">{cleanTitle}</span>
                           </DirectTextOverlay>
                           <div className="hover-overlay">
-                             {isArabic ? "اختر التصميم" : "Select Design"}
+                            {isArabic ? "اختر التصميم" : "Select Design"}
                           </div>
                         </PureTextDesignCard>
                       );
@@ -755,6 +759,7 @@ const EditorialShowcase = ({ shopId, onSelectDesign }) => {
 EditorialShowcase.propTypes = {
   shopId: PropTypes.string.isRequired,
   onSelectDesign: PropTypes.func.isRequired,
+  compact: PropTypes.bool,
 };
 
 export default EditorialShowcase;

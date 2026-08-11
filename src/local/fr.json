@@ -1387,6 +1387,19 @@
       "pricing": "Prix Direct Atelier",
       "shipping": "Livraison 69 Wilayas"
     }
-  }
+  },
+  "filter_title": "Filtres",
+  "filter_clear_all": "Tout effacer",
+  "filter_print_surface": "Surface d'impression",
+  "filter_front_back_accessible": "Face & Dos Imprimables",
+  "filter_collection_group": "Groupe de Collection",
+  "filter_fabric_weight": "Poids du Tissu",
+  "filter_material": "Matière",
+  "filter_cut_fit": "Coupe & Forme",
+  "filter_colors": "Couleurs",
+  "group_kids": "Enfants",
+  "group_fashion": "Mode",
+  "group_accessories": "Accessoires",
+  "group_sports": "Sport"
 
 }

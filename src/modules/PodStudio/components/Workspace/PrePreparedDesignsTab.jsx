@@ -105,10 +105,8 @@ export default function PrePreparedDesignsTab({ onSelectArtwork }) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "0.75rem",
-          maxHeight: "220px",
-          overflowY: "auto",
+          gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+          gap: "1rem",
           paddingRight: "4px",
         }}
       >
@@ -123,7 +121,7 @@ export default function PrePreparedDesignsTab({ onSelectArtwork }) {
             <button
               type="button"
               key={art._id || art.id}
-              onClick={() => onSelectArtwork(artworkUrl, placement)}
+              onClick={() => onSelectArtwork(artworkUrl, placement, art)}
               style={{
                 background: "rgba(255, 255, 255, 0.02)",
                 border: "1px solid rgba(255, 255, 255, 0.06)",
