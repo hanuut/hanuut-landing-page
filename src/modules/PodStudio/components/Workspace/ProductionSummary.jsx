@@ -1,15 +1,12 @@
-import React, { useMemo, useEffect, useState } from "react";
+// src/modules/PodStudio/components/Workspace/ProductionSummary.jsx
+
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { addToCart, updateCartQuantity } from "../../../Cart/state/reducers";
 import { persistFile, retrieveFile } from "../../utils/indexedDbHelper";
-import {
-  getGarmentDimensions,
-  getTemplateConfig,
-  getRawPrintCost,
-} from "../../hooks/usePrintableArea";
 
 const BillCard = styled.div`
   background: #060608;
@@ -18,38 +15,50 @@ const BillCard = styled.div`
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
   width: 100%;
   box-sizing: border-box;
   margin-top: auto;
 `;
 
-const CostRow = styled.div`
+const BaseRow = styled.div`
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #a1a1aa;
   font-family: "Cairo", sans-serif;
-  font-weight: 600;
+  font-weight: 500;
 `;
 
-const GrandTotalRow = styled(CostRow)`
+const PrintRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #ffffff;
+  font-family: "Cairo", sans-serif;
+  font-weight: 700;
+`;
+
+const GrandTotalRow = styled.div`
+  display: flex;
+  justify-content: space-between;
   border-top: 1px dashed rgba(255, 255, 255, 0.1);
-  padding-top: 0.75rem;
-  margin-top: 0.25rem;
-  font-size: 1.15rem;
+  padding-top: 0.6rem;
+  margin-top: 0.2rem;
+  font-size: 0.9rem; /* ~10% larger than 0.8rem */
   font-weight: 800;
   color: ${(props) => props.theme.primaryColor || "#F07A48"};
+  font-family: "Tajawal", sans-serif;
 `;
 
 const CommitButton = styled.button`
   width: 100%;
-  padding: 1rem;
+  padding: 0.9rem;
   background-color: ${(props) => props.theme.primaryColor || "#F07A48"};
   color: #050505;
   border: none;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.2s;
@@ -78,77 +87,22 @@ const ProductionSummary = ({
   shopId,
   onCommitSuccess,
   editingCartItem,
+  // 🔴 NEW: Pricing values passed down from DesignWorkspace to prevent duplicate calculation
+  baseCost,
+  frontPrintCost,
+  backPrintCost,
+  totalCost,
 }) => {
   const { t, i18n } = useTranslation();
-  // 🔴 FIX: DEFINE 'isArabic' LOCALLY
   const isArabic = i18n.language === "ar";
   const dispatch = useDispatch();
 
   const activeColorObj = canvas.availableColors.find(
-    (c) => c.colorName === selectedColor
+    (c) => c.colorName === selectedColor,
   );
 
-  const baseCost = useMemo(() => {
-    const matchedSize = canvas.sizes.find((s) => s.sizeCode === selectedSize);
-    return matchedSize ? matchedSize.baseCost : 0;
-  }, [canvas, selectedSize]);
-
-  const [frontAspect, setFrontAspect] = useState(1);
-  const [backAspect, setBackAspect] = useState(1);
-
-  useEffect(() => {
-    let isMounted = true;
-    if (frontDesign.previewUrl) {
-      const img = new Image();
-      img.src = frontDesign.previewUrl;
-      img.onload = () => {
-        if (isMounted) setFrontAspect(img.naturalWidth / img.naturalHeight);
-      };
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, [frontDesign.previewUrl]);
-
-  useEffect(() => {
-    let isMounted = true;
-    if (backDesign.previewUrl) {
-      const img = new Image();
-      img.src = backDesign.previewUrl;
-      img.onload = () => {
-        if (isMounted) setBackAspect(img.naturalWidth / img.naturalHeight);
-      };
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, [backDesign.previewUrl]);
-
-  const cfg = useMemo(() => getTemplateConfig(canvas.title), [canvas.title]);
-  const garmentDims = useMemo(() => getGarmentDimensions(canvas.title, selectedSize, canvas.sizeChart), [canvas.title, selectedSize, canvas.sizeChart]);
-
-  const printWidthRatio = useMemo(() => cfg.printW_ref / cfg.B_ref, [cfg]);
-
-  const frontPrintCost = useMemo(() => {
-    if (!frontDesign.previewUrl) return 0;
-    const maxPrintWidthCm = garmentDims.B * printWidthRatio;
-    const wCm = (frontDesign.scale / 100) * maxPrintWidthCm;
-    const hCm = wCm / frontAspect;
-    return getRawPrintCost(wCm, hCm) + 170;
-  }, [frontDesign.previewUrl, frontDesign.scale, garmentDims, printWidthRatio, frontAspect]);
-
-  const backPrintCost = useMemo(() => {
-    if (!backDesign.previewUrl) return 0;
-    const maxPrintWidthCm = garmentDims.B * printWidthRatio;
-    const wCm = (backDesign.scale / 100) * maxPrintWidthCm;
-    const hCm = wCm / backAspect;
-    return getRawPrintCost(wCm, hCm) + 170;
-  }, [backDesign.previewUrl, backDesign.scale, garmentDims, printWidthRatio, backAspect]);
-
-  const totalPrintCost = frontPrintCost + backPrintCost;
-  const totalCost = baseCost + totalPrintCost;
-
-  const apiProdUrl = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+  const apiProdUrl =
+    process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
 
   const frontTemplateUrl = useMemo(() => {
     return activeColorObj?.podFrontTemplateId
@@ -170,7 +124,7 @@ const ProductionSummary = ({
       const confirmBlank = window.confirm(
         isArabic
           ? "لم تقوم بإضافة أي تصميم. هل ترغب في شراء القطعة بدون طباعة؟"
-          : "You haven't added a design. Would you like to buy this item blank?"
+          : "You haven't added a design. Would you like to buy this item blank?",
       );
       if (!confirmBlank) return;
     }
@@ -216,10 +170,10 @@ const ProductionSummary = ({
       hasFront && hasBack
         ? "double"
         : hasBack
-        ? "back"
-        : hasFront
-        ? "front"
-        : "blank";
+          ? "back"
+          : hasFront
+            ? "front"
+            : "blank";
 
     const cartPayload = {
       productId: canvas.canvasId,
@@ -234,7 +188,7 @@ const ProductionSummary = ({
       podCustomization: {
         printSide: printSideKeyword,
         baseGarmentCost: baseCost,
-        printCost: totalPrintCost,
+        printCost: frontPrintCost + backPrintCost,
         front: hasFront
           ? {
               imageId:
@@ -284,30 +238,30 @@ const ProductionSummary = ({
 
   return (
     <BillCard>
-      <CostRow>
-        <span>{t("pod_studio_item_base_cost")}</span>
+      <BaseRow>
+        <span>{isArabic ? "القطعة الأساسية:" : "Apparel Base:"}</span>
         <span>
           {baseCost} {t("zd", "DA")}
         </span>
-      </CostRow>
+      </BaseRow>
       {frontPrintCost > 0 && (
-        <CostRow>
-          <span>{t("pod_studio_item_front_cost")} (Front)</span>
+        <PrintRow>
+          <span>{isArabic ? "الطباعة (أمامي):" : "Custom Print (Front):"}</span>
           <span>
             +{frontPrintCost} {t("zd", "DA")}
           </span>
-        </CostRow>
+        </PrintRow>
       )}
       {backPrintCost > 0 && (
-        <CostRow>
-          <span>{t("pod_studio_item_front_cost")} (Back)</span>
+        <PrintRow>
+          <span>{isArabic ? "الطباعة (خلفي):" : "Custom Print (Back):"}</span>
           <span>
             +{backPrintCost} {t("zd", "DA")}
           </span>
-        </CostRow>
+        </PrintRow>
       )}
       <GrandTotalRow>
-        <span>{t("pod_studio_item_total_cost")}</span>
+        <span>{isArabic ? "الإجمالي المستحق:" : "Total Cost:"}</span>
         <span>
           {totalCost} {t("zd", "DA")}
         </span>
@@ -315,8 +269,12 @@ const ProductionSummary = ({
 
       <CommitButton type="button" onClick={handleCommitToTray}>
         {editingCartItem
-          ? (isArabic ? "حفظ التعديلات" : "Update Design")
-          : (isArabic ? "إضافة إلى السلة" : "Add to Cart")}
+          ? isArabic
+            ? "حفظ التعديلات"
+            : "Update Design"
+          : isArabic
+            ? "إضافة إلى السلة"
+            : "Add to Cart"}
       </CommitButton>
     </BillCard>
   );
@@ -331,6 +289,10 @@ ProductionSummary.propTypes = {
   shopId: PropTypes.string.isRequired,
   onCommitSuccess: PropTypes.func,
   editingCartItem: PropTypes.object,
+  baseCost: PropTypes.number.isRequired,
+  frontPrintCost: PropTypes.number.isRequired,
+  backPrintCost: PropTypes.number.isRequired,
+  totalCost: PropTypes.number.isRequired,
 };
 
 export default ProductionSummary;

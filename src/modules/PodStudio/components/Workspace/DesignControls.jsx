@@ -1,3 +1,5 @@
+// src/modules/PodStudio/components/Workspace/DesignControls.jsx
+
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
@@ -21,10 +23,6 @@ import {
 
 import JoystickPositionPad from "./JoystickPositionPad";
 import RadialRotationDial from "./RadialRotationDial";
-
-// ===========================================================================
-// STYLED COMPONENTS - PRO INSPECTOR PANEL (PHOTOSHOP / FIGMA STYLE)
-// ===========================================================================
 
 const ControlsCard = styled.div`
   background: rgba(255, 255, 255, 0.02);
@@ -97,7 +95,6 @@ const ArtistSelectBtn = styled.button`
   }
 `;
 
-// 🔴 3D STACKED HOVER & 5s TIMER ANIMATED ARTWORK WIDGET
 const StackedWidgetWrapper = styled(motion.div)`
   background: rgba(18, 18, 20, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -221,7 +218,6 @@ const IconActionButton = styled.button`
   }
 `;
 
-// 🔴 SEGMENTED INSPECTOR TAB BAR
 const TabBar = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -265,7 +261,7 @@ const SingleRowDimension = styled.div`
   padding: 0.45rem 0.65rem;
   direction: ltr;
 
-   .dim-label {
+  .dim-label {
     font-size: 0.7rem;
     font-weight: 500;
     color: #a1a1aa;
@@ -344,7 +340,6 @@ const DesignControls = ({
     return getGarmentDimensions(canvasName, selectedSize, sizeChart);
   }, [canvasName, selectedSize, sizeChart]);
 
-  // 🔴 5-SECOND AUTOMATED FANNING ANIMATION TIMER
   useEffect(() => {
     if (!designState.previewUrl) return;
     const timer = setInterval(() => {
@@ -394,7 +389,6 @@ const DesignControls = ({
     return Math.round(imgDimensions.width / widthInInches);
   }, [imgDimensions, physicalMetrics.width]);
 
-  // 🔴 ZERO ROUTE NAVIGATION HANDLER FOR PALETTE & LAYER CARD
   const handleOpenLibraryClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -426,7 +420,7 @@ const DesignControls = ({
 
   const handleReset = () => {
     setDesignState({
-      file: null,
+     file: null,
       previewUrl: null,
       x: 50,
       y: 50,
@@ -435,8 +429,7 @@ const DesignControls = ({
     });
   };
 
-  // 🔴 STRICT SEGMENTED TAB INSPECTOR (Applied to both Desktop & Mobile)
-  const showTransform = activeTab === "transform";
+  const showTransform = activeTab === "transform" || activeTab === "scale";
   const showPosition = activeTab === "position";
   const showRotation = activeTab === "rotation";
 
@@ -575,7 +568,7 @@ const DesignControls = ({
             <TabBar>
               <TabButton
                 type="button"
-                $active={activeTab === "transform"}
+                $active={activeTab === "transform" || activeTab === "scale"}
                 onClick={() => setActiveTab("transform")}
               >
                 <FaCropAlt /> {isArabic ? "الحجم" : "Size"}

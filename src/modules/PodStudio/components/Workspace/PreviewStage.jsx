@@ -1,3 +1,5 @@
+// src/modules/PodStudio/components/Workspace/PreviewStage.jsx
+
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
@@ -18,11 +20,11 @@ import {
 import PrintableArea from "./PrintableArea";
 import { analyzeProductImageLuminance } from "../../utils/colorLuminanceAnalyzer";
 
-// 🔴 DYNAMIC CONTRAST BACKGROUND
+// 🔴 DYNAMIC CONTRAST STAGE
 const StageOuter = styled.div`
   width: 100%;
   height: 100%;
-  min-height: 480px;
+  min-height: 440px;
   background-color: ${(props) => (props.$isDarkGarment ? "#2d2e36" : "#0c0c0e")};
   border-radius: 24px;
   border: 1px solid ${(props) => (props.$isDarkGarment ? "rgba(255, 255, 255, 0.15)" : "rgba(255, 255, 255, 0.05)")};
@@ -51,62 +53,63 @@ const SolidColorBackground = styled.div`
   pointer-events: none;
 `;
 
-const StageFloatingControls = styled.div`
+// 🔴 COMPACT ICON-ONLY TOOLBAR FOR STAGE CONTROLS
+const StageControlsBar = styled.div`
   position: absolute;
   top: 15px;
   right: 15px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   z-index: 100;
   flex-wrap: wrap;
 
   @media (max-width: 1024px) {
-    top: auto;
-    bottom: 60px;
-    right: 15px;
-    flex-direction: column;
+    top: 75px;
+    left: 12px;
   }
 `;
 
-const FloatingToggleBtn = styled.button`
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid ${(props) => (props.$active ? props.theme.primaryColor || "#F07A48" : "rgba(255, 255, 255, 0.2)")};
+const IconToolBtn = styled.button`
+  background: rgba(15, 15, 18, 0.75);
+  border: 1px solid ${(props) => (props.$active ? props.theme.primaryColor || "#F07A48" : "rgba(255, 255, 255, 0.15)")};
   color: ${(props) => (props.$active ? props.theme.primaryColor || "#F07A48" : "#ffffff")};
-  padding: 0.5rem 0.9rem;
-  border-radius: 50px;
-  font-size: 0.75rem;
-  font-weight: 700;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 0.9rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  transition: all 0.2s;
-  font-family: "Tajawal", sans-serif;
+  transition: all 0.2s ease;
 
   &:hover {
     border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
+    transform: scale(1.05);
   }
 `;
 
-const FloatingColorWheel = styled.div`
+const ColorWheelWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  background: rgba(15, 15, 18, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 4px 8px;
-  border-radius: 50px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
 
   input[type="color"] {
     border: none;
     background: none;
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
     cursor: pointer;
     padding: 0;
   }
@@ -118,17 +121,18 @@ const ZoomControls = styled.div`
   bottom: 15px;
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(15, 15, 18, 0.75);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 50px;
-  padding: 4px 10px;
+  padding: 3px 8px;
   z-index: 100;
-  gap: 8px;
+  gap: 6px;
 
   @media (max-width: 1024px) {
-    bottom: 60px;
+    bottom: 80px;
+    left: 12px;
   }
 `;
 
@@ -136,15 +140,15 @@ const ZoomBtn = styled.button`
   background: transparent;
   border: none;
   color: white;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   transition: background 0.2s;
 
   &:hover:not(:disabled) {
@@ -157,10 +161,9 @@ const ZoomBtn = styled.button`
 `;
 
 const Divider = styled.div`
-  width: 60%;
-  height: 1px;
+  width: 1px;
+  height: 16px;
   background: rgba(255, 255, 255, 0.2);
-  margin: 2px 0;
 `;
 
 const ZoomText = styled.div`
@@ -170,7 +173,7 @@ const ZoomText = styled.div`
   font-size: 0.7rem;
   font-weight: 700;
   color: #a1a1aa;
-  min-width: 45px;
+  min-width: 38px;
   cursor: pointer;
   font-family: monospace;
   transition: color 0.2s;
@@ -371,7 +374,10 @@ const PreviewStage = ({
   const isArabic = i18n.language === "ar";
   const stageRef = useRef(null);
 
-  const [zoomLevel, setZoomLevel] = useState(1);
+  // 🔴 1. INITIAL MOBILE ZOOM LEVEL IS SET TO 65% (0.65)
+  const [zoomLevel, setZoomLevel] = useState(() =>
+    typeof window !== "undefined" && window.innerWidth <= 1024 ? 0.65 : 1
+  );
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDarkGarment, setIsDarkGarment] = useState(false);
 
@@ -402,7 +408,8 @@ const PreviewStage = ({
   };
   const handleZoomReset = (e) => {
     e.stopPropagation();
-    setZoomLevel(1);
+    const defaultScale = typeof window !== "undefined" && window.innerWidth <= 1024 ? 0.65 : 1;
+    setZoomLevel(defaultScale);
   };
 
   const alphaBounds = useGarmentAlphaBounds(activeTemplateUrl);
@@ -422,46 +429,51 @@ const PreviewStage = ({
       <StageOuter $isDarkGarment={isDarkGarment}>
         <SolidColorBackground $active={showSolidBg} $color={solidBgColor} />
 
-        <StageFloatingControls onClick={(e) => e.stopPropagation()}>
-          <FloatingToggleBtn
+        {/* 🔴 COMPACT ICON-ONLY STAGE CONTROLS */}
+        <StageControlsBar onClick={(e) => e.stopPropagation()}>
+          <IconToolBtn
             type="button"
             $active={showGrid}
             onClick={() => setShowGrid(!showGrid)}
+            title={isArabic ? "شبكة المحاذاة" : "Alignment Grid"}
           >
-            <FaBorderAll /> {t("pod_studio_toggle_grid", "Grid")}
-          </FloatingToggleBtn>
-          <FloatingToggleBtn
+            <FaBorderAll />
+          </IconToolBtn>
+          
+          <IconToolBtn
             type="button"
             $active={showSolidBg}
             onClick={() => setShowSolidBg(!showSolidBg)}
+            title={isArabic ? "لون الخلفية" : "Canvas Background"}
           >
-            <FaFillDrip /> {t("pod_studio_toggle_bg", "Bg")}
-          </FloatingToggleBtn>
+            <FaFillDrip />
+          </IconToolBtn>
 
           {showSolidBg && (
-            <FloatingColorWheel>
+            <ColorWheelWrapper>
               <input
                 type="color"
                 value={solidBgColor}
                 onChange={(e) => setSolidBgColor(e.target.value)}
               />
-            </FloatingColorWheel>
+            </ColorWheelWrapper>
           )}
-        </StageFloatingControls>
+        </StageControlsBar>
 
+        {/* COMPACT ZOOM CONTROLS */}
         <ZoomControls onClick={(e) => e.stopPropagation()}>
           <ZoomBtn onClick={() => setIsFullscreen(true)} title="Full Preview">
-            <FaExpand size={14} />
+            <FaExpand size={12} />
           </ZoomBtn>
           <Divider />
           <ZoomBtn onClick={handleZoomIn} disabled={zoomLevel >= 3}>
-            <FaSearchPlus size={14} />
+            <FaSearchPlus size={12} />
           </ZoomBtn>
-          <ZoomText onClick={handleZoomReset} title="Click to reset zoom">
+          <ZoomText onClick={handleZoomReset} title="Reset Zoom">
             {Math.round(zoomLevel * 100)}%
           </ZoomText>
           <ZoomBtn onClick={handleZoomOut} disabled={zoomLevel <= 0.25}>
-            <FaSearchMinus size={14} />
+            <FaSearchMinus size={12} />
           </ZoomBtn>
         </ZoomControls>
 

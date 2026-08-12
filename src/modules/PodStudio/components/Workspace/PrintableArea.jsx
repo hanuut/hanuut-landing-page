@@ -1,3 +1,5 @@
+// src/modules/PodStudio/components/Workspace/PrintableArea.jsx
+
 import React, { useRef, useMemo } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
@@ -108,7 +110,6 @@ const SnapGuideline = styled.div`
   }
 `;
 
-/* Relocated notice badge pinned cleanly to top corner of the stage, away from artwork handles */
 const CornerNoticeBadge = styled.div`
   position: absolute;
   top: 12px;
@@ -148,8 +149,13 @@ const PrintableArea = ({
     return leftEdge < 0 || rightEdge > 100 || topEdge < 0 || bottomEdge > 100;
   }, [designState.x, designState.y, designState.scale, designState.previewUrl]);
 
+  // 🔴 STOP EVENT PROPAGATION TO PREVENT T-SHIRT STAGE FROM PANNING/DRAGGING
   const handlePointerDown = (e, actionType) => {
     e.stopPropagation();
+    if (e.nativeEvent) {
+      e.nativeEvent.stopPropagation();
+      e.nativeEvent.stopImmediatePropagation();
+    }
     e.preventDefault();
     if (!designState.previewUrl) return;
 
@@ -249,6 +255,14 @@ const PrintableArea = ({
     }));
   };
 
+  const stopEvent = (e) => {
+    e.stopPropagation();
+    if (e.nativeEvent) {
+      e.nativeEvent.stopPropagation();
+      e.nativeEvent.stopImmediatePropagation();
+    }
+  };
+
   return (
     <>
       {isOutsideStandardZone && (
@@ -286,7 +300,12 @@ const PrintableArea = ({
         </div>
       </TemplateContentArea>
 
-      <InteractivePrintArea ref={containerRef} $area={ratios.absolutePrintArea}>
+      <InteractivePrintArea
+        ref={containerRef}
+        $area={ratios.absolutePrintArea}
+        onPointerDown={stopEvent}
+        onTouchStart={stopEvent}
+      >
         {designState.isSnappedX && (
           <SnapGuideline className="vertical" $state="exact" />
         )}
@@ -305,6 +324,7 @@ const PrintableArea = ({
               transform: `translate(-50%, -50%) rotate(${designState.rotation}deg)`,
             }}
             onPointerDown={(e) => handlePointerDown(e, "drag")}
+            onTouchStart={(e) => handlePointerDown(e, "drag")}
           >
             <div style={{ width: "100%", height: "100%", opacity: 0 }} />
             <ScaleCorner onPointerDown={(e) => handlePointerDown(e, "scale")} />
