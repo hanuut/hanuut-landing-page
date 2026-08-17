@@ -115,35 +115,36 @@ export const getFittedPrintZoneRatios = (
 };
 
 export const getRawPrintCost = (widthCm, heightCm) => {
-  const largestSide = Math.max(widthCm, heightCm);
+  if (!widthCm || !heightCm || widthCm <= 0 || heightCm <= 0) return 0;
+
   const smallestSide = Math.min(widthCm, heightCm);
+  const largestSide = Math.max(widthCm, heightCm);
 
-  let rawCost = 0;
-
+  // TIER A: smallestSide <= 30cm -> based on largestSide (D)
   if (smallestSide <= 30) {
-    const D = largestSide;
-    if (D <= 5) rawCost = 0;
-    else if (D <= 10) rawCost = 40;
-    else if (D <= 15) rawCost = 90;
-    else if (D <= 20) rawCost = 160;
-    else if (D <= 25) rawCost = 250;
-    else if (D <= 30) rawCost = 360;
-    else if (D <= 35) rawCost = 420;
-    else if (D <= 40) rawCost = 480;
-    else if (D <= 45) rawCost = 540;
-    else if (D <= 50) rawCost = 590;
-    else if (D <= 55) rawCost = 660;
-    else rawCost = 720;
-  } else {
-    const D = smallestSide;
-    if (D <= 35) rawCost = 840;
-    else if (D <= 40) rawCost = 940;
-    else if (D <= 45) rawCost = 1080;
-    else if (D <= 50) rawCost = 1200;
-    else rawCost = 1440;
+    const d = largestSide;
+    if (d <= 5) return 100;
+    if (d <= 10) return 150;
+    if (d <= 15) return 250;
+    if (d <= 20) return 350;
+    if (d <= 25) return 500;
+    if (d <= 30) return 700;
+    if (d <= 35) return 800;
+    if (d <= 40) return 900;
+    if (d <= 45) return 1000;
+    if (d <= 50) return 1100;
+    if (d <= 55) return 1200;
+    return 1300;
+  } 
+  // TIER B: smallestSide > 30cm -> based on smallestSide (D)
+  else {
+    const d = smallestSide;
+    if (d <= 35) return 1500;
+    if (d <= 40) return 1700;
+    if (d <= 45) return 1950;
+    if (d <= 50) return 2150;
+    return 2550;
   }
-
-  return rawCost;
 };
 
 /**
