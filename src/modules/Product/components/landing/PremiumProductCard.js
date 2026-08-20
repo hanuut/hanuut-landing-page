@@ -462,20 +462,16 @@ const PremiumProductCard = ({
 
   const hasBackPrint = product.hasBackPrintSurface;
 
-  const resolvedImageId = useMemo(() => {
-    return (
-      defaultAvailability?.podFrontTemplateId ||
-      defaultAvailability?.imageId ||
-      product.previewImages?.[0] ||
-      product.imageId ||
-      null
-    );
-  }, [defaultAvailability, product]);
+  const hasPreviews = product?.previewImages?.length > 0;
+  const resolvedImageId = hasPreviews 
+    ? product.previewImages[0] 
+    : (defaultAvailability?.podFrontTemplateId || defaultAvailability?.imageId || product.imageId);
+    
+  const hoverImageId = hasPreviews && product.previewImages.length > 1 
+    ? product.previewImages[1] 
+    : (defaultAvailability?.podFrontTemplateId || defaultAvailability?.imageId || product.imageId);
 
-  const hoverImageId =
-    product?.previewImages?.length > 1
-      ? getPreferredProductImageId(product, 1, defaultAvailability?.color)
-      : null;
+
 
   useEffect(() => {
     let isMounted = true;

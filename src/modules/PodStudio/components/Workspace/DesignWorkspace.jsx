@@ -16,17 +16,29 @@ import {
   FaTimes,
   FaTshirt,
   FaPalette,
+  FaCloudUploadAlt,
   FaSlidersH,
   FaBookOpen,
-  FaCloudUploadAlt,
+  FaArrowLeft,
+  FaArrowRight,
 } from "react-icons/fa";
 
 // Redux & Services Imports
-import { selectCart, updateCartQuantity, openCart, addToCart } from "../../../Cart/state/reducers";
+import {
+  selectCart,
+  updateCartQuantity,
+  openCart,
+  addToCart,
+} from "../../../Cart/state/reducers";
 import { getImage } from "../../../Images/services/imageServices";
 import { getImageUrl } from "../../../../utils/imageUtils";
 import { retrieveFile, persistFile } from "../../utils/indexedDbHelper";
-import { getGarmentDimensions, getTemplateConfig, getRawPrintCost, calculatePhysicalMetrics } from "../../hooks/usePrintableArea";
+import {
+  getGarmentDimensions,
+  getTemplateConfig,
+  getRawPrintCost,
+  calculatePhysicalMetrics,
+} from "../../hooks/usePrintableArea";
 import { useDesignHistory } from "../../hooks/useDesignHistory";
 
 import PreviewStage from "./PreviewStage";
@@ -153,14 +165,16 @@ const DockItem = styled.button`
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  color: ${(props) => (props.$active ? props.theme.primaryColor || "#F07A48" : "#a1a1aa")};
+  color: ${(props) =>
+    props.$active ? props.theme.primaryColor || "#F07A48" : "#a1a1aa"};
   cursor: pointer;
   font-family: "Tajawal", sans-serif;
   transition: all 0.2s ease;
   padding: 0;
 
   &:hover {
-    color: ${(props) => (props.$active ? props.theme.primaryColor || "#F07A48" : "white")};
+    color: ${(props) =>
+      props.$active ? props.theme.primaryColor || "#F07A48" : "white"};
     transform: translateY(-2px);
   }
 
@@ -201,14 +215,14 @@ const HeaderLeftGroup = styled.div`
   flex-direction: column;
   gap: 2px;
   text-align: start;
-  
+
   h2 {
     font-size: 0.95rem !important;
     font-weight: 600 !important;
     color: #e4e4e7 !important;
     margin: 0;
   }
-  
+
   span.sku {
     font-size: 10px !important;
     font-weight: 500 !important;
@@ -245,7 +259,7 @@ const TopCartButton = styled.button`
   }
 
   .badge {
-    background: #F07A48;
+    background: #f07a48;
     color: #000;
     font-weight: 800;
     border-radius: 20px;
@@ -291,17 +305,23 @@ const CompactViewBtn = styled.button`
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: ${(props) => (props.$active ? "rgba(240, 122, 72, 0.2)" : "rgba(255,255,255,0.05)")};
-  border: 1px solid ${(props) => (props.$active ? props.theme.primaryColor || "#F07A48" : "rgba(255,255,255,0.12)")};
-  color: ${(props) => (props.$active ? props.theme.primaryColor || "#F07A48" : "#a1a1aa")};
+  background: ${(props) =>
+    props.$active ? "rgba(240, 122, 72, 0.2)" : "rgba(255,255,255,0.05)"};
+  border: 1px solid
+    ${(props) =>
+      props.$active
+        ? props.theme.primaryColor || "#F07A48"
+        : "rgba(255,255,255,0.12)"};
+  color: ${(props) =>
+    props.$active ? props.theme.primaryColor || "#F07A48" : "#a1a1aa"};
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
     border-color: ${(props) => props.theme.primaryColor || "#F07A48"};
   }
 `;
@@ -319,9 +339,18 @@ const MiniOverlayThumbnail = styled.img`
 `;
 
 const ShirtIcon = ({ side }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M20.38 3.46L16 1.7a2 2 0 0 0-1.42 0l-1.92.77a2 2 0 0 1-1.32 0l-1.92-.77a2 2 0 0 0-1.42 0L3.62 3.46a2 2 0 0 0-1.24 1.84v4.54a2 2 0 0 0 1.24 1.84L6 12.6V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.4l2.38-1a2 2 0 0 0 1.24-1.84V5.3a2 2 0 0 0-1.24-1.84z" />
-    {side === 'back' && <path d="M12 4v4M10 5h4" />}
+    {side === "back" && <path d="M12 4v4M10 5h4" />}
   </svg>
 );
 
@@ -332,7 +361,7 @@ const MobileHeaderOverlay = styled.div`
     justify-content: space-between;
     align-items: flex-start;
     position: absolute;
-    top: 15px; 
+    top: 15px;
     left: 12px;
     right: 12px;
     z-index: 100;
@@ -394,7 +423,7 @@ const CartBadge = styled.span`
   position: absolute;
   top: -4px;
   right: -4px;
-  background: #F07A48;
+  background: #f07a48;
   color: #000;
   font-size: 10px;
   font-weight: 800;
@@ -436,9 +465,7 @@ const ToolIconButton = styled.button`
     props.$active ? props.theme.primaryColor || "#F07A48" : "#a1a1aa"};
   border: 1px solid
     ${(props) =>
-      props.$active
-        ? props.theme.primaryColor || "#F07A48"
-        : "transparent"};
+      props.$active ? props.theme.primaryColor || "#F07A48" : "transparent"};
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -633,6 +660,39 @@ const LightboxOverlay = styled(motion.div)`
   padding: 2rem;
 `;
 
+const LightboxCard = styled(motion.div)`
+  width: 90%;
+  max-width: 450px;
+  aspect-ratio: 1;
+  background-image:
+    linear-gradient(45deg, #18181b 25%, transparent 25%),
+    linear-gradient(-45deg, #18181b 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #18181b 75%),
+    linear-gradient(-45deg, transparent 75%, #18181b 75%);
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0px;
+  background-color: #27272a;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  position: relative;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+`;
+
 const LibraryModalCard = styled(motion.div)`
   width: 100%;
   max-width: 900px;
@@ -675,8 +735,13 @@ const LibraryModalBody = styled.div`
   overflow-y: auto;
   padding: 1.5rem 2rem;
 
-  &::-webkit-scrollbar { width: 6px; }
-  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 10px; }
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+  }
 `;
 
 const ScrollableInspector = styled.div`
@@ -757,17 +822,25 @@ const DesignWorkspace = ({
   }, [cart, shopId]);
 
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [activePanel, setActivePanel] = useState("variants"); // Desktop
-  
+
   // Mobile Panel & Sub-Menu States
   const [activeMobilePanel, setActiveMobilePanel] = useState(null); // 'variants' | 'layer' | 'manipulation'
   const [subManipulationTab, setSubManipulationTab] = useState("scale"); // 'scale' | 'position' | 'rotation'
 
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const galleryImages = useMemo(() => {
+    return canvas?.rawProduct?.previewImages?.length > 0
+      ? canvas.rawProduct.previewImages
+      : [canvas.previewImageId];
+  }, [canvas]);
+
   const [selectedColor, setSelectedColor] = useState(
-    canvas.availableColors[0]?.colorName || ""
+    canvas.availableColors[0]?.colorName || "",
   );
   const [selectedSize, setSelectedSize] = useState(
-    canvas.sizes[0]?.sizeCode || ""
+    canvas.sizes[0]?.sizeCode || "",
   );
 
   const artistDesign = canvas.initialArtistDesign;
@@ -885,12 +958,12 @@ const DesignWorkspace = ({
 
           if (editingCartItem.color || editingCartItem.colorSelected) {
             setSelectedColor(
-              editingCartItem.color || editingCartItem.colorSelected
+              editingCartItem.color || editingCartItem.colorSelected,
             );
           }
           if (editingCartItem.size || editingCartItem.sizeSelected) {
             setSelectedSize(
-              editingCartItem.size || editingCartItem.sizeSelected
+              editingCartItem.size || editingCartItem.sizeSelected,
             );
           }
 
@@ -942,7 +1015,7 @@ const DesignWorkspace = ({
     if (!canvas?.availableColors || !selectedColor) return null;
     const target = String(selectedColor).trim().toLowerCase();
     return canvas.availableColors.find(
-      (c) => String(c.colorName).trim().toLowerCase() === target
+      (c) => String(c.colorName).trim().toLowerCase() === target,
     );
   }, [canvas, selectedColor]);
 
@@ -972,12 +1045,34 @@ const DesignWorkspace = ({
     return activeColorObj?.sizes?.find((s) => s.size === selectedSize);
   }, [activeColorObj, selectedSize]);
 
-  const baseApparelCost = currentSizeDetails?.sellingPrice || canvas.sizes[0]?.baseCost || 0;
+  const baseApparelCost =
+    currentSizeDetails?.sellingPrice || canvas.sizes[0]?.baseCost || 0;
 
-  const garmentDims = useMemo(() => getGarmentDimensions(canvas.title, selectedSize, canvas.sizeChart), [canvas.title, selectedSize, canvas.sizeChart]);
+  const garmentDims = useMemo(
+    () => getGarmentDimensions(canvas.title, selectedSize, canvas.sizeChart),
+    [canvas.title, selectedSize, canvas.sizeChart],
+  );
 
-  const frontMetrics = useMemo(() => calculatePhysicalMetrics(frontDesign.scale, garmentDims.B, garmentDims.A, frontDesign.aspectRatio || 1), [frontDesign.scale, garmentDims, frontDesign.aspectRatio]);
-  const backMetrics = useMemo(() => calculatePhysicalMetrics(backDesign.scale, garmentDims.B, garmentDims.A, backDesign.aspectRatio || 1), [backDesign.scale, garmentDims, backDesign.aspectRatio]);
+  const frontMetrics = useMemo(
+    () =>
+      calculatePhysicalMetrics(
+        frontDesign.scale,
+        garmentDims.B,
+        garmentDims.A,
+        frontDesign.aspectRatio || 1,
+      ),
+    [frontDesign.scale, garmentDims, frontDesign.aspectRatio],
+  );
+  const backMetrics = useMemo(
+    () =>
+      calculatePhysicalMetrics(
+        backDesign.scale,
+        garmentDims.B,
+        garmentDims.A,
+        backDesign.aspectRatio || 1,
+      ),
+    [backDesign.scale, garmentDims, backDesign.aspectRatio],
+  );
 
   const frontPrintCost = useMemo(() => {
     if (!frontDesign.previewUrl) return 0;
@@ -992,8 +1087,14 @@ const DesignWorkspace = ({
   const totalPrintCost = frontPrintCost + backPrintCost;
   const finalCost = baseApparelCost + totalPrintCost;
 
-  const frontDesignThumbnail = useMemo(() => frontDesign?.previewUrl || null, [frontDesign]);
-  const backDesignThumbnail = useMemo(() => backDesign?.previewUrl || null, [backDesign]);
+  const frontDesignThumbnail = useMemo(
+    () => frontDesign?.previewUrl || null,
+    [frontDesign],
+  );
+  const backDesignThumbnail = useMemo(
+    () => backDesign?.previewUrl || null,
+    [backDesign],
+  );
 
   const handleMobileNavClick = (panelKey) => {
     if (activeMobilePanel === panelKey) {
@@ -1011,7 +1112,7 @@ const DesignWorkspace = ({
       const confirmBlank = window.confirm(
         isArabic
           ? "لم تقوم بإضافة أي تصميم. هل ترغب في شراء القطعة بدون طباعة؟"
-          : "You haven't added a design. Would you like to buy this item blank?"
+          : "You haven't added a design. Would you like to buy this item blank?",
       );
       if (!confirmBlank) return;
     }
@@ -1054,11 +1155,22 @@ const DesignWorkspace = ({
     }
 
     const printSideKeyword =
-      hasFront && hasBack ? "double" : hasBack ? "back" : hasFront ? "front" : "blank";
-      
-    const apiProdUrl = process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
-    const frontTemplateUrl = activeColorObj?.podFrontTemplateId ? `${apiProdUrl}/image/raw/${activeColorObj.podFrontTemplateId}` : null;
-    const backTemplateUrl = activeColorObj?.podBackTemplateId ? `${apiProdUrl}/image/raw/${activeColorObj.podBackTemplateId}` : null;
+      hasFront && hasBack
+        ? "double"
+        : hasBack
+          ? "back"
+          : hasFront
+            ? "front"
+            : "blank";
+
+    const apiProdUrl =
+      process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
+    const frontTemplateUrl = activeColorObj?.podFrontTemplateId
+      ? `${apiProdUrl}/image/raw/${activeColorObj.podFrontTemplateId}`
+      : null;
+    const backTemplateUrl = activeColorObj?.podBackTemplateId
+      ? `${apiProdUrl}/image/raw/${activeColorObj.podBackTemplateId}`
+      : null;
 
     const cartPayload = {
       productId: canvas.canvasId,
@@ -1070,29 +1182,54 @@ const DesignWorkspace = ({
       imageId: canvas.previewImageId,
       quantity: editingCartItem ? editingCartItem.quantity : 1,
       shopId: shopId,
-      podCustomization: hasFront || hasBack ? {
-        printSide: printSideKeyword,
-        baseGarmentCost: baseApparelCost,
-        printCost: totalPrintCost,
-        front: hasFront ? {
-          imageId: frontDesign.file === "existing" ? frontDesign.previewUrl : `${targetVariantId}_front`,
-          imageUrl: frontDesign.previewUrl,
-          originalImageId: frontDesign.file === "existing" ? frontDesign.previewUrl : `${targetVariantId}_front`,
-          originalImageUrl: frontDesign.previewUrl,
-          width: frontDesign.scale, height: frontDesign.scale,
-          x: frontDesign.x, y: frontDesign.y, rotation: frontDesign.rotation,
-          templateUrl: frontTemplateUrl,
-        } : null,
-        back: hasBack ? {
-          imageId: backDesign.file === "existing" ? backDesign.previewUrl : `${targetVariantId}_back`,
-          imageUrl: backDesign.previewUrl,
-          originalImageId: backDesign.file === "existing" ? backDesign.previewUrl : `${targetVariantId}_back`,
-          originalImageUrl: backDesign.previewUrl,
-          width: backDesign.scale, height: backDesign.scale,
-          x: backDesign.x, y: backDesign.y, rotation: backDesign.rotation,
-          templateUrl: backTemplateUrl,
-        } : null,
-      } : null,
+      podCustomization:
+        hasFront || hasBack
+          ? {
+              printSide: printSideKeyword,
+              baseGarmentCost: baseApparelCost,
+              printCost: totalPrintCost,
+              front: hasFront
+                ? {
+                    imageId:
+                      frontDesign.file === "existing"
+                        ? frontDesign.previewUrl
+                        : `${targetVariantId}_front`,
+                    imageUrl: frontDesign.previewUrl,
+                    originalImageId:
+                      frontDesign.file === "existing"
+                        ? frontDesign.previewUrl
+                        : `${targetVariantId}_front`,
+                    originalImageUrl: frontDesign.previewUrl,
+                    width: frontDesign.scale,
+                    height: frontDesign.scale,
+                    x: frontDesign.x,
+                    y: frontDesign.y,
+                    rotation: frontDesign.rotation,
+                    templateUrl: frontTemplateUrl,
+                  }
+                : null,
+              back: hasBack
+                ? {
+                    imageId:
+                      backDesign.file === "existing"
+                        ? backDesign.previewUrl
+                        : `${targetVariantId}_back`,
+                    imageUrl: backDesign.previewUrl,
+                    originalImageId:
+                      backDesign.file === "existing"
+                        ? backDesign.previewUrl
+                        : `${targetVariantId}_back`,
+                    originalImageUrl: backDesign.previewUrl,
+                    width: backDesign.scale,
+                    height: backDesign.scale,
+                    x: backDesign.x,
+                    y: backDesign.y,
+                    rotation: backDesign.rotation,
+                    templateUrl: backTemplateUrl,
+                  }
+                : null,
+            }
+          : null,
     };
 
     dispatch(addToCart(cartPayload));
@@ -1114,10 +1251,30 @@ const DesignWorkspace = ({
   const canRedo = activeSide === "back" ? canRedoBack : canRedoFront;
 
   const DOCK_ITEMS = [
-    { id: "variants", label: isArabic ? "الألوان والمقاسات" : "Colors & Sizes", icon: <FaTshirt />, tooltip: isArabic ? "تغيير اللون والمقاس" : "Change Color & Size" },
-    { id: "layer", label: isArabic ? "التصميم والطبقات" : "Artwork & Layers", icon: <FaPalette />, tooltip: isArabic ? "إدارة تصميمك والطبقات" : "Manage Artwork Layers" },
-    { id: "transform", label: isArabic ? "التعديل والموقع" : "Transform & Align", icon: <FaSlidersH />, tooltip: isArabic ? "ضبط الحجم والدوران" : "Scale, Rotate & Align" },
-    { id: "collections", label: isArabic ? "مكتبة التصاميم" : "Art Library", icon: <FaBookOpen />, tooltip: isArabic ? "تصفح تصاميم الفنانين" : "Browse Creator Designs" },
+    {
+      id: "variants",
+      label: isArabic ? "الألوان والمقاسات" : "Colors & Sizes",
+      icon: <FaTshirt />,
+      tooltip: isArabic ? "تغيير اللون والمقاس" : "Change Color & Size",
+    },
+    {
+      id: "layer",
+      label: isArabic ? "التصميم والطبقات" : "Artwork & Layers",
+      icon: <FaPalette />,
+      tooltip: isArabic ? "إدارة تصميمك والطبقات" : "Manage Artwork Layers",
+    },
+    {
+      id: "transform",
+      label: isArabic ? "التعديل والموقع" : "Transform & Align",
+      icon: <FaSlidersH />,
+      tooltip: isArabic ? "ضبط الحجم والدوران" : "Scale, Rotate & Align",
+    },
+    {
+      id: "collections",
+      label: isArabic ? "مكتبة التصاميم" : "Art Library",
+      icon: <FaBookOpen />,
+      tooltip: isArabic ? "تصفح تصاميم الفنانين" : "Browse Creator Designs",
+    },
   ];
 
   const handleDockClick = (id) => {
@@ -1140,7 +1297,9 @@ const DesignWorkspace = ({
               <span className="sku">{canvas.sku || canvas.serialNumber}</span>
               <PricingBreakdown>
                 <span className="base">{baseApparelCost} DA</span>
-                {totalPrintCost > 0 && <span className="print">+{totalPrintCost} DA</span>}
+                {totalPrintCost > 0 && (
+                  <span className="print">+{totalPrintCost} DA</span>
+                )}
                 <span className="total">{finalCost} DA</span>
               </PricingBreakdown>
             </MobileHeaderContent>
@@ -1162,7 +1321,10 @@ const DesignWorkspace = ({
                       >
                         <ShirtIcon side="front" />
                         {frontDesignThumbnail && (
-                          <MiniOverlayThumbnail src={frontDesignThumbnail} alt="Front Print" />
+                          <MiniOverlayThumbnail
+                            src={frontDesignThumbnail}
+                            alt="Front Print"
+                          />
                         )}
                       </CompactViewBtn>
                       {activeSide === "front" && frontPrintCost > 0 && (
@@ -1182,7 +1344,10 @@ const DesignWorkspace = ({
                       >
                         <ShirtIcon side="back" />
                         {backDesignThumbnail && (
-                          <MiniOverlayThumbnail src={backDesignThumbnail} alt="Back Print" />
+                          <MiniOverlayThumbnail
+                            src={backDesignThumbnail}
+                            alt="Back Print"
+                          />
                         )}
                       </CompactViewBtn>
                       {activeSide === "back" && backPrintCost > 0 && (
@@ -1191,17 +1356,22 @@ const DesignWorkspace = ({
                     </ToggleWrapper>
                   </>
                 )}
-                
+
                 {/* 🔴 CART MOVED TO HEADER ALONGSIDE SHIRT ICONS */}
                 <CompactViewBtn
                   type="button"
                   onClick={() => dispatch(openCart())}
                   title={t("pod_studio_tray_title", "Bag")}
-                  style={{ position: 'relative' }}
+                  style={{ position: "relative" }}
                 >
                   <FaShoppingCart size={14} color="#FFF" />
                   {shopCartItems.length > 0 && (
-                    <CartBadge>{shopCartItems.reduce((acc, item) => acc + item.quantity, 0)}</CartBadge>
+                    <CartBadge>
+                      {shopCartItems.reduce(
+                        (acc, item) => acc + item.quantity,
+                        0,
+                      )}
+                    </CartBadge>
                   )}
                 </CompactViewBtn>
               </SideViewToggleGroup>
@@ -1228,10 +1398,44 @@ const DesignWorkspace = ({
         <InspectorContainer>
           <ControlDrawer>
             <InlineHeaderRow>
-              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "1rem" }}
+              >
                 <HeaderLeftGroup>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
+                    {/* Clickable thumbnail to open gallery */}
+                    <div
+                      onClick={() => setIsLightboxOpen(true)}
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "6px",
+                        background: "#18181b",
+                        cursor: "pointer",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <img
+                        src={`https://api.hanuut.com/image/raw/${galleryImages[0]}`}
+                        alt="Thumbnail"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
+                  </div>
                   <h2>{canvas.title}</h2>
-                  <span className="sku">{canvas.sku || canvas.serialNumber}</span>
+                  <span className="sku">
+                    {canvas.sku || canvas.serialNumber}
+                  </span>
                 </HeaderLeftGroup>
 
                 {canvas.specifications?.printableSurfaces?.includes("back") && (
@@ -1248,7 +1452,10 @@ const DesignWorkspace = ({
                       >
                         <ShirtIcon side="front" />
                         {frontDesignThumbnail && (
-                          <MiniOverlayThumbnail src={frontDesignThumbnail} alt="Front Print" />
+                          <MiniOverlayThumbnail
+                            src={frontDesignThumbnail}
+                            alt="Front Print"
+                          />
                         )}
                       </CompactViewBtn>
                       {activeSide === "front" && frontPrintCost > 0 && (
@@ -1268,7 +1475,10 @@ const DesignWorkspace = ({
                       >
                         <ShirtIcon side="back" />
                         {backDesignThumbnail && (
-                          <MiniOverlayThumbnail src={backDesignThumbnail} alt="Back Print" />
+                          <MiniOverlayThumbnail
+                            src={backDesignThumbnail}
+                            alt="Back Print"
+                          />
                         )}
                       </CompactViewBtn>
                       {activeSide === "back" && backPrintCost > 0 && (
@@ -1280,16 +1490,21 @@ const DesignWorkspace = ({
               </div>
 
               <HeaderRightGroup>
-                <PricingBreakdown style={{ marginRight: '1rem' }}>
+                <PricingBreakdown style={{ marginRight: "1rem" }}>
                   <span className="base">{baseApparelCost} DA</span>
-                  {totalPrintCost > 0 && <span className="print">+{totalPrintCost} DA</span>}
+                  {totalPrintCost > 0 && (
+                    <span className="print">+{totalPrintCost} DA</span>
+                  )}
                   <span className="total">{finalCost} DA</span>
                 </PricingBreakdown>
                 <TopCartButton onClick={() => dispatch(openCart())}>
                   <FaShoppingCart size={16} />
                   {shopCartItems.length > 0 && (
                     <span className="badge">
-                      {shopCartItems.reduce((acc, item) => acc + item.quantity, 0)}
+                      {shopCartItems.reduce(
+                        (acc, item) => acc + item.quantity,
+                        0,
+                      )}
                     </span>
                   )}
                 </TopCartButton>
@@ -1332,7 +1547,10 @@ const DesignWorkspace = ({
                       ))}
                     </CollapsiblePills>
                     {/* PRODUCT MEASUREMENTS TABLE DIRECTLY UNDER SIZES IN DESKTOP PANEL */}
-                    <CollapsibleSizingWidget canvas={canvas} selectedSize={selectedSize} />
+                    <CollapsibleSizingWidget
+                      canvas={canvas}
+                      selectedSize={selectedSize}
+                    />
                   </OptionSection>
                 </OptionRow>
               )}
@@ -1431,22 +1649,48 @@ const DesignWorkspace = ({
             transition={{ type: "spring", damping: 25, stiffness: 260 }}
           >
             {/* Minimal Header with Undo/Redo */}
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-              <span style={{ fontWeight: 700, color: "white", fontSize: "0.95rem" }}>
-                {activeMobilePanel === "variants" ? (isArabic ? "الألوان والمقاسات" : "Colors & Sizes") : 
-                 activeMobilePanel === "layer" ? (isArabic ? "الطبقات" : "Layers") :
-                 (isArabic ? "تعديل" : "Transform")}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "0.5rem",
+              }}
+            >
+              <span
+                style={{ fontWeight: 700, color: "white", fontSize: "0.95rem" }}
+              >
+                {activeMobilePanel === "variants"
+                  ? isArabic
+                    ? "الألوان والمقاسات"
+                    : "Colors & Sizes"
+                  : activeMobilePanel === "layer"
+                    ? isArabic
+                      ? "الطبقات"
+                      : "Layers"
+                    : isArabic
+                      ? "تعديل"
+                      : "Transform"}
               </span>
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button
-                  style={{ background: "transparent", border: "none", color: canUndo ? "#FFF" : "#555", cursor: "pointer" }}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: canUndo ? "#FFF" : "#555",
+                    cursor: "pointer",
+                  }}
                   disabled={!canUndo}
                   onClick={handleUndo}
                 >
                   <FaUndo size={14} />
                 </button>
                 <button
-                  style={{ background: "transparent", border: "none", color: canRedo ? "#FFF" : "#555", cursor: "pointer" }}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: canRedo ? "#FFF" : "#555",
+                    cursor: "pointer",
+                  }}
                   disabled={!canRedo}
                   onClick={handleRedo}
                 >
@@ -1458,7 +1702,9 @@ const DesignWorkspace = ({
             {activeMobilePanel === "variants" && (
               <OptionRow>
                 <OptionSection>
-                  <SectionLabel>{t("pod_studio_colors_title", "Colors")}</SectionLabel>
+                  <SectionLabel>
+                    {t("pod_studio_colors_title", "Colors")}
+                  </SectionLabel>
                   <CollapsiblePills>
                     {canvas.availableColors.map((col) => (
                       <ColorSwatch
@@ -1472,7 +1718,9 @@ const DesignWorkspace = ({
                 </OptionSection>
 
                 <OptionSection>
-                  <SectionLabel>{t("pod_studio_sizes_title", "Sizes")}</SectionLabel>
+                  <SectionLabel>
+                    {t("pod_studio_sizes_title", "Sizes")}
+                  </SectionLabel>
                   <CollapsiblePills>
                     {canvas.sizes.map((s) => (
                       <SizePill
@@ -1485,7 +1733,10 @@ const DesignWorkspace = ({
                     ))}
                   </CollapsiblePills>
                   {/* PRODUCT MEASUREMENTS TABLE DIRECTLY UNDER SIZES IN MOBILE PANEL */}
-                  <CollapsibleSizingWidget canvas={canvas} selectedSize={selectedSize} />
+                  <CollapsibleSizingWidget
+                    canvas={canvas}
+                    selectedSize={selectedSize}
+                  />
                 </OptionSection>
               </OptionRow>
             )}
@@ -1559,33 +1810,90 @@ const DesignWorkspace = ({
       </FloatingToolbar>
 
       <AnimatePresence>
-        {isDesignLibraryOpen && (
+        {isLightboxOpen && (
           <LightboxOverlay
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setIsDesignLibraryOpen(false)}
+            onClick={() => setIsLightboxOpen(false)}
             style={{ zIndex: 3000 }}
           >
-            <LibraryModalCard
-              $isArabic={isArabic}
+            <LightboxCard
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              initial={{ scale: 0.95, opacity: 0, y: 30 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 30 }}
             >
-              <LibraryModalHeader>
-                <h3>{isArabic ? "مكتبة التصاميم" : "Artwork Library"}</h3>
-                <CloseBtn onClick={() => setIsDesignLibraryOpen(false)}>
-                  <FaTimes />
-                </CloseBtn>
-              </LibraryModalHeader>
-              <LibraryModalBody>
-                <PrePreparedDesignsTab 
-                  onSelectArtwork={(url, placement, art) => handleSwapArtworkFromLibrary(canvas, art, activeSide)}
-                />
-              </LibraryModalBody>
-            </LibraryModalCard>
+              {galleryImages.length > 1 && (
+                <button
+                  style={{
+                    position: "absolute",
+                    left: "-50px",
+                    background: "none",
+                    border: "none",
+                    color: "white",
+                    fontSize: "2rem",
+                    cursor: "pointer",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setGalleryIndex((prev) =>
+                      prev === 0 ? galleryImages.length - 1 : prev - 1,
+                    );
+                  }}
+                >
+                  <FaArrowLeft />
+                </button>
+              )}
+
+              <img
+                src={`https://api.hanuut.com/image/raw/${galleryImages[galleryIndex]}`}
+                alt="Bespoke Design view"
+              />
+
+              {galleryImages.length > 1 && (
+                <button
+                  style={{
+                    position: "absolute",
+                    right: "-50px",
+                    background: "none",
+                    border: "none",
+                    color: "white",
+                    fontSize: "2rem",
+                    cursor: "pointer",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setGalleryIndex(
+                      (prev) => (prev + 1) % galleryImages.length,
+                    );
+                  }}
+                >
+                  <FaArrowRight />
+                </button>
+              )}
+
+              <button
+                onClick={() => setIsLightboxOpen(false)}
+                style={{
+                  position: "absolute",
+                  top: "15px",
+                  right: "15px",
+                  background: "rgba(0,0,0,0.6)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "white",
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FaTimes />
+              </button>
+            </LightboxCard>
           </LightboxOverlay>
         )}
       </AnimatePresence>

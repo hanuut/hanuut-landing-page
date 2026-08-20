@@ -76,6 +76,35 @@ const LiquidGlassStage = styled.div`
   }
 `;
 
+const MockupOverlayRow = styled.div`
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+`;
+
+const MiniMockupThumb = styled.div`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #18181b;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+
+  img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+  }
+`;
+
 // 🔴 MULTIPLE ADAPTIVE LIGHT SOURCES
 const LightOrb1 = styled.div`
   position: absolute;
@@ -339,6 +368,17 @@ const ProductCard = ({ product, index, onSelect }) => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {hasPreviews && product.availabilities?.length > 0 && (
+          <MockupOverlayRow>
+            {product.availabilities.slice(0, 3).map((av, i) => (
+              <MiniMockupThumb key={i}>
+                <img src={av.podFrontTemplateId ? `https://api.hanuut.com/image/raw/${av.podFrontTemplateId}` : imageUrl} alt="mockup" />
+              </MiniMockupThumb>
+            ))}
+          </MockupOverlayRow>
+        )}
+
       </LiquidGlassStage>
 
       <InfoBlock>

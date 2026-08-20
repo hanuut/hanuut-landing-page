@@ -775,12 +775,19 @@ const PodStudioDashboard = ({
             </Suspense>
           ) : (
             <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "4rem" }}>
-              <HeroSection
-                onScrollToCatalog={handleScrollToCatalog}
-                sampleProducts={rawProducts}
-                onSelectCanvas={handleSelectCanvas}
-              />
+              
+              {/* 1. Catalog Grid is now at the TOP */}
+              <div id="canvas-library-anchor" style={{ scrollMarginTop: "100px" }}>
+                <CanvasLibrary
+                  shopId={shopId}
+                  onSelectCanvas={handleSelectCanvas}
+                  onBlankOrderClick={handleDirectBlankOrder}
+                  shop={shop}
+                  displayMode="grid"
+                />
+              </div>
 
+              {/* 2. HeroTripleRow (Discovery + Marquee + Editorial) moved BELOW catalog */}
               <HeroTripleRow $isArabic={isArabic}>
                 <HiddenOnMobileCol style={{ background: "#050507" }}>
                   <CanvasLibrary
@@ -814,16 +821,6 @@ const PodStudioDashboard = ({
                   />
                 </TripleCol>
               </HeroTripleRow>
-
-              <div id="canvas-library-anchor" style={{ scrollMarginTop: "100px" }}>
-                <CanvasLibrary
-                  shopId={shopId}
-                  onSelectCanvas={handleSelectCanvas}
-                  onBlankOrderClick={handleDirectBlankOrder}
-                  shop={shop}
-                  displayMode="grid"
-                />
-              </div>
 
               <CreativePossibilities
                 products={rawProducts}

@@ -1306,9 +1306,14 @@ const Cart = ({
 
   const discountAmount = useMemo(() => {
     if (!appliedDiscount) return 0;
+    
     if (appliedDiscount.type === "percent") {
-      return itemsTotal * (appliedDiscount.value / 100);
+      const val = appliedDiscount.value;
+      // Logical boundaries for percentage (Epic 1 Constraints)
+      if (val <= 0 || val > 100) return 0;
+      return itemsTotal * (val / 100);
     }
+    
     return appliedDiscount.value;
   }, [appliedDiscount, itemsTotal]);
 
@@ -1845,12 +1850,20 @@ const Cart = ({
                     style={{
                       paddingBottom: "0.5rem",
                       borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "4px"
                     }}
                   >
+                    {discountAmount > 0 && (
+                      <span style={{ fontSize: "1rem", color: "#EF4444", fontWeight: "700" }}>
+                        {t("discount", "Discount")}: -{parseInt(discountAmount)} {t("zd", "DA")}
+                      </span>
+                    )}
                     <TotalValue
                       style={{ fontSize: "1.8rem", color: "#39A170" }}
                     >
-                      zd {finalTotal}
+                      {finalTotal} {t("zd", "DA")}
                     </TotalValue>
                     <span
                       style={{
