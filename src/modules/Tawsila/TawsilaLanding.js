@@ -1,126 +1,92 @@
-import { useEffect, useRef } from "react";
+// modules/Tawsila/TawsilaLanding.js
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
   FaArrowRight,
   FaArrowLeft,
   FaUsers,
-  FaWallet,
-  FaGlobe,
-  FaClock,
   FaRoute,
-  FaHeadset,
+  FaWallet,
+  FaMapMarkerAlt,
+  FaShieldAlt,
+  FaCompass,
 } from "react-icons/fa";
 
-// --- Components ---
 import TawsilaLayout from "./components/TawsilaLayout";
 import BorderBeamButton from "../../components/BorderBeamButton";
 import Seo from "../../components/Seo";
+import abridLogoGraphic from "../../assets/abridh_logo.webp";
 
-// --- 1. THE MAP MOBILITY CANVAS BACKGROUND ---
-const CanvasContainer = styled.canvas`
+// --- 1. LIGHT GALAXY MOBILITY CANVAS ---
+const CanvasWrapper = styled.canvas`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
-  pointer-events: auto;
-  background: #050505;
+  z-index: 3;
+  pointer-events: none;
 `;
 
-const getAbridhStoreLink = () => {
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  return isIOS
-    ? "https://apps.apple.com/dz/app/abridh/id6760981883"
-    : process.env.REACT_APP_TAWSILA_DOWNLOAD_LINK;
-};
-
-const MobilityCanvas = () => {
+const LightMobilityCanvas = () => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    
-    // Cap DPR to 1.5 for extreme performance on 4K/Retina screens
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5); 
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const isMobile = window.innerWidth < 768;
 
     let w, h;
     let particles = [];
-    let mouse = { x: -1000, y: -1000, radius: isMobile ? 200 : 350 };
     let animationFrame;
 
-    // Tawsila Colors
-    const COLORS = ["#397FF9", "#FFFFFF", "#1E40AF"];
+    const COLORS = ["#00875F", "#10B981", "#397FF9"];
 
-    class MapNode {
+    class ParticleNode {
       constructor() {
         this.x = Math.random() * w;
         this.y = Math.random() * h;
-        this.size = Math.random() * (isMobile ? 3 : 5) + 2; 
-        
-        // Very slow, deliberate movement like map tracking
-        this.vx = (Math.random() - 0.5) * 0.3;
-        this.vy = (Math.random() - 0.5) * 0.3;
-        
+        this.size = Math.random() * (isMobile ? 2.5 : 4) + 1.5;
+        this.vx = (Math.random() - 0.5) * 0.25;
+        this.vy = (Math.random() - 0.5) * 0.25;
         this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
-        this.connections = 0; // Track connections to limit webbing
       }
 
       draw() {
-        // Inner solid core
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = 0.6;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
 
-        // Subtle outer ring (map marker effect)
-        ctx.globalAlpha = 0.3;
+        ctx.globalAlpha = 0.15;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = this.color === "#FFFFFF" ? "#397FF9" : this.color;
+        ctx.arc(this.x, this.y, this.size * 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
         ctx.fill();
       }
 
       update() {
-        // Mouse interaction (gentle push away)
-        let dx = mouse.x - this.x;
-        let dy = mouse.y - this.y;
-        let distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < mouse.radius * 0.5) {
-          const force = (mouse.radius * 0.5 - distance) / (mouse.radius * 0.5);
-          this.vx += (dx / distance) * force * 0.02;
-          this.vy += (dy / distance) * force * 0.02;
-        }
+        this.x += this.vx;
+        this.y += this.vy;
 
-        // Friction to keep movement steady
-        this.vx *= 0.98;
-        this.vy *= 0.98;
-
-        this.x += this.vx + (Math.random() - 0.5) * 0.1;
-        this.y += this.vy + (Math.random() - 0.5) * 0.1;
-
-        // Wrap around screen
-        if (this.x < -20) this.x = w + 20;
-        if (this.x > w + 20) this.x = -20;
-        if (this.y < -20) this.y = h + 20;
-        if (this.y > h + 20) this.y = -20;
+        if (this.x < -10) this.x = w + 10;
+        if (this.x > w + 10) this.x = -10;
+        if (this.y < -10) this.y = h + 10;
+        if (this.y > h + 10) this.y = -10;
       }
     }
 
     const init = () => {
       particles = [];
-      // Higher density works now because we aren't using expensive blending modes
-      const count = isMobile ? 35 : 70; 
+      const count = isMobile ? 25 : 55;
       for (let i = 0; i < count; i++) {
-        particles.push(new MapNode());
+        particles.push(new ParticleNode());
       }
     };
 
@@ -135,32 +101,20 @@ const MobilityCanvas = () => {
       init();
     };
 
-    const drawMapRoutes = () => {
-      const maxDistSq = isMobile ? 15000 : 30000;
-      
-      // Reset connection counts
-      particles.forEach(p => p.connections = 0);
-
-      ctx.lineWidth = 1.5;
+    const drawConnections = () => {
+      const maxDistSq = isMobile ? 12000 : 22000;
+      ctx.lineWidth = 1;
 
       for (let a = 0; a < particles.length; a++) {
         for (let b = a + 1; b < particles.length; b++) {
-          // Limit to max 2 connections per node to create map "routes" instead of stars
-          if (particles[a].connections >= 2 || particles[b].connections >= 2) continue;
-
           const dx = particles[a].x - particles[b].x;
           const dy = particles[a].y - particles[b].y;
           const distSq = dx * dx + dy * dy;
 
           if (distSq < maxDistSq) {
-            particles[a].connections++;
-            particles[b].connections++;
-
-            let opacity = 1 - (distSq / maxDistSq);
-            
-            ctx.globalAlpha = opacity * 0.6;
-            ctx.strokeStyle = '#397FF9';
-            
+            const opacity = (1 - distSq / maxDistSq) * 0.25;
+            ctx.globalAlpha = opacity;
+            ctx.strokeStyle = "#00875F";
             ctx.beginPath();
             ctx.moveTo(particles[a].x, particles[a].y);
             ctx.lineTo(particles[b].x, particles[b].y);
@@ -171,365 +125,596 @@ const MobilityCanvas = () => {
     };
 
     const animate = () => {
-      // Clear canvas fully every frame for crisp, clean map lines (no blurry trails)
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = "#050505";
-      ctx.fillRect(0, 0, w, h);
-
-      // Draw map network
-      drawMapRoutes();
-      
-      // Draw map nodes
-      particles.forEach(p => {
+      drawConnections();
+      particles.forEach((p) => {
         p.update();
         p.draw();
       });
-
-      // --- SPOTLIGHT VIGNETTE ---
-      // This creates the perfect contrast for text and darkness where the mouse isn't
-      ctx.globalAlpha = 1;
-      let gradient;
-      
-      if (mouse.x !== -1000) {
-        // If mouse is active, create a clear window around the mouse
-        gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, mouse.radius);
-        gradient.addColorStop(0, 'rgba(5, 5, 5, 0)');     // Fully transparent at mouse
-        gradient.addColorStop(0.5, 'rgba(5, 5, 5, 0.6)'); // Starts fading to black
-        gradient.addColorStop(1, 'rgba(5, 5, 5, 0.95)');  // Nearly pitch black outside radius
-      } else {
-        // Idle state: Screen is mostly dark to keep text contrast extremely high
-        gradient = 'rgba(5, 5, 5, 0.85)';
-      }
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, w, h);
-
       animationFrame = requestAnimationFrame(animate);
     };
 
-    const handleMouseMove = (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    };
-
-    const handleMouseLeave = () => {
-      mouse.x = -1000;
-      mouse.y = -1000;
-    };
-
     window.addEventListener("resize", resize);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseleave", handleMouseLeave);
-
     resize();
     animate();
 
     return () => {
       window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animationFrame);
     };
   }, []);
 
-  return <CanvasContainer ref={canvasRef} />;
+  return <CanvasWrapper ref={canvasRef} />;
 };
 
-// --- 2. STYLED COMPONENTS ---
-
+// --- 2. HERO & LIQUID-GLASS LOGO REVEAL ---
 const HeroSection = styled.section`
   position: relative;
-  height: 100vh;
+  min-height: 85vh;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  background-color: #f8fafc;
+  padding-top: calc(${(props) => props.theme.navHeight || "80px"} + 1rem);
+  padding-bottom: 4rem;
+`;
+
+// Layer 2: Large Logo in Background
+const BackgroundLogoContainer = styled.div`
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(520px, 85vw);
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.85;
+
+  img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0, 135, 95, 0.15));
+  }
+`;
+
+// Layer 3 & 4: Liquid Glass with dynamic cursor reveal
+const LiquidGlassLayer = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(248, 250, 252, 0.6);
+
+  /* Progressive cursor reveal mask */
+  mask-image: radial-gradient(
+    circle 240px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(0, 0, 0, 0.8) 60%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle 240px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(0, 0, 0, 0.8) 60%,
+    rgba(0, 0, 0, 1) 100%
+  );
+
+  @media (hover: none) {
+    mask-image: none;
+    -webkit-mask-image: none;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
 `;
 
 const HeroContent = styled(motion.div)`
   position: relative;
-  z-index: 2;
+  z-index: 4;
   text-align: center;
-  max-width: 900px;
+  max-width: 840px;
   width: 90%;
-  pointer-events: none;
-`;
-
-const Badge = styled(motion.div)`
-  display: inline-block;
-  padding: 0.5rem 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50px;
-  color: #397ff9;
-  font-weight: 700;
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
-  backdrop-filter: blur(10px);
-  letter-spacing: 1px;
-`;
-
-const Title = styled(motion.h1)`
-  font-size: clamp(1.6rem, 3.8vw, 3rem)
-  font-weight: 900;
-  color: white;
-  line-height: 1.1;
-  margin: 0 0 1.5rem 0;
-  font-family: "Tajawal", sans-serif;
-  letter-spacing: -1px;
-  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-`;
-
-const Subtitle = styled(motion.p)`
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
-  color: #a1a1aa;
-  margin: 0 auto 3rem auto;
-  max-width: 600px;
-  line-height: 1.6;
-  font-family: "Cairo", sans-serif;
-`;
-
-const CtaGroup = styled(motion.div)`
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-  pointer-events: auto;
-  flex-wrap: wrap;
-`;
-
-// --- NEW HIGH-PERFORMANCE BENTO GRID ---
-const BentoSection = styled.section`
-  padding: 6rem 0 10rem 0;
-  background: #050505;
-  display: flex;
-  justify-content: center;
-  position: relative;
-  z-index: 2;
-`;
-
-const BentoContainer = styled.div`
-  width: 90%;
-  max-width: 1200px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: minmax(320px, auto);
-  gap: 1.5rem;
-  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    grid-auto-rows: auto;
-  }
-`;
-
-const BentoCard = styled(motion.div)`
-  background: #18181b;
-  border-radius: 32px;
-  padding: 3rem;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  cursor: default;
+  align-items: center;
+  gap: 1.25rem;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+`;
+
+const LaunchBadge = styled(motion.div)`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 9999px;
+  color: #00875f;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(0, 135, 95, 0.08);
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+  }
+`;
+
+const HeroTitle = styled(motion.h1)`
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1.2;
+  margin: 0;
+  font-family: var(--font-primary, "Tajawal"), sans-serif;
+  letter-spacing: -0.5px;
+
+  span {
+    color: #00875f;
+  }
+`;
+
+const HeroSubtitle = styled(motion.p)`
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  color: #475569;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 680px;
+  font-weight: 500;
+`;
+
+const CtaRow = styled(motion.div)`
+  display: flex;
+  gap: 1.25rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+`;
+
+const PrimaryPillBtn = styled.button`
+  background-color: #00875f;
+  color: #ffffff;
+  padding: 1rem 2.25rem;
+  border-radius: 9999px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(0, 135, 95, 0.25);
+  transition: all 0.2s ease;
+  font-family: inherit;
 
   &:hover {
-    border-color: rgba(57, 127, 249, 0.4);
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(57, 127, 249, 0.1);
+    background-color: #006847;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 135, 95, 0.35);
+  }
+`;
+
+const SecondaryPillBtn = styled.button`
+  background-color: #ffffff;
+  color: #0b1528;
+  padding: 1rem 2.25rem;
+  border-radius: 9999px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  border: 1.5px solid #cbd5e1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  font-family: inherit;
+
+  &:hover {
+    border-color: #00875f;
+    color: #00875f;
+    transform: translateY(-2px);
+    background-color: #f0fdf4;
+  }
+`;
+
+// --- 3. DUAL-PERSONA SECTION ---
+const SectionContainer = styled.section`
+  width: 90%;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
+`;
+
+const DualPersonaGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+
+  @media (max-width: 840px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const PersonaCard = styled(motion.div)`
+  background: #ffffff;
+  border: 1.5px solid
+    ${({ $isCaptain }) => ($isCaptain ? "#bfdbfe" : "#a7f3d0")};
+  border-radius: 28px;
+  padding: 2.75rem 2.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.04);
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: ${({ $isCaptain }) => ($isCaptain ? "#397FF9" : "#00875F")};
   }
 
-  &.span-2 {
-    grid-column: span 2;
-    @media (max-width: 900px) {
-      grid-column: span 1;
-    }
-  }
-
-  .content-wrapper {
-    position: relative;
-    z-index: 2;
+  .persona-badge {
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: ${({ $isCaptain }) => ($isCaptain ? "#2563eb" : "#00875f")};
+    background: ${({ $isCaptain }) => ($isCaptain ? "#eff6ff" : "#ecfdf5")};
+    padding: 4px 12px;
+    border-radius: 6px;
+    width: fit-content;
   }
 
   h3 {
-    font-size: 2rem;
-    color: white;
-    margin-bottom: 1rem;
-    font-family: "Tajawal", sans-serif;
-  }
-
-  p {
-    font-size: 1.1rem;
-    color: #a1a1aa;
-    line-height: 1.6;
-    font-family: "Cairo", sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #0f172a;
     margin: 0;
   }
 
-  .icon-top {
-    font-size: 2.5rem;
-    color: #397ff9;
-    margin-bottom: 2rem;
+  p {
+    font-size: 1.05rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+    flex-grow: 1;
   }
 
-  .bg-icon {
-    position: absolute;
-    top: -10%;
-    ${(props) => (props.$isArabic ? "left: -10%;" : "right: -10%;")}
-    font-size: 15rem;
-    color: rgba(255, 255, 255, 0.02);
-    z-index: 0;
-    transition:
-      transform 0.5s ease,
-      color 0.5s ease;
-  }
+  .action-btn {
+    margin-top: 1rem;
+    padding: 0.95rem 1.75rem;
+    border-radius: 9999px;
+    font-weight: 800;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
 
-  &:hover .bg-icon {
-    transform: scale(1.1)
-      rotate(${(props) => (props.$isArabic ? "10deg" : "-10deg")});
-    color: rgba(57, 127, 249, 0.05);
+    ${({ $isCaptain }) =>
+      $isCaptain
+        ? `
+      background: #0b1528;
+      color: #ffffff;
+      &:hover { background: #1e293b; transform: translateY(-2px); }
+    `
+        : `
+      background: #00875f;
+      color: #ffffff;
+      &:hover { background: #006847; transform: translateY(-2px); }
+    `}
   }
 `;
 
-// --- 3. MAIN COMPONENT ---
+// --- 4. 3 STREAMLINED PILLARS ---
+const PillarsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const PillarCard = styled.div`
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+
+  .icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: #ecfdf5;
+    color: #00875f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+
+  h4 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0;
+  }
+`;
+
+const BejaiaNotice = styled.div`
+  background: #f1f5f9;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 24px;
+  padding: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+
+  .text {
+    max-width: 680px;
+    h4 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 0.5rem 0;
+    }
+    p {
+      font-size: 1rem;
+      color: #475569;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+`;
+
 const TawsilaLanding = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const navigate = useNavigate();
+  const heroRef = useRef(null);
 
-  const bentoCards = [
-    {
-      className: "span-2",
-      icon: FaClock,
-      title: t("tawsila_sticky_1_title"),
-      desc: t("tawsila_sticky_1_desc"),
-    },
-    {
-      className: "span-1",
-      icon: FaUsers, 
-      title: t("tawsila_bento_1_title"),
-      desc: t("tawsila_bento_1_desc"),
-    },
-    {
-      className: "span-1",
-      icon: FaRoute, 
-      title: t("tawsila_sticky_2_title"),
-      desc: t("tawsila_sticky_2_desc"),
-    },
-    {
-      className: "span-2",
-      icon: FaWallet, 
-      title: t("tawsila_bento_2_title"),
-      desc: t("tawsila_bento_2_desc"),
-    },
-    {
-      className: "span-1",
-      icon: FaHeadset,
-      title: t("tawsila_sticky_3_title"),
-      desc: t("tawsila_sticky_3_desc"),
-    },
-    {
-      className: "span-2",
-      icon: FaGlobe, 
-      title: t("tawsila_bento_3_title"),
-      desc: t("tawsila_bento_3_desc"),
-    },
-  ];
+  // Dynamic Liquid-Glass Mouse Coordinate Tracking
+  const handleMouseMove = (e) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    heroRef.current.style.setProperty("--mouse-x", `${x}%`);
+    heroRef.current.style.setProperty("--mouse-y", `${y}%`);
+  };
 
-  const seoTitle = t("seo_tawsila_title");
-  const seoDesc = t("seo_tawsila_desc");
+  const getAbridStoreLink = () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    return isIOS
+      ? "https://apps.apple.com/dz/app/abridh/id6760981883"
+      : process.env.REACT_APP_TAWSILA_DOWNLOAD_LINK ||
+          "https://play.google.com/store/apps";
+  };
 
   return (
     <TawsilaLayout>
       <Seo
-        title={seoTitle}
-        description={seoDesc}
+        title={t(
+          "seo_abrid_title",
+          "Abrid | La mobilité communautaire, simplement (Béjaïa)",
+        )}
+        description={t(
+          "seo_abrid_desc",
+          "Plateforme de mobilité communautaire et de partage de trajets à Béjaïa. Déplacements partagés, participation transparente aux frais.",
+        )}
         url="https://hanuut.com/abridh"
-        customSchema={{
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "Abridh by Hanuut",
-          operatingSystem: "Android, iOS",
-          applicationCategory: "TravelApplication",
-          image: "https://hanuut.com/static/abridh.png", 
-          url: "https://hanuut.com/abridh",
-          offers: {
-            "@type": "Offer",
-            price: "0",
-            priceCurrency: "DZD",
-          },
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: "4.9",
-            ratingCount: "1240",
-          },
-          description: seoDesc,
-        }}
       />
 
-      {/* --- HERO SECTION --- */}
-      <HeroSection>
-        <MobilityCanvas />
-        <HeroContent
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-        >
-          <Badge>Abridh | Phase Expérimentale</Badge>
-          <Title>{t("tawsila_hero_title")}</Title>
-          <Subtitle>{t("tawsila_hero_subtitle")}</Subtitle>
+      {/* --- HERO SECTION WITH LOGO LIQUID GLASS & GALAXY PARTICLES --- */}
+      <HeroSection ref={heroRef} onMouseMove={handleMouseMove}>
+        {/* Layer 1: Canvas particles */}
+        <LightMobilityCanvas />
 
-          <CtaGroup>
-            <BorderBeamButton
-              onClick={() => navigate("/tawsila/drive")}
-              beamColor="#397FF9"
-            >
-              {t("tawsila_btn_drive")}{" "}
-              {isArabic ? (
-                <FaArrowLeft style={{ marginRight: "8px" }} />
-              ) : (
-                <FaArrowRight style={{ marginLeft: "8px" }} />
+        {/* Layer 2: Big Background Logo */}
+        <BackgroundLogoContainer>
+          <img src={abridLogoGraphic} alt="Abrid Watermark Logo" />
+        </BackgroundLogoContainer>
+
+        {/* Layer 3 & 4: Liquid Glass Layer with cursor reveal */}
+        <LiquidGlassLayer />
+
+        {/* Layer 5: Hero Content */}
+        <HeroContent
+          $isArabic={isArabic}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <LaunchBadge>
+            <span className="dot" />
+            <span>
+              {t(
+                "abrid_launch_badge",
+                "Phase de test & Déploiement initial à Béjaïa",
               )}
-            </BorderBeamButton>
-            <BorderBeamButton
-              secondary
-              onClick={() => window.open(getAbridhStoreLink(), "_blank")}
-              beamColor="#FFFFFF"
+            </span>
+          </LaunchBadge>
+
+          <HeroTitle>
+            {t("abrid_hero_title_prefix", "La mobilité communautaire, ")}
+            <span>{t("abrid_hero_title_highlight", "simplement.")}</span>
+          </HeroTitle>
+
+          <HeroSubtitle>
+            {t(
+              "abrid_hero_sub",
+              "Coordonnez vos déplacements, partagez vos trajets et participez aux frais avec une communauté de membres.",
+            )}
+          </HeroSubtitle>
+
+          <CtaRow>
+            <PrimaryPillBtn onClick={() => navigate("/abridh/drive")}>
+              <span>{t("abrid_btn_captain", "Devenir Capitaine")}</span>
+              {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+            </PrimaryPillBtn>
+
+            <SecondaryPillBtn
+              onClick={() => window.open(getAbridStoreLink(), "_blank")}
             >
-              {t("tawsila_btn_ride")}
-            </BorderBeamButton>
-          </CtaGroup>
+              <span>{t("abrid_btn_passenger", "Demander un déplacement")}</span>
+            </SecondaryPillBtn>
+          </CtaRow>
         </HeroContent>
       </HeroSection>
 
-      {/* --- BENTO GRID SECTION --- */}
-      <BentoSection>
-        <BentoContainer $isArabic={isArabic}>
-          {bentoCards.map((card, index) => {
-            const IconComponent = card.icon;
-            return (
-              <BentoCard
-                key={index}
-                className={card.className}
-                $isArabic={isArabic}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
-              >
-                <IconComponent className="bg-icon" />
-                <div className="content-wrapper">
-                  <IconComponent className="icon-top" />
-                  <h3>{card.title}</h3>
-                  <p>{card.desc}</p>
-                </div>
-              </BentoCard>
-            );
-          })}
-        </BentoContainer>
-      </BentoSection>
+      {/* --- DUAL PERSONA MODULE --- */}
+      <SectionContainer $isArabic={isArabic}>
+        <DualPersonaGrid>
+          {/* Persona 1: Passager */}
+          <PersonaCard $isCaptain={false} $isArabic={isArabic}>
+            <span className="persona-badge">
+              {t("persona_passenger_tag", "Pour les Passagers")}
+            </span>
+            <h3>{t("persona_passenger_title", "Voyagez en toute sérénité")}</h3>
+            <p>
+              {t(
+                "persona_passenger_desc",
+                "Rejoignez des membres effectuant le même trajet que vous. Déplacements locaux clairs, estimation transparente de la contribution aux frais et capitaines vérifiés.",
+              )}
+            </p>
+            <button
+              className="action-btn"
+              onClick={() => window.open(getAbridStoreLink(), "_blank")}
+            >
+              <span>
+                {t("persona_passenger_cta", "Télécharger l'Application")}
+              </span>
+              {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+            </button>
+          </PersonaCard>
+
+          {/* Persona 2: Capitaine */}
+          <PersonaCard $isCaptain={true} $isArabic={isArabic}>
+            <span className="persona-badge">
+              {t("persona_captain_tag", "Pour les Capitaines")}
+            </span>
+            <h3>
+              {t("persona_captain_title", "Partagez vos trajets du quotidien")}
+            </h3>
+            <p>
+              {t(
+                "persona_captain_desc",
+                "Compensez vos dépenses d'entretien et de carburant en accueillant des membres voyageurs sur vos trajets habituels à Béjaïa. Zéro contrainte d'horaire.",
+              )}
+            </p>
+            <button
+              className="action-btn"
+              onClick={() => navigate("/abridh/drive")}
+            >
+              <span>
+                {t("persona_captain_cta", "Rejoindre en tant que Capitaine")}
+              </span>
+              {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+            </button>
+          </PersonaCard>
+        </DualPersonaGrid>
+
+        {/* --- 3 CORE COMMUNITY PILLARS --- */}
+        <PillarsGrid>
+          <PillarCard $isArabic={isArabic}>
+            <div className="icon-wrap">
+              <FaRoute />
+            </div>
+            <h4>{t("pillar_1_title", "Partage de Trajets")}</h4>
+            <p>
+              {t(
+                "pillar_1_desc",
+                "Des itinéraires partagés entre membres pour se déplacer simplement en ville ou entre localités voisines.",
+              )}
+            </p>
+          </PillarCard>
+
+          <PillarCard $isArabic={isArabic}>
+            <div className="icon-wrap">
+              <FaCompass />
+            </div>
+            <h4>{t("pillar_2_title", "Coordination Simple")}</h4>
+            <p>
+              {t(
+                "pillar_2_desc",
+                "Une application intuitive pour convenir facilement d'un point de rendez-vous et suivre l'arrivée du membre conducteur.",
+              )}
+            </p>
+          </PillarCard>
+
+          <PillarCard $isArabic={isArabic}>
+            <div className="icon-wrap">
+              <FaWallet />
+            </div>
+            <h4>{t("pillar_3_title", "Partage des Frais")}</h4>
+            <p>
+              {t(
+                "pillar_3_desc",
+                "Une contribution équitable aux frais de route calculée en amont, sans négociation ni surprise.",
+              )}
+            </p>
+          </PillarCard>
+        </PillarsGrid>
+
+        {/* --- BÉJAÏA LAUNCH COMMITMENT --- */}
+        <BejaiaNotice $isArabic={isArabic}>
+          <div className="text">
+            <h4>
+              {t("bejaia_notice_title", "Déploiement progressif à Béjaïa")}
+            </h4>
+            <p>
+              {t(
+                "bejaia_notice_desc",
+                "Abrid démarre son déploiement initial sous forme de phase pilote à Béjaïa. Nous stabilisons le service avec un groupe de membres fondateurs avant d'étendre la couverture.",
+              )}
+            </p>
+          </div>
+          <PrimaryPillBtn onClick={() => navigate("/abridh/drive")}>
+            <FaMapMarkerAlt />
+            <span>{t("bejaia_btn_join", "Participer au Pilote")}</span>
+          </PrimaryPillBtn>
+        </BejaiaNotice>
+      </SectionContainer>
     </TawsilaLayout>
   );
 };

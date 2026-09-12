@@ -72,25 +72,25 @@ export default async (request, context) => {
   }
   // --- MOBILITY & ABRIDH ROUTES ---
   else if (path.startsWith("/tawsila") || path.startsWith("/abrid")) {
-    metaData.title = "Abridh | Réseau Privé de Mobilité Communautaire";
+    metaData.title = "Abrid | La mobilité communautaire, simplement (Béjaïa)";
     metaData.description =
-      "Rejoignez la phase expérimentale d'Abridh. Un réseau privé à accès limité pour coordonner vos déplacements en Algérie.";
+      "Découvrez Abrid à Béjaïa. Coordonnez vos déplacements, partagez vos trajets et participez aux frais avec une communauté de membres.";
     metaData.image = `${url.origin}/static/abridh.png`;
-  } else if (path.startsWith("/esuuq")) {
-    metaData.title = "eSUUQ | Achat, Vente et Livraison en Algérie";
-    metaData.description =
-      "La marketplace n°1 en Algérie. Commandez vos repas, faites vos courses ou vendez vos objets d'occasion.";
-    metaData.image = `${url.origin}/static/esuuq.png`;
-  } else if (path.startsWith("/partners")) {
-    metaData.title = "My Hanuut | Logiciel de Caisse & Boutique en Ligne";
-    metaData.description =
-      "Numérisez votre commerce gratuitement. Menu digital, gestion de stock par code-barres et site e-commerce.";
-    metaData.image = `${url.origin}/static/my-hanuut.png`;
-  } else if (path.startsWith("/explore")) {
-    metaData.title = "Explore Local Shops | Hanuut";
-    metaData.description =
-      "Discover and order from the best shops and restaurants in your city.";
+    metaData.jsonLdBlock = buildJsonLdBlock({
+      "@context": "https://schema.org/",
+      "@type": "SoftwareApplication",
+      name: "Abrid by Hanuut",
+      operatingSystem: "Android, iOS",
+      applicationCategory: "TravelApplication",
+      image: `${url.origin}/static/abridh.png`,
+      description: metaData.description,
+      areaServed: {
+        "@type": "AdministrativeArea",
+        name: "Béjaïa, Algeria",
+      },
+    });
   }
+  
   // --- AURAS LAB storefront ---
   else if (path === "/aurasLab" || path === "/aurasLab/") {
     metaData.title = "AURAS LAB | Custom Print-On-Demand Streetwear in Algeria";

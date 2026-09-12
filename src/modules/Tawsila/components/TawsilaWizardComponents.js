@@ -1,111 +1,114 @@
+// modules/Tawsila/components/TawsilaWizardComponents.js
 import styled, { css } from "styled-components";
 import { motion } from "framer-motion";
 
 export const WizardContainer = styled.div`
   min-height: 100vh;
   width: 100%;
-  background-color: ${(props) => props.theme.body};
+  background-color: #f8fafc;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
   overflow-x: hidden;
-  font-family: 'Tajawal', sans-serif;
-  color: white;
-  padding-top: calc(${(props) => props.theme.navHeight} + 2rem);
+  font-family: var(--font-primary, "Tajawal"), sans-serif;
+  color: #0f172a;
+  padding-top: calc(${(props) => props.theme.navHeight || "80px"} + 1.5rem);
+  padding-bottom: 5rem;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 `;
 
 export const StepWrapper = styled.div`
   width: 100%;
-  max-width: 600px;
+  max-width: 640px;
   box-sizing: border-box;
-  padding: 3rem;
+  padding: 3rem 2.5rem;
   z-index: 2;
 
-  /* Glassmorphism card style */
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 32px;
-  backdrop-filter: blur(10px);
-  
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
 
-  @media (max-width: 768px) {
-    padding: 2rem 1.5rem;
-    border: none;
+  @media (max-width: 680px) {
+    padding: 2rem 1.25rem;
+    border-radius: 20px;
+    box-shadow: none;
     background: transparent;
-    backdrop-filter: none;
+    border: none;
   }
 `;
 
 export const StepTitle = styled(motion.h2)`
-  font-size: 2.5rem;
+  font-size: clamp(1.75rem, 4vw, 2.3rem);
   font-weight: 800;
-  color: white;
-  margin-bottom: 0.5rem;
+  color: #0f172a;
+  margin: 0 0 0.5rem 0;
   text-align: center;
   letter-spacing: -0.5px;
-  
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
+  line-height: 1.25;
 `;
 
 export const StepSubtitle = styled(motion.p)`
-  font-size: 1.1rem;
-  color: #A1A1AA;
+  font-size: 1.05rem;
+  color: #64748b;
   text-align: center;
-  margin-bottom: 3rem;
-  font-family: 'Cairo', sans-serif;
+  margin: 0 auto 2.5rem auto;
+  max-width: 500px;
+  line-height: 1.6;
 `;
 
 export const InputGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
   width: 100%;
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
 `;
 
 export const Label = styled.label`
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #D4D4D8;
-  margin-left: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-left: 2px;
+  margin-right: 2px;
 `;
 
 export const PremiumInput = styled.input`
   width: 100%;
-  padding: 1.2rem;
-  font-size: 1.1rem;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: rgba(255, 255, 255, 0.03);
-  color: white;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 1rem 1.15rem;
+  font-size: 1rem;
+  border-radius: 14px;
+  border: 1.5px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #0f172a;
+  transition: all 0.2s ease;
   box-sizing: border-box;
   font-family: inherit;
-  
+
   &:focus {
     outline: none;
-    border-color: #397FF9; /* Tawsila Blue */
-    background-color: rgba(57, 127, 249, 0.05);
-    box-shadow: 0 0 0 4px rgba(57, 127, 249, 0.1);
+    border-color: #00875f;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(0, 135, 95, 0.1);
   }
 
   &::placeholder {
-    color: #52525B;
+    color: #94a3b8;
   }
 `;
 
 export const ProgressContainer = styled.div`
   width: 90%;
-  max-width: 400px;
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  max-width: 420px;
+  height: 6px;
+  background-color: #e2e8f0;
+  border-radius: 9999px;
   margin-top: 1rem;
+  margin-bottom: 2rem;
   overflow: hidden;
   position: relative;
   z-index: 2;
@@ -113,9 +116,8 @@ export const ProgressContainer = styled.div`
 
 export const ProgressFill = styled(motion.div)`
   height: 100%;
-  background: #397FF9;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(57, 127, 249, 0.5);
+  background: linear-gradient(90deg, #00875f 0%, #10b981 100%);
+  border-radius: 9999px;
 `;
 
 export const NavContainer = styled.div`
@@ -123,57 +125,66 @@ export const NavContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-top: auto;
-  padding-top: 3rem;
+  margin-top: 1.5rem;
+  gap: 1rem;
 `;
 
 export const NavButton = styled.button`
   padding: 1rem 2rem;
-  border-radius: 50px;
-  font-size: 1.1rem;
-  font-weight: 700;
+  border-radius: 9999px;
+  font-size: 1.05rem;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'Tajawal', sans-serif;
-  display: flex;
+  font-family: inherit;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 
-  ${props => props.$primary ? css`
-    background-color: #397FF9;
-    color: white;
-    border: none;
-    box-shadow: 0 10px 20px -10px rgba(57, 127, 249, 0.6);
-    flex: 1;
-    max-width: 200px;
-    
-    &:hover {
-      background-color: #2563EB;
-      transform: translateY(-2px);
-    }
-    &:disabled {
-      background-color: #27272A;
-      color: #52525B;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-  ` : css`
-    background-color: transparent;
-    color: #A1A1AA;
-    border: none;
-    
-    &:hover {
-      color: white;
-      background-color: rgba(255, 255, 255, 0.05);
-    }
-  `}
+  ${(props) =>
+    props.$primary
+      ? css`
+          background-color: #00875f;
+          color: #ffffff;
+          border: none;
+          box-shadow: 0 6px 20px rgba(0, 135, 95, 0.25);
+          flex: 1;
+
+          &:hover:not(:disabled) {
+            background-color: #006847;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 135, 95, 0.35);
+          }
+          &:disabled {
+            background-color: #cbd5e1;
+            color: #64748b;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+          }
+        `
+      : css`
+          background-color: #ffffff;
+          color: #475569;
+          border: 1.5px solid #cbd5e1;
+
+          &:hover {
+            color: #0f172a;
+            border-color: #94a3b8;
+            background-color: #f1f5f9;
+          }
+        `}
 `;
 
 export const ErrorText = styled(motion.p)`
-  color: #EF4444;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
   font-size: 0.9rem;
-  margin-top: -0.5rem;
-  margin-bottom: 1rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  text-align: center;
 `;

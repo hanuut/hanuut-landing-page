@@ -1,36 +1,21 @@
+// modules/Tawsila/components/TawsilaPreFooter.js
 import React from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import BorderBeamButton from "../../../components/BorderBeamButton";
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 
 const Section = styled.section`
   width: 100%;
-  padding: 6rem 0;
-  background-color: #050505;
+  padding: 5rem 0;
+  background-color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   overflow: hidden;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-`;
-
-const Glow = styled.div`
-  position: absolute;
-  bottom: -50%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80vw;
-  height: 50vh;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(57, 127, 249, 0.15) 0%, 
-    transparent 70%
-  );
-  filter: blur(60px);
-  pointer-events: none;
+  border-top: 1px solid #e2e8f0;
 `;
 
 const Container = styled(motion.div)`
@@ -40,46 +25,79 @@ const Container = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   z-index: 2;
+  direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
 `;
 
 const Title = styled.h2`
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 800;
-  color: white;
-  line-height: 1.2;
-  font-family: 'Tajawal', sans-serif;
-  
+  font-size: clamp(1.8rem, 4vw, 2.75rem);
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1.25;
+  font-family: var(--font-primary, "Tajawal"), sans-serif;
+
   span {
-    color: #397FF9; /* Tawsila Blue */
+    color: #00875f;
+  }
+`;
+
+const Subtitle = styled.p`
+  font-size: 1.1rem;
+  color: #64748b;
+  max-width: 600px;
+  margin: 0;
+  line-height: 1.6;
+`;
+
+const ActionBtn = styled.button`
+  background-color: #00875f;
+  color: #ffffff;
+  padding: 1rem 2.25rem;
+  border-radius: 9999px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(0, 135, 95, 0.25);
+  transition: all 0.2s ease;
+  font-family: inherit;
+
+  &:hover {
+    background-color: #006847;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 135, 95, 0.35);
   }
 `;
 
 const TawsilaPreFooter = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const isArabic = i18n.language === "ar";
 
   return (
     <Section>
-      <Glow />
       <Container
-        initial={{ opacity: 0, y: 30 }}
+        $isArabic={isArabic}
+        initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-        dir={t.language === 'ar' ? 'rtl' : 'ltr'}
+        transition={{ duration: 0.6 }}
       >
         <Title>
-          {t("prefooter_title", "Ready to hit the road?")} <br />
-          <span>{t("prefooter_subtitle", "Join the private network today.")}</span>
+          {t("prefooter_title", "Prêt à partager vos déplacements ?")} <br />
+          <span>{t("prefooter_subtitle", "Rejoignez la communauté Abrid à Béjaïa.")}</span>
         </Title>
-        <BorderBeamButton 
-          onClick={() => navigate("/abridh/drive")} // <-- FIXED ROUTE
-          beamColor="#397FF9"
-        >
-          {t("tawsila_btn_drive", "Join as a Driving Member")}
-        </BorderBeamButton>
+        <Subtitle>
+          {t("prefooter_desc", "Participez au projet pilote pour fluidifier les trajets du quotidien.")}
+        </Subtitle>
+        <ActionBtn onClick={() => navigate("/abridh/drive")}>
+          <span>{t("abrid_btn_captain", "Devenir Capitaine")}</span>
+          {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+        </ActionBtn>
       </Container>
     </Section>
   );

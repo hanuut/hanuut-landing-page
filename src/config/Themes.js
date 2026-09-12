@@ -118,40 +118,54 @@ export const partnerTheme = {
 // ---------------------------------------------------------
 // 3. TAWSILA THEME (The "Premium Mobility" Dark Theme)
 // ---------------------------------------------------------
+// config/Themes.js
 export const tawsilaTheme = {
-  ...commonSettings,
+  // --- Canvas & Backgrounds ---
+  body: "#F8FAFC",
+  bodyRgba: "248, 250, 252",
+  surface: "#FFFFFF",
+  surfaceRgba: "255, 255, 255",
+  surfaceMint: "#F0FDF4",
+  surfaceMintBorder: "#A7F3D0",
 
-  // Deep black background for the 3D Canvas to pop
-  body: "#050505", 
-  text: "#FFFFFF",
-  textColor: "#FFFFFF",
-  textRgba: "255, 255, 255",
-  secondaryText: "#A1A1AA", 
+  // --- Brand Colors ---
+  primaryColor: "#00875F", // Hanuut Emerald
+  primaryColorHover: "#006847",
+  primaryRgba: "0, 135, 95",
+  mintAccent: "#C4F5E2",
 
-  // Tawsila Electric Blue as Primary
-  primary: "#397FF9", 
-  primaryColor: "#397FF9",
-  primaryRgba: "57, 127, 249",
-  primaryLight: "#60A5FA",
+  // --- Secondary Accent (Captain Portal) ---
+  secondaryColor: "#397FF9", // Abrid Captain Blue
+  secondaryColorHover: "#2563EB",
+  secondaryRgba: "57, 127, 249",
+  navyAccent: "#0B1528",
 
-  secondary: "#FFFFFF", 
-  secondaryColor: "#FFFFFF",
+  // --- Typography & Text ---
+  text: "#0F172A", // Slate 900 Charcoal
+  textSecondary: "#475569", // Slate 600
+  textMuted: "#64748B", // Slate 500
+  textRgba: "15, 23, 42",
 
-  accent: "#39A170", 
-  error: "#EF4444", 
+  // --- Borders & Elevation ---
+  cardBorder: "rgba(15, 23, 42, 0.08)",
+  cardBorderHover: "rgba(0, 135, 95, 0.3)",
+  cardShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
+  cardShadowHover: "0 12px 30px rgba(0, 135, 95, 0.08)",
 
-  // Glassmorphism surfaces
-  surface: "#18181B", // Zinc 900
-  surfaceBorder: "rgba(255, 255, 255, 0.08)",
-
-  // Gemini / Premium Specs
-  zinc950: "#09090B",
-  zinc900: "#18181B",
-  zinc800: "#27272A",
-  zinc500: "#71717A",
-  zinc100: "#F4F4F5",
-
-  beamColor: "#397FF9", // Blue beam for Tawsila buttons
-  glassSurface: "rgba(24, 24, 27, 0.6)",
-  glassBorder: "rgba(255, 255, 255, 0.1)",
+  // --- Spacing & Radius ---
+  defaultRadius: "20px",
+  smallRadius: "12px",
+  pillRadius: "9999px",
+  navHeight: "80px",
+  navHeightMobile: "70px",
+  actionButtonPadding: "1rem 2rem",
+  actionButtonPaddingMobile: "0.85rem 1.5rem",
+  smallPadding: "0.5rem 1rem",
+  fontsm: "0.85rem",
+  fontmd: "0.95rem",
+  fontlg: "1.05rem",
+  fontxl: "1.2rem",
+  fontxxl: "1.5rem",
+  fontxxxl: "2rem",
+  fontLargest: "2.75rem",
 };
