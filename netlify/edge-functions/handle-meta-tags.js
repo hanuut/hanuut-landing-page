@@ -4,6 +4,22 @@ const buildJsonLdBlock = (schema) => {
   return `<script type="application/ld+json">${json}</script>`;
 };
 
+// Careers Metadata Dictionary for Edge Rendering
+const CAREERS_ROLES_META = {
+  "senior-mobile-systems-engineer": {
+    title: "Senior Mobile Systems Engineer (Flutter) | Abridh & Hanuut",
+    description: "Rejoignez l'équipe Abridh à Béjaïa. Développez et optimisez les applications mobiles Flutter (Passager & Capitaine) pour la mobilité en Algérie. Statut Auto-Entrepreneur préféré.",
+  },
+  "technical-lead-backend": {
+    title: "Technical Lead / Senior Backend Engineer (NestJS) | Abridh & Hanuut",
+    description: "Prenez en charge l'architecture backend NestJS & MongoDB de la plateforme Abridh à Béjaïa. Algorithmes de dispatching en temps réel et haute disponibilité.",
+  },
+  "launch-operations-coordinator": {
+    title: "Coordinateur des Opérations & Lancement (Béjaïa) | Abridh",
+    description: "Rejoignez l'équipe fondatrice sur le terrain à Béjaïa. Onboarding des Capitaines, inspections des véhicules et coordination du lancement commercial.",
+  },
+};
+
 export default async (request, context) => {
   const url = new URL(request.url);
   const path = url.pathname;
@@ -17,7 +33,45 @@ export default async (request, context) => {
     jsonLdBlock: "",
   };
 
-  if (path.startsWith("/tawsila") || path.startsWith("/abrid")) {
+  // --- CAREERS ROUTES (Main hub & specific job slugs) ---
+  if (path.startsWith("/careers")) {
+    const slug = path.split("/careers/")[1]?.replace(/\/$/, "");
+
+    if (slug && CAREERS_ROLES_META[slug]) {
+      const role = CAREERS_ROLES_META[slug];
+      metaData.title = role.title;
+      metaData.description = role.description;
+      metaData.image = `${url.origin}/static/abridh-careers.png`;
+      metaData.jsonLdBlock = buildJsonLdBlock({
+        "@context": "https://schema.org/",
+        "@type": "JobPosting",
+        title: role.title,
+        description: role.description,
+        hiringOrganization: {
+          "@type": "Organization",
+          name: "Abridh by Hanuut",
+          sameAs: "https://hanuut.com",
+          logo: `${url.origin}/logoPic.png`,
+        },
+        jobLocation: {
+          "@type": "Place",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Béjaïa",
+            addressRegion: "Béjaïa",
+            addressCountry: "DZ",
+          },
+        },
+      });
+    } else {
+      metaData.title = "Rejoignez l'équipe | Recrutement Abridh & Hanuut (Béjaïa)";
+      metaData.description =
+        "Opportunités d'ingénierie et d'opérations pour le lancement d'Abridh en Algérie. Statut Auto-Entrepreneur (ANAE) privilégié.";
+      metaData.image = `${url.origin}/static/abridh-careers.png`;
+    }
+  }
+  // --- MOBILITY & ABRIDH ROUTES ---
+  else if (path.startsWith("/tawsila") || path.startsWith("/abrid")) {
     metaData.title = "Abridh | Réseau Privé de Mobilité Communautaire";
     metaData.description =
       "Rejoignez la phase expérimentale d'Abridh. Un réseau privé à accès limité pour coordonner vos déplacements en Algérie.";
@@ -37,14 +91,14 @@ export default async (request, context) => {
     metaData.description =
       "Discover and order from the best shops and restaurants in your city.";
   }
-  // --- NEW: AURAS LAB storefront ---
+  // --- AURAS LAB storefront ---
   else if (path === "/aurasLab" || path === "/aurasLab/") {
     metaData.title = "AURAS LAB | Custom Print-On-Demand Streetwear in Algeria";
     metaData.description =
       "Design your own hoodies, tees, totes and more. Upload your artwork, customize it live, and we print and ship anywhere in Algeria.";
     metaData.image = `${url.origin}/static/auras-lab.png`;
   }
-  // --- NEW: AURAS LAB individual product pages ---
+  // --- AURAS LAB individual product pages ---
   else if (path.startsWith("/aurasLab/")) {
     const sku = path.split("/aurasLab/")[1]?.replace(/\/$/, "");
     if (sku && sku !== "studio" && sku !== "collab") {
@@ -149,6 +203,7 @@ export const config = {
     "/*.png",
     "/*.webp",
     "/*.gif",
+    "/*.woff*",
     "/static/*",
     "/assets/*",
     "/.well-known/*",
