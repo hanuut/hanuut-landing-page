@@ -21,16 +21,16 @@ const DropDownButton = styled.button`
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
   transition: all 0.2s ease;
-  
+
   /* Match navbar menu items styling */
   font-size: 1rem;
   font-weight: 500;
   color: ${({ $textColor }) => $textColor || "#FFFFFF"};
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.1);
   }
-  
+
   /* Flag sizing */
   img {
     width: 20px;
@@ -51,7 +51,7 @@ const DropDownContent = styled(motion.div)`
   overflow: hidden;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  
+
   ${(props) =>
     props.$isPremium
       ? css`
@@ -99,7 +99,7 @@ const DropDownItem = styled.div`
           color: ${props.$isActive ? "#FFFFFF" : "#D4D4D8"};
           &:hover {
             background-color: rgba(255, 255, 255, 0.12);
-            color: #FFFFFF;
+            color: #ffffff;
           }
         `
       : css`
@@ -177,29 +177,34 @@ const LanguagesDropDown = ({ handleChooseLanguage, textColor }) => {
     const initializeLanguage = () => {
       // Priority 1: Check localStorage for saved preference
       const savedLanguage = localStorage.getItem("preferredLanguage");
-      if (savedLanguage && languages.some((lang) => lang.code === savedLanguage)) {
+      if (
+        savedLanguage &&
+        languages.some((lang) => lang.code === savedLanguage)
+      ) {
         i18n.changeLanguage(savedLanguage);
         return;
       }
 
       // Priority 2: Detect browser language
       const browserLang = navigator.language || navigator.userLanguage;
-      const detectedLangCode = browserLang.split("-")[0]; // e.g., "en-US" -> "en"
+      const detectedLangCode = browserLang ? browserLang.split("-")[0] : "fr";
 
       // Check if detected language is supported
-      const supportedLang = languages.find((lang) => lang.code === detectedLangCode);
+      const supportedLang = languages.find(
+        (lang) => lang.code === detectedLangCode,
+      );
       if (supportedLang) {
         i18n.changeLanguage(supportedLang.code);
         localStorage.setItem("preferredLanguage", supportedLang.code);
       } else {
-        // Priority 3: Default to Arabic if nothing matches
-        i18n.changeLanguage("ar");
-        localStorage.setItem("preferredLanguage", "ar");
+        // Priority 3: Default to French if nothing matches (CHANGED FROM "ar" TO "fr")
+        i18n.changeLanguage("fr");
+        localStorage.setItem("preferredLanguage", "fr");
       }
     };
 
     initializeLanguage();
-  }, []); // Only run once on mount
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -218,10 +223,10 @@ const LanguagesDropDown = ({ handleChooseLanguage, textColor }) => {
   return (
     <DropDownContainer ref={dropdownRef}>
       <DropDownButton onClick={toggleDropdown} $textColor={textColor}>
-        {currentLanguage?.name || "Language"} 
+        {currentLanguage?.name || "Language"}
         {currentLanguage && <Flag country={currentLanguage.flag} />}
       </DropDownButton>
-      
+
       <AnimatePresence>
         {isOpen && (
           <DropDownContent
