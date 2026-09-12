@@ -580,7 +580,7 @@ const Navbar = () => {
                           {t("navBlog")}
                         </Link>
                       </MenuItem> */}
-                      <MenuItem $textColor={textColor}>
+                      {/* <MenuItem $textColor={textColor}>
                         <Link 
                           to="/aurasLab" 
                           style={{ 
@@ -593,7 +593,12 @@ const Navbar = () => {
                         >
                           <span>✨ AURAS LAB</span>
                         </Link>
-                      </MenuItem>
+                      </MenuItem> */}
+                      <MenuItem $textColor={textColor}>
+  <Link to="/careers" style={{ color: textColor }}>
+    {t("navCareers", "Careers")}
+  </Link>
+</MenuItem>
                       <MenuItem $textColor={textColor}>
                         <Link
                           to="/track"

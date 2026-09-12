@@ -817,7 +817,8 @@
     "link_terms": "Terms of Use",
     "link_delete": "Delete Account",
     "contact_title": "Contact Us",
-    "copyright": "© 2026 Hanuut Express. All rights reserved."
+    "copyright": "© 2026 Hanuut Express. All rights reserved.",
+    "link_careers": "Careers / Hiring"
   },
   "supermarkets_tab_label": "Grocery",
   "foodShops_tab_label": "Restaurants",
@@ -1396,5 +1397,14 @@
   "group_fashion": "Fashion",
   "group_accessories": "Accessories",
   "group_sports": "Sports",
-  "discount": "Discount"
+  "discount": "Discount","navCareers": "Careers",
+"careers_seo_title": "Join the Team | Abridh & Hanuut",
+"careers_seo_desc": "Build real products with real impact. Explore engineering and operations opportunities for the Abridh launch in Béjaïa, Algeria.",
+"careers_auto_ent_badge": "Auto-Entrepreneur Preferred",
+  "careers_freelance_preferred": "Freelance / Auto-Entrepreneur (Preferred)",
+  "candidate_auto_entrepreneur_label": "Professional Status & Invoicing",
+  "auto_ent_yes": "✅ Yes, registered Auto-Entrepreneur (ANAE cardholder)",
+  "auto_ent_in_progress": "⏳ Registration in progress / Ready to register",
+  "auto_ent_no": "❌ No (Interested only in employee contract)",
+  "auto_ent_preferred_hint": "⭐ We strongly prefer working with registered Auto-Entrepreneurs for contractual flexibility and direct invoicing in Algeria."
 }

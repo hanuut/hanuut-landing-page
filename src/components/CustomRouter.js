@@ -5,11 +5,13 @@ import PropTypes from "prop-types";
 import OnboardingWizard from "../modules/Partners/components/Onboarding/OnboardingWizard";
 import Loader from "./Loader";
 
-// Direct imports for frequently accessed pages
+// Direct imports for frequently accessed pages (MUST be at the top)
 import HomePage from "../modules/HomePage";
 import NotFoundPage from "../modules/NotFoundPage";
 
 // Lazy-loaded routes
+const CareersPage = lazy(() => import("../modules/Careers/CareersPage"));
+const JobDetailPage = lazy(() => import("../modules/Careers/JobDetailPage"));
 const SupportPage = lazy(() => import("../modules/SupportPage"));
 const PaymentReturnPage = lazy(() => import("../modules/payment/PaymentReturnPage"));
 const PrivacyPolicy = lazy(() => import("../modules/PrivacyPolicy"));
@@ -196,6 +198,10 @@ const CustomRouter = ({ appConfig, location }) => {
           {/* Individual product landing (PDP) for ad traffic */}
           <Route path="/aurasLab/:ProductSku" element={<AurasLabProductPage />} />
           <Route path="/@aurasLab/:ProductSku" element={<AurasLabProductPage />} />
+
+          {/* Careers Routes */}
+          <Route path="/careers" element={<CareersPage />} />
+          <Route path="/careers/:slug" element={<JobDetailPage />} />
 
           {/* Catch all route */}
           <Route path="*" element={<NotFoundPage />} />
