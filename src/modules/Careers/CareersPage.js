@@ -1,4 +1,4 @@
-// modules/Careers/CareersPage.js
+// src/modules/Careers/CareersPage.js
 import React from "react";
 import styled, { keyframes } from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -17,12 +17,8 @@ import {
 import Seo from "../../components/Seo";
 import { JOBS_DATA, DEFERRED_ROLES } from "./data/careersData";
 
-// --- Fluid Light Ambient Animation ---
 const pulseGlow = keyframes`
-  0% { transform: translate(-30%, -20%) scale(1); opacity: 0.45; }
-  50% { transform: translate(20%, 20%) scale(1.15); opacity: 0.7; }
-  100% { transform: translate(-30%, -20%) scale(1); opacity: 0.45; }
-`;
+  0% { transform: translate(-30%, -20%) scale(1); opacity: 0.45; }  50% { transform: translate(20%, 20%) scale(1.15); opacity: 0.7; }  100% { transform: translate(-30%, -20%) scale(1); opacity: 0.45; }`;
 
 const PageWrapper = styled.main`
   min-height: 100vh;
@@ -37,11 +33,10 @@ const PageWrapper = styled.main`
       : "var(--font-primary, 'Tajawal'), sans-serif"};
 `;
 
-// --- Hero with Blurred Image Background & Fluid Ambient Lights ---
 const HeroWrapper = styled.section`
   position: relative;
   width: 100%;
-  min-height: 520px;
+  min-height: 480px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -151,7 +146,6 @@ const Subtitle = styled.p`
   max-width: 720px;
 `;
 
-// --- Body Containers in Light Theme ---
 const MainContainer = styled.div`
   max-width: 1150px;
   width: 90%;
@@ -310,7 +304,7 @@ const JobMeta = styled.div`
   }
 
   h3 {
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     font-weight: 800;
     color: #0f172a;
     margin: 0;
@@ -445,13 +439,13 @@ const EmailButton = styled.a`
   }
 `;
 
-// Helper that safely handles both plain strings and multilingual objects
-const getSafeLocalizedText = (field, langKey, fallback = "") => {
-  if (!field) return fallback;
-  if (typeof field === "string") return field;
-  return (
-    field[langKey] || field["fr"] || field["en"] || field["ar"] || fallback
-  );
+const resolveText = (val, langKey, fallback = "") => {
+  if (!val) return fallback;
+  if (typeof val === "string") return val;
+  if (typeof val === "object") {
+    return val[langKey] || val["ar"] || val["fr"] || val["en"] || fallback;
+  }
+  return fallback;
 };
 
 const CareersPage = () => {
@@ -470,7 +464,6 @@ const CareersPage = () => {
         url="https://hanuut.com/careers"
       />
 
-      {/* --- HERO SECTION WITH BLURRED IMAGE & FLUID LIGHTS --- */}
       <HeroWrapper>
         <HeroImageBackground />
         <FluidLightOrb className="orb-emerald" />
@@ -494,7 +487,6 @@ const CareersPage = () => {
         </HeroContent>
       </HeroWrapper>
 
-      {/* --- MAIN LIGHT THEME CONTENT --- */}
       <MainContainer>
         <ValueGrid>
           <ValueCard $isArabic={isArabic}>
@@ -538,50 +530,56 @@ const CareersPage = () => {
           </SectionHeader>
 
           <JobList>
-            {JOBS_DATA.map((job) => (
-              <JobCard key={job.slug} to={`/careers/${job.slug}`}>
-                <JobMeta $isArabic={isArabic}>
-                  <div className="tag-row">
-                    <span className="dep-tag">
-                      {getSafeLocalizedText(
-                        job.department,
-                        langKey,
-                        "Engineering",
-                      )}
-                    </span>
-                    <span className="auto-badge">
-                      {t("careers_auto_ent_badge", "Auto-Entrepreneur Préféré")}
-                    </span>
-                  </div>
-                  <h3>{getSafeLocalizedText(job.title, langKey, job.slug)}</h3>
-                  <div className="details">
+            {JOBS_DATA.map((job) => {
+              const roleTitle = resolveText(job.title, langKey, job.slug);
+              const department = resolveText(
+                job.department,
+                langKey,
+                "Engineering",
+              );
+              const location = resolveText(
+                job.location,
+                langKey,
+                "Béjaïa, Algeria",
+              );
+              const contract = resolveText(
+                job.contractType,
+                langKey,
+                "Freelance / CDI",
+              );
+
+              return (
+                <JobCard key={job.slug} to={`/careers/${job.slug}`}>
+                  <JobMeta $isArabic={isArabic}>
+                    <div className="tag-row">
+                      <span className="dep-tag">{department}</span>
+                      <span className="auto-badge">
+                        {t(
+                          "careers_auto_ent_badge",
+                          "Auto-Entrepreneur Préféré",
+                        )}
+                      </span>
+                    </div>
+                    <h3>{roleTitle}</h3>
+                    <div className="details">
+                      <span>
+                        <FaMapMarkerAlt /> {location}
+                      </span>
+                      <span>•</span>
+                      <span>
+                        <FaClock /> {contract}
+                      </span>
+                    </div>
+                  </JobMeta>
+                  <ActionArrow $isArabic={isArabic}>
                     <span>
-                      <FaMapMarkerAlt />{" "}
-                      {getSafeLocalizedText(
-                        job.location,
-                        langKey,
-                        "Béjaïa, Algeria",
-                      )}
+                      {t("careers_view_role", "Consulter l'offre & Postuler")}
                     </span>
-                    <span>•</span>
-                    <span>
-                      <FaClock />{" "}
-                      {getSafeLocalizedText(
-                        job.contractType || job.type,
-                        langKey,
-                        "Freelance / CDI",
-                      )}
-                    </span>
-                  </div>
-                </JobMeta>
-                <ActionArrow $isArabic={isArabic}>
-                  <span>
-                    {t("careers_view_role", "Consulter l'offre & Postuler")}
-                  </span>
-                  {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
-                </ActionArrow>
-              </JobCard>
-            ))}
+                    {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+                  </ActionArrow>
+                </JobCard>
+              );
+            })}
           </JobList>
         </OpeningsSection>
 
@@ -597,7 +595,7 @@ const CareersPage = () => {
             >
               {t("careers_deferred_title", "Prochains recrutements (À venir)")}
             </h3>
-            <p style={{ color: "#64748b", fontSize: "0.95rem", margin: 0 }}>
+            <p style={{ color: "#64748b", fontSize: "#0.95rem", margin: 0 }}>
               {t("careers_deferred_sub")}
             </p>
           </div>
@@ -605,19 +603,12 @@ const CareersPage = () => {
           <FutureGrid>
             {DEFERRED_ROLES.map((role, idx) => (
               <FutureItem key={idx}>
-                <h4>
-                  {getSafeLocalizedText(role.title, langKey, role.titleEn)}
-                </h4>
+                <h4>{resolveText(role.title, langKey, "Role")}</h4>
                 <span className="status">
-                  ⏳{" "}
-                  {getSafeLocalizedText(role.statusBadge, langKey, "À venir")}
+                  ⏳ {resolveText(role.statusBadge, langKey, "À venir")}
                 </span>
                 <span style={{ color: "#64748b", fontSize: "0.85rem" }}>
-                  {getSafeLocalizedText(
-                    role.location,
-                    langKey,
-                    "Béjaïa, Algérie",
-                  )}
+                  {resolveText(role.location, langKey, "Béjaïa, Algérie")}
                 </span>
               </FutureItem>
             ))}

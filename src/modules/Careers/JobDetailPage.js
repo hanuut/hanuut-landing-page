@@ -1,5 +1,5 @@
-// modules/Careers/JobDetailPage.js
-import React, { useState, useMemo } from "react";
+// src/modules/Careers/JobDetailPage.js
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -14,7 +14,12 @@ import {
   FaTrash,
   FaExclamationCircle,
   FaLock,
+  FaChevronDown,
+  FaChevronUp,
+  FaFileUpload,
+  FaPaperclip,
 } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 
 import Seo from "../../components/Seo";
 import Loader from "../../components/Loader";
@@ -27,7 +32,7 @@ const PageWrapper = styled.main`
   width: 100%;
   background-color: #f8fafc;
   color: #0f172a;
-  padding-top: calc(${(props) => props.theme.navHeight || "80px"} + 2rem);
+  padding-top: calc(${(props) => props.theme.navHeight || "80px"} + 1.5rem);
   padding-bottom: 6rem;
   direction: ${(props) => (props.$isArabic ? "rtl" : "ltr")};
   font-family: ${(props) =>
@@ -37,12 +42,12 @@ const PageWrapper = styled.main`
 `;
 
 const Container = styled.div`
-  max-width: 900px;
+  max-width: 860px;
   width: 90%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 2rem;
 `;
 
 const BackLink = styled(Link)`
@@ -61,14 +66,14 @@ const BackLink = styled(Link)`
   }
 `;
 
-const HeaderCard = styled.header`
+const OverviewCard = styled.header`
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 24px;
-  padding: 2.5rem;
+  padding: 2.25rem 2.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   text-align: ${(props) => (props.$isArabic ? "right" : "left")};
 
@@ -100,8 +105,8 @@ const HeaderCard = styled.header`
   }
 
   h1 {
-    font-size: clamp(1.85rem, 3.8vw, 2.6rem);
-    font-weight: 800;
+    font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+    font-weight: 900;
     color: #0f172a;
     margin: 0;
     line-height: 1.3;
@@ -113,8 +118,6 @@ const HeaderCard = styled.header`
     gap: 1.25rem;
     color: #64748b;
     font-size: 0.95rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid #f1f5f9;
 
     span {
       display: flex;
@@ -122,58 +125,106 @@ const HeaderCard = styled.header`
       gap: 6px;
     }
   }
+
+  .mission-box {
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    border-right: ${(props) => (props.$isArabic ? "4px solid #059669" : "none")};
+    border-left: ${(props) => (props.$isArabic ? "none" : "4px solid #059669")};
+
+    p {
+      margin: 0;
+      color: #334155;
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+  }
 `;
 
-const SectionCard = styled.section`
+const ToggleSpecsButton = styled.button`
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  padding: 0.9rem 1.5rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+  }
+`;
+
+const ExpandableSpecsBlock = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow: hidden;
+`;
+
+const SpecSectionCard = styled.div`
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 20px;
-  padding: 2rem 2.25rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
   text-align: ${(props) => (props.$isArabic ? "right" : "left")};
 
-  h2 {
-    font-size: 1.35rem;
+  h3 {
+    font-size: 1.25rem;
     font-weight: 800;
     color: #0f172a;
     margin: 0;
   }
 
   p {
-    font-size: 1.05rem;
-    color: #334155;
+    font-size: 1rem;
+    color: #475569;
     line-height: 1.7;
     margin: 0;
   }
+`;
 
-  ul {
-    margin: 0;
-    padding-left: ${(props) => (props.$isArabic ? "0" : "1.5rem")};
-    padding-right: ${(props) => (props.$isArabic ? "1.5rem" : "0")};
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
+const LocalizedList = styled.ul`
+  margin: 0;
+  direction: ${(props) => props.$dir};
+  text-align: ${(props) => (props.$dir === "rtl" ? "right" : "left")};
+  padding-left: ${(props) => (props.$dir === "rtl" ? "0" : "1.5rem")};
+  padding-right: ${(props) => (props.$dir === "rtl" ? "1.5rem" : "0")};
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 
-    li {
-      color: #334155;
-      line-height: 1.6;
-      font-size: 1rem;
-    }
+  li {
+    color: #334155;
+    line-height: 1.65;
+    font-size: 0.95rem;
   }
 `;
 
-const FormWrapper = styled.section`
+// --- MULTI-STEP WIZARD FORM STYLES ---
+
+const WizardCard = styled.section`
   background: #ffffff;
-  border: 2px solid #e2e8f0;
+  border: 1.5px solid #e2e8f0;
   border-radius: 24px;
-  padding: 2.75rem 2.5rem;
+  padding: 2.5rem 2.25rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.04);
   text-align: ${(props) => (props.$isArabic ? "right" : "left")};
 
   @media (max-width: 600px) {
@@ -199,6 +250,47 @@ const FormWrapper = styled.section`
   }
 `;
 
+const StepperProgress = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  margin-bottom: 1rem;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e2e8f0;
+    z-index: 1;
+  }
+`;
+
+const StepDot = styled.div`
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: ${(props) =>
+    props.$active ? "#059669" : props.$completed ? "#ecfdf5" : "#f1f5f9"};
+  color: ${(props) =>
+    props.$active ? "#ffffff" : props.$completed ? "#059669" : "#94a3b8"};
+  border: 2px solid
+    ${(props) =>
+      props.$active ? "#059669" : props.$completed ? "#059669" : "#cbd5e1"};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  transition: all 0.2s ease;
+`;
+
 const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
@@ -222,16 +314,14 @@ const Label = styled.label`
 
   span.req {
     color: #ef4444;
-    margin-right: 4px;
-    margin-left: 4px;
+    margin: 0 4px;
   }
 
   span.opt {
     color: #94a3b8;
     font-weight: 600;
     font-size: 0.8rem;
-    margin-right: 4px;
-    margin-left: 4px;
+    margin: 0 4px;
   }
 `;
 
@@ -265,7 +355,7 @@ const TextArea = styled.textarea`
   font-size: 1rem;
   box-sizing: border-box;
   font-family: inherit;
-  min-height: 110px;
+  min-height: 120px;
   resize: vertical;
 
   &:focus {
@@ -282,8 +372,9 @@ const Select = styled.select`
   border: 1.5px solid #cbd5e1;
   border-radius: 12px;
   color: #0f172a;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-family: inherit;
+  cursor: pointer;
 
   &:focus {
     outline: none;
@@ -291,9 +382,49 @@ const Select = styled.select`
   }
 `;
 
+const FileUploadZone = styled.label`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 1.5rem;
+  border: 2px dashed #94a3b8;
+  border-radius: 14px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #475569;
+  font-weight: 700;
+  font-size: 0.95rem;
+
+  &:hover {
+    border-color: #059669;
+    color: #059669;
+    background: #ecfdf5;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+`;
+
+const SelectedFilePill = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 6px 14px;
+  border-radius: 8px;
+  color: #065f46;
+  font-size: 0.85rem;
+  font-weight: 700;
+  width: fit-content;
+`;
+
 const ProfileRow = styled.div`
   display: grid;
-  grid-template-columns: 200px 1fr auto;
+  grid-template-columns: 180px 1fr auto;
   gap: 0.75rem;
   align-items: center;
 
@@ -340,26 +471,46 @@ const AddButton = styled.button`
   }
 `;
 
-const SubmitBtn = styled.button`
-  background-color: #059669;
-  color: #ffffff;
-  border: none;
-  padding: 1.15rem 2.25rem;
+const WizardActionRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+`;
+
+const WizardBtn = styled.button`\n  padding: 1rem 2rem;
   border-radius: 14px;
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  gap: 8px;
   transition: all 0.2s ease;
+  font-family: inherit;
 
-  &:hover:not(:disabled) {
-    background-color: #047857;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(5, 150, 105, 0.25);
-  }
+  ${(props) =>
+    props.$primary
+      ? `
+    background: #059669;
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 4px 15px rgba(5, 150, 105, 0.2);
+    &:hover:not(:disabled) {
+      background: #047857;
+      transform: translateY(-2px);
+    }
+  `
+      : `
+    background: #ffffff;
+    color: #475569;
+    border: 1.5px solid #cbd5e1;
+    &:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+  `}
 
   &:disabled {
     opacity: 0.5;
@@ -430,13 +581,6 @@ const SuccessCard = styled.div`
   }
 `;
 
-const HoneypotWrapper = styled.div`
-  display: none !important;
-  visibility: hidden;
-  position: absolute;
-  left: -9999px;
-`;
-
 const PLATFORM_OPTIONS = [
   "LinkedIn",
   "GitHub",
@@ -446,22 +590,20 @@ const PLATFORM_OPTIONS = [
   "Other",
 ];
 
-// --- Bullet-proof text resolver that handles both objects and legacy strings ---
 const resolveText = (val, langKey, fallback = "") => {
   if (!val) return fallback;
   if (typeof val === "string") return val;
   if (typeof val === "object") {
-    return val[langKey] || val["fr"] || val["en"] || val["ar"] || fallback;
+    return val[langKey] || val["ar"] || val["fr"] || val["en"] || fallback;
   }
   return fallback;
 };
 
-// --- Bullet-proof array resolver for responsibilities/mustHave/preferred ---
 const resolveList = (val, langKey) => {
   if (!val) return [];
   if (Array.isArray(val)) return val;
   if (typeof val === "object") {
-    const list = val[langKey] || val["fr"] || val["en"] || val["ar"];
+    const list = val[langKey] || val["ar"] || val["fr"] || val["en"];
     return Array.isArray(list) ? list : [];
   }
   return [];
@@ -475,6 +617,12 @@ const JobDetailPage = () => {
 
   const job = useMemo(() => JOBS_DATA.find((j) => j.slug === slug), [slug]);
 
+  // Progressive Disclosure State
+  const [showFullSpec, setShowFullSpec] = useState(false);
+
+  // Stepper State (1: Personal, 2: Experience/CV, 3: Deep-Dive)
+  const [step, setStep] = useState(1);
+
   // Form State
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -483,17 +631,72 @@ const JobDetailPage = () => {
   const [autoStatus, setAutoStatus] = useState("YES");
   const [currentRole, setCurrentRole] = useState("");
   const [cvLink, setCvLink] = useState("");
+  const [cvFile, setCvFile] = useState(null);
   const [profiles, setProfiles] = useState([
     { platform: "LinkedIn", url: "" },
     { platform: "GitHub", url: "" },
   ]);
   const [roleAnswer, setRoleAnswer] = useState("");
   const [additionalNotes, setAdditionalNotes] = useState("");
-  const [middleNameHp, setMiddleNameHp] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Auto-restore form draft from localStorage
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(`hanuut_career_draft_${slug}`);
+      if (cached) {
+        const d = JSON.parse(cached);
+        if (d.fullName) setFullName(d.fullName);
+        if (d.email) setEmail(d.email);
+        if (d.phone) setPhone(d.phone);
+        if (d.location) setLocation(d.location);
+        if (d.autoStatus) setAutoStatus(d.autoStatus);
+        if (d.currentRole) setCurrentRole(d.currentRole);
+        if (d.cvLink) setCvLink(d.cvLink);
+        if (d.profiles) setProfiles(d.profiles);
+        if (d.roleAnswer) setRoleAnswer(d.roleAnswer);
+        if (d.additionalNotes) setAdditionalNotes(d.additionalNotes);
+      }
+    } catch (e) {
+      console.warn("Could not load draft", e);
+    }
+  }, [slug]);
+
+  // Auto-save form draft to localStorage
+  useEffect(() => {
+    try {
+      const payload = {
+        fullName,
+        email,
+        phone,
+        location,
+        autoStatus,
+        currentRole,
+        cvLink,
+        profiles,
+        roleAnswer,
+        additionalNotes,
+      };
+      localStorage.setItem(`hanuut_career_draft_${slug}`, JSON.stringify(payload));
+    } catch (e) {
+      console.warn("Could not save draft", e);
+    }
+  }, [
+    slug,
+    fullName,
+    email,
+    phone,
+    location,
+    autoStatus,
+    currentRole,
+    cvLink,
+    profiles,
+    roleAnswer,
+    additionalNotes,
+  ]);
 
   if (!job) {
     return (
@@ -501,34 +704,22 @@ const JobDetailPage = () => {
         <Container style={{ textAlign: "center", padding: "4rem 0" }}>
           <h2>{isArabic ? "الوظيفة غير موجودة" : "Offre non trouvée"}</h2>
           <Link to="/careers" style={{ color: "#059669", fontWeight: "bold" }}>
-            ← {t("back_to_careers", "العودة للوظائف")}
+            ← {t("careers_back_to_roles", "العودة للوظائف")}
           </Link>
         </Container>
       </PageWrapper>
     );
   }
 
-  // Safe localized properties
-  const jobTitle = resolveText(
-    job.title,
-    langKey,
-    job.titleFr || job.titleEn || job.slug,
-  );
+  // Safe localized text resolvers
+  const jobTitle = resolveText(job.title, langKey, job.slug);
   const jobDepartment = resolveText(job.department, langKey, "Engineering");
-  const jobLocation = resolveText(job.location, langKey, "Béjaïa, Algérie");
-  const jobContractType = resolveText(
-    job.contractType || job.type,
-    langKey,
-    "Freelance / CDI",
-  );
+  const jobLocation = resolveText(job.location, langKey, "Béjaïa, Algeria");
+  const jobContract = resolveText(job.contractType, langKey, "Freelance / CDI");
   const jobMission = resolveText(job.mission, langKey, "");
   const jobWhyExists = resolveText(job.whyExists, langKey, "");
-  const jobSpecificQuestion = resolveText(job.specificQuestion, langKey, "");
-  const jobPlaceholder = resolveText(
-    job.placeholder || job.questionPlaceholder,
-    langKey,
-    "",
-  );
+  const jobQuestion = resolveText(job.specificQuestion, langKey, "");
+  const jobPlaceholder = resolveText(job.questionPlaceholder, langKey, "");
 
   const responsibilities = resolveList(job.responsibilities, langKey);
   const mustHave = resolveList(job.mustHave, langKey);
@@ -550,43 +741,58 @@ const JobDetailPage = () => {
     setProfiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCvFile(file);
+    }
+  };
+
+  const validateStep = (targetStep) => {
     setErrorMessage("");
 
-    if (middleNameHp && middleNameHp.trim() !== "") {
-      setSubmissionSuccess(true);
-      return;
+    if (targetStep === 1) {
+      if (!fullName.trim() || !email.trim() || !phone.trim()) {
+        setErrorMessage(t("careers_err_required", "يرجى ملء جميع الحقول الإلزامية."));
+        return false;
+      }
+      if (!isValidEmail(email)) {
+        setErrorMessage(t("careers_err_email", "يرجى إدخال عنوان بريد إلكتروني صحيح."));
+        return false;
+      }
+      if (!isValidPhone(phone)) {
+        setErrorMessage(t("careers_err_phone", "يرجى إدخال رقم هاتف جزائري صحيح."));
+        return false;
+      }
     }
 
-    if (!fullName.trim() || !email.trim() || !phone.trim()) {
-      setErrorMessage(
-        isArabic
-          ? "يرجى ملء جميع الحقول الإلزامية (*)."
-          : "Veuillez remplir tous les champs obligatoires (*).",
-      );
-      return;
+    if (targetStep === 2) {
+      if (!cvFile && !cvLink.trim()) {
+        setErrorMessage(t("careers_err_cv", "يرجى إرفاق ملف السيرة الذاتية أو إدخال رابط معتمد."));
+        return false;
+      }
     }
 
-    if (!isValidEmail(email)) {
-      setErrorMessage(
-        isArabic
-          ? "يرجى إدخال عنوان بريد إلكتروني صحيح."
-          : "Veuillez saisir une adresse email valide.",
-      );
-      return;
-    }
+    return true;
+  };
 
-    if (!isValidPhone(phone)) {
-      setErrorMessage(
-        isArabic
-          ? "يرجى إدخال رقم هاتف جزائري صحيح (05/06/07)."
-          : "Veuillez saisir un numéro de téléphone algérien valide.",
-      );
-      return;
+  const goToNextStep = () => {
+    if (validateStep(step)) {
+      setStep((prev) => Math.min(prev + 1, 3));
     }
+  };
+
+  const goToPrevStep = () => {
+    setErrorMessage("");
+    setStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateStep(1) || !validateStep(2)) return;
 
     setIsSubmitting(true);
+    setErrorMessage("");
 
     const payload = {
       jobSlug: job.slug,
@@ -597,6 +803,7 @@ const JobDetailPage = () => {
       autoEntrepreneurStatus: autoStatus,
       currentRole: currentRole.trim(),
       cvLink: cvLink.trim(),
+      cvFileName: cvFile ? cvFile.name : null,
       profiles: profiles.filter((p) => p.url.trim() !== ""),
       roleSpecificAnswer: roleAnswer.trim(),
       additionalNotes: additionalNotes.trim(),
@@ -606,32 +813,28 @@ const JobDetailPage = () => {
       process.env.REACT_APP_API_PROD_URL || "https://api.hanuut.com";
 
     try {
-      console.log("[Careers] Preparing candidate submission...");
       let envelope = null;
-
       try {
         envelope = await encryptCandidatePayload(payload);
       } catch (cryptoErr) {
         console.warn("[Careers Crypto Notice]:", cryptoErr.message);
       }
 
-      // Use envelope if encrypted, otherwise send safe fallback payload
-      const requestBody = envelope
-        ? { envelope, hpField: middleNameHp }
-        : { data: payload, hpField: middleNameHp };
+      const requestBody = envelope ? { envelope } : { data: payload };
 
       const response = await axios.post(
         `${apiProdUrl}/feedback/careers-apply`,
         requestBody,
         {
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
 
       if (response.status === 200 || response.status === 201) {
         setSubmissionSuccess(true);
+        localStorage.removeItem(`hanuut_career_draft_${slug}`);
       } else {
-        throw new Error("Server returned non-success response");
+        throw new Error("Unexpected response from server");
       }
     } catch (err) {
       console.error("[Careers Submit Error]:", err);
@@ -639,8 +842,8 @@ const JobDetailPage = () => {
       setErrorMessage(
         serverMsg ||
           (isArabic
-            ? "تعذر إرسال الطلب حالياً. يرجى التحقق من الشبكة أو مراسلتنا على contact.hanuut@gmail.com"
-            : "Impossible d'envoyer votre candidature. Veuillez vérifier votre connexion ou nous contacter sur contact.hanuut@gmail.com"),
+            ? "تعذر إرسال الطلب حالياً. يرجى التحقق من الشبكة أو مراسلتنا مباشرة على contact.hanuut@gmail.com"
+            : "Impossible d'envoyer votre candidature. Veuillez vérifier votre connexion ou nous contacter sur contact.hanuut@gmail.com")
       );
     } finally {
       setIsSubmitting(false);
@@ -651,110 +854,118 @@ const JobDetailPage = () => {
     <PageWrapper $isArabic={isArabic}>
       <Seo
         title={`${jobTitle} | Abridh & Hanuut`}
-        description={jobMission || "Offre d'emploi chez Abridh"}
+        description={jobMission || "Job Opening at Abridh & Hanuut"}
         url={`https://hanuut.com/careers/${job.slug}`}
       />
 
       <Container>
         <BackLink to="/careers">
           {isArabic ? <FaArrowRight /> : <FaArrowLeft />}
-          <span>{t("back_to_careers", "Retour aux offres")}</span>
+          <span>{t("careers_back_to_roles", "Retour aux offres")}</span>
         </BackLink>
 
-        {/* --- HEADER --- */}
-        <HeaderCard $isArabic={isArabic}>
+        {/* --- STEP 1: COMPACT ROLE OVERVIEW --- */}
+        <OverviewCard $isArabic={isArabic}>
           <div className="tag-row">
             <span className="dep-tag">{jobDepartment}</span>
             <span className="auto-badge">
               {t("careers_auto_ent_badge", "Auto-Entrepreneur Préféré")}
             </span>
           </div>
+
           <h1>{jobTitle}</h1>
+
           <div className="meta-grid">
             <span>
               <FaMapMarkerAlt /> {jobLocation}
             </span>
             <span>•</span>
             <span>
-              <FaClock /> {jobContractType}
+              <FaClock /> {jobContract}
             </span>
             <span>•</span>
             <span style={{ color: "#059669", fontWeight: "800" }}>
-              ● {isArabic ? "مفتوحة" : "Ouvert"}
+              ● {t("careers_role_open", "Ouverte")}
             </span>
           </div>
-        </HeaderCard>
 
-        {/* --- MISSION --- */}
-        {jobMission && (
-          <SectionCard $isArabic={isArabic}>
-            <h2>{isArabic ? "الهدف الأساسي من المنصب" : "Mission du Poste"}</h2>
-            <p>{jobMission}</p>
-          </SectionCard>
-        )}
+          {jobMission && (
+            <div className="mission-box">
+              <p>{jobMission}</p>
+            </div>
+          )}
 
-        {/* --- WHY THIS ROLE EXISTS --- */}
-        {jobWhyExists && (
-          <SectionCard $isArabic={isArabic}>
-            <h2>
-              {isArabic
-                ? "لماذا يحتاج فريق أبريذ هذا المنصب؟"
-                : "Pourquoi ce rôle existe"}
-            </h2>
-            <p>{jobWhyExists}</p>
-          </SectionCard>
-        )}
+          {/* Progressive Disclosure Action */}
+          <ToggleSpecsButton
+            type="button"
+            onClick={() => setShowFullSpec(!showFullSpec)}
+          >
+            <span>
+              {showFullSpec
+                ? t("careers_hide_full_spec", "إخفاء التفاصيل")
+                : t("careers_view_full_spec", "عرض التفاصيل الكاملة للمنصب")}
+            </span>
+            {showFullSpec ? <FaChevronUp /> : <FaChevronDown />}
+          </ToggleSpecsButton>
+        </OverviewCard>
 
-        {/* --- RESPONSIBILITIES --- */}
-        {responsibilities.length > 0 && (
-          <SectionCard $isArabic={isArabic}>
-            <h2>
-              {isArabic ? "المهام والمسؤوليات المباشرة" : "Vos Responsabilités"}
-            </h2>
-            <ul>
-              {responsibilities.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </SectionCard>
-        )}
-
-        {/* --- MUST HAVE --- */}
-        {mustHave.length > 0 && (
-          <SectionCard $isArabic={isArabic}>
-            <h2>{isArabic ? "المتطلبات الأساسية" : "Critères Requis"}</h2>
-            <ul>
-              {mustHave.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </SectionCard>
-        )}
-
-        {/* --- PREFERRED --- */}
-        {preferred.length > 0 && (
-          <SectionCard $isArabic={isArabic}>
-            <h2>
-              {isArabic ? "مؤهلات وخصائص مفضلة" : "Points Forts Souhaités"}
-            </h2>
-            <ul>
-              {preferred.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </SectionCard>
-        )}
-
-        {/* --- APPLICATION FORM --- */}
-        <FormWrapper id="apply" $isArabic={isArabic}>
-          <div className="header">
-            <h2>{t("apply_now_title", "Postuler à cette offre")}</h2>
-            <p>
-              {t(
-                "apply_now_sub_clean",
-                "Notre équipe examine chaque candidature directement. Décrivez vos expériences pratiques avec précision.",
+        {/* --- EXPANDABLE SPECIFICATION ACCORDION --- */}
+        <AnimatePresence>
+          {showFullSpec && (
+            <ExpandableSpecsBlock
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              {jobWhyExists && (
+                <SpecSectionCard $isArabic={isArabic}>
+                  <h3>{t("careers_section_why", "لماذا يحتاج فريق أبريذ هذا المنصب؟")}</h3>
+                  <p>{jobWhyExists}</p>
+                </SpecSectionCard>
               )}
-            </p>
+
+              {responsibilities.length > 0 && (
+                <SpecSectionCard $isArabic={isArabic}>
+                  <h3>{t("careers_section_responsibilities", "المهام والمسؤوليات المباشرة")}</h3>
+                  <LocalizedList $dir={langKey === "ar" ? "rtl" : "ltr"}>
+                    {responsibilities.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </LocalizedList>
+                </SpecSectionCard>
+              )}
+
+              {mustHave.length > 0 && (
+                <SpecSectionCard $isArabic={isArabic}>
+                  <h3>{t("careers_section_requirements", "المتطلبات الأساسية")}</h3>
+                  <LocalizedList $dir={langKey === "ar" ? "rtl" : "ltr"}>
+                    {mustHave.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </LocalizedList>
+                </SpecSectionCard>
+              )}
+
+              {preferred.length > 0 && (
+                <SpecSectionCard $isArabic={isArabic}>
+                  <h3>{t("careers_section_preferred", "مؤهلات وخصائص مفضلة")}</h3>
+                  <LocalizedList $dir={langKey === "ar" ? "rtl" : "ltr"}>
+                    {preferred.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </LocalizedList>
+                </SpecSectionCard>
+              )}
+            </ExpandableSpecsBlock>
+          )}
+        </AnimatePresence>
+
+        {/* --- STEPPED APPLICATION WIZARD --- */}
+        <WizardCard id="apply" $isArabic={isArabic}>
+          <div className="header">
+            <h2>{t("careers_apply_title", "الترشح لهذا المنصب")}</h2>
+            <p>{t("careers_apply_subtitle")}</p>
           </div>
 
           {submissionSuccess ? (
@@ -762,13 +973,8 @@ const JobDetailPage = () => {
               <div className="icon">
                 <FaCheckCircle />
               </div>
-              <h3>{t("careers_success_title", "Candidature bien reçue")}</h3>
-              <p>
-                {t(
-                  "careers_success_desc_clean",
-                  "Merci pour votre candidature. Notre équipe étudiera attentivement votre profil et vous recontactera directement si une opportunité se confirme.",
-                )}
-              </p>
+              <h3>{t("careers_success_headline", "تم استلام ترشحك بنجاح!")}</h3>
+              <p>{t("careers_success_body")}</p>
               <Link
                 to="/careers"
                 style={{
@@ -777,315 +983,313 @@ const JobDetailPage = () => {
                   marginTop: "1rem",
                 }}
               >
-                ← {t("back_to_careers", "Retour aux offres")}
+                ← {t("careers_back_to_roles", "العودة للوظائف")}
               </Link>
             </SuccessCard>
           ) : (
-            <form
-              onSubmit={handleSubmit}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "1.5rem",
-              }}
-            >
-              <HoneypotWrapper aria-hidden="true">
-                <input
-                  type="text"
-                  name="middle_name_field"
-                  tabIndex="-1"
-                  autoComplete="off"
-                  value={middleNameHp}
-                  onChange={(e) => setMiddleNameHp(e.target.value)}
-                />
-              </HoneypotWrapper>
-
-              <FormRow>
-                <FormGroup>
-                  <Label>
-                    {isArabic ? "الاسم واللقب" : "Nom et Prénom"}
-                    <span className="req">*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    placeholder={
-                      isArabic ? "مثال: حسان بلقاسم" : "ex: Yacine Khelifi"
-                    }
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>
-                    {isArabic ? "البريد الإلكتروني" : "Adresse Email"}
-                    <span className="req">*</span>
-                  </Label>
-                  <Input
-                    type="email"
-                    placeholder="yacine@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </FormGroup>
-              </FormRow>
-
-              <FormRow>
-                <FormGroup>
-                  <Label>
-                    {isArabic ? "رقم الهاتف" : "Numéro de Téléphone"}
-                    <span className="req">*</span>
-                  </Label>
-                  <Input
-                    type="tel"
-                    placeholder="05 XX XX XX XX / 07 XX XX XX XX"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                    dir="ltr"
-                    style={{ textAlign: isArabic ? "right" : "left" }}
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>
-                    {isArabic ? "المدينة ومقر الإقامة" : "Ville de résidence"}
-                    <span className="opt">
-                      ({isArabic ? "اختياري" : "Optionnel"})
-                    </span>
-                  </Label>
-                  <Input
-                    type="text"
-                    placeholder={
-                      isArabic
-                        ? "مثال: بجاية، الجزائر العاصمة..."
-                        : "ex: Béjaïa, Alger..."
-                    }
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                  />
-                </FormGroup>
-              </FormRow>
-
-              <FormRow>
-                <FormGroup>
-                  <Label>
-                    {t(
-                      "candidate_auto_entrepreneur_label",
-                      "Statut Auto-Entrepreneur / Facturation",
-                    )}
-                    <span className="req">*</span>
-                  </Label>
-                  <Select
-                    value={autoStatus}
-                    onChange={(e) => setAutoStatus(e.target.value)}
-                    required
-                  >
-                    <option value="YES">
-                      {t(
-                        "auto_ent_yes",
-                        "✅ Oui, titulaire de la carte Auto-Entrepreneur (ANAE)",
-                      )}
-                    </option>
-                    <option value="IN_PROGRESS">
-                      {t(
-                        "auto_ent_in_progress",
-                        "⏳ Démarche en cours / Prêt(e) à l'obtenir",
-                      )}
-                    </option>
-                    <option value="NO">
-                      {t(
-                        "auto_ent_no",
-                        "❌ Pas de statut (Souhaite un contrat salarié)",
-                      )}
-                    </option>
-                  </Select>
-                  <span
-                    style={{
-                      fontSize: "0.8rem",
-                      color: "#059669",
-                      fontWeight: "600",
-                      marginTop: "3px",
-                    }}
-                  >
-                    {t(
-                      "auto_ent_preferred_hint",
-                      "⭐ Nous privilégions le statut auto-entrepreneur pour la flexibilité de contractualisation.",
-                    )}
-                  </span>
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>
-                    {isArabic
-                      ? "المنصب الحالي أو الأخير"
-                      : "Poste actuel ou plus récent"}
-                    <span className="opt">
-                      ({isArabic ? "اختياري" : "Optionnel"})
-                    </span>
-                  </Label>
-                  <Input
-                    type="text"
-                    placeholder={
-                      isArabic
-                        ? "مثال: مهندس فلاتر في شركة X"
-                        : "ex: Développeur Flutter chez..."
-                    }
-                    value={currentRole}
-                    onChange={(e) => setCurrentRole(e.target.value)}
-                  />
-                </FormGroup>
-              </FormRow>
-
-              <FormGroup>
-                <Label>
-                  {isArabic
-                    ? "رابط السيرة الذاتية (Google Drive / Dropbox / Notion)"
-                    : "Lien vers votre CV / Portfolio"}
-                  <span className="opt">
-                    ({isArabic ? "اختياري" : "Optionnel"})
-                  </span>
-                </Label>
-                <Input
-                  type="url"
-                  placeholder="https://drive.google.com/..."
-                  value={cvLink}
-                  onChange={(e) => setCvLink(e.target.value)}
-                  dir="ltr"
-                />
-              </FormGroup>
-
-              {/* Profiles Row */}
-              <FormGroup>
-                <Label>
-                  {isArabic
-                    ? "روابط مهنية وحسابات الأكواد (LinkedIn / GitHub)"
-                    : "Profils professionnels & code"}
-                  <span className="opt">
-                    ({isArabic ? "اختياري" : "Optionnel"})
-                  </span>
-                </Label>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "0.75rem",
-                  }}
+            <form onSubmit={handleSubmit}>
+              <StepperProgress>
+                <StepDot
+                  $active={step === 1}
+                  $completed={step > 1}
+                  onClick={() => setStep(1)}
                 >
-                  {profiles.map((p, idx) => (
-                    <ProfileRow key={idx}>
-                      <Select
-                        value={p.platform}
-                        onChange={(e) =>
-                          handleUpdateProfile(idx, "platform", e.target.value)
-                        }
-                      >
-                        {PLATFORM_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </Select>
-                      <Input
-                        type="url"
-                        placeholder="https://..."
-                        value={p.url}
-                        onChange={(e) =>
-                          handleUpdateProfile(idx, "url", e.target.value)
-                        }
-                        dir="ltr"
-                      />
-                      {profiles.length > 1 && (
-                        <IconButton
-                          type="button"
-                          onClick={() => handleRemoveProfile(idx)}
-                          aria-label="Supprimer"
-                        >
-                          <FaTrash />
-                        </IconButton>
-                      )}
-                    </ProfileRow>
-                  ))}
-                  <AddButton type="button" onClick={handleAddProfile}>
-                    <FaPlus />{" "}
-                    {isArabic ? "إضافة رابط آخر" : "Ajouter un autre lien"}
-                  </AddButton>
-                </div>
-              </FormGroup>
+                  1
+                </StepDot>
+                <StepDot
+                  $active={step === 2}
+                  $completed={step > 2}
+                  onClick={() => validateStep(1) && setStep(2)}
+                >
+                  2
+                </StepDot>
+                <StepDot
+                  $active={step === 3}
+                  $completed={step === 3}
+                  onClick={() => validateStep(1) && validateStep(2) && setStep(3)}
+                >
+                  3
+                </StepDot>
+              </StepperProgress>
 
-              {/* Role Specific Question */}
-              {jobSpecificQuestion && (
-                <FormGroup>
-                  <Label>
-                    {jobSpecificQuestion}
-                    <span className="opt">
-                      ({isArabic ? "اختياري" : "Optionnel"})
+              {/* STAGE 1: IDENTITY & CONTACT */}
+              {step === 1 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                  <h4 style={{ margin: "0 0 0.5rem 0", color: "#0f172a", fontSize: "1.1rem" }}>
+                    1. {t("careers_step_1_title", "البيانات الشخصية")}
+                  </h4>
+
+                  <FormRow>
+                    <FormGroup>
+                      <Label>
+                        {t("careers_full_name", "الاسم واللقب")}
+                        <span className="req">*</span>
+                      </Label>
+                      <Input
+                        type="text"
+                        placeholder={t("careers_full_name_ph", "مثال: حسان بلقاسم")}
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        required
+                      />
+                    </FormGroup>
+
+                    <FormGroup>
+                      <Label>
+                        {t("careers_email", "البريد الإلكتروني")}
+                        <span className="req">*</span>
+                      </Label>
+                      <Input
+                        type="email"
+                        placeholder="yacine@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </FormGroup>
+                  </FormRow>
+
+                  <FormRow>
+                    <FormGroup>
+                      <Label>
+                        {t("careers_phone", "رقم الهاتف")}
+                        <span className="req">*</span>
+                      </Label>
+                      <Input
+                        type="tel"
+                        placeholder={t("careers_phone_ph", "05 XX XX XX XX")}
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                        dir="ltr"
+                        style={{ textAlign: isArabic ? "right" : "left" }}
+                      />
+                    </FormGroup>
+
+                    <FormGroup>
+                      <Label>
+                        {t("careers_location", "المدينة ومقر الإقامة")}
+                        <span className="opt">({t("careers_optional", "اختياري")})</span>
+                      </Label>
+                      <Input
+                        type="text"
+                        placeholder={t("careers_location_ph", "مثال: بجاية، الجزائر العاصمة...")}
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                      />
+                    </FormGroup>
+                  </FormRow>
+
+                  <FormGroup>
+                    <Label>
+                      {t("candidate_auto_entrepreneur_label", "الوضعية المهنية والفوترة (Auto-Entrepreneur)")}
+                      <span className="req">*</span>
+                    </Label>
+                    <Select
+                      value={autoStatus}
+                      onChange={(e) => setAutoStatus(e.target.value)}
+                      required
+                    >
+                      <option value="YES">
+                        {t("auto_ent_yes", "✅ نعم، حامل لبطاقة المقاول الذاتي (ANAE)")}
+                      </option>
+                      <option value="IN_PROGRESS">
+                        {t("auto_ent_in_progress", "⏳ بصدد استخراج البطاقة / مستعد للتسجيل")}
+                      </option>
+                      <option value="NO">
+                        {t("auto_ent_no", "❌ لا أملك البطاقة (أفضل عقد عمل تقليدي)")}
+                      </option>
+                    </Select>
+                    <span style={{ fontSize: "0.8rem", color: "#059669", fontWeight: "600", marginTop: "3px" }}>
+                      {t("auto_ent_preferred_hint", "⭐ نفضل العمل بصيغة المقاول الذاتي لمرونة التعاقد.")}
                     </span>
-                  </Label>
-                  <TextArea
-                    placeholder={jobPlaceholder}
-                    rows="4"
-                    value={roleAnswer}
-                    onChange={(e) => setRoleAnswer(e.target.value)}
-                  />
-                </FormGroup>
+                  </FormGroup>
+
+                  <WizardActionRow>
+                    <div />
+                    <WizardBtn type="button" $primary onClick={goToNextStep}>
+                      <span>{t("careers_step_next", "متابعة ➔")}</span>
+                      {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+                    </WizardBtn>
+                  </WizardActionRow>
+                </div>
               )}
 
-              {/* Additional Notes */}
-              <FormGroup>
-                <Label>
-                  {isArabic
-                    ? "ملاحظات أو أسئلة إضافية لفريقنا"
-                    : "Remarques ou questions pour notre équipe"}
-                  <span className="opt">
-                    ({isArabic ? "اختياري" : "Optionnel"})
-                  </span>
-                </Label>
-                <TextArea
-                  placeholder={
-                    isArabic
-                      ? "مدى توفرك، شروط معينة، أو أي استفسار..."
-                      : "Disponibilité, contraintes particulières, questions..."
-                  }
-                  rows="3"
-                  value={additionalNotes}
-                  onChange={(e) => setAdditionalNotes(e.target.value)}
-                />
-              </FormGroup>
+              {/* STAGE 2: PROFESSIONAL PROFILE & RESUME */}
+              {step === 2 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                  <h4 style={{ margin: "0 0 0.5rem 0", color: "#0f172a", fontSize: "1.1rem" }}>
+                    2. {t("careers_step_2_title", "الوضعية المهنية والسيرة")}
+                  </h4>
 
-              <SecurityNotice>
-                <FaLock />
-                <span>
-                  {t(
-                    "careers_encryption_notice",
-                    "Vos données de candidature sont chiffrées côté client avant leur transmission et protégées selon la loi 18-07.",
+                  <FormGroup>
+                    <Label>
+                      {t("careers_current_role", "المنصب الحالي أو الأخير")}
+                      <span className="opt">({t("careers_optional", "اختياري")})</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      placeholder={t("careers_current_role_ph", "مثال: مهندس فلاتر في شركة...")}
+                      value={currentRole}
+                      onChange={(e) => setCurrentRole(e.target.value)}
+                    />
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label>
+                      {t("careers_cv_label", "السيرة الذاتية")}
+                      <span className="req">*</span>
+                    </Label>
+
+                    <FileUploadZone>
+                      <FaFileUpload size={20} />
+                      <span>{t("careers_cv_upload_btn", "رفع ملف السيرة الذاتية (PDF, DOCX)")}</span>
+                      <input
+                        type="file"
+                        accept=".pdf,.docx,.doc"
+                        onChange={handleFileUpload}
+                      />
+                    </FileUploadZone>
+
+                    {cvFile && (
+                      <SelectedFilePill>
+                        <FaPaperclip /> {cvFile.name} ({(cvFile.size / 1024).toFixed(0)} KB)
+                      </SelectedFilePill>
+                    )}
+
+                    <Input
+                      type="url"
+                      placeholder={t("careers_cv_link_ph", "أو ضع رابطاً سحابياً (Google Drive / Dropbox)...")}
+                      value={cvLink}
+                      onChange={(e) => setCvLink(e.target.value)}
+                      dir="ltr"
+                      style={{ marginTop: "6px" }}
+                    />
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label>
+                      {t("careers_links_label", "روابط الحسابات المهنية والأكواد")}
+                      <span className="opt">({t("careers_optional", "اختياري")})</span>
+                    </Label>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                      {profiles.map((p, idx) => (
+                        <ProfileRow key={idx}>
+                          <Select
+                            value={p.platform}
+                            onChange={(e) =>
+                              handleUpdateProfile(idx, "platform", e.target.value)
+                            }
+                          >
+                            {PLATFORM_OPTIONS.map((opt) => (
+                              <option key={opt} value={opt}>
+                                {opt}
+                              </option>
+                            ))}
+                          </Select>
+                          <Input
+                            type="url"
+                            placeholder="https://..."
+                            value={p.url}
+                            onChange={(e) =>
+                              handleUpdateProfile(idx, "url", e.target.value)
+                            }
+                            dir="ltr"
+                          />
+                          {profiles.length > 1 && (
+                            <IconButton
+                              type="button"
+                              onClick={() => handleRemoveProfile(idx)}
+                              aria-label="Delete"
+                            >
+                              <FaTrash />
+                            </IconButton>
+                          )}
+                        </ProfileRow>
+                      ))}
+                      <AddButton type="button" onClick={handleAddProfile}>
+                        <FaPlus /> {t("careers_add_link", "+ إضافة رابط آخر")}
+                      </AddButton>
+                    </div>
+                  </FormGroup>
+
+                  <WizardActionRow>
+                    <WizardBtn type="button" onClick={goToPrevStep}>
+                      {isArabic ? <FaArrowRight /> : <FaArrowLeft />}
+                      <span>{t("careers_step_prev", "السابق")}</span>
+                    </WizardBtn>
+                    <WizardBtn type="button" $primary onClick={goToNextStep}>
+                      <span>{t("careers_step_next", "متابعة ➔")}</span>
+                      {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+                    </WizardBtn>
+                  </WizardActionRow>
+                </div>
+              )}
+
+              {/* STAGE 3: ENGINEERING DEEP-DIVE & SUBMISSION */}
+              {step === 3 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                  <h4 style={{ margin: "0 0 0.5rem 0", color: "#0f172a", fontSize: "1.1rem" }}>
+                    3. {t("careers_step_3_title", "التعمق الهندسي والملاحظات")}
+                  </h4>
+
+                  {jobQuestion && (
+                    <FormGroup>
+                      <Label>
+                        {jobQuestion}
+                        <span className="opt">({t("careers_optional", "اختياري")})</span>
+                      </Label>
+                      <TextArea
+                        placeholder={jobPlaceholder}
+                        rows="4"
+                        value={roleAnswer}
+                        onChange={(e) => setRoleAnswer(e.target.value)}
+                      />
+                    </FormGroup>
                   )}
-                </span>
-              </SecurityNotice>
+
+                  <FormGroup>
+                    <Label>
+                      {t("careers_notes_label", "ملاحظات أو أسئلة إضافية لفريقنا")}
+                      <span className="opt">({t("careers_optional", "اختياري")})</span>
+                    </Label>
+                    <TextArea
+                      placeholder={t("careers_notes_ph", "مدى توفرك، شروط معينة، أو أي استفسار...")}
+                      rows="3"
+                      value={additionalNotes}
+                      onChange={(e) => setAdditionalNotes(e.target.value)}
+                    />
+                  </FormGroup>
+
+                  <SecurityNotice>
+                    <FaLock />
+                    <span>{t("careers_security_notice")}</span>
+                  </SecurityNotice>
+
+                  <WizardActionRow>
+                    <WizardBtn type="button" onClick={goToPrevStep}>
+                      {isArabic ? <FaArrowRight /> : <FaArrowLeft />}
+                      <span>{t("careers_step_prev", "السابق")}</span>
+                    </WizardBtn>
+                    <WizardBtn type="submit" $primary disabled={isSubmitting}>
+                      {isSubmitting ? (
+                        <Loader fullscreen={false} />
+                      ) : (
+                        <span>{t("careers_submit_btn", "إرسال طلب الترشح")}</span>
+                      )}
+                    </WizardBtn>
+                  </WizardActionRow>
+                </div>
+              )}
 
               {errorMessage && (
-                <ErrorBanner>
+                <ErrorBanner style={{ marginTop: "1.25rem" }}>
                   <FaExclamationCircle /> {errorMessage}
                 </ErrorBanner>
               )}
-
-              <SubmitBtn type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <Loader fullscreen={false} />
-                ) : (
-                  <>
-                    <span>
-                      {isArabic
-                        ? "إرسال طلب الترشح"
-                        : "Soumettre ma candidature"}
-                    </span>
-                    {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
-                  </>
-                )}
-              </SubmitBtn>
             </form>
           )}
-        </FormWrapper>
+        </WizardCard>
       </Container>
     </PageWrapper>
   );
