@@ -13,6 +13,7 @@ import {
   FaRoute,
   FaApple,
   FaQuestionCircle,
+  FaCar,
 } from "react-icons/fa";
 
 import logoAr from "../assets/logo_ar.webp";
@@ -246,29 +247,29 @@ const Footer = () => {
             </LinkList>
           </Column>
 
-          {/* --- 2. NEW COLUMN: Abridh --- */}
+          {/* Column 3: Abridh */}
           <Column>
-            <ColumnTitle>{t("nav_abridh_beta", "Abridh (Beta)")}</ColumnTitle>
+            <ColumnTitle>{t("nav_abridh_beta", "Abrid Mobilité")}</ColumnTitle>
             <LinkList>
               <StyledLink to="/abridh" $isArabic={isArabic}>
-                <FaRoute size={14} /> {t("tawsila_btn_ride", "Request a trip")}
+                <FaRoute size={14} /> {t("tawsila_btn_ride", "Télécharger l'application Abrid")}
               </StyledLink>
               <StyledLink to="/abridh/drive" $isArabic={isArabic}>
-                {t("tawsila_btn_drive", "Join as a Driving Member")}
+                <FaCar size={14} /> {t("tawsila_btn_drive", "Devenir Capitaine Abridh")}
               </StyledLink>
               <ExternalLink
                 href={links.abridhApp}
                 target="_blank"
                 $isArabic={isArabic}
               >
-                <FaGooglePlay size={14} /> Abridh (Android)
+                <FaGooglePlay size={14} /> Abrid (Android)
               </ExternalLink>
               <ExternalLink
                 href="https://apps.apple.com/dz/app/abridh/id6760981883"
                 target="_blank"
                 $isArabic={isArabic}
               >
-                <FaApple size={14} /> Abridh (iOS)
+                <FaApple size={14} /> Abrid (iOS)
               </ExternalLink>
             </LinkList>
           </Column>

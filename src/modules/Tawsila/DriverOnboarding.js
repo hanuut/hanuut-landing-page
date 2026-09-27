@@ -1,4 +1,4 @@
-// modules/Tawsila/DriverOnboarding.js
+// src/modules/Tawsila/DriverOnboarding.js
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,17 +10,15 @@ import {
   FaCheck,
   FaArrowRight,
   FaArrowLeft,
-  FaMapMarkerAlt
 } from "react-icons/fa";
 
 import Loader from "../../components/Loader";
-
 import TawsilaLayout from "./components/TawsilaLayout";
 import AddressesDropDown from "../../components/AddressesDropDown";
 import { isValidEmail, isValidPhone } from "../../components/validators";
 import {
   checkPhoneNumberAvailability,
-  postSubscribeRequest
+  postSubscribeRequest,
 } from "../SubscribeRequest/services/SubscribeRequest";
 import Seo from "../../components/Seo";
 
@@ -36,7 +34,7 @@ import {
   ProgressFill,
   NavContainer,
   NavButton,
-  ErrorText
+  ErrorText,
 } from "./components/TawsilaWizardComponents";
 
 const VehicleGrid = styled.div`
@@ -51,10 +49,8 @@ const VehicleGrid = styled.div`
 `;
 
 const VehicleCard = styled.div`
-  background: ${(props) =>
-    props.$selected ? "#ecfdf5" : "#ffffff"};
-  border: 2px solid
-    ${(props) => (props.$selected ? "#00875f" : "#e2e8f0")};
+  background: ${(props) => (props.$selected ? "#eff6ff" : "#ffffff")};
+  border: 2px solid ${(props) => (props.$selected ? "#2563eb" : "#e2e8f0")};
   border-radius: 18px;
   padding: 1.5rem 1rem;
   display: flex;
@@ -66,20 +62,20 @@ const VehicleCard = styled.div`
   transition: all 0.2s ease;
   text-align: center;
   box-shadow: ${(props) =>
-    props.$selected ? "0 4px 15px rgba(0, 135, 95, 0.15)" : "none"};
+    props.$selected ? "0 4px 15px rgba(37, 99, 235, 0.15)" : "none"};
 
   &:hover {
-    border-color: ${(props) => (props.$selected ? "#00875f" : "#94a3b8")};
+    border-color: ${(props) => (props.$selected ? "#2563eb" : "#94a3b8")};
     transform: translateY(-2px);
   }
 
   svg {
     font-size: 2.25rem;
-    color: ${(props) => (props.$selected ? "#00875f" : "#64748b")};
+    color: ${(props) => (props.$selected ? "#2563eb" : "#64748b")};
   }
 
   span.title {
-    color: ${(props) => (props.$selected ? "#064e3b" : "#1e293b")};
+    color: ${(props) => (props.$selected ? "#1e3a8a" : "#1e293b")};
     font-weight: 800;
     font-size: 0.95rem;
   }
@@ -91,18 +87,38 @@ const VehicleCard = styled.div`
   }
 `;
 
+const SelectBox = styled.select`
+  width: 100%;
+  padding: 1rem 1.15rem;
+  font-size: 1rem;
+  border-radius: 14px;
+  border: 1.5px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #0f172a;
+  cursor: pointer;
+  font-family: inherit;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  }
+`;
+
 const SuccessCircle = styled(motion.div)`
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background-color: #00875f;
+  background-color: #2563eb;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 2.75rem;
   margin: 0 auto 1.5rem auto;
-  box-shadow: 0 10px 30px rgba(0, 135, 95, 0.3);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
 `;
 
 const TOTAL_STEPS = 4;
@@ -124,7 +140,8 @@ const DriverOnboarding = () => {
     phone: "",
     wilaya: "",
     commune: "",
-    vehicleType: "Berline / Citadine"
+    vehicleType: "Berline / Citadine",
+    autoStatus: "YES",
   });
 
   const updateData = (field, value) => {
@@ -155,7 +172,9 @@ const DriverOnboarding = () => {
     if (step === 2) {
       if (!formData.phone.trim()) {
         return setError(
-          isArabic ? "يرجى إدخال رقم الهاتف." : "Veuillez renseigner votre numéro."
+          isArabic
+            ? "يرجى إدخال رقم الهاتف."
+            : "Veuillez renseigner votre numéro."
         );
       }
       if (!isValidPhone(formData.phone)) {
@@ -230,8 +249,8 @@ const DriverOnboarding = () => {
       email: formData.email.trim(),
       wilaya: formData.wilaya,
       commune: formData.commune,
-      type: "driver", // Matches backend CRM schema
-      businessName: formData.vehicleType
+      type: "driver",
+      businessName: `${formData.vehicleType} | Status: ${formData.autoStatus}`,
     };
 
     try {
@@ -274,16 +293,20 @@ const DriverOnboarding = () => {
             <FaCheck />
           </SuccessCircle>
           <StepTitle>
-            {isArabic ? "تم استلام طلبك بنجاح!" : "Candidature Bien Reçue !"}
+            {isArabic ? "تم استلام ملفك بنجاح!" : "Dossier Reçu avec Succès !"}
           </StepTitle>
           <StepSubtitle>
             {isArabic
-              ? "شكراً لتسجيلك. سيقوم منسق العمليات الميدانية في بجاية بمراجعة ملفك والاتصال بك لتحديد موعد الفحص وتفعيل حسابك."
-              : "Merci pour votre inscription. Notre coordinateur des opérations à Béjaïa vous contactera pour valider vos documents et activer votre profil."}
+              ? "شكراً لتسجيلك ككابتن في أبريذ. سيقوم فريق العمليات بالتواصل معك هاتفياً لمراجعة ملفك وتحديد موعد الفحص وتفعيل حسابك."
+              : "Merci pour votre candidature. Notre équipe des opérations prendra contact avec vous par téléphone pour vérifier vos documents et finaliser l'activation de votre profil."}
           </StepSubtitle>
           <NavButton
             $primary
-            style={{ margin: "2rem auto 0 auto", maxWidth: "260px" }}
+            style={{
+              margin: "2rem auto 0 auto",
+              maxWidth: "260px",
+              background: "#2563eb",
+            }}
             onClick={() => (window.location.href = "/abridh")}
           >
             {isArabic ? "العودة للرئيسية" : "Retour à l'accueil"}
@@ -297,15 +320,21 @@ const DriverOnboarding = () => {
         return (
           <>
             <StepTitle>
-              {isArabic ? "الانضمام ككابتن" : "Devenir Capitaine Abrid"}
+              {isArabic ? "انضم ككابتن مع أبريذ" : "Devenir Capitaine Abridh"}
             </StepTitle>
             <StepSubtitle>
               {isArabic
-                ? "سجّل معلوماتك للمشاركة في المرحلة التجريبية الأولى بمدينة بجاية."
-                : "Renseignez vos coordonnées pour rejoindre la phase pilote à Béjaïa."}
+                ? "سجّل معلوماتك الشخصية للبدء في تفعيل حساب الكابتن الشريك."
+                : "Renseignez vos coordonnées pour rejoindre le réseau des capitaines partenaires."}
             </StepSubtitle>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "1rem",
+              }}
+            >
               <InputGroup $isArabic={isArabic}>
                 <Label>{isArabic ? "الاسم" : "Prénom"}</Label>
                 <PremiumInput
@@ -328,7 +357,9 @@ const DriverOnboarding = () => {
             </div>
 
             <InputGroup $isArabic={isArabic}>
-              <Label>{isArabic ? "البريد الإلكتروني (اختياري)" : "Email (Optionnel)"}</Label>
+              <Label>
+                {isArabic ? "البريد الإلكتروني (اختياري)" : "Email (Optionnel)"}
+              </Label>
               <PremiumInput
                 type="email"
                 placeholder="amine@example.com"
@@ -347,8 +378,8 @@ const DriverOnboarding = () => {
             </StepTitle>
             <StepSubtitle>
               {isArabic
-                ? "سنستخدم هذا الرقم للتواصل معك وتأكيد تفعيل الحساب."
-                : "Ce numéro permettra à notre équipe de vous contacter pour finaliser l'inscription."}
+                ? "سنستخدم هذا الرقم للتواصل معك هاتفياً ومتابعة ملفك."
+                : "Ce numéro permettra à notre équipe de vous joindre directement pour le suivi de votre dossier."}
             </StepSubtitle>
             <InputGroup $isArabic={isArabic}>
               <Label>{isArabic ? "رقم الهاتف" : "Numéro de Téléphone"}</Label>
@@ -369,12 +400,12 @@ const DriverOnboarding = () => {
         return (
           <>
             <StepTitle>
-              {isArabic ? "منطقة النشاط والتنقل" : "Votre Zone de Déplacement"}
+              {isArabic ? "مدينة ونطاق التنقل" : "Votre Zone de Déplacement"}
             </StepTitle>
             <StepSubtitle>
               {isArabic
-                ? "حدد المدينة والبلدية الرئيسية لتنقلاتك المعتادة (نركز حالياً على ولاية بجاية)."
-                : "Sélectionnez votre zone principale de déplacement (Priorité actuelle : Wilaya de Béjaïa)."}
+                ? "حدد المدينة والبلدية الرئيسية التي تتنقل فيها بانتظام."
+                : "Sélectionnez votre wilaya et commune principale d'activité."}
             </StepSubtitle>
             <div
               style={{
@@ -400,12 +431,12 @@ const DriverOnboarding = () => {
         return (
           <>
             <StepTitle>
-              {isArabic ? "صنف المركبة" : "Votre Véhicule"}
+              {isArabic ? "المركبة والوضعية المهنية" : "Véhicule & Statut"}
             </StepTitle>
             <StepSubtitle>
               {isArabic
-                ? "ما هو نوع المركبة التي تستخدمها في تنقلاتك اليومية؟"
-                : "Quel type de véhicule utilisez-vous pour vos trajets quotidiens ?"}
+                ? "اختر صنف مركبتك ووضح وضعيتك المهنية للتسجيل."
+                : "Précisez votre catégorie de véhicule et votre situation d'auto-entrepreneur."}
             </StepSubtitle>
 
             <VehicleGrid>
@@ -414,8 +445,12 @@ const DriverOnboarding = () => {
                 onClick={() => updateData("vehicleType", "Berline / Citadine")}
               >
                 <FaCarSide />
-                <span className="title">{isArabic ? "سيارة سياحية" : "Berline / Citadine"}</span>
-                <span className="sub">{isArabic ? "4 مقاعد ركاب" : "4 places passagers"}</span>
+                <span className="title">
+                  {isArabic ? "سيارة سياحية" : "Berline / Citadine"}
+                </span>
+                <span className="sub">
+                  {isArabic ? "4 مقاعد ركاب" : "4 places passagers"}
+                </span>
               </VehicleCard>
 
               <VehicleCard
@@ -423,8 +458,12 @@ const DriverOnboarding = () => {
                 onClick={() => updateData("vehicleType", "Break / SUV")}
               >
                 <FaCar />
-                <span className="title">{isArabic ? "سيارة واسعة / SUV" : "Break / SUV"}</span>
-                <span className="sub">{isArabic ? "مساحة حقائب واسعة" : "Grand coffre"}</span>
+                <span className="title">
+                  {isArabic ? "سيارة واسعة / SUV" : "Break / SUV"}
+                </span>
+                <span className="sub">
+                  {isArabic ? "مساحة حقائب واسعة" : "Grand coffre"}
+                </span>
               </VehicleCard>
 
               <VehicleCard
@@ -432,10 +471,47 @@ const DriverOnboarding = () => {
                 onClick={() => updateData("vehicleType", "Minibus / Navette")}
               >
                 <FaShuttleVan />
-                <span className="title">{isArabic ? "حافلة صغيرة / فان" : "Minibus / Van"}</span>
-                <span className="sub">{isArabic ? "7 إلى 9 مقاعد" : "7 à 9 places"}</span>
+                <span className="title">
+                  {isArabic ? "فان / حافلة صغيرة" : "Minibus / Van"}
+                </span>
+                <span className="sub">
+                  {isArabic ? "7 إلى 9 مقاعد" : "7 à 9 places"}
+                </span>
               </VehicleCard>
             </VehicleGrid>
+
+            <div style={{ height: "1.25rem" }} />
+
+            <InputGroup $isArabic={isArabic}>
+              <Label>
+                {t(
+                  "candidate_auto_entrepreneur_label",
+                  "Statut Auto-Entrepreneur (ANAE)"
+                )}
+              </Label>
+              <SelectBox
+                value={formData.autoStatus}
+                onChange={(e) => updateData("autoStatus", e.target.value)}
+              >
+                <option value="YES">
+                  {t(
+                    "auto_ent_yes",
+                    "✅ نعم، حامل لبطاقة المقاول الذاتي (ANAE)"
+                  )}
+                </option>
+                <option value="IN_PROGRESS">
+                  {t(
+                    "auto_ent_in_progress",
+                    "⏳ بصدد استخراج البطاقة / مستعد للتسجيل"
+                  )}
+                </option>
+                <option value="NO">
+                  {isArabic
+                    ? "❌ لا أملكها حالياً (أحتاج لمساعدة وتوجيه)"
+                    : "❌ Pas encore de statut (Besoin d'accompagnement)"}
+                </option>
+              </SelectBox>
+            </InputGroup>
           </>
         );
 
@@ -450,7 +526,7 @@ const DriverOnboarding = () => {
         title={`${t("abrid_btn_captain", "Devenir Capitaine")} | Abrid`}
         description={t(
           "abrid_hero_sub",
-          "Rejoignez la communauté des Capitaines Abrid à Béjaïa. Partagez vos trajets du quotidien."
+          "Rejoignez la communauté des Capitaines Abridh. Partagez vos trajets du quotidien."
         )}
         url="https://hanuut.com/abridh/drive"
       />
@@ -462,6 +538,9 @@ const DriverOnboarding = () => {
               initial={{ width: 0 }}
               animate={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
               transition={{ duration: 0.3 }}
+              style={{
+                background: "linear-gradient(90deg, #2563eb 0%, #38bdf8 100%)",
+              }}
             />
           </ProgressContainer>
         )}
@@ -510,11 +589,21 @@ const DriverOnboarding = () => {
                   <span>{isArabic ? "السابق" : "Retour"}</span>
                 </NavButton>
 
-                <NavButton $primary type="button" onClick={handleNext} disabled={isSubmitting}>
+                <NavButton
+                  $primary
+                  type="button"
+                  onClick={handleNext}
+                  disabled={isSubmitting}
+                  style={{ background: "#2563eb" }}
+                >
                   {isSubmitting ? (
                     <Loader fullscreen={false} />
                   ) : step === TOTAL_STEPS ? (
-                    <span>{isArabic ? "إرسال طلب الانضمام" : "Envoyer ma candidature"}</span>
+                    <span>
+                      {isArabic
+                        ? "إرسال طلب الانضمام"
+                        : "Envoyer ma candidature"}
+                    </span>
                   ) : (
                     <>
                       <span>{isArabic ? "التالي" : "Suivant"}</span>

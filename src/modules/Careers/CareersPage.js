@@ -17,8 +17,12 @@ import {
 import Seo from "../../components/Seo";
 import { JOBS_DATA, DEFERRED_ROLES } from "./data/careersData";
 
+// --- Ambient Light Animation ---
 const pulseGlow = keyframes`
-  0% { transform: translate(-30%, -20%) scale(1); opacity: 0.45; }  50% { transform: translate(20%, 20%) scale(1.15); opacity: 0.7; }  100% { transform: translate(-30%, -20%) scale(1); opacity: 0.45; }`;
+  0% { transform: translate(-30%, -20%) scale(1); opacity: 0.45; }
+  50% { transform: translate(20%, 20%) scale(1.15); opacity: 0.7; }
+  100% { transform: translate(-30%, -20%) scale(1); opacity: 0.45; }
+`;
 
 const PageWrapper = styled.main`
   min-height: 100vh;
@@ -33,6 +37,7 @@ const PageWrapper = styled.main`
       : "var(--font-primary, 'Tajawal'), sans-serif"};
 `;
 
+// --- Hero Section ---
 const HeroWrapper = styled.section`
   position: relative;
   width: 100%;
@@ -212,6 +217,75 @@ const OpeningsSection = styled.section`
   gap: 1.5rem;
 `;
 
+// --- Dedicated Captain Banner (Captain Blue #2563EB) ---
+const CaptainHighlightBanner = styled.div`
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  color: #ffffff;
+  border-radius: 24px;
+  padding: 2.25rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
+  text-align: ${(props) => (props.$isArabic ? "right" : "left")};
+  margin-bottom: 2rem;
+
+  .text-side {
+    max-width: 620px;
+
+    .badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    h3 {
+      font-size: 1.55rem;
+      font-weight: 900;
+      margin: 0 0 0.5rem 0;
+      color: #ffffff;
+    }
+
+    p {
+      color: #dbeafe;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+`;
+
+const CaptainApplyBtn = styled(Link)`
+  background: #ffffff;
+  color: #1e3a8a;
+  padding: 0.95rem 2rem;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+
+  &:hover {
+    background: #eff6ff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+`;
+
 const SectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -246,7 +320,7 @@ const JobList = styled.div`
 const JobCard = styled(Link)`
   text-decoration: none;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid ${(props) => (props.$isCaptain ? "#bfdbfe" : "#e2e8f0")};
   border-radius: 20px;
   padding: 1.75rem 2.25rem;
   display: flex;
@@ -256,9 +330,13 @@ const JobCard = styled(Link)`
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 
   &:hover {
-    border-color: #10b981;
+    border-color: ${(props) => (props.$isCaptain ? "#2563eb" : "#10b981")};
     transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.12);
+    box-shadow: 0 10px 30px
+      ${(props) =>
+        props.$isCaptain
+          ? "rgba(37, 99, 235, 0.12)"
+          : "rgba(16, 185, 129, 0.12)"};
   }
 
   @media (max-width: 768px) {
@@ -287,8 +365,8 @@ const JobMeta = styled.div`
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-weight: 800;
-    color: #2563eb;
-    background: #eff6ff;
+    color: ${(props) => (props.$isCaptain ? "#1e40af" : "#2563eb")};
+    background: ${(props) => (props.$isCaptain ? "#dbeafe" : "#eff6ff")};
     padding: 3px 10px;
     border-radius: 6px;
   }
@@ -329,7 +407,7 @@ const ActionArrow = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #059669;
+  color: ${(props) => (props.$isCaptain ? "#2563eb" : "#059669")};
   font-weight: 800;
   font-size: 1rem;
   white-space: nowrap;
@@ -459,7 +537,7 @@ const CareersPage = () => {
         title={t("careers_seo_title", "Rejoignez l'équipe | Abridh & Hanuut")}
         description={t(
           "careers_seo_desc",
-          "Construisez des solutions concrètes avec un réel impact. Découvrez les opportunités pour le lancement d'Abridh à Béjaïa.",
+          "Construisez des solutions concrètes avec un réel impact. Découvrez les opportunités pour le lancement d'Abridh à Béjaïa."
         )}
         url="https://hanuut.com/careers"
       />
@@ -481,7 +559,7 @@ const CareersPage = () => {
           <Subtitle>
             {t(
               "careers_hero_sub",
-              "Nous sommes une équipe resserrée qui prépare le lancement opérationnel d'Abridh à Béjaïa. Nous privilégions une forte responsabilité personnelle, des architectures logicielles propres et des solutions concrètes pour rendre le quotidien en Algérie plus serein et plus fiable.",
+              "Nous sommes une équipe resserrée qui prépare le lancement opérationnel d'Abridh à Béjaïa. Nous privilégions une forte responsabilité personnelle, des architectures logicielles propres et des solutions concrètes pour rendre le quotidien en Algérie plus serein et plus fiable."
             )}
           </Subtitle>
         </HeroContent>
@@ -496,7 +574,7 @@ const CareersPage = () => {
             <h3>
               {t(
                 "careers_val_1_title",
-                "Un produit réel, ancré sur le terrain",
+                "Un produit réel, ancré sur le terrain"
               )}
             </h3>
             <p>{t("careers_val_1_desc")}</p>
@@ -522,6 +600,21 @@ const CareersPage = () => {
         </ValueGrid>
 
         <OpeningsSection id="openings">
+          {/* Captain Specialized Highlight Card */}
+          <CaptainHighlightBanner $isArabic={isArabic}>
+            <div className="text-side">
+              <span className="badge">
+                {t("careers_dep_mobility", "Opérations & Mobilité")}
+              </span>
+              <h3>{t("careers_captain_highlight_title")}</h3>
+              <p>{t("careers_captain_highlight_desc")}</p>
+            </div>
+            <CaptainApplyBtn to="/abridh/drive">
+              <span>{t("careers_captain_highlight_btn")}</span>
+              {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+            </CaptainApplyBtn>
+          </CaptainHighlightBanner>
+
           <SectionHeader>
             <h2>{t("careers_open_roles", "Postes ouverts actuellement")}</h2>
             <span className="counter">
@@ -535,28 +628,36 @@ const CareersPage = () => {
               const department = resolveText(
                 job.department,
                 langKey,
-                "Engineering",
+                "Engineering"
               );
               const location = resolveText(
                 job.location,
                 langKey,
-                "Béjaïa, Algeria",
+                "Béjaïa, Algeria"
               );
               const contract = resolveText(
                 job.contractType,
                 langKey,
-                "Freelance / CDI",
+                "Freelance / CDI"
               );
+              const isCaptain = job.isCaptainRole;
+              const targetUrl = isCaptain
+                ? "/abridh/drive"
+                : `/careers/${job.slug}`;
 
               return (
-                <JobCard key={job.slug} to={`/careers/${job.slug}`}>
-                  <JobMeta $isArabic={isArabic}>
+                <JobCard
+                  key={job.slug}
+                  to={targetUrl}
+                  $isCaptain={isCaptain}
+                >
+                  <JobMeta $isArabic={isArabic} $isCaptain={isCaptain}>
                     <div className="tag-row">
                       <span className="dep-tag">{department}</span>
                       <span className="auto-badge">
                         {t(
                           "careers_auto_ent_badge",
-                          "Auto-Entrepreneur Préféré",
+                          "Auto-Entrepreneur Préféré"
                         )}
                       </span>
                     </div>
@@ -571,9 +672,14 @@ const CareersPage = () => {
                       </span>
                     </div>
                   </JobMeta>
-                  <ActionArrow $isArabic={isArabic}>
+                  <ActionArrow $isArabic={isArabic} $isCaptain={isCaptain}>
                     <span>
-                      {t("careers_view_role", "Consulter l'offre & Postuler")}
+                      {isCaptain
+                        ? t("abrid_btn_captain", "Devenir Capitaine")
+                        : t(
+                            "careers_view_role",
+                            "Consulter l'offre & Postuler"
+                          )}
                     </span>
                     {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
                   </ActionArrow>
@@ -595,7 +701,7 @@ const CareersPage = () => {
             >
               {t("careers_deferred_title", "Prochains recrutements (À venir)")}
             </h3>
-            <p style={{ color: "#64748b", fontSize: "#0.95rem", margin: 0 }}>
+            <p style={{ color: "#64748b", fontSize: "0.95rem", margin: 0 }}>
               {t("careers_deferred_sub")}
             </p>
           </div>
@@ -620,7 +726,7 @@ const CareersPage = () => {
             <h3>
               {t(
                 "careers_contact_title",
-                "Vous ne trouvez pas de poste correspondant ?",
+                "Vous ne trouvez pas de poste correspondant ?"
               )}
             </h3>
             <p>{t("careers_contact_desc")}</p>

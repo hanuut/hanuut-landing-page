@@ -12,6 +12,115 @@ rQIDAQAB
 
 export const JOBS_DATA = [
   {
+    slug: "capitaine-partenaire-abridh",
+    title: {
+      ar: "كابتن شريك / عضو سائق (Abridh Captain)",
+      fr: "Capitaine Partenaire / Membre Conducteur (Abridh)",
+      en: "Partner Captain / Driving Member (Abridh)",
+    },
+    department: {
+      ar: "العمليات وشبكة التنقل",
+      fr: "Opérations & Mobilité",
+      en: "Operations & Mobility",
+    },
+    location: {
+      ar: "الجزائر (بجاية، باتنة والمدن المجاورة)",
+      fr: "Algérie (Béjaïa, Batna et environs)",
+      en: "Algeria (Béjaïa, Batna & surrounding hubs)",
+    },
+    contractType: {
+      ar: "شراكة مستقلة / مقاول ذاتي (مرونة كاملة)",
+      fr: "Partenariat Indépendant / Auto-Entrepreneur (Flexibilité totale)",
+      en: "Independent Partnership / Auto-Entrepreneur (Full Flexibility)",
+    },
+    priority: 0,
+    status: "OPEN",
+    isCaptainRole: true,
+    mission: {
+      ar: "الانضمام إلى شبكة كباتن أبريذ لتقديم خدمات تنقل محترمة وموثوقة للركاب ونقل الطرود، مع الاستفادة من حرية كاملة في تحديد أوقات العمل ومداخيل يومية واضحة.",
+      fr: "Rejoindre le réseau des Capitaines Abridh pour assurer des déplacements fiables et courtois aux passagers et réaliser des missions de livraison, en bénéficiant d'une liberté totale d'horaires et de revenus transparents.",
+      en: "Join the Abridh Captains network to provide reliable, courteous transportation for commuters and delivery missions, enjoying complete schedule freedom and transparent daily earnings.",
+    },
+    whyExists: {
+      ar: "لا يمكن لأي تكنولوجيا أن تنجح دون وجود كباتن موثوقين ومحترمين على أرض الواقع. نبحث عن شركاء يشاركوننا قيم الاحترام والأمانة لجعل التنقل في الجزائر أكثر راحة وهدوءاً.",
+      fr: "La technologie n'a de valeur que portée par des partenaires de confiance sur le terrain. Nous recherchons des conducteurs professionnels et bienveillants pour offrir un service de mobilité digne et sécurisé en Algérie.",
+      en: "Great technology is meaningless without dependable, courteous partners on the road. We are seeking committed drivers who share our values of respect and safety to elevate daily mobility in Algeria.",
+    },
+    responsibilities: {
+      ar: [
+        "استقبال طلبات الرحلات ومهمات التوصيل عبر تطبيق الكابتن وقبولها بكل حرية واستقلالية.",
+        "استقبال الركاب بأسلوب لبق ومحترم والالتزام بالمسار المحدد بأمان.",
+        "الحفاظ على نظافة السيارة ومظهرها العام وتوفير بيئة تنقل مريحة ومكيفة.",
+        "الالتزام بقواعد المرور والقيادة الآمنة وتجنب السرعة أو التهور.",
+        "التواصل الإيجابي مع فريق الدعم الميداني في حال وجود أي استفسار أو ملاحظة.",
+      ],
+      fr: [
+        "Recevoir et accepter les demandes de courses ou de livraisons via l'application Capitaine en totale autonomie.",
+        "Accueillir les passagers avec courtoisie, écoute et professionnalisme.",
+        "Maintenir un véhicule propre, soigné et confortable tout au long de la journée.",
+        "Adopter une conduite prudente et exemplaire dans le strict respect du code de la route.",
+        "Échanger avec l'équipe de coordination terrain pour toute assistance ou amélioration du service.",
+      ],
+      en: [
+        "Receive and accept ride requests or local delivery missions via the Captain app with complete freedom.",
+        "Welcome passengers with courtesy, respect, and professional hospitality.",
+        "Maintain a clean, comfortable, and well-kept vehicle environment.",
+        "Practice safe, attentive driving strictly respecting local road regulations.",
+        "Collaborate with our local operations team whenever on-the-ground support is needed.",
+      ],
+    },
+    mustHave: {
+      ar: [
+        "امتلاك رخصة سياقة سارية المفعول لأكثر من سنتين مع سجل قيادة نظيف.",
+        "حيازة سيارة سياحية بحالة ميكانيكية وجمالية ممتازة ونظيفة ومجهزة بمكيف هواء يعمل بكفاءة.",
+        "هاتف ذكي بنظام أندرويد أو iOS مع اتصال إنترنت مستقر.",
+        "حسن السيرة والسلوك، واللباقة في الحديث، والالتزام بأعلى معايير الاحترام والأمانة.",
+        "معرفة جيدة بمحاور وأحياء مدينتك وتفرعاتها الرئيسية.",
+      ],
+      fr: [
+        "Permis de conduire valide depuis au moins 2 ans avec une conduite irréprochable.",
+        "Véhicule récent, en excellent état mécanique et esthétique, doté d'une climatisation fonctionnelle.",
+        "Smartphone récent (Android ou iOS) avec connexion internet stable.",
+        "Excellente présentation, sens de l'accueil, courtoisie et rigueur personnelle.",
+        "Très bonne connaissance des quartiers et des principaux axes de circulation locaux.",
+      ],
+      en: [
+        "Valid driver's license held for at least 2 years with a clean driving record.",
+        "A well-maintained, clean passenger car in great mechanical condition with functioning air conditioning.",
+        "Modern smartphone (Android or iOS) with a dependable mobile internet connection.",
+        "Courteous communication, professional demeanor, and a strong sense of personal integrity.",
+        "Solid knowledge of your city's layout, transit corridors, and neighborhoods.",
+      ],
+    },
+    preferred: {
+      ar: [
+        "حيازة بطاقة المقاول الذاتي (ANAE) أو الاستعداد للحصول عليها بمرافقة وإرشاد من فريقنا لتسهيل الفوترة.",
+        "خبرة سابقة في النقل، السياحة، أو خدمة العملاء والاستقبال.",
+        "الإقامة في بجاية، باتنة، أو المدن المجاورة.",
+      ],
+      fr: [
+        "Titulaire de la carte Auto-Entrepreneur (ANAE) ou prêt à l'obtenir avec l'accompagnement de notre équipe.",
+        "Expérience préalable dans le transport, le tourisme ou la relation client.",
+        "Résidence à Béjaïa, Batna ou dans les agglomérations environnantes.",
+      ],
+      en: [
+        "Registered Auto-Entrepreneur (ANAE card) or willing to acquire it with our team's guidance.",
+        "Prior experience in passenger transport, tourism, or professional customer hospitality.",
+        "Residing in Béjaïa, Batna, or surrounding metropolitan areas.",
+      ],
+    },
+    specificQuestion: {
+      ar: "ما هي نوع وسنة سيارتك؟ وما هي أوقات فراغك المعتادة لتلقي الرحلات؟",
+      fr: "Quel est le modèle et l'année de votre véhicule ? Quels sont vos créneaux habituels de disponibilité ?",
+      en: "What is your vehicle model and year? What is your typical weekly availability for trips?",
+    },
+    questionPlaceholder: {
+      ar: "اذكر موديل السيارة وسنتها، والمدينة التي تتنقل فيها...",
+      fr: "Indiquez le modèle, l'année du véhicule et votre ville de déplacement...",
+      en: "State your car model, year, and your primary driving city...",
+    },
+  },
+  {
     slug: "senior-mobile-systems-engineer",
     title: {
       ar: "مهندس أول لتطبيقات وأنظمة الهاتف (Flutter)",
